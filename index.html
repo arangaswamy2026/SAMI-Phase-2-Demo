@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAMI Phase 2 — Prototype Index</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #f4f6f9;
+    color: #1a2332;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: #001b50;
+    padding: 28px 40px 24px;
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+    border-bottom: 3px solid #ff5d00;
+  }
+  .header-logo {
+    width: 32px; height: 32px;
+    background: #ff5d00;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 800; color: #fff; letter-spacing: -1px;
+    flex-shrink: 0;
+  }
+  .header-title { font-size: 22px; font-weight: 700; color: #fff; letter-spacing: -0.02em; }
+  .header-sub { font-size: 13px; color: #7ba0cc; margin-top: 3px; font-weight: 400; }
+  .header-meta { margin-left: auto; font-size: 12px; color: #4a6a8c; text-align: right; }
+  .header-meta strong { color: #7ba0cc; }
+
+  /* ── Layout ── */
+  .container { max-width: 1280px; margin: 0 auto; padding: 36px 40px 60px; }
+
+  /* ── Section heading ── */
+  .section { margin-bottom: 44px; }
+  .section-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #dde3ec;
+  }
+  .section-icon {
+    width: 28px; height: 28px; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; flex-shrink: 0;
+  }
+  .ic-blue   { background: #e8f0fb; color: #1a55c7; }
+  .ic-orange { background: #fff0e8; color: #ff5d00; }
+  .ic-green  { background: #eaf6e2; color: #3a8c1e; }
+  .ic-purple { background: #f3eeff; color: #7c3aed; }
+  .ic-teal   { background: #e4f6f5; color: #0e7c7a; }
+
+  .section-title { font-size: 16px; font-weight: 700; color: #001b50; letter-spacing: -0.01em; }
+  .section-desc  { font-size: 12.5px; color: #6a86a6; margin-top: 1px; }
+
+  /* ── Grid ── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 14px;
+  }
+
+  /* ── Card ── */
+  .card {
+    background: #fff;
+    border: 1px solid #dde3ec;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: box-shadow 0.18s, border-color 0.18s, transform 0.18s;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+  }
+  .card:hover {
+    box-shadow: 0 6px 24px rgba(0,27,80,0.10);
+    border-color: #b0c8e8;
+    transform: translateY(-2px);
+  }
+
+  .card-accent { height: 3px; flex-shrink: 0; }
+  .ca-blue   { background: #1a55c7; }
+  .ca-orange { background: #ff5d00; }
+  .ca-green  { background: #3a8c1e; }
+  .ca-purple { background: #7c3aed; }
+  .ca-teal   { background: #0e7c7a; }
+  .ca-amber  { background: #d97706; }
+  .ca-red    { background: #c70f0f; }
+
+  .card-body { padding: 16px 18px 14px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+
+  .card-top { display: flex; align-items: flex-start; gap: 10px; }
+  .version-badge {
+    font-size: 10px; font-weight: 700;
+    padding: 2px 7px; border-radius: 4px;
+    background: #001b50; color: #fff;
+    letter-spacing: 0.04em;
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .vb-latest { background: #ff5d00; }
+  .vb-standalone { background: #3a8c1e; }
+
+  .card-name { font-size: 14px; font-weight: 600; color: #0e2841; line-height: 1.35; flex: 1; }
+  .card-filename { font-size: 11px; color: #9ab0c8; font-family: 'Courier New', monospace; margin-top: 2px; }
+
+  .card-changes {
+    display: flex; flex-direction: column; gap: 5px;
+    margin-top: 4px;
+  }
+  .change-item {
+    display: flex; align-items: flex-start; gap: 7px;
+    font-size: 12px; color: #4a6a8c; line-height: 1.45;
+  }
+  .change-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #b0c8e8; flex-shrink: 0; margin-top: 4px;
+  }
+  .change-dot.changed { background: #ff5d00; }
+  .change-dot.added   { background: #3a8c1e; }
+  .change-dot.removed { background: #c70f0f; }
+  .change-dot.neutral { background: #9ab0c8; }
+
+  .card-footer {
+    padding: 9px 18px;
+    background: #f8fafc;
+    border-top: 1px solid #edf1f7;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .card-date { font-size: 11px; color: #9ab0c8; }
+  .open-link {
+    font-size: 11.5px; font-weight: 600; color: #1a55c7;
+    text-decoration: none; display: flex; align-items: center; gap: 4px;
+  }
+  .open-link:hover { color: #ff5d00; }
+  .open-link::after { content: '↗'; font-size: 11px; }
+
+  /* ── Legend ── */
+  .legend {
+    display: flex; align-items: center; gap: 20px;
+    background: #fff; border: 1px solid #dde3ec;
+    border-radius: 8px; padding: 10px 16px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+  .legend-title { font-size: 11px; font-weight: 700; color: #6a86a6; text-transform: uppercase; letter-spacing: 0.06em; margin-right: 4px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: #4a6a8c; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* ── Summary stats ── */
+  .stats-bar {
+    display: flex; gap: 12px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+  .stat-chip {
+    background: #fff; border: 1px solid #dde3ec;
+    border-radius: 8px; padding: 10px 16px;
+    display: flex; flex-direction: column; gap: 2px;
+    min-width: 110px;
+  }
+  .stat-val { font-size: 22px; font-weight: 700; color: #001b50; line-height: 1; }
+  .stat-lbl { font-size: 11px; color: #6a86a6; font-weight: 500; margin-top: 2px; }
+
+  /* ── Edit mode ── */
+  .edit-bar {
+    position: sticky; top: 0; z-index: 100;
+    background: #001b50;
+    border-bottom: 2px solid #ff5d00;
+    padding: 10px 40px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .edit-toggle {
+    font-size: 12.5px; font-weight: 600;
+    padding: 6px 14px; border-radius: 6px;
+    border: 1.5px solid #4a6a8c; color: #b0c8e8;
+    background: transparent; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .edit-toggle:hover { border-color: #ff5d00; color: #ff5d00; }
+  .edit-toggle.active { background: #ff5d00; border-color: #ff5d00; color: #fff; }
+  .save-btn {
+    font-size: 12.5px; font-weight: 700;
+    padding: 6px 18px; border-radius: 6px;
+    border: none; background: #3a8c1e; color: #fff; cursor: pointer;
+    display: none; transition: background 0.15s;
+  }
+  .save-btn:hover { background: #2e7015; }
+  .save-btn.saving { background: #6a86a6; cursor: default; }
+  .save-status {
+    font-size: 12px; color: #7ba0cc;
+    display: none;
+  }
+  .edit-hint {
+    font-size: 11.5px; color: #4a6a8c;
+    display: none;
+    margin-left: 4px;
+  }
+
+  /* Editable field styles */
+  .card-name[contenteditable="true"],
+  .change-item[contenteditable="true"] {
+    outline: none;
+    border-radius: 4px;
+    padding: 2px 5px;
+    margin: -2px -5px;
+    background: rgba(255,255,255,0.06);
+    border: 1.5px dashed #b0c8e8;
+    cursor: text;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .card-name[contenteditable="true"]:focus,
+  .change-item[contenteditable="true"]:focus {
+    background: #fff;
+    border-color: #ff5d00;
+    color: #0e2841;
+    box-shadow: 0 0 0 3px rgba(255,93,0,0.12);
+  }
+  .change-item[contenteditable="true"] {
+    display: block;
+  }
+  .change-dot { pointer-events: none; }
+
+  body.edit-active .card { cursor: default; transform: none !important; box-shadow: none !important; }
+  body.edit-active .card:hover { border-color: #dde3ec; }
+  body.edit-active .open-link { pointer-events: none; opacity: 0.4; }
+</style>
+</head>
+<body>
+
+<!-- Edit bar -->
+<div class="edit-bar" id="editBar">
+  <button class="edit-toggle" id="editToggle" onclick="toggleEdit()">✏ Edit Mode</button>
+  <button class="save-btn" id="saveBtn" onclick="saveChanges()">Save to File</button>
+  <span class="edit-hint" id="editHint">Click any card title or description bullet to edit it</span>
+  <span class="save-status" id="saveStatus"></span>
+</div>
+
+<header class="header">
+  <div class="header-logo">S</div>
+  <div>
+    <div class="header-title">SAMI Phase 2 — Prototype Index</div>
+    <div class="header-sub">Design iteration history · all prototypes in one place</div>
+  </div>
+  <div class="header-meta">
+    <strong>33 files</strong> across 6 groups<br>
+    Last modified May 20, 2026
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- Stats -->
+  <div class="stats-bar">
+    <div class="stat-chip"><div class="stat-val">11</div><div class="stat-lbl">Overview iterations</div></div>
+    <div class="stat-chip"><div class="stat-val">6</div><div class="stat-lbl">NSM Dashboard variants</div></div>
+    <div class="stat-chip"><div class="stat-val">5</div><div class="stat-lbl">Standalone screens</div></div>
+    <div class="stat-chip"><div class="stat-val">4</div><div class="stat-lbl">Workflow explorations</div></div>
+    <div class="stat-chip"><div class="stat-val">2</div><div class="stat-lbl">UM Dashboard variants</div></div>
+    <div class="stat-chip"><div class="stat-val">1</div><div class="stat-lbl">Partner landing</div></div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <span class="legend-title">Change type</span>
+    <div class="legend-item"><div class="legend-dot" style="background:#ff5d00"></div>Modified</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#3a8c1e"></div>Added</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#c70f0f"></div>Removed</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#9ab0c8"></div>Structural / token</div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- GROUP 1: SAMI Overview Series -->
+  <!-- ══════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-icon ic-blue">◎</div>
+      <div>
+        <div class="section-title">SAMI Overview — Iteration Series</div>
+        <div class="section-desc">Multi-tenant AI dashboard · 11 versions · v1 → v11</div>
+      </div>
+    </div>
+
+    <div class="grid">
+
+      <!-- v1 -->
+      <a class="card" href="01_overview.html" target="_blank">
+        <div class="card-accent ca-blue"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="version-badge">V1</span>
+            <div>
+              <div class="card-name">Overview — Baseline with 5-Metric KPI Strip + Sparklines</div>
+              <div class="card-filename">01_overview.html</div>
+            </div>
+          </div>
+          <div class="card-changes">
+            <div class="change-item"><div class="change-dot neutral"></div>Initial layout: stat card row (Auto-Resolved, Hours Saved, ARR Protected, Avg Resolution, Needs Attention)</div>
+            <div class="change-item"><div class="change-dot neutral"></div>Each card has sparkline chart + animated count-up + delta label</div>
+            <div class="change-item"><div class="change-dot neutral"></div>4-column SAMI Recommendation grid below</div>
+          </div>
+        </div>
+        <div class="card-footer"><span class="card-date">May 15, 2026</span><span class="open-link">Open</span></div>
+      </a>
+
+      <!-- v2 -->
+      <a class="card" href="01_overview_v2.html" target="_blank">
+        <div class="card-accent ca-blue"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="version-badge">V2</span>
+            <div>
+              <div class="card-name">Overview — KPI Strip Removed, Simplified Hero Section</div>
+              <div class="card-filename">01_overview_v2.html</div>
+            </div>
+          </div>
+          <div class="card-changes">
+            <div class="change-item"><div class="change-dot removed"></div>Removed 5-card KPI strip (stats-5 row) with sparklines</div>
+            <div class="change-item"><div class="change-dot neutral"></div>Cleaner page header — hero text alone without metric cards</div>
+          </div>
+        </div>
+        <div class="card-footer"><span class="card-date">May 15, 2026</span><span class="open-link">Open</span></div>
+      </a>
+
+      <!-- v3 -->
+      <a class="card" href="01_overview_v3.html" target="_blank">
+        <div class="card-accent ca-blue"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="version-badge">V3</span>
+            <div>
+              <div class="card-name">Overview — Autonomy Rate Donut Banner Introduced</div>
+              <div class="card-filename">01_overview_v3.html</div>
+            </div>
+          </div>
+          <div class="card-changes">
+            <div class="change-item"><div class="change-dot added"></div>Autonomy banner: donut chart (93.6%), headline "44 of 52 issues autonomous", legend (green / red)</div>
+            <div class="change-item"><div class="change-dot changed"></div>Needs Attention card icon changed from blue to orange</div>
+            <div class="change-item"><div class="change-dot added"></div>Live Activity card added alongside Needs Attention</div>
+          </div>
+        </div>
+        <div class="card-footer"><span class="card-date">May 15, 2026</span><span class="open-link">Open</span></div>
+      </a>
+
+      <!-- v4 -->
+      <a class="card" href="01_overview_v4.html" target="_blank">
+        <div class="card-accent ca-blue"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="version-badge">V4</span>
+            <div>
+              <div class="card-name">Overview — "Surface Known Issues" Badge De-emphasised</div>
+              <div class="card-filename">01_overview_v4.html</div>
+            </div>
+          </div>
+          <div class="card-changes">
+            <div class="change-item"><div class="change-dot changed"></div>"Surface Known Issues" action badge changed from orange fill to neutral/muted background</div>
+            <div class="change-item"><div class="change-dot neutral"></div>No structural layout changes from v3</div>
+          </div>
+        </div>
+        <div class="card-footer"><span class="card-date">May 15, 2026</span><span class="open-link">Open</span></div>
+      </a>
+
+      <!-- v5 -->
+      <a class="card" href="01_overview_v5.html" target="_blank">
+        <div class="card-accent ca-blue"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="version-badge">V5</span>
+            <div>
+              <div class="card-name">Overview — Action Badge Fully Neutralised (White Fill)</div>
+              <div class="card-filename">01_overview_v5.html</div>
+            </div>
+          </div>
+          <div class="card-changes">
+            <div class="change-item"><div class="change-dot changed"></div>Action badge background changed to white with neutral border (removed orange tint from v4)</div>
+            <div class="change-item"><div class="change-dot neutral"></div>Isolated styling change only; all other layout identical to v4</div>
+          </div>
+        </div>
+        <div class="card-footer"><span class="card-date">May 15, 2026</span><span class="open-link">Open</span></div>
+      </a>
+
+      <!-- v6 -->
+      <a class="card" href="01_overview_v6.html" target="_blank">
+        <div class="card-accent ca-blue"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="version-badge">V6</span>
+            <div>
+              <div class="card-name">Overview — Recommendations Section Removed (Compact Layout)</div>
+              <div class="card-filename">01_overview_v6.html</div>
+            </div>
+          </div>
+          <div class="card-changes">
+            <div class="change-item"><div class="change-dot removed"></div>Entire SAMI Recommendations card grid removed (−431 lines)</div>
+            <div class="change-item"><div class="change-dot neutral"></div>Focus shifted to Needs Attention + Live Activity only</div>
+          </div>
+        </div>
+        <div class="card-footer"><span class="card-date">May 15, 2026</span><span class="open-link">Open</span></div>
+      </a>
+
+      <!-- v7 -->
+      <a class="card" href="01_overview_v7.html" target="_blank">
+        <div class="card-accent ca-blue"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="version-badge">V7</span>
+            <div>
+              <div class="card-name">Overview — Recommendations Restored as 5-Column Grid + Shared Legend Sidebar</div>
+              <div class="card-filename">01_overview_v7.html</div>
+            </div>
+          </div>
+          <div class="card-changes">
+            <div class="change-item"><div class="change-dot added"></div>Recommendations section restored with new layout: outer flex wrapper (sami-recs-outer)</div>
+            <div class="change-item"><div class="change-dot changed"></div>Grid expanded from 4-column to 5-column</div>
+            <div class="change-item"><div class="change-dot added"></div>Shared legend sidebar panel added (min-width 108px) with colour-coded severity dots</div>
+          </div>
+        </div>
+        <div class="card-footer"><span class="card-date">May 15, 2026</span><span class="open-link">Open</span></div>
+      </a>
+
+      <!-- v8 -->
+      <a class="card" href="01_overview_v8.html" target="_blank">
+        <div class="card-accent ca-orange"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="version-badge">V8</span>
+            <div>
+              <div class="card-name">Overview — Full SonicWall Brand Token Refresh + Gradient Topbar</div>
+              <div class="card-filename">01_overview_v8.html</div>
+            </div>
+          </div>
+          <div class="card-changes">
+            <div class="change-item"><div class="change-dot added"></div>Introduced --snwl-navy, --snwl-orange, --snwl-blue, --snwl-pale-bg brand tokens</div>
+            <div class="change-item"><div class="change-dot changed"></div>Topbar gets gradient background (pale blue radials + orange accent) and bottom border update</div>
+            <div class="change-item"><div class="change-dot changed"></div>All text tokens remapped to SonicWall navy/blue scale</div>
+            <div class="change-item"><div class="change-dot added"></div>Orange divider line (ph-divider) added below page title</div>
+          </div>
+        </div>
+        <div class="card-footer"><span class="card-date">May 15, 2026</span><span class="open-link">Open</span></div>
+      </a>
+
+      <!-- v9 -->
+      <a class="card" href="01_overview_v9_2026-05-15.html" target="_blank">
+        <div class="card-accent ca-orange"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="version-badge">V9</span>
+            <div>
+              <div class="card-name">Overview — "Needs Attention" Redesigned as Standalone Cards with SAMI Analysis Block</div>
+              <div class="card-filename">01_overview_v9_2026-05-15.html</div>
+            </div>
+          </div>
+          <div class="card-changes">
+            <div class="change-item"><div class="change-dot changed"></div>Needs Attention items upgraded from flat list rows to individual cards (attn-card)</div>
+            <div class="change-item"><div class="change-dot added"></div>SAMI Analysis block per card: purple left-border, violet label + AI reasoning text</div>
+            <div class="change-item"><div class="change-dot changed"></div>Section dividers changed from orange bar to full-width horizontal rule style</div>
+          </div>
+        </div>
+        <div class="card-footer"><span class="card-date">May 15, 2026</span><span class="open-link">Open</span></div>
+      </a>
+
+      <!-- v10 -->
+      <a class="card" href="01_overview_v10_2026-05-15.html" target="_blank">
+        <div class="card-accent ca-orange"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="version-badge">V10</span>
+            <div>
+              <div class="card-name">Overview — Attention Card Header Regrouped; SAMI Analysis Block Restyled Orange</div>
+              <div class="card-filename">01_overview_v10_2026-05-15.html</div>
+            </div>
+          </div>
+          <div class="card-changes">
+            <div class="change-item"><div class="change-dot changed"></div>Card header refactored: title anchored left (flex:1), badge + date grouped right (attn-card-header-right)</div>
+            <div class="change-item"><div class="change-dot changed"></div>SAMI Analysis block: purple/violet → grey background (#F3F3F3), label recoloured orange (#FF5D00)</div>
+            <div class="change-item"><div class="change-dot changed"></div>Removed icon (✦) from analysis block; flat label+text layout replaces icon+nested div structure</div>
+          </div>
+        </div>
+        <div class="card-footer"><span class="card-date">May 15, 2026</span><span class="open-link">Open</span></div>
+      </a>
+
+      <!-- v11 -->
+      <a class="card" href="01_overview_v11_AI dashboard with prgress bar.html" target="_blank">
+        <div class="card-accent ca-orange"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="version-badge vb-latest">V11 · LATEST</span>
+            <div>
+              <div class="card-name">Overview — UUIF 9.2 Token Migration + Nunito Sans Variable Font + Progress Bar</div>
+              <div class="card-filename">01_overview_v11_AI dashboard with prgress bar.html</div>
+            </div>
+          </div>
+          <div class="card-changes">
+            <div class="change-item"><div class="change-dot changed"></div>All CSS variables migrated to UUIF 9.2 canonical --uuif-* prefix (30+ tokens)</div>
+            <div class="change-item"><div class="change-dot changed"></div>Font switched to Nunito Sans variable axis (replaces Inter)</div>
+            <div class="change-item"><div class="change-dot changed"></div>Sidebar widened to 60px (from 48px); topbar reduced to 46px (from 64px)</div>
+            <div class="change-item"><div class="change-dot added"></div>Progress bar component added to AI dashboard cards</div>
+          </div>
+        </div>
+        <div class="card-footer"><span class="card-date">May 17, 2026</span><span class="open-link">Open</span></div>
+      </a>
+
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- GROUP 2: UM Dashboard -->
+  <!-- ══════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-icon ic-teal">⊞</div>
+      <div>
+        <div class="section-title">Unified Management (UM) Dashboard — SAMI Insights Panel</div>
+        <div class="section-desc">UM dashboard with embedded SAMI Insights + Needs Attention · 2 versions</div>
+      </div>
+    </div>
+
+    <div class="grid">
+
+      <a class="card" href="02_dashboard_v1_2026-05-18_Cards on top section.html" target="_blank">
+        <div class="card-accent ca-teal"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="version-badge">V1</span>
+            <div>
+              <div class="card-name">UM Dashboard — SAMI Insights Panel with Red-Tinted Critical Cards</div>
+              <div class="card-filename">02_dashboard_v1_2026-05-18_Cards on top section.html</div>
+            </div>
+          </div>
+          <div class="card-changes">
+            <div class="change-item"><div class="change-dot neutral"></div>SAMI Insights section embedded in UM dashboard (SSL VPN, MFA, Renewal alerts)</div>
+            <div class="change-item"><div class="change-dot neutral"></div>Critical Needs Attention cards use red-tinted background (#fdf3f3) and red border</div>
+            <div class="change-item"><div class="change-dot neutral"></div>Mini-card titles styled in dark red (#7a0808)</div>
+          </div>
+        </div>
+        <div class="card-footer"><span class="card-date">May 18, 2026</span><span class="open-link">Open</span></div>
+      </a>
+
+      <a class="card" href="02_dashboard_v2_2026-05-18.html" target="_blank">
+        <div class="card-accent ca-teal"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="version-badge">V2</span>
+            <div>
+              <div class="card-name">UM Dashboard — Critical Cards Neutralised to Standard Card Background</div>
+              <div class="card-filename">02_dashboard_v2_2026-05-18.html</div>
+            </div>
+          </div>
+          <div class="card-changes">
+            <div class="change-item"><div class="change-dot changed"></div>Critical card background changed from red-tinted (#fdf3f3) to standard --card token</div>
+            <div class="change-item"><div class="change-dot changed"></div>Card border changed from red (#f3d4d4) to neutral --border token</div>
+            <div class="change-item"><div class="change-dot changed"></div>Title text colour changed from dark red to standard --text-1</div>
+          </div>
+        </div>
+        <div class="card-footer"><span class="card-date">May 18, 2026</span><span class="open-link">Open</span></div>
+      </a>
+
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- GROUP 3: NSM Dashboard — May 20 Series -->
+  <!-- ══════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-icon ic-orange">⚡</div>
+      <div>
+        <div class="section-title">NSM Dashboard — SAMI Phase 2 Series (May 20)</div>
+        <div class="section-desc">NSM dashboard variants exploring SAMI activation, Day 0 empty state, inline notifications · 6 variants</div>
+      </div>
+    </div>
+
+    <div class="grid">
+
+      <a class="card" href="sami-dashboard-v2-2026-05-20.html" target="_blank">
+        <div class="card-accent ca-orange"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="version-badge">V2</span>
+            <div>
+              <div class="card-name">NSM Dashboard — Full-Page Baseline with SAMI Alerts + Notifications Panels</div>
+              <div class="card-filename">sami-dashboard-v2-2026-05-20.html</div>
+            </div>
+          </div>
+          <div class="card-changes">
+            <div class="change-item"><div class="change-dot neutral"></div>Two-panel layout: SAMI Alerts (lateral movement, CVE) and Notifications side-by-side</div>
+            <div class="change-item"><div class="change-dot neutral"></div>Device summary row (Firewall, Capture Client, AP, Switch, SMA 1000)</div>
+          </div>
+        </div>
+        <div class="card-footer"><span class="card-date">May 20, 2026</span><span class="open-link">Open</span></div>
+      </a>
+
+      <a class="card" href="sami-page1-dashboard-v2-2026-05-20.html" target="_blank">
+        <div class="card-accent ca-orange"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="version-badge">V2</span>
+            <div>
+              <div class="card-name">NSM Dashboard Page 1 — Overview with Compact SAMI Alerts Widget</div>
+              <div class="card-filename">sami-page1-dashboard-v2-2026-05-20.html</div>
+            </div>
+          </div>
+          <div class="card-changes">
+            <div class="change-item"><div class="change-dot neutral"></div>Standard NSM overview layout with compact SAMI Alerts + Notifications widgets</div>
+            <div class="change-item"><div class="change-dot neutral"></div>Alert items list below device summary row; CVE and device alert types visible</div>
+          </div>
+        </div>
+        <div class="card-footer"><span class="card-date">May 20, 2026</span><span class="open-link">Open</span></div>
+      </a>
+
+      <a class="card" href="sami-page1-dashboard-v3-2026-05-20.html" target="_blank">
+        <div class="card-accent ca-orange"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="version-badge">V3</span>
+            <div>
+              <div class="card-name">NSM Dashboard Page 1 — Day 0 Empty State with SAMI Onboarding Prompt</div>
+              <div class="card-filename">sami-page1-dashboard-v3-2026-05-20.html</div>
+            </div>
+          </div>
+          <div class="card-changes">
+            <div class="change-item"><div class="change-dot changed"></div>SAMI widget replaced with Day 0 empty state — "CVE DETECTED" activation call-to-action</div>
+            <div class="change-item"><div class="change-dot added"></div>Illustrates first-run state before SAMI is activated</div>
+          </div>
+        </div>
+        <div class="card-footer"><span class="card-date">May 20, 2026</span><span class="open-link">Open</span></div>
+      </a>
+
+      <a class="card" href="sami-page1-dashboard-v4-2026-05-20.html" target="_blank">
+        <div class="card-accent ca-orange"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="version-badge">V4</span>
+            <div>
+              <div class="card-name">NSM Dashboard Page 1 — SAMI Activation Flow with Risk Reduction Metrics</div>
+              <div class="card-filename">sami-page1-dashboard-v4-2026-05-20.html</div>
+            </div>
+          </div>
+          <div class="card-changes">
+            <div class="change-item"><div class="change-dot added"></div>SAMI activation journey: CVE prompt → activate SAMI → risk score reduction shown</div>
+            <div class="change-item"><div class="change-dot added"></div>Highlights "Risk −34%", "Auto-Fix Ready" benefit callouts</div>
+          </div>
+        </div>
+        <div class="card-footer"><span class="card-date">May 20, 2026</span><span class="open-link">Open</span></div>
+      </a>
+
+      <a class="card" href="sami-page1-dashboard-v5-2026-05-20.html" target="_blank">
+        <div class="card-accent ca-orange"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="version-badge vb-latest">V5 · LATEST</span>
+            <div>
+              <div class="card-name">NSM Dashboard Page 1 — SAMI Alerts and Notifications Merged Inline</div>
+              <div class="card-filename">sami-page1-dashboard-v5-2026-05-20.html</div>
+            </div>
+          </div>
+          <div class="card-changes">
+            <div class="change-item"><div class="change-dot changed"></div>SAMI Alerts and Notifications collapsed into a single inline section (no separate panel)</div>
+            <div class="change-item"><div class="change-dot removed"></div>Notifications column removed as a distinct panel</div>
+          </div>
+        </div>
+        <div class="card-footer"><span class="card-date">May 20, 2026</span><span class="open-link">Open</span></div>
+      </a>
+
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- GROUP 4: SAMI Workflow Explorations -->
+  <!-- ══════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-icon ic-purple">✦</div>
+      <div>
+        <div class="section-title">SAMI Workflow Explorations — Scheduling, CVE, Recommendations</div>
+        <div class="section-desc">Interaction design patterns for deferred actions, CVE deployment, and recommendation details · 4 files</div>
+      </div>
+    </div>
+
+    <div class="grid">
+
+      <a class="card" href="sami-page2-recommendation-v2-2026-05-20.html" target="_blank">
+        <div class="card-accent ca-purple"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="version-badge">PAGE 2</span>
+            <div>
+              <div class="card-name">SAMI Recommendation Detail — Categorised Alert List with Priority Sidebar</div>
+              <div class="card-filename">sami-page2-recommendation-v2-2026-05-20.html</div>
+            </div>
+          </div>
+          <div class="card-changes">
+            <div class="change-item"><div class="change-dot neutral"></div>Left sidebar with category filters: CVE, Policy Gaps, Behavioral, Renewals, Device Alerts</div>
+            <div class="change-item"><div class="change-dot neutral"></div>Right panel: recommendation detail view with type badges and timestamps</div>
+          </div>
+        </div>
+        <div class="card-footer"><span class="card-date">May 20, 2026</span><span class="open-link">Open</span></div>
+      </a>
+
+      <a class="card" href="sami-page3-alerts-day0-v1-2026-05-20.html" target="_blank">
+        <div class="card-accent ca-purple"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="version-badge">PAGE 3</span>
+            <div>
+              <div class="card-name">SAMI Alerts — Day 0 Onboarding Screen with Feature Benefit Grid</div>
+              <div class="card-filename">sami-page3-alerts-day0-v1-2026-05-20.html</div>
+            </div>
+          </div>
+          <div class="card-changes">
+            <div class="change-item"><div class="change-dot neutral"></div>Day 0 SAMI Alerts page — shown before any alerts are present</div>
+            <div class="change-item"><div class="change-dot neutral"></div>Feature benefit grid: CVE & Vulnerability Alerts, Behavioral Anomaly Detection, Threat Intel</div>
+            <div class="change-item"><div class="change-dot neutral"></div>Continuous 24/7 scan callout + Risk −34% metric</div>
+          </div>
+        </div>
+        <div class="card-footer"><span class="card-date">May 20, 2026</span><span class="open-link">Open</span></div>
+      </a>
+
+      <a class="card" href="sami-rec-scheduling-v1-2026-05-20.html" target="_blank">
+        <div class="card-accent ca-purple"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="version-badge">V1</span>
+            <div>
+              <div class="card-name">SAMI Recommendation — Deferred Action Scheduling Flow (Inline)</div>
+              <div class="card-filename">sami-rec-scheduling-v1-2026-05-20.html</div>
+            </div>
+          </div>
+          <div class="card-changes">
+            <div class="change-item"><div class="change-dot neutral"></div>Recommendation detail with scheduling options embedded inline (not modal)</div>
+            <div class="change-item"><div class="change-dot neutral"></div>Quick-pick date options: Tonight 10pm, Thu, Tomorrow 9am, Mon</div>
+            <div class="change-item"><div class="change-dot neutral"></div>Design exploration toggle visible (Option A/B/C)</div>
+          </div>
+        </div>
+        <div class="card-footer"><span class="card-date">May 20, 2026</span><span class="open-link">Open</span></div>
+      </a>
+
+      <a class="card" href="sami-scheduling-options-v1-2026-05-20.html" target="_blank">
+        <div class="card-accent ca-purple"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="version-badge">V1</span>
+            <div>
+              <div class="card-name">Scheduling & Status Patterns — 3-Option Design Exploration (Tabbed / Inline / Work Tray)</div>
+              <div class="card-filename">sami-scheduling-options-v1-2026-05-20.html</div>
+            </div>
+          </div>
+          <div class="card-changes">
+            <div class="change-item"><div class="change-dot neutral"></div>Option A: Tabbed Work Queue — clearest org, tabs per action type</div>
+            <div class="change-item"><div class="change-dot neutral"></div>Option B: Inline States — most context, status shown inline in the list</div>
+            <div class="change-item"><div class="change-dot neutral"></div>Option C: Persistent Work Tray — least disruptive, collapsible tray overlay</div>
+          </div>
+        </div>
+        <div class="card-footer"><span class="card-date">May 20, 2026</span><span class="open-link">Open</span></div>
+      </a>
+
+      <a class="card" href="sami-cve-interactive-v1-2026-05-20.html" target="_blank">
+        <div class="card-accent ca-red"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="version-badge">V1</span>
+            <div>
+              <div class="card-name">CVE-2026-1142 — Interactive Step-by-Step Patch Deployment Workflow</div>
+              <div class="card-filename">sami-cve-interactive-v1-2026-05-20.html</div>
+            </div>
+          </div>
+          <div class="card-changes">
+            <div class="change-item"><div class="change-dot neutral"></div>Interactive multi-step CVE remediation flow for a specific vulnerability</div>
+            <div class="change-item"><div class="change-dot neutral"></div>Scope: ATP Expiring &lt;9 Days — 3 Tenants, 21 Firewalls, $87K ARR</div>
+            <div class="change-item"><div class="change-dot neutral"></div>Category sidebar with filtered views (CVE, Policy Gaps, Behavioral, Renewals)</div>
+          </div>
+        </div>
+        <div class="card-footer"><span class="card-date">May 20, 2026</span><span class="open-link">Open</span></div>
+      </a>
+
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- GROUP 5: Standalone Screens -->
+  <!-- ══════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-icon ic-green">▣</div>
+      <div>
+        <div class="section-title">Standalone SAMI Screens</div>
+        <div class="section-desc">Individual full-page views — Needs Attention, Tenants, Inventory, Licenses, Internal, AI Triage</div>
+      </div>
+    </div>
+
+    <div class="grid">
+
+      <a class="card" href="02_needs_attention.html" target="_blank">
+        <div class="card-accent ca-green"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="version-badge vb-standalone">SCREEN</span>
+            <div>
+              <div class="card-name">Needs Attention — Full-Page Alert Triage View (8 Items, Live Badge)</div>
+              <div class="card-filename">02_needs_attention.html</div>
+            </div>
+          </div>
+          <div class="card-changes">
+            <div class="change-item"><div class="change-dot neutral"></div>Dedicated full-page Needs Attention view, 8 items requiring human action</div>
+            <div class="change-item"><div class="change-dot neutral"></div>Live pill indicator in page header</div>
+          </div>
+        </div>
+        <div class="card-footer"><span class="card-date">May 15, 2026</span><span class="open-link">Open</span></div>
+      </a>
+
+      <a class="card" href="03_tenants.html" target="_blank">
+        <div class="card-accent ca-green"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="version-badge vb-standalone">SCREEN</span>
+            <div>
+              <div class="card-name">Tenants — Multi-Tenant List View (12 Active Tenants · 847 Devices)</div>
+              <div class="card-filename">03_tenants.html</div>
+            </div>
+          </div>
+          <div class="card-changes">
+            <div class="change-item"><div class="change-dot neutral"></div>Tenant management list: 12 active tenants across 847 total devices</div>
+            <div class="change-item"><div class="change-dot neutral"></div>+ Add Tenant action in page header</div>
+          </div>
+        </div>
+        <div class="card-footer"><span class="card-date">May 15, 2026</span><span class="open-link">Open</span></div>
+      </a>
+
+      <a class="card" href="04_inventory.html" target="_blank">
+        <div class="card-accent ca-green"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="version-badge vb-standalone">SCREEN</span>
+            <div>
+              <div class="card-name">Device Inventory — Cross-Tenant Device Table with Filters (847 Devices)</div>
+              <div class="card-filename">04_inventory.html</div>
+            </div>
+          </div>
+          <div class="card-changes">
+            <div class="change-item"><div class="change-dot neutral"></div>847 devices across 12 tenants in filterable table</div>
+            <div class="change-item"><div class="change-dot neutral"></div>Filters + Add Device actions in page header</div>
+          </div>
+        </div>
+        <div class="card-footer"><span class="card-date">May 15, 2026</span><span class="open-link">Open</span></div>
+      </a>
+
+      <a class="card" href="05_licenses.html" target="_blank">
+        <div class="card-accent ca-green"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="version-badge vb-standalone">SCREEN</span>
+            <div>
+              <div class="card-name">Licenses — License Renewal Tracker (3 Expiring Within 7 Days)</div>
+              <div class="card-filename">05_licenses.html</div>
+            </div>
+          </div>
+          <div class="card-changes">
+            <div class="change-item"><div class="change-dot neutral"></div>License management view with expiry urgency (3 licenses expiring in &lt;7 days)</div>
+            <div class="change-item"><div class="change-dot neutral"></div>Bulk "Renew selected" action in header</div>
+          </div>
+        </div>
+        <div class="card-footer"><span class="card-date">May 15, 2026</span><span class="open-link">Open</span></div>
+      </a>
+
+      <a class="card" href="06_internal.html" target="_blank">
+        <div class="card-accent ca-green"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="version-badge vb-standalone">SCREEN</span>
+            <div>
+              <div class="card-name">Internal View — SonicWall Internal Operations Dashboard</div>
+              <div class="card-filename">06_internal.html</div>
+            </div>
+          </div>
+          <div class="card-changes">
+            <div class="change-item"><div class="change-dot neutral"></div>Internal/ops-facing view of SAMI data (largest file: 242KB)</div>
+          </div>
+        </div>
+        <div class="card-footer"><span class="card-date">May 15, 2026</span><span class="open-link">Open</span></div>
+      </a>
+
+      <a class="card" href="sot4_ai_triage_notifications.html" target="_blank">
+        <div class="card-accent ca-green"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="version-badge vb-standalone">SOT 4</span>
+            <div>
+              <div class="card-name">AI Triage in Notification Table — Noise Reduction with Signal-First Grouping</div>
+              <div class="card-filename">sot4_ai_triage_notifications.html</div>
+            </div>
+          </div>
+          <div class="card-changes">
+            <div class="change-item"><div class="change-dot neutral"></div>NSM notification table with SAMI AI triage active — raw alerts vs. actionable signals</div>
+            <div class="change-item"><div class="change-dot neutral"></div>"Noise reduced / Need action" toggle to filter alert types</div>
+            <div class="change-item"><div class="change-dot neutral"></div>SAMI Analysis column in table: root cause, escalation action per row</div>
+          </div>
+        </div>
+        <div class="card-footer"><span class="card-date">May 18, 2026</span><span class="open-link">Open</span></div>
+      </a>
+
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- GROUP 6: Partner Landing -->
+  <!-- ══════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-icon ic-orange">◈</div>
+      <div>
+        <div class="section-title">Partner Intelligence Dashboard</div>
+        <div class="section-desc">MSP/partner-facing SAMI landing page · 1 file</div>
+      </div>
+    </div>
+
+    <div class="grid">
+
+      <a class="card" href="sami_partner_landing_v3-2026-05-15.html" target="_blank">
+        <div class="card-accent ca-orange"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="version-badge">V3</span>
+            <div>
+              <div class="card-name">Partner Intelligence Dashboard — Personalised Morning Briefing with ARR & CVE KPIs</div>
+              <div class="card-filename">sami_partner_landing_v3-2026-05-15.html</div>
+            </div>
+          </div>
+          <div class="card-changes">
+            <div class="change-item"><div class="change-dot neutral"></div>Partner-personalised greeting ("Good morning") with tenant/ARR/CVE/policy KPI chips</div>
+            <div class="change-item"><div class="change-dot neutral"></div>Needs Attention items with tenant name, P1/P2 priority, and one-click actions</div>
+            <div class="change-item"><div class="change-dot neutral"></div>Left sidebar: AI Insights Dashboard, Tenants, Inventory, CC, Licenses, System</div>
+          </div>
+        </div>
+        <div class="card-footer"><span class="card-date">May 15, 2026</span><span class="open-link">Open</span></div>
+      </a>
+
+    </div>
+  </section>
+
+</main>
+
+<script>
+  const SAVE_URL = 'http://127.0.0.1:47821/';
+  let editActive = false;
+
+  // Block card navigation in edit mode
+  document.querySelectorAll('a.card').forEach(card => {
+    card.addEventListener('click', e => {
+      if (editActive) e.preventDefault();
+    });
+  });
+
+  function toggleEdit() {
+    editActive = !editActive;
+    document.body.classList.toggle('edit-active', editActive);
+
+    const toggle = document.getElementById('editToggle');
+    const saveBtn = document.getElementById('saveBtn');
+    const hint = document.getElementById('editHint');
+
+    toggle.textContent = editActive ? '✕ Exit Edit Mode' : '✏ Edit Mode';
+    toggle.classList.toggle('active', editActive);
+    saveBtn.style.display = editActive ? 'inline-block' : 'none';
+    hint.style.display = editActive ? 'inline' : 'none';
+
+    // Toggle contenteditable on card names
+    document.querySelectorAll('.card-name').forEach(el => {
+      el.contentEditable = editActive ? 'true' : 'false';
+    });
+
+    // Toggle contenteditable on change-item text (skip the dot child)
+    document.querySelectorAll('.change-item').forEach(el => {
+      const dot = el.querySelector('.change-dot');
+      if (editActive) {
+        el.contentEditable = 'true';
+        if (dot) dot.contentEditable = 'false';
+      } else {
+        el.contentEditable = 'false';
+      }
+    });
+
+    if (!editActive) {
+      document.getElementById('saveStatus').style.display = 'none';
+    }
+  }
+
+  async function saveChanges() {
+    const btn = document.getElementById('saveBtn');
+    const status = document.getElementById('saveStatus');
+    btn.textContent = 'Saving…';
+    btn.classList.add('saving');
+    btn.disabled = true;
+    status.style.display = 'inline';
+    status.textContent = '';
+
+    const payload = [];
+    document.querySelectorAll('a.card').forEach(card => {
+      const href = card.getAttribute('href');
+      const nameEl = card.querySelector('.card-name');
+      const changeEls = card.querySelectorAll('.change-item');
+
+      const changes = [];
+      changeEls.forEach(el => {
+        // Get text, stripping the dot div's text
+        const dot = el.querySelector('.change-dot');
+        let text = el.textContent || '';
+        if (dot) text = text.replace(dot.textContent, '').trim();
+        changes.push({ text });
+      });
+
+      payload.push({
+        filename: href,
+        title: nameEl ? nameEl.textContent.trim() : '',
+        changes
+      });
+    });
+
+    try {
+      const res = await fetch(SAVE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const json = await res.json();
+      if (json.ok) {
+        status.textContent = '✓ Saved successfully';
+        status.style.color = '#59a02e';
+      } else {
+        status.textContent = '✗ Error: ' + json.error;
+        status.style.color = '#c70f0f';
+      }
+    } catch (e) {
+      status.textContent = '✗ Could not reach save server';
+      status.style.color = '#c70f0f';
+    }
+
+    btn.textContent = 'Save to File';
+    btn.classList.remove('saving');
+    btn.disabled = false;
+    status.style.display = 'inline';
+  }
+</script>
+</body>
+</html>
