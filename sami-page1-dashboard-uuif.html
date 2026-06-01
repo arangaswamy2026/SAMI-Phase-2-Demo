@@ -210,6 +210,41 @@ body{font-family:'Nunito Sans',sans-serif;background:var(--uuif-surface-bg);colo
 .col-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--uuif-text-highlight)}
 .view-all{font-size:12px;color:var(--uuif-text-secondary);text-decoration:none}
 .view-all:hover{color:var(--uuif-text-hover)}
+
+/* ── MASTER-DETAIL VIEW ───────────────────────────────────────────────────── */
+.md-view{display:none;height:calc(100vh - 46px);overflow:hidden}
+.md-view.visible{display:flex}
+.md-master{width:360px;flex-shrink:0;border-right:1px solid var(--uuif-border-tertiary);display:flex;flex-direction:column;background:var(--uuif-surface-container);overflow:hidden}
+.md-master-hdr{padding:var(--uuif-sp-5);border-bottom:1px solid var(--uuif-border-transparent);flex-shrink:0}
+.md-master-title{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--uuif-text-highlight)}
+.md-master-count{font-size:11px;color:var(--uuif-text-tertiary);margin-top:2px}
+.md-list{flex:1;overflow-y:auto;padding:var(--uuif-sp-3)}
+.md-item{padding:var(--uuif-sp-4);border-radius:var(--uuif-radius-6);border:1px solid var(--uuif-border-tertiary);margin-bottom:var(--uuif-sp-3);cursor:pointer;transition:border-color .12s,background .12s;background:var(--uuif-surface-container)}
+.md-item:hover{border-color:var(--uuif-border-secondary);background:var(--uuif-surface-hover)}
+.md-item.selected{border-left:3px solid var(--uuif-brand-orange);background:var(--uuif-surface-selected);border-color:var(--uuif-brand-orange)}
+.md-item-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--uuif-sp-2)}
+.md-item-time{font-size:10px;color:var(--uuif-text-tertiary)}
+.md-item-title{font-size:12px;font-weight:700;color:var(--uuif-text-primary);line-height:1.4;margin-bottom:var(--uuif-sp-2)}
+.md-item-summary{font-size:11px;color:var(--uuif-text-tertiary);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.md-detail{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--uuif-surface-bg)}
+.md-detail-body{flex:1;overflow-y:auto;padding:var(--uuif-sp-7)}
+.md-detail-chip-row{margin-bottom:var(--uuif-sp-4)}
+.md-detail-title{font-size:18px;font-weight:800;color:var(--uuif-text-primary);line-height:1.35;margin-bottom:var(--uuif-sp-6)}
+.md-section{margin-bottom:var(--uuif-sp-6)}
+.md-section-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--uuif-text-tertiary);margin-bottom:var(--uuif-sp-3)}
+.md-section-text{font-size:13px;color:var(--uuif-text-primary);line-height:1.6}
+.md-evidence{list-style:none;display:flex;flex-direction:column;gap:var(--uuif-sp-3)}
+.md-evidence li{display:flex;align-items:flex-start;gap:var(--uuif-sp-3);font-size:12px;color:var(--uuif-text-primary);line-height:1.5}
+.md-ev-icon{width:20px;height:20px;border-radius:var(--uuif-radius-4);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px}
+.md-timeline{display:flex;flex-direction:column;gap:var(--uuif-sp-3)}
+.md-tl-row{display:flex;gap:var(--uuif-sp-5);font-size:12px;align-items:flex-start}
+.md-tl-date{color:var(--uuif-brand-orange);font-weight:700;white-space:nowrap;min-width:120px}
+.md-tl-event{color:var(--uuif-text-secondary)}
+.md-detail-footer{flex-shrink:0;padding:var(--uuif-sp-4) var(--uuif-sp-7);border-top:1px solid var(--uuif-border-tertiary);background:var(--uuif-surface-container);display:flex;align-items:center;justify-content:space-between}
+.md-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;color:var(--uuif-text-tertiary);gap:var(--uuif-sp-3)}
+.md-empty-icon{width:48px;height:48px;border-radius:50%;background:var(--uuif-surface-model);display:flex;align-items:center;justify-content:center}
+.md-empty-icon svg{width:22px;height:22px;color:var(--uuif-icon-secondary)}
+.md-empty-text{font-size:12px}
 </style>
 </head>
 <body>
@@ -298,8 +333,25 @@ body{font-family:'Nunito Sans',sans-serif;background:var(--uuif-surface-bg);colo
   </div>
 </header>
 
+<!-- MASTER-DETAIL VIEW (shown when a SAMI AI subnav item is active) -->
+<main class="page md-view" id="md-view">
+  <div class="md-master">
+    <div class="md-master-hdr">
+      <div class="md-master-title" id="md-category-title">CVE Vulnerabilities</div>
+      <div class="md-master-count" id="md-category-count">3 items</div>
+    </div>
+    <div class="md-list" id="md-list"></div>
+  </div>
+  <div class="md-detail" id="md-detail">
+    <div class="md-empty">
+      <div class="md-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12h6m-3-3v6"/><circle cx="12" cy="12" r="10"/></svg></div>
+      <div class="md-empty-text">Select an item to view details</div>
+    </div>
+  </div>
+</main>
+
 <!-- PAGE CONTENT -->
-<main class="page">
+<main class="page" id="dashboard-view">
   <div class="inner">
 
     <!-- Overview card — org-summary removed per request -->
@@ -548,6 +600,7 @@ body{font-family:'Nunito Sans',sans-serif;background:var(--uuif-surface-bg);colo
 </main>
 
 <script>
+/* ── Product scroll ── */
 const row = document.getElementById('prod-row');
 document.getElementById('prev-btn').addEventListener('click', () => row.scrollBy({left:-160,behavior:'smooth'}));
 document.getElementById('next-btn').addEventListener('click', () => row.scrollBy({left:160,behavior:'smooth'}));
@@ -555,9 +608,328 @@ document.querySelectorAll('.uuif-tab').forEach(t => t.addEventListener('click', 
   document.querySelectorAll('.uuif-tab').forEach(x=>x.classList.remove('active'));
   this.classList.add('active');
 }));
-document.querySelectorAll('.sn-link').forEach(l => l.addEventListener('click', function(){
-  document.querySelectorAll('.sn-link').forEach(x=>x.classList.remove('active'));
+
+/* ── Master-detail data ── */
+const MD_DATA = {
+  'CVE Vulnerabilities': [
+    {
+      time: '2 hrs ago',
+      title: 'SSL VPN Auth Bypass (CVE-2026-1142) — 12 Firewalls Across 4 Tenants',
+      summary: 'CVSS 9.8 critical. Unauthenticated RCE possible on SonicOS < 7.1.2-1023. Active PoC exploit in the wild.',
+      chipClass: 'chip-err', chipLabel: 'CVE · CVSS 9.8',
+      analysis: 'CVE-2026-1142 enables unauthenticated remote code execution on SSL VPN gateways running firmware below 7.1.2-1023. Public PoC exploit observed in the wild as of 4 days ago. SAMI has staged the firmware fix and verified compatibility with current configs across all affected devices.',
+      evidence: [
+        {icon:'🔒', text:'CVSS score: 9.8 (Critical) · NVD-confirmed'},
+        {icon:'🛡️', text:'12 firewalls running vulnerable firmware (≤ 7.1.1-907)'},
+        {icon:'⚠️', text:'Exploit attempts detected on 2 devices in last 24h'},
+        {icon:'✅', text:'Patch 7.1.2-1023 passed compatibility check across all 12 devices'},
+      ],
+      timeline: [
+        {date:'Apr 16, 09:12', event:'CVE disclosed by SonicWall PSIRT'},
+        {date:'Apr 18, 14:30', event:'PoC exploit code published to GitHub'},
+        {date:'Apr 21, 03:48', event:'SAMI detected 2 probe attempts against FW-PROD-07'},
+        {date:'Apr 22, 07:00', event:'Patch pre-staged · ready to deploy'},
+      ],
+      primaryBtn:'Deploy patch to 12 devices →', secondaryBtn:'Schedule for tonight'
+    },
+    {
+      time: '5 hrs ago',
+      title: 'Remote Code Execution in SonicOS Management UI (CVE-2026-0987) — 6 Devices',
+      summary: 'CVSS 8.1. Authenticated admin can trigger stack overflow via crafted HTTP request to management interface.',
+      chipClass: 'chip-err', chipLabel: 'CVE · CVSS 8.1',
+      analysis: 'CVE-2026-0987 affects the SonicOS HTTPS management interface on TZ and NSA series running 7.0.x. An authenticated admin can trigger a stack overflow allowing arbitrary code execution. No public PoC yet, but Shodan shows 6 management interfaces exposed to the internet across 3 tenants.',
+      evidence: [
+        {icon:'🔒', text:'CVSS score: 8.1 (High) · vendor-confirmed'},
+        {icon:'🌐', text:'6 management interfaces exposed to internet (Shodan-verified)'},
+        {icon:'🛡️', text:'Affects TZ370, TZ570, NSA 2700 running SonicOS 7.0.1'},
+        {icon:'✅', text:'Patch 7.0.2 available · no reboot required'},
+      ],
+      timeline: [
+        {date:'Apr 19, 11:00', event:'CVE reported via HackerOne bounty'},
+        {date:'Apr 20, 08:45', event:'SonicWall issued advisory and patch'},
+        {date:'Apr 21, 14:20', event:'SAMI flagged 6 exposed management interfaces'},
+        {date:'Apr 22, 09:00', event:'Patch staged for affected devices'},
+      ],
+      primaryBtn:'Deploy patch → 6 devices', secondaryBtn:'Disable remote mgmt'
+    },
+    {
+      time: 'Yesterday',
+      title: 'Authentication Token Reuse in Capture Client (CVE-2025-8821) — 14 Endpoints',
+      summary: 'CVSS 7.4. Session tokens not invalidated on logout allowing replay attacks on unpatched endpoints.',
+      chipClass: 'chip-warn', chipLabel: 'CVE · CVSS 7.4',
+      analysis: 'CVE-2025-8821 affects Capture Client 3.7.x where authentication tokens are not invalidated server-side on logout. An attacker with network access can replay captured tokens to re-authenticate without credentials. 14 endpoints across 2 tenants remain on the vulnerable build.',
+      evidence: [
+        {icon:'🔒', text:'CVSS score: 7.4 (High) · researcher-reported'},
+        {icon:'💻', text:'14 endpoints on Capture Client 3.7.1 (vulnerable)'},
+        {icon:'🔍', text:'No active exploitation observed in telemetry'},
+        {icon:'✅', text:'Capture Client 3.7.2 resolves the token invalidation issue'},
+      ],
+      timeline: [
+        {date:'Apr 10, 16:00', event:'Vulnerability reported by external researcher'},
+        {date:'Apr 14, 10:30', event:'Patch released as Capture Client 3.7.2'},
+        {date:'Apr 20, 08:00', event:'SAMI identified 14 unpatched endpoints'},
+        {date:'Apr 22, 07:00', event:'Auto-update policy available to apply'},
+      ],
+      primaryBtn:'Update 14 endpoints', secondaryBtn:'View affected devices'
+    }
+  ],
+  'Policy Gaps': [
+    {
+      time: 'Drift > 60d',
+      title: 'Permit-Any Outbound on WAN Edge — Defeats DPI-SSL Across 3 Tenants',
+      summary: 'Acme Corp, Beta Networks, and Westfield IT have default-allow outbound rules bypassing DPI-SSL inspection.',
+      chipClass: 'chip-warn', chipLabel: 'Policy Gap',
+      analysis: 'Acme Corp, Beta Networks, and Westfield IT have default-allow outbound rules at the WAN interface, bypassing DPI-SSL inspection entirely. Malicious C2 traffic can exfiltrate data uninspected over HTTPS. Policy was last reviewed over 45 days ago and has drifted from the SAMI-recommended baseline.',
+      evidence: [
+        {icon:'📋', text:'3 tenants with permit-any outbound on WAN zone'},
+        {icon:'🔓', text:'DPI-SSL effectively disabled on 9 firewalls'},
+        {icon:'📅', text:'Policy last reviewed 60+ days ago'},
+        {icon:'⚠️', text:'SAMI baseline recommends deny-by-default with application-layer exceptions'},
+      ],
+      timeline: [
+        {date:'Mar 01, 00:00', event:'Policy last reviewed and approved'},
+        {date:'Apr 01, 00:00', event:'30-day drift threshold exceeded'},
+        {date:'Apr 15, 00:00', event:'SAMI flagged policy as non-compliant'},
+        {date:'Apr 22, 07:00', event:'Baseline correction ready to apply'},
+      ],
+      primaryBtn:'Apply baseline policy', secondaryBtn:'Review rules'
+    },
+    {
+      time: 'Drift > 45d',
+      title: 'Super-Admin MFA Not Enforced — 2 Tenants, Single-Factor Login Active',
+      summary: 'Beta Networks and Delta Logistics allow super-admin login with password only. No MFA enforced at tenant level.',
+      chipClass: 'chip-warn', chipLabel: 'Policy Gap',
+      analysis: 'Beta Networks and Delta Logistics have super-admin accounts configured without mandatory MFA enforcement. SAMI detected this is linked to active credential-stuffing probes on these same accounts. Single-factor admin access represents a critical exposure given observed threat activity.',
+      evidence: [
+        {icon:'👤', text:'2 super-admin accounts with no MFA requirement'},
+        {icon:'🌍', text:'Login attempts from 3 previously unseen geographies'},
+        {icon:'🔗', text:'Same accounts targeted in Behavioral Anomaly alert (1hr ago)'},
+        {icon:'✅', text:'MFA enforcement can be applied in under 2 minutes'},
+      ],
+      timeline: [
+        {date:'Feb 10, 00:00', event:'MFA policy exemption granted (temporary)'},
+        {date:'Mar 28, 00:00', event:'Exemption expiry passed without renewal'},
+        {date:'Apr 21, 14:00', event:'Credential stuffing attempts detected'},
+        {date:'Apr 22, 07:00', event:'SAMI escalated to policy gap + behavioral alert'},
+      ],
+      primaryBtn:'Enforce MFA now', secondaryBtn:'Notify tenant admin'
+    }
+  ],
+  'Renewal Risk': [
+    {
+      time: 'Expires in 9d',
+      title: 'ATP & TZ Subscriptions Expiring — Acme Corp, Beta Networks, Delta Logistics',
+      summary: '$87K ARR at risk. 21 firewalls lose Advanced Threat Protection before the next QBR.',
+      chipClass: 'chip-info', chipLabel: 'Renewal Risk',
+      analysis: 'Acme Corp (8 FW), Beta Networks (7 FW), and Delta Logistics (6 FW) ATP subscriptions lapse within 9 days — before the next scheduled QBR. These 21 firewalls will lose Capture ATP sandboxing, botnet filtering, and geo-IP blocking on expiry. Renewal quotes have been auto-generated and are ready to send.',
+      evidence: [
+        {icon:'📅', text:'Expiry: May 1, 2026 — 9 days from today'},
+        {icon:'🛡️', text:'21 firewalls lose ATP sandboxing on expiry'},
+        {icon:'💰', text:'$87K ARR at risk across 3 tenants'},
+        {icon:'✅', text:'Renewal quotes auto-generated and ready to send'},
+      ],
+      timeline: [
+        {date:'May 01, 2025', event:'Original ATP subscriptions activated'},
+        {date:'Apr 08, 2026', event:'SAMI first flagged 30-day renewal window'},
+        {date:'Apr 15, 2026', event:'Renewal quotes auto-generated'},
+        {date:'May 01, 2026', event:'Subscriptions lapse if not renewed'},
+      ],
+      primaryBtn:'Initiate renewal → $87K', secondaryBtn:'Send quotes to tenants'
+    },
+    {
+      time: 'Expires in 21d',
+      title: 'NSM On-Prem Support Lapsing — Westfield IT & Crown Logistics, 4 Appliances',
+      summary: '$42K ARR. 4 NSM On-Prem appliances lose support entitlement. Migration to NSM SaaS available.',
+      chipClass: 'chip-info', chipLabel: 'Renewal Risk',
+      analysis: 'Westfield IT (2 appliances) and Crown Logistics (2 appliances) NSM On-Prem annual support contracts expire in 21 days. Post-expiry, these tenants will have no access to firmware updates, technical support, or replacement hardware. SAMI recommends using the renewal window to propose migration to NSM SaaS at comparable ARR.',
+      evidence: [
+        {icon:'📅', text:'Expiry: May 13, 2026 — 21 days from today'},
+        {icon:'🖥️', text:'4 NSM On-Prem appliances affected across 2 tenants'},
+        {icon:'💰', text:'$42K ARR at risk'},
+        {icon:'🔄', text:'NSM SaaS migration path available at same price point'},
+      ],
+      timeline: [
+        {date:'May 13, 2025', event:'Support contracts last renewed'},
+        {date:'Apr 13, 2026', event:'30-day renewal window opened'},
+        {date:'Apr 22, 2026', event:'SAMI flagged as renewal risk'},
+        {date:'May 13, 2026', event:'Support lapses if not renewed'},
+      ],
+      primaryBtn:'Initiate renewal', secondaryBtn:'Propose SaaS migration'
+    }
+  ],
+  'Behavioral Anomalies': [
+    {
+      time: '1 hr ago',
+      title: 'Credential Stuffing Against Super-Admin Accounts — Beta Networks & Crown Logistics',
+      summary: '18 failed login attempts from 3 new geographies. Both admin accounts lack MFA and have active concurrent sessions.',
+      chipClass: 'chip-info', chipLabel: 'Behavioral Anomaly',
+      analysis: '18 failed login attempts from 3 previously unseen geographies were detected against admin@beta.local and sysadmin@crown.local in the past hour. Both accounts lack MFA enforcement. SAMI also flagged concurrent active sessions from a known IP running alongside the probe attempts, suggesting the attacker may already have valid credentials.',
+      evidence: [
+        {icon:'🌍', text:'18 failed attempts from 3 new geographies in 60 minutes'},
+        {icon:'👤', text:'2 target accounts: admin@beta.local, sysadmin@crown.local'},
+        {icon:'🔓', text:'Neither account has MFA enforced'},
+        {icon:'⚠️', text:'Concurrent active session from known IP detected during probe window'},
+      ],
+      timeline: [
+        {date:'Apr 22, 06:12', event:'First failed login from AS48282 (Kyiv, UA)'},
+        {date:'Apr 22, 06:34', event:'Attempts spread to AS9002 (Frankfurt, DE)'},
+        {date:'Apr 22, 06:58', event:'Third geography added — AS7018 (Atlanta, US)'},
+        {date:'Apr 22, 07:01', event:'SAMI escalated — concurrent session anomaly detected'},
+      ],
+      primaryBtn:'Force MFA now', secondaryBtn:'Lock accounts'
+    },
+    {
+      time: '4 hrs ago',
+      title: 'Unusual Lateral Movement — Acme Corp Internal Subnet, 3 Hops in 8 Minutes',
+      summary: 'A workstation on 10.10.4.0/24 made authenticated connections to 3 servers in sequence over 8 minutes. Pattern matches ransomware staging.',
+      chipClass: 'chip-info', chipLabel: 'Behavioral Anomaly',
+      analysis: 'SAMI detected a workstation (ACME-WS-047) on the Acme Corp employee subnet making rapid sequential authenticated connections to a file server, a backup server, and a domain controller within 8 minutes — a pattern consistent with ransomware reconnaissance and staging. No encryption activity has been observed yet.',
+      evidence: [
+        {icon:'🖥️', text:'Source: ACME-WS-047 (10.10.4.47) — standard user account'},
+        {icon:'🔗', text:'3 lateral connections: file server → backup server → DC'},
+        {icon:'⏱️', text:'All 3 hops completed within 8 minutes'},
+        {icon:'🔍', text:'No encryption activity detected yet — early-stage indicator'},
+      ],
+      timeline: [
+        {date:'Apr 22, 03:02', event:'ACME-WS-047 authenticated to FS-ACME-01'},
+        {date:'Apr 22, 03:06', event:'Connection to BKP-ACME-02 established'},
+        {date:'Apr 22, 03:10', event:'DC-ACME-01 access attempt — succeeded'},
+        {date:'Apr 22, 03:14', event:'SAMI flagged pattern — ransomware staging confidence: 78%'},
+      ],
+      primaryBtn:'Isolate workstation', secondaryBtn:'View full activity log'
+    }
+  ],
+  'Device Alerts': [
+    {
+      time: '3 hrs ago',
+      title: '3 Gateways Unreachable — Northgate Health & Delta Logistics',
+      summary: 'FW-NH-02, FW-NH-03, and FW-DL-01 have been unreachable for 3+ hours. Last heartbeat lost after BGP route change.',
+      chipClass: 'chip-warn', chipLabel: 'Device Alert',
+      analysis: 'FW-NH-02 and FW-NH-03 (Northgate Health) and FW-DL-01 (Delta Logistics) have been unreachable for over 3 hours. The last successful heartbeat was lost immediately following a BGP route change on the upstream provider. Branch sites are currently operating without perimeter inspection. SAMI has attempted automatic failover but the secondary path is also unavailable.',
+      evidence: [
+        {icon:'📡', text:'3 firewalls offline: FW-NH-02, FW-NH-03, FW-DL-01'},
+        {icon:'🔗', text:'Last heartbeat lost after BGP route change at 04:12 UTC'},
+        {icon:'🌐', text:'Secondary failover path also unavailable (ISP outage confirmed)'},
+        {icon:'⚠️', text:'Branch sites currently without perimeter inspection'},
+      ],
+      timeline: [
+        {date:'Apr 22, 04:10', event:'BGP route change on upstream provider AS1234'},
+        {date:'Apr 22, 04:12', event:'Heartbeat lost — FW-NH-02, FW-NH-03, FW-DL-01'},
+        {date:'Apr 22, 04:15', event:'SAMI attempted automatic failover — no secondary path'},
+        {date:'Apr 22, 07:05', event:'Alert escalated — 3hrs unreachable'},
+      ],
+      primaryBtn:'Diagnose connectivity', secondaryBtn:'Notify tenant'
+    },
+    {
+      time: '6 hrs ago',
+      title: 'High CPU on FW-ACME-01 — Sustained 94% for 2 Hours',
+      summary: 'FW-ACME-01 CPU sustained above 94% for 2 hours. Deep packet inspection throughput degraded by 60%.',
+      chipClass: 'chip-warn', chipLabel: 'Device Alert',
+      analysis: 'FW-ACME-01 has been running at 94%+ CPU utilisation for over 2 hours, causing DPI throughput to degrade by approximately 60%. SAMI identified a sudden spike in SSL inspection load correlating with a large file transfer from an external IP. The firewall is currently dropping packets under load.',
+      evidence: [
+        {icon:'📊', text:'CPU: 94% sustained for 120+ minutes'},
+        {icon:'📉', text:'DPI throughput degraded by ~60%'},
+        {icon:'📦', text:'Large file transfer from 185.220.101.x triggered spike'},
+        {icon:'⚠️', text:'Packet drops occurring — 1.2% loss rate observed'},
+      ],
+      timeline: [
+        {date:'Apr 22, 01:04', event:'CPU spike to 94% — external transfer initiated'},
+        {date:'Apr 22, 01:30', event:'DPI throughput degradation detected'},
+        {date:'Apr 22, 02:15', event:'Packet drops began — loss rate 1.2%'},
+        {date:'Apr 22, 03:10', event:'SAMI escalated — CPU sustained above threshold'},
+      ],
+      primaryBtn:'Throttle connection', secondaryBtn:'View traffic analysis'
+    }
+  ]
+};
+
+/* ── View switching ── */
+const dashView = document.getElementById('dashboard-view');
+const mdView   = document.getElementById('md-view');
+const mdList   = document.getElementById('md-list');
+const mdDetail = document.getElementById('md-detail');
+const mdCategoryTitle = document.getElementById('md-category-title');
+const mdCategoryCount = document.getElementById('md-category-count');
+
+function chipHtml(cls, label) {
+  return `<span class="uuif-chip ${cls}">${label}</span>`;
+}
+
+function renderMasterList(category) {
+  const items = MD_DATA[category] || [];
+  mdCategoryTitle.textContent = category;
+  mdCategoryCount.textContent = `${items.length} item${items.length !== 1 ? 's' : ''}`;
+  mdList.innerHTML = items.map((item, i) => `
+    <div class="md-item" data-index="${i}">
+      <div class="md-item-meta">
+        ${chipHtml(item.chipClass, item.chipLabel)}
+        <span class="md-item-time">${item.time}</span>
+      </div>
+      <div class="md-item-title">${item.title}</div>
+      <div class="md-item-summary">${item.summary}</div>
+    </div>
+  `).join('');
+  mdDetail.innerHTML = `<div class="md-empty">
+    <div class="md-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12h6m-3-3v6"/><circle cx="12" cy="12" r="10"/></svg></div>
+    <div class="md-empty-text">Select an item to view details</div>
+  </div>`;
+  mdList.querySelectorAll('.md-item').forEach(el => {
+    el.addEventListener('click', function() {
+      mdList.querySelectorAll('.md-item').forEach(x => x.classList.remove('selected'));
+      this.classList.add('selected');
+      renderDetail(MD_DATA[category][parseInt(this.dataset.index)]);
+    });
+  });
+}
+
+function renderDetail(item) {
+  const evidenceHtml = item.evidence.map(e =>
+    `<li><span class="md-ev-icon">${e.icon}</span><span>${e.text}</span></li>`
+  ).join('');
+  const timelineHtml = item.timeline.map(t =>
+    `<div class="md-tl-row"><span class="md-tl-date">${t.date}</span><span class="md-tl-event">${t.event}</span></div>`
+  ).join('');
+  mdDetail.innerHTML = `
+    <div class="md-detail-body">
+      <div class="md-detail-chip-row">${chipHtml(item.chipClass, item.chipLabel)}</div>
+      <div class="md-detail-title">${item.title}</div>
+      <div class="md-section">
+        <div class="md-section-label">Analysis</div>
+        <div class="md-section-text">${item.analysis}</div>
+      </div>
+      <div class="md-section">
+        <div class="md-section-label">Evidence</div>
+        <ul class="md-evidence">${evidenceHtml}</ul>
+      </div>
+      <div class="md-section">
+        <div class="md-section-label">Timeline</div>
+        <div class="md-timeline">${timelineHtml}</div>
+      </div>
+    </div>
+    <div class="md-detail-footer">
+      <button class="uuif-btn uuif-btn-secondary">View affected devices</button>
+      <div style="display:flex;gap:8px">
+        <button class="uuif-btn uuif-btn-secondary">${item.secondaryBtn}</button>
+        <button class="uuif-btn uuif-btn-primary" style="background:var(--uuif-brand-orange)">${item.primaryBtn}</button>
+      </div>
+    </div>
+  `;
+}
+
+const SAMI_CATEGORIES = ['CVE Vulnerabilities','Policy Gaps','Renewal Risk','Behavioral Anomalies','Device Alerts'];
+
+document.querySelectorAll('.sn-link').forEach(l => l.addEventListener('click', function() {
+  document.querySelectorAll('.sn-link').forEach(x => x.classList.remove('active'));
   this.classList.add('active');
+  const label = this.textContent.trim().replace(/\d+$/, '').trim();
+  if (label === 'Dashboard') {
+    dashView.style.display = '';
+    mdView.classList.remove('visible');
+  } else if (SAMI_CATEGORIES.includes(label)) {
+    dashView.style.display = 'none';
+    mdView.classList.add('visible');
+    renderMasterList(label);
+  }
 }));
 </script>
 </body>
