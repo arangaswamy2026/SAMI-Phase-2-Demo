@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<!--
+  Design System Version: UUIF 9.2
+  Reference Files Read: 01-tokens-color.md, 02-tokens-foundation.md, 03-components-nav.md,
+                        04-components-forms.md, 06-components-data.md
+  Visual References: None found in assets/visual-references/ — proceeding with UUIF 9.2 defaults
+  Components Used: uuif-nav-rail (60px), uuif-subnav (266px), uuif-topbar (46px),
+    uuif-btn-primary, uuif-btn-secondary (pill-shaped), uuif-card, uuif-chip,
+    uuif-count-block, uuif-tab-bar
+  Gaps Flagged: Ask-SAMI search bar (no UUIF pattern — extrapolated from Input + brand-orange border);
+    SAMI insight callout (extrapolated from info fill + brand-orange left border)
+  Changes from source: org-summary card removed; 48px sidebar → 60px rail + 266px subnav;
+    all hex values replaced with --uuif-* tokens; buttons converted to pill shape;
+    Nunito Sans loaded; card headers added with surface-model bg
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAMI — Dashboard Overview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
+<style>
+/* ── UUIF 9.2 TOKENS ──────────────────────────────────────────────────────── */
+:root {
+  --uuif-text-primary:    #191c25;
+  --uuif-text-secondary:  #4a618f;
+  --uuif-text-tertiary:   #888888;
+  --uuif-text-contrast:   #ffffff;
+  --uuif-text-disabled:   rgba(17,17,17,0.3);
+  --uuif-text-hover:      #ff5d00;
+  --uuif-text-highlight:  #0c2b67;
+  --uuif-surface-container: #ffffff;
+  --uuif-surface-bg:        #fafafa;
+  --uuif-surface-primary:   #5b74a7;
+  --uuif-surface-secondary: #d2dff2;
+  --uuif-surface-tertiary:  #f6f8fe;
+  --uuif-surface-highlight: #ff5d00;
+  --uuif-surface-hover:     rgba(17,17,17,0.06);
+  --uuif-surface-selected:  rgba(255,72,26,0.09);
+  --uuif-surface-disabled:  #e8eff9;
+  --uuif-surface-model:     #f0f2f5;
+  --uuif-border-primary:      #ff5d00;
+  --uuif-border-secondary:    #78a3e5;
+  --uuif-border-tertiary:     #cccccc;
+  --uuif-border-transparent:  rgba(17,17,17,0.09);
+  --uuif-border-disabled:     #d2dff2;
+  --uuif-border-hover:        #ff5d00;
+  --uuif-icon-primary:   #5885cc;
+  --uuif-icon-secondary: #9dafd3;
+  --uuif-brand-navy:   #001b50;
+  --uuif-brand-blue:   #1f3c73;
+  --uuif-brand-orange: #ff5d00;
+  --uuif-brand-green:  #59a02e;
+  --uuif-brand-red:    #c70f0f;
+  --uuif-brand-yellow: #f3ac3d;
+  --uuif-status-normal: #99CC00;
+  --uuif-status-minor:  #FFCC00;
+  --uuif-status-major:  #FF9900;
+  --uuif-status-high:   #FF0000;
+  --uuif-status-failed: #CC0000;
+  --uuif-fill-blue-lightest:      #f6f8fe;
+  --uuif-fill-green-xxx-lighter:  #e3efdc;
+  --uuif-fill-yellow-xxx-lighter: #ffe9be;
+  --uuif-fill-red-lightest:       #fff0f0;
+  --uuif-fill-orange-lighter:     #fff3ed;
+  --uuif-radius-4:    4px;
+  --uuif-radius-6:    6px;
+  --uuif-radius-8:    8px;
+  --uuif-radius-22:   22px;
+  --uuif-radius-pill: 88px;
+  --uuif-shadow-sm: 0px 1px 6px 2px rgba(0,0,0,0.12);
+  --uuif-shadow-md: 0px 4px 12px 0px rgba(0,0,0,0.16);
+  --uuif-sp-1:2px; --uuif-sp-2:4px;  --uuif-sp-3:8px;
+  --uuif-sp-4:12px; --uuif-sp-5:16px; --uuif-sp-6:20px;
+  --uuif-sp-7:24px; --uuif-sp-8:32px;
+}
+
+/* ── BASE ─────────────────────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito Sans',sans-serif;background:var(--uuif-surface-bg);color:var(--uuif-text-primary);font-size:13px;line-height:1.4}
+
+/* ── PRIMARY NAV RAIL 60px ────────────────────────────────────────────────── */
+.nav-rail{position:fixed;left:0;top:0;width:60px;height:100vh;background:var(--uuif-brand-navy);display:flex;flex-direction:column;align-items:center;z-index:200}
+.nav-logo{width:60px;height:60px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nav-item{width:60px;height:52px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;color:#D2DFF2;transition:background .15s}
+.nav-item:hover{background:rgba(255,255,255,.08);color:var(--uuif-brand-orange)}
+.nav-item.active{background:rgba(17,17,17,.4);border-left:2px solid var(--uuif-brand-orange);color:var(--uuif-brand-orange)}
+.nav-item svg{width:22px;height:22px}
+.nav-badge{position:absolute;top:8px;right:8px;background:var(--uuif-brand-orange);color:#fff;font-size:9px;font-weight:700;border-radius:var(--uuif-radius-pill);min-width:15px;height:15px;display:flex;align-items:center;justify-content:center;padding:0 3px}
+.nav-divider{width:44px;height:1px;background:rgba(255,255,255,.15);margin:2px 0}
+.nav-spacer{flex:1}
+
+/* ── SUBNAV 266px ─────────────────────────────────────────────────────────── */
+.subnav{position:fixed;left:60px;top:0;width:266px;height:100vh;background:var(--uuif-surface-container);border-right:1px solid var(--uuif-border-tertiary);display:flex;flex-direction:column;z-index:190;overflow-y:auto}
+.sn-header{padding:var(--uuif-sp-4) var(--uuif-sp-5);border-bottom:1px solid var(--uuif-border-tertiary);flex-shrink:0}
+.sn-wordmark{font-size:16px;font-weight:800;color:var(--uuif-brand-orange);letter-spacing:.01em;margin-bottom:2px}
+.sn-product{font-size:13px;font-weight:600;color:#e67f02}
+.sn-page-title{font-size:15px;font-weight:700;text-transform:uppercase;color:var(--uuif-brand-navy);letter-spacing:.03em;margin-top:var(--uuif-sp-3)}
+.sn-section{padding:var(--uuif-sp-4) var(--uuif-sp-5) var(--uuif-sp-2)}
+.sn-section-hdr{font-size:11px;font-weight:700;color:var(--uuif-brand-navy);text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:var(--uuif-sp-2);opacity:.7}
+.sn-link{display:flex;align-items:center;gap:var(--uuif-sp-3);padding:5px var(--uuif-sp-3);font-size:12px;color:var(--uuif-text-secondary);border-radius:5px;cursor:pointer;margin-bottom:1px;text-decoration:none;transition:background .12s}
+.sn-link:hover{background:var(--uuif-surface-hover)}
+.sn-link.active{background:var(--uuif-surface-selected);color:#e67f02;font-weight:600}
+.sn-link svg{color:var(--uuif-icon-secondary);flex-shrink:0}
+.sn-badge{margin-left:auto;background:var(--uuif-brand-orange);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:var(--uuif-radius-pill)}
+
+/* ── TOP ACTION BAR 46px ──────────────────────────────────────────────────── */
+.topbar{position:fixed;left:326px;right:0;top:0;height:46px;background:var(--uuif-surface-container);border-bottom:1px solid var(--uuif-border-tertiary);display:flex;align-items:center;padding:0 var(--uuif-sp-5);z-index:180;gap:var(--uuif-sp-3)}
+.breadcrumb{display:flex;align-items:center;gap:var(--uuif-sp-2);font-size:12px;color:var(--uuif-text-secondary);flex:1}
+.breadcrumb a{color:var(--uuif-text-secondary);text-decoration:none}
+.breadcrumb a:hover{color:var(--uuif-text-hover)}
+.breadcrumb .sep{color:var(--uuif-border-tertiary)}
+.breadcrumb .cur{color:var(--uuif-text-primary);font-weight:600}
+.tenant-pill{display:flex;align-items:center;gap:var(--uuif-sp-2);border:1px solid var(--uuif-border-tertiary);border-radius:var(--uuif-radius-pill);padding:3px 12px;font-size:12px;color:var(--uuif-text-primary);cursor:pointer;background:var(--uuif-surface-container)}
+.t-dot{width:7px;height:7px;background:var(--uuif-brand-orange);border-radius:50%}
+.topbar-icons{display:flex;align-items:center;gap:var(--uuif-sp-3)}
+.icon-btn{width:30px;height:30px;border-radius:var(--uuif-radius-22);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--uuif-icon-primary);position:relative;transition:background .12s}
+.icon-btn:hover{background:var(--uuif-surface-hover);color:var(--uuif-text-hover)}
+.icon-btn svg{width:16px;height:16px}
+.notif-dot{position:absolute;top:3px;right:3px;width:7px;height:7px;background:var(--uuif-brand-orange);border-radius:50%}
+.avatar{width:28px;height:28px;border-radius:50%;background:var(--uuif-surface-primary);color:var(--uuif-text-contrast);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer}
+
+/* ── PAGE ─────────────────────────────────────────────────────────────────── */
+.page{margin-left:326px;padding-top:46px;min-height:100vh;background:var(--uuif-surface-bg)}
+.inner{padding:var(--uuif-sp-5)}
+
+/* ── UUIF CARD ────────────────────────────────────────────────────────────── */
+.uuif-card{background:var(--uuif-surface-container);border:1px solid var(--uuif-border-tertiary);border-radius:var(--uuif-radius-6);overflow:hidden;margin-bottom:var(--uuif-sp-5)}
+.card-hdr{background:var(--uuif-surface-model);border-bottom:1px solid var(--uuif-border-transparent);padding:0 var(--uuif-sp-5);height:35px;display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--uuif-text-highlight)}
+.card-body{padding:var(--uuif-sp-3) var(--uuif-sp-4)}
+
+/* ── PRODUCT SCROLL ───────────────────────────────────────────────────────── */
+.scroll-row{display:flex;align-items:center;gap:var(--uuif-sp-3)}
+.scroll-btn{width:24px;height:24px;flex-shrink:0;border:1px solid var(--uuif-border-tertiary);border-radius:var(--uuif-radius-6);display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--uuif-surface-container);color:var(--uuif-text-secondary)}
+.scroll-btn:hover{border-color:var(--uuif-border-hover);color:var(--uuif-text-hover)}
+.prod-row{display:flex;gap:var(--uuif-sp-3);overflow-x:auto;flex:1;scrollbar-width:none}
+.prod-row::-webkit-scrollbar{display:none}
+.prod-card{background:var(--uuif-surface-container);border:1px solid var(--uuif-border-tertiary);border-radius:var(--uuif-radius-6);padding:var(--uuif-sp-4) var(--uuif-sp-5);min-width:138px;flex-shrink:0;transition:box-shadow .15s,border-color .15s}
+.prod-card:hover{border-color:var(--uuif-border-secondary);box-shadow:var(--uuif-shadow-sm)}
+.pc-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--uuif-text-secondary);display:flex;align-items:center;gap:var(--uuif-sp-2);margin-bottom:var(--uuif-sp-3)}
+.pc-lbl svg{color:var(--uuif-icon-primary)}
+.pc-num{font-size:26px;font-weight:700;color:var(--uuif-text-highlight);line-height:1;margin-bottom:var(--uuif-sp-2)}
+.pc-sub{font-size:11px;color:var(--uuif-text-tertiary);margin-bottom:var(--uuif-sp-2)}
+.pc-att{font-size:11px;color:var(--uuif-text-secondary)}
+.pc-att .warn{color:var(--uuif-brand-orange);font-weight:600}
+.pc-att .eol{color:var(--uuif-text-tertiary)}
+.pc-soon{color:var(--uuif-brand-orange);font-size:11px;font-weight:600}
+
+/* ── BUTTONS (always pill) ────────────────────────────────────────────────── */
+.uuif-btn{border-radius:var(--uuif-radius-pill);font-family:'Nunito Sans',sans-serif;font-size:12px;padding:4px 16px;cursor:pointer;border:none;transition:opacity .12s,border-color .12s,color .12s;white-space:nowrap;font-weight:400}
+.uuif-btn-primary{background:var(--uuif-surface-primary);color:var(--uuif-text-contrast)}
+.uuif-btn-primary:hover{opacity:.88}
+.uuif-btn-secondary{background:var(--uuif-surface-container);color:var(--uuif-text-secondary);border:1px solid var(--uuif-border-secondary)}
+.uuif-btn-secondary:hover{border-color:var(--uuif-border-hover);color:var(--uuif-text-hover)}
+.uuif-btn-ghost{background:var(--uuif-surface-container);color:var(--uuif-text-secondary);border:1px solid var(--uuif-border-tertiary)}
+
+/* ── TAB BAR ──────────────────────────────────────────────────────────────── */
+.tab-bar{background:var(--uuif-surface-container);border-bottom:2px solid var(--uuif-border-primary);display:flex;padding:0 var(--uuif-sp-6);margin-bottom:var(--uuif-sp-5)}
+.uuif-tab{height:40px;padding:0 var(--uuif-sp-5);font-size:14px;cursor:pointer;color:var(--uuif-text-secondary);display:flex;align-items:center;border:2px solid transparent;border-bottom:none;border-radius:var(--uuif-radius-6) var(--uuif-radius-6) 0 0;margin-bottom:-2px}
+.uuif-tab.active{font-weight:700;color:var(--uuif-text-hover);border-color:var(--uuif-border-primary);background:var(--uuif-surface-container)}
+
+/* ── ASK SAMI (gap — extrapolated from Input + brand tokens) ──────────────── */
+.sami-wrap{display:flex;justify-content:center;margin-bottom:var(--uuif-sp-5)}
+.sami-bar{display:flex;align-items:center;gap:var(--uuif-sp-3);border:1.5px solid var(--uuif-brand-orange);border-radius:var(--uuif-radius-pill);padding:var(--uuif-sp-3) var(--uuif-sp-5);width:560px;background:var(--uuif-surface-container);box-shadow:0 0 0 3px rgba(255,93,0,.08)}
+.sami-spark{color:var(--uuif-brand-orange);font-size:15px}
+.sami-bar input{border:none;outline:none;flex:1;font-family:'Nunito Sans',sans-serif;font-size:13px;color:var(--uuif-text-secondary);background:transparent}
+.kbd{font-size:10px;color:var(--uuif-text-tertiary);background:var(--uuif-surface-model);border-radius:var(--uuif-radius-4);padding:2px 5px;font-family:monospace}
+
+/* ── CHIP ─────────────────────────────────────────────────────────────────── */
+.uuif-chip{display:inline-flex;align-items:center;gap:5px;height:22px;padding:2px 8px;border-radius:var(--uuif-radius-4);font-size:10.5px;font-weight:600;white-space:nowrap}
+.uuif-chip::before{content:'';width:6px;height:6px;border-radius:50%}
+.chip-err{background:var(--uuif-fill-red-lightest);border:1px solid var(--uuif-brand-red);color:var(--uuif-brand-red)}
+.chip-err::before{background:var(--uuif-brand-red)}
+.chip-warn{background:var(--uuif-fill-yellow-xxx-lighter);border:1px solid var(--uuif-brand-yellow);color:var(--uuif-brand-yellow)}
+.chip-warn::before{background:var(--uuif-brand-yellow)}
+.chip-info{background:var(--uuif-fill-blue-lightest);border:1px solid var(--uuif-border-secondary);color:var(--uuif-text-secondary)}
+.chip-info::before{background:var(--uuif-border-secondary)}
+
+/* ── SAMI CALLOUT (gap — extrapolated from info fill + brand-orange) ─────── */
+.sami-callout{display:flex;align-items:flex-start;gap:var(--uuif-sp-3);background:var(--uuif-fill-orange-lighter);border-left:3px solid var(--uuif-brand-orange);border-radius:0 var(--uuif-radius-4) var(--uuif-radius-4) 0;padding:var(--uuif-sp-3);font-size:11.5px;color:var(--uuif-text-primary);line-height:1.5;margin-bottom:var(--uuif-sp-3)}
+.sami-tag{background:var(--uuif-brand-orange);color:var(--uuif-text-contrast);font-size:9px;font-weight:700;border-radius:var(--uuif-radius-4);padding:1px 5px;letter-spacing:.03em;flex-shrink:0;margin-top:2px}
+
+/* ── ITEM CARDS ───────────────────────────────────────────────────────────── */
+.item-card{background:var(--uuif-surface-container);border:1px solid var(--uuif-border-tertiary);border-radius:var(--uuif-radius-6);padding:var(--uuif-sp-4) var(--uuif-sp-5);margin-bottom:var(--uuif-sp-4);transition:box-shadow .15s}
+.item-card:hover{box-shadow:var(--uuif-shadow-sm)}
+.item-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--uuif-sp-3)}
+.item-time{font-size:11px;color:var(--uuif-text-tertiary)}
+.item-title{font-size:13px;font-weight:700;color:var(--uuif-text-primary);margin-bottom:var(--uuif-sp-3);line-height:1.4}
+.item-footer{display:flex;align-items:center;justify-content:space-between;margin-top:var(--uuif-sp-3)}
+.item-scope{display:flex;gap:var(--uuif-sp-5);font-size:11px;color:var(--uuif-text-secondary);align-items:center}
+.item-scope span{display:flex;align-items:center;gap:var(--uuif-sp-2)}
+.item-scope svg{color:var(--uuif-icon-secondary)}
+.item-actions{display:flex;gap:var(--uuif-sp-2)}
+
+/* ── COUNT BLOCKS ─────────────────────────────────────────────────────────── */
+.count-blocks{display:flex;gap:var(--uuif-sp-3);margin-bottom:var(--uuif-sp-5)}
+.count-block{flex:1;background:var(--uuif-surface-container);border:1px solid var(--uuif-border-secondary);border-radius:var(--uuif-radius-8);padding:var(--uuif-sp-4);display:flex;align-items:center;gap:var(--uuif-sp-3)}
+.cb-icon{width:36px;height:36px;border-radius:var(--uuif-radius-6);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cb-icon svg{width:20px;height:20px}
+.cb-val{font-size:20px;font-weight:700;line-height:1;color:var(--uuif-text-primary)}
+.cb-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--uuif-text-secondary);margin-top:3px}
+
+/* ── TWO COL ──────────────────────────────────────────────────────────────── */
+.two-col{display:flex;gap:var(--uuif-sp-4);align-items:flex-start}
+.col{flex:1;min-width:0}
+.col-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--uuif-sp-4)}
+.col-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--uuif-text-highlight)}
+.view-all{font-size:12px;color:var(--uuif-text-secondary);text-decoration:none}
+.view-all:hover{color:var(--uuif-text-hover)}
+</style>
+</head>
+<body>
+
+<!-- PRIMARY NAV RAIL -->
+<nav class="nav-rail">
+  <div class="nav-logo">
+    <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
+      <path d="M16 3C9.9 3 5 7.9 5 14c0 3.8 1.9 7.2 4.9 9.2L9 29h14l-.9-5.8C25.1 21.2 27 17.8 27 14 27 7.9 22.1 3 16 3z" fill="#FF5D00"/>
+      <circle cx="16" cy="14" r="3.5" fill="white"/>
+    </svg>
+  </div>
+  <div class="nav-item active">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+  </div>
+  <div class="nav-item" style="position:relative">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    <span class="nav-badge">8</span>
+  </div>
+  <div class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  </div>
+  <div class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+  </div>
+  <div class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+  </div>
+  <div class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/><path d="M12 2a10 10 0 1 0 10 10"/></svg>
+  </div>
+  <div class="nav-spacer"></div>
+  <div class="nav-item" style="position:relative">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <span class="nav-badge">3</span>
+  </div>
+</nav>
+
+<!-- SUBNAV -->
+<aside class="subnav">
+  <div class="sn-header">
+    <div class="sn-wordmark">SonicWall</div>
+    <div class="sn-product">Unified Management</div>
+    <div class="sn-page-title">Dashboard</div>
+  </div>
+
+  <div class="sn-section">
+    <a class="sn-link active">Dashboard</a>
+  </div>
+
+  <div class="sn-section">
+    <div class="sn-section-hdr">SAMI AI
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <a class="sn-link">CVE Vulnerabilities<span class="sn-badge">8</span></a>
+    <a class="sn-link">Policy Gaps</a>
+    <a class="sn-link">Renewal Risk</a>
+    <a class="sn-link">Behavioral Anomalies</a>
+    <a class="sn-link">Device Alerts</a>
+  </div>
+</aside>
+
+<!-- TOP ACTION BAR -->
+<header class="topbar">
+  <nav class="breadcrumb">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--uuif-icon-secondary)"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span class="sep">›</span><a href="#">Dashboard</a><span class="sep">›</span><span class="cur">Overview</span>
+  </nav>
+  <div class="tenant-pill">
+    <div class="t-dot"></div>All Tenants (Global)
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+  </div>
+  <div class="topbar-icons">
+    <div class="icon-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <div class="notif-dot"></div>
+    </div>
+    <div class="icon-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </div>
+    <div class="avatar">HN</div>
+  </div>
+</header>
+
+<!-- PAGE CONTENT -->
+<main class="page">
+  <div class="inner">
+
+    <!-- Overview card — org-summary removed per request -->
+    <div class="uuif-card">
+      <div class="card-hdr">
+        <span class="card-title">Overview</span>
+        <span style="font-size:11px;color:var(--uuif-text-tertiary)">Active Products</span>
+      </div>
+      <div class="card-body">
+        <div class="scroll-row">
+          <div class="scroll-btn" id="prev-btn">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          </div>
+          <div class="prod-row" id="prod-row">
+
+            <div class="prod-card">
+              <div class="pc-lbl"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Firewall</div>
+              <div class="pc-num">110</div>
+              <div class="pc-sub">Total Devices</div>
+              <div class="pc-att">Need Attention</div>
+              <div class="pc-att"><span class="warn">⚠ 2</span>&nbsp;<span class="eol">EOL 6</span></div>
+            </div>
+
+            <div class="prod-card">
+              <div class="pc-lbl"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>Cloud Secure Edge</div>
+              <div class="pc-num">2</div>
+              <div class="pc-sub">Active Licenses</div>
+              <button class="uuif-btn uuif-btn-ghost" style="font-size:11px;padding:3px 12px;margin-top:8px">Learn More</button>
+            </div>
+
+            <div class="prod-card">
+              <div class="pc-lbl"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>Access Point</div>
+              <div class="pc-num">10</div>
+              <div class="pc-sub">Total Devices</div>
+              <div class="pc-att">Need Attention: 0</div>
+            </div>
+
+            <div class="prod-card">
+              <div class="pc-lbl"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>Switch</div>
+              <div class="pc-num">9</div>
+              <div class="pc-sub">Total Devices</div>
+              <div class="pc-att">Need Attention: 0</div>
+            </div>
+
+            <div class="prod-card">
+              <div class="pc-lbl"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Capture Client</div>
+              <div class="pc-num">2</div>
+              <div class="pc-sub">Total Endpoints</div>
+              <div class="pc-att">Need Attention: 0</div>
+            </div>
+
+            <div class="prod-card">
+              <div class="pc-lbl"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Capture Client MDR</div>
+              <div class="pc-num">2</div>
+              <div class="pc-sub">Total Endpoints</div>
+              <div class="pc-att">Need Attention: 0</div>
+            </div>
+
+            <div class="prod-card">
+              <div class="pc-lbl"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>SMA 1000</div>
+              <div class="pc-num">6</div>
+              <div class="pc-sub">Total Devices</div>
+              <div class="pc-soon">Coming Soon ⊙</div>
+            </div>
+
+          </div>
+          <div class="scroll-btn" id="next-btn">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Bar -->
+    <div class="tab-bar">
+      <div class="uuif-tab active">SAMI Alerts</div>
+      <div class="uuif-tab">Notifications</div>
+    </div>
+
+    <!-- Ask SAMI -->
+    <div class="sami-wrap">
+      <div class="sami-bar">
+        <span class="sami-spark">✦</span>
+        <input type="text" placeholder='Ask SAMI anything — e.g. "Show renewals at risk this month"'>
+        <span class="kbd">⌘</span><span class="kbd">K</span>
+      </div>
+    </div>
+
+    <!-- Two columns -->
+    <div class="two-col">
+
+      <!-- LEFT: Need Attention -->
+      <div class="col">
+        <div class="col-hdr"><div class="col-title">Need Attention</div></div>
+
+        <div class="item-card">
+          <div class="item-meta">
+            <span class="uuif-chip chip-err">CVE Vulnerability</span>
+            <span class="item-time">2 hrs ago</span>
+          </div>
+          <div class="item-title">SSL VPN Auth Bypass (CVE-2026-1142) — 12 Firewalls Across 4 Tenants</div>
+          <div class="sami-callout">
+            <span class="sami-tag">SAMI</span>
+            <span>CVSS 9.8 critical. Unauthenticated RCE possible on SonicOS &lt; 7.1.2-1023. Active PoC exploit observed in the wild. Acme Corp, Beta Networks, Westfield IT, and Crown Logistics are exposed. Patch pre-staged and compatibility-verified across all 12 devices.</span>
+          </div>
+          <div class="item-footer">
+            <div class="item-scope">
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>4 Tenants</span>
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>12 Firewalls</span>
+            </div>
+            <div class="item-actions">
+              <button class="uuif-btn uuif-btn-primary">Deploy patch</button>
+              <button class="uuif-btn uuif-btn-secondary">Schedule</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="item-card">
+          <div class="item-meta">
+            <span class="uuif-chip chip-warn">Device Alert</span>
+            <span class="item-time">3 hrs ago</span>
+          </div>
+          <div class="item-title">3 Gateways Unreachable — Northgate Health &amp; Delta Logistics</div>
+          <div class="sami-callout">
+            <span class="sami-tag">SAMI</span>
+            <span>FW-NH-02, FW-NH-03 (Northgate Health) and FW-DL-01 (Delta Logistics) have been unreachable for 3+ hours. Last heartbeat lost after a BGP route change. Branch sites are currently without perimeter inspection.</span>
+          </div>
+          <div class="item-footer">
+            <div class="item-scope">
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>2 Tenants</span>
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>3 Firewalls offline</span>
+            </div>
+            <div class="item-actions">
+              <button class="uuif-btn uuif-btn-primary">Diagnose</button>
+              <button class="uuif-btn uuif-btn-secondary">Notify tenant</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="item-card">
+          <div class="item-meta">
+            <span class="uuif-chip chip-info">Subscription Risk</span>
+            <span class="item-time">Today · 08:14 AM</span>
+          </div>
+          <div class="item-title">ATP &amp; TZ Subscriptions Expiring in &lt;9 Days — 3 Tenants, 21 Firewalls</div>
+          <div class="sami-callout">
+            <span class="sami-tag">SAMI</span>
+            <span>Acme Corp (8 FW), Beta Networks (7 FW), and Delta Logistics (6 FW) ATP subscriptions lapse before the next QBR. $87K ARR at risk. Renewal quotes are ready.</span>
+          </div>
+          <div class="item-footer">
+            <div class="item-scope">
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>3 Tenants</span>
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>21 Firewalls at risk</span>
+            </div>
+            <div class="item-actions">
+              <button class="uuif-btn uuif-btn-primary">Initiate renewal</button>
+              <button class="uuif-btn uuif-btn-secondary">Snooze</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: SAMI Recommendations -->
+      <div class="col">
+        <div class="col-hdr">
+          <div class="col-title">SAMI Recommendations</div>
+          <a class="view-all" href="#">View all</a>
+        </div>
+
+        <!-- Count blocks -->
+        <div class="count-blocks">
+          <div class="count-block">
+            <div class="cb-icon" style="background:var(--uuif-fill-red-lightest)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--uuif-brand-red)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div><div class="cb-val" style="color:var(--uuif-brand-red)">8</div><div class="cb-lbl">CVE Vulnerabilities</div></div>
+          </div>
+          <div class="count-block">
+            <div class="cb-icon" style="background:var(--uuif-fill-blue-lightest)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--uuif-surface-primary)" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <div><div class="cb-val" style="color:var(--uuif-surface-primary)">5</div><div class="cb-lbl">Behavioral Anomalies</div></div>
+          </div>
+          <div class="count-block">
+            <div class="cb-icon" style="background:var(--uuif-surface-model)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--uuif-text-secondary)" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </div>
+            <div><div class="cb-val">5</div><div class="cb-lbl">Policy Gaps Found</div></div>
+          </div>
+          <div class="count-block">
+            <div class="cb-icon" style="background:var(--uuif-fill-green-xxx-lighter)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--uuif-brand-green)" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div><div class="cb-val" style="color:var(--uuif-brand-green);font-size:17px">$287K</div><div class="cb-lbl">ARR Renewal Risk</div></div>
+          </div>
+        </div>
+
+        <div class="item-card">
+          <div class="item-meta">
+            <span class="uuif-chip chip-info">Behavioral Anomaly</span>
+            <span class="item-time">1 hr ago</span>
+          </div>
+          <div class="item-title">Credential Stuffing Against Super-Admin Accounts — Beta Networks &amp; Crown Logistics</div>
+          <div class="sami-callout">
+            <span class="sami-tag">SAMI</span>
+            <span>18 failed login attempts from 3 new geographies against admin@beta.local and sysadmin@crown.local. Both accounts lack MFA. SAMI flagged concurrent active sessions from known IP alongside the probe attempts.</span>
+          </div>
+          <div class="item-footer">
+            <div class="item-scope">
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>2 Tenants</span>
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>2 Admin accounts</span>
+            </div>
+            <div class="item-actions">
+              <button class="uuif-btn uuif-btn-primary">Force MFA now</button>
+              <button class="uuif-btn uuif-btn-secondary">Snooze</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="item-card">
+          <div class="item-meta">
+            <span class="uuif-chip chip-warn">Policy Gap</span>
+            <span class="item-time" style="color:var(--uuif-brand-yellow)">Drift &gt; 45d</span>
+          </div>
+          <div class="item-title">Permit-Any Outbound on WAN Edge — Defeats DPI-SSL Across 3 Tenants</div>
+          <div class="sami-callout">
+            <span class="sami-tag">SAMI</span>
+            <span>Acme Corp, Beta Networks, and Westfield IT have default-allow outbound rules at the WAN interface, bypassing DPI-SSL inspection. Malicious C2 traffic can exfiltrate data uninspected. Policy last reviewed 45+ days ago.</span>
+          </div>
+          <div class="item-footer">
+            <div class="item-scope">
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>3 Tenants</span>
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>9 Firewalls</span>
+            </div>
+            <div class="item-actions">
+              <button class="uuif-btn uuif-btn-primary">Apply baseline</button>
+              <button class="uuif-btn uuif-btn-secondary">Review rules</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+const row = document.getElementById('prod-row');
+document.getElementById('prev-btn').addEventListener('click', () => row.scrollBy({left:-160,behavior:'smooth'}));
+document.getElementById('next-btn').addEventListener('click', () => row.scrollBy({left:160,behavior:'smooth'}));
+document.querySelectorAll('.uuif-tab').forEach(t => t.addEventListener('click', function(){
+  document.querySelectorAll('.uuif-tab').forEach(x=>x.classList.remove('active'));
+  this.classList.add('active');
+}));
+document.querySelectorAll('.sn-link').forEach(l => l.addEventListener('click', function(){
+  document.querySelectorAll('.sn-link').forEach(x=>x.classList.remove('active'));
+  this.classList.add('active');
+}));
+</script>
+</body>
+</html>
