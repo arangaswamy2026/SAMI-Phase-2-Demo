@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAMI Alerts — Day 0 Onboarding</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; color: #1a2332; font-size: 13px; }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    position: fixed; left: 0; top: 0; width: 48px; height: 100vh;
+    background: #0d1526; display: flex; flex-direction: column;
+    align-items: center; padding: 0; z-index: 100;
+  }
+  .sidebar-logo {
+    width: 48px; height: 48px; background: #E85D1A;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .sidebar-logo svg { width: 26px; height: 26px; fill: white; }
+  .sidebar-icon {
+    width: 48px; height: 44px; display: flex; align-items: center; justify-content: center;
+    color: #7a8ba0; cursor: pointer; position: relative; transition: color 0.2s;
+  }
+  .sidebar-icon:hover { color: #fff; }
+  .sidebar-icon.active { color: #fff; border-left: 2px solid #E85D1A; }
+  .sidebar-icon .badge {
+    position: absolute; top: 7px; right: 7px;
+    background: #E85D1A; color: white; font-size: 9px; font-weight: 700;
+    border-radius: 8px; min-width: 16px; height: 16px;
+    display: flex; align-items: center; justify-content: center; padding: 0 3px;
+  }
+  .sidebar-spacer { flex: 1; }
+
+  /* ── Topbar ── */
+  .topbar {
+    position: fixed; left: 48px; right: 0; top: 0; height: 44px;
+    background: #fff; border-bottom: 1px solid #e2e6ea;
+    display: flex; align-items: center; padding: 0 16px; z-index: 99; gap: 8px;
+  }
+  .breadcrumb { display: flex; align-items: center; gap: 4px; font-size: 12.5px; color: #555; flex: 1; }
+  .breadcrumb a { color: #3b7dd8; text-decoration: none; }
+  .breadcrumb span { color: #999; }
+  .tenant-selector {
+    display: flex; align-items: center; gap: 6px;
+    border: 1px solid #d0d7de; border-radius: 20px;
+    padding: 4px 12px; font-size: 12.5px; cursor: pointer;
+    background: #fff; color: #333;
+  }
+  .tenant-selector .dot { width: 8px; height: 8px; background: #E85D1A; border-radius: 50%; }
+  .topbar-icons { display: flex; align-items: center; gap: 10px; }
+  .topbar-icons .icon-btn {
+    width: 30px; height: 30px; border-radius: 50%; display: flex;
+    align-items: center; justify-content: center; cursor: pointer;
+    color: #555; transition: background 0.2s; position: relative;
+  }
+  .topbar-icons .icon-btn:hover { background: #f0f2f5; }
+  .topbar-icons .notif-badge {
+    position: absolute; top: 2px; right: 2px;
+    width: 8px; height: 8px; background: #E85D1A; border-radius: 50%;
+  }
+  .avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: #1a3a5c; color: #fff; font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+
+  .page { margin-left: 48px; padding-top: 44px; min-height: 100vh; }
+  .p-content { padding: 16px; }
+
+  /* ── Section header row ── */
+  .section-top {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;
+  }
+  .section-top-left { display: flex; align-items: center; gap: 10px; }
+  .section-title-main { font-size: 18px; font-weight: 800; color: #1a2332; }
+  .sami-badge-pill {
+    background: linear-gradient(135deg, #E85D1A 0%, #c44c12 100%);
+    color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 0.4px;
+    border-radius: 12px; padding: 3px 9px; display: flex; align-items: center; gap: 4px;
+  }
+
+  /* ── Tabs ── */
+  .sami-tabs { display: flex; gap: 0; border-bottom: 1px solid #e2e6ea; margin-bottom: 0; }
+  .sami-tab {
+    padding: 9px 16px; font-size: 13px; cursor: pointer; color: #666;
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+  }
+  .sami-tab.active { color: #E85D1A; border-bottom-color: #E85D1A; font-weight: 600; }
+
+  /* ── Ask SAMI bar ── */
+  .ask-sami-wrap { display: flex; justify-content: center; padding: 20px 0 4px; }
+  .ask-sami {
+    display: flex; align-items: center; gap: 8px;
+    border: 1.5px solid #3b7dd8; border-radius: 24px;
+    padding: 9px 16px; width: 560px; background: #fff;
+    box-shadow: 0 0 0 3px rgba(59,125,216,0.08);
+  }
+  .ask-sami .sami-spark { color: #E85D1A; font-size: 15px; }
+  .ask-sami input { border: none; outline: none; flex: 1; font-size: 13px; color: #555; background: transparent; }
+  .ask-sami .kbd {
+    font-size: 10px; color: #999; background: #f0f2f5;
+    border-radius: 3px; padding: 2px 5px; font-family: monospace;
+  }
+
+  /* ── Main card shell (matches the dashboard's SAMI section) ── */
+  .sami-section {
+    background: #fff; border-radius: 8px; border: 1px solid #e2e6ea;
+    overflow: hidden;
+  }
+  .sami-section-inner { padding: 0 14px 14px; }
+
+  /* ════════════════════════════════════════
+     DAY-0 EMPTY STATE
+  ════════════════════════════════════════ */
+  .day0-wrap {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 40px 24px 48px;
+  }
+
+  /* Step pill */
+  .step-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #fff3ed; border: 1px solid #fbd2b9;
+    border-radius: 20px; padding: 4px 14px; margin-bottom: 28px;
+    font-size: 11px; font-weight: 700; color: #E85D1A; letter-spacing: 0.3px;
+  }
+  .step-pill .step-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: #E85D1A;
+    animation: pulse-dot 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.7); }
+  }
+
+  /* Illustration */
+  .illus-wrap {
+    position: relative; width: 520px; height: 300px; margin-bottom: 36px;
+  }
+
+  /* Headline + sub */
+  .day0-headline {
+    font-size: 26px; font-weight: 800; color: #1a2332; text-align: center;
+    line-height: 1.25; margin-bottom: 10px;
+  }
+  .day0-headline span { color: #E85D1A; }
+  .day0-sub {
+    font-size: 13.5px; color: #666; text-align: center; max-width: 520px; line-height: 1.6;
+    margin-bottom: 36px;
+  }
+
+  /* Benefits grid */
+  .benefits-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+    width: 100%; max-width: 720px; margin-bottom: 36px;
+  }
+  .benefit-card {
+    background: #f8f9fb; border: 1px solid #e8ecf0; border-radius: 8px;
+    padding: 16px 16px 14px; display: flex; flex-direction: column; gap: 8px;
+    transition: box-shadow 0.2s, border-color 0.2s;
+  }
+  .benefit-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.07); border-color: #d0d8e4; }
+  .benefit-icon-wrap {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .benefit-card .b-title { font-size: 12.5px; font-weight: 700; color: #1a2332; line-height: 1.3; }
+  .benefit-card .b-desc { font-size: 11.5px; color: #777; line-height: 1.5; }
+  .benefit-card .b-tag {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    border-radius: 4px; padding: 2px 7px; letter-spacing: 0.2px;
+    margin-top: 2px; align-self: flex-start;
+  }
+
+  /* CTAs */
+  .day0-ctas { display: flex; align-items: center; gap: 12px; }
+  .btn-activate {
+    display: flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, #E85D1A 0%, #c44c12 100%);
+    color: #fff; border: none; border-radius: 6px;
+    padding: 11px 22px; font-size: 13.5px; font-weight: 700; cursor: pointer;
+    box-shadow: 0 4px 14px rgba(232,93,26,0.35); transition: box-shadow 0.2s, transform 0.15s;
+    letter-spacing: 0.2px;
+  }
+  .btn-activate:hover { box-shadow: 0 6px 20px rgba(232,93,26,0.45); transform: translateY(-1px); }
+  .btn-learn {
+    display: flex; align-items: center; gap: 6px;
+    background: #fff; color: #3b7dd8; border: 1.5px solid #3b7dd8;
+    border-radius: 6px; padding: 10px 18px; font-size: 13px;
+    font-weight: 600; cursor: pointer; transition: background 0.2s;
+  }
+  .btn-learn:hover { background: #f0f6ff; }
+
+  /* Social proof strip */
+  .proof-strip {
+    display: flex; align-items: center; gap: 20px;
+    margin-top: 28px; padding-top: 24px;
+    border-top: 1px solid #edf0f3; width: 100%; max-width: 720px;
+    justify-content: center;
+  }
+  .proof-item { display: flex; align-items: center; gap: 7px; font-size: 11.5px; color: #666; }
+  .proof-item strong { color: #1a2332; font-weight: 700; }
+  .proof-sep { width: 1px; height: 20px; background: #dde2e8; }
+
+  /* ── Tooltip shimmer ── */
+  .shimmer-ring {
+    animation: shimmer-pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes shimmer-pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════ SIDEBAR ══════ -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <svg viewBox="0 0 32 32"><path d="M16 2 L30 9 L30 23 L16 30 L2 23 L2 9 Z"/></svg>
+  </div>
+  <!-- Dashboard -->
+  <div class="sidebar-icon active" title="Dashboard">
+    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+      <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+      <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+    </svg>
+  </div>
+  <!-- Devices -->
+  <div class="sidebar-icon" title="Devices">
+    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+      <rect x="2" y="6" width="20" height="12" rx="2"/><path d="M8 18v2M16 18v2M5 18h14"/>
+    </svg>
+    <span class="badge">3</span>
+  </div>
+  <!-- Policy -->
+  <div class="sidebar-icon" title="Policy">
+    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+      <path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+    </svg>
+  </div>
+  <!-- Alerts (current) -->
+  <div class="sidebar-icon" title="SAMI Alerts" style="color:#E85D1A; border-left:2px solid #E85D1A;">
+    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+      <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+  </div>
+  <!-- Reports -->
+  <div class="sidebar-icon" title="Reports">
+    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+      <path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+    </svg>
+  </div>
+  <div class="sidebar-spacer"></div>
+  <!-- Settings -->
+  <div class="sidebar-icon" title="Settings">
+    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+      <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+      <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+    </svg>
+  </div>
+</nav>
+
+<!-- ══════ TOPBAR ══════ -->
+<header class="topbar">
+  <div class="breadcrumb">
+    <a href="#">NSM</a>
+    <span>›</span>
+    <a href="#">Dashboard</a>
+    <span>›</span>
+    <strong style="color:#1a2332">SAMI Alerts</strong>
+  </div>
+  <div class="tenant-selector">
+    <span class="dot"></span>
+    All Tenants (247)
+    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+  </div>
+  <div class="topbar-icons">
+    <div class="icon-btn" title="Notifications">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+        <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+      </svg>
+      <span class="notif-badge"></span>
+    </div>
+    <div class="icon-btn" title="Help">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/>
+      </svg>
+    </div>
+    <div class="avatar">AR</div>
+  </div>
+</header>
+
+<!-- ══════ PAGE CONTENT ══════ -->
+<main class="page">
+  <div class="p-content">
+
+    <!-- Page header row -->
+    <div class="section-top">
+      <div class="section-top-left">
+        <span style="font-size:18px;font-weight:800;color:#1a2332;">SAMI</span>
+        <div class="sami-badge-pill">
+          <svg width="10" height="10" fill="currentColor" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          AI-Powered
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button style="background:#fff;border:1px solid #d0d7de;border-radius:4px;padding:5px 12px;font-size:12px;color:#555;cursor:pointer;display:flex;align-items:center;gap:5px;">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
+          Configure SAMI
+        </button>
+      </div>
+    </div>
+
+    <!-- SAMI Section Card -->
+    <div class="sami-section">
+
+      <!-- Tabs -->
+      <div class="sami-section-inner" style="padding-bottom:0;">
+        <div class="sami-tabs">
+          <div class="sami-tab active">Alerts</div>
+          <div class="sami-tab">Recommendations</div>
+          <div class="sami-tab">Risk Score</div>
+          <div class="sami-tab">History</div>
+        </div>
+      </div>
+
+      <!-- Ask SAMI bar -->
+      <div class="ask-sami-wrap">
+        <div class="ask-sami">
+          <span class="sami-spark">✦</span>
+          <input type="text" placeholder="Ask SAMI anything about your network security…" disabled style="cursor:default;"/>
+          <span class="kbd">⌘K</span>
+        </div>
+      </div>
+
+      <!-- ════ DAY-0 EMPTY STATE ════ -->
+      <div class="day0-wrap">
+
+        <!-- Step indicator -->
+        <div class="step-pill">
+          <span class="step-dot"></span>
+          SAMI IS READY — ACTIVATION REQUIRED
+        </div>
+
+        <!-- SVG Illustration -->
+        <div class="illus-wrap">
+          <svg width="520" height="300" viewBox="0 0 520 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <!-- Background glow -->
+              <radialGradient id="bgGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#E85D1A" stop-opacity="0.06"/>
+                <stop offset="100%" stop-color="#E85D1A" stop-opacity="0"/>
+              </radialGradient>
+              <!-- Center glow -->
+              <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#E85D1A" stop-opacity="0.18"/>
+                <stop offset="100%" stop-color="#E85D1A" stop-opacity="0"/>
+              </radialGradient>
+              <!-- Shield gradient -->
+              <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#1a3a5c"/>
+                <stop offset="100%" stop-color="#0d1526"/>
+              </linearGradient>
+              <!-- Pulse ring gradient -->
+              <radialGradient id="pulseGrad" cx="50%" cy="50%" r="50%">
+                <stop offset="70%" stop-color="#E85D1A" stop-opacity="0"/>
+                <stop offset="100%" stop-color="#E85D1A" stop-opacity="0.2"/>
+              </radialGradient>
+              <!-- Node gradient -->
+              <linearGradient id="nodeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#2a4a6e"/>
+                <stop offset="100%" stop-color="#1a2f4e"/>
+              </linearGradient>
+              <!-- CVE node -->
+              <linearGradient id="cveGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#E85D1A"/>
+                <stop offset="100%" stop-color="#c44c12"/>
+              </linearGradient>
+              <!-- Safe node -->
+              <linearGradient id="safeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#1a8a4a"/>
+                <stop offset="100%" stop-color="#0f5c30"/>
+              </linearGradient>
+              <!-- Info node -->
+              <linearGradient id="infoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#3b7dd8"/>
+                <stop offset="100%" stop-color="#2563b8"/>
+              </linearGradient>
+
+              <!-- Animated dashes -->
+              <style>
+                .flow-line { stroke-dasharray: 6 4; animation: flowAnim 2s linear infinite; }
+                .flow-line-rev { stroke-dasharray: 6 4; animation: flowAnimRev 2.5s linear infinite; }
+                .flow-line-slow { stroke-dasharray: 6 4; animation: flowAnim 3.5s linear infinite; }
+                @keyframes flowAnim { to { stroke-dashoffset: -40; } }
+                @keyframes flowAnimRev { to { stroke-dashoffset: 40; } }
+                .pulse-r1 { animation: pulseRing 2.4s ease-out infinite; }
+                .pulse-r2 { animation: pulseRing 2.4s ease-out 0.8s infinite; }
+                .pulse-r3 { animation: pulseRing 2.4s ease-out 1.6s infinite; }
+                @keyframes pulseRing {
+                  0% { r: 50; opacity: 0.5; }
+                  100% { r: 110; opacity: 0; }
+                }
+                .node-float { animation: nodeFloat 3s ease-in-out infinite; }
+                .node-float-2 { animation: nodeFloat 3.8s ease-in-out 0.5s infinite; }
+                .node-float-3 { animation: nodeFloat 2.8s ease-in-out 1.2s infinite; }
+                @keyframes nodeFloat {
+                  0%, 100% { transform: translateY(0); }
+                  50% { transform: translateY(-4px); }
+                }
+                .spark-blink { animation: sparkBlink 1.6s ease-in-out infinite; }
+                @keyframes sparkBlink { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+              </style>
+            </defs>
+
+            <!-- Background radial glow -->
+            <ellipse cx="260" cy="150" rx="220" ry="160" fill="url(#bgGlow)"/>
+
+            <!-- ── Concentric orbit rings ── -->
+            <circle cx="260" cy="150" r="90" stroke="#e2e6ea" stroke-width="1" stroke-dasharray="4 6" fill="none" opacity="0.6"/>
+            <circle cx="260" cy="150" r="130" stroke="#e2e6ea" stroke-width="1" stroke-dasharray="3 8" fill="none" opacity="0.4"/>
+
+            <!-- ── Pulsing rings from center ── -->
+            <circle cx="260" cy="150" r="50" fill="none" stroke="#E85D1A" stroke-width="1.5" class="pulse-r1" opacity="0.5"/>
+            <circle cx="260" cy="150" r="50" fill="none" stroke="#E85D1A" stroke-width="1.5" class="pulse-r2" opacity="0.5"/>
+            <circle cx="260" cy="150" r="50" fill="none" stroke="#E85D1A" stroke-width="1.5" class="pulse-r3" opacity="0.5"/>
+
+            <!-- ── CONNECTION LINES (device → center) ── -->
+            <!-- Top-left Firewall -->
+            <line x1="130" y1="68" x2="228" y2="126" stroke="#3b7dd8" stroke-width="1.2" class="flow-line" opacity="0.5"/>
+            <!-- Top-right Router -->
+            <line x1="390" y1="58" x2="294" y2="122" stroke="#3b7dd8" stroke-width="1.2" class="flow-line" opacity="0.5"/>
+            <!-- Left NSM -->
+            <line x1="60" y1="158" x2="214" y2="150" stroke="#E85D1A" stroke-width="1.5" class="flow-line" opacity="0.6"/>
+            <!-- Right Switch -->
+            <line x1="462" y1="148" x2="308" y2="150" stroke="#3b7dd8" stroke-width="1.2" class="flow-line-rev" opacity="0.5"/>
+            <!-- Bottom-left CVE node -->
+            <line x1="140" y1="240" x2="228" y2="174" stroke="#E85D1A" stroke-width="1.5" class="flow-line" opacity="0.7"/>
+            <!-- Bottom-right Behavior node -->
+            <line x1="380" y1="248" x2="294" y2="178" stroke="#3b7dd8" stroke-width="1.2" class="flow-line-slow" opacity="0.5"/>
+
+            <!-- ── Small data packets on lines ── -->
+            <circle r="3" fill="#E85D1A" opacity="0.8">
+              <animateMotion dur="2s" repeatCount="indefinite">
+                <mpath href="#p1"/>
+              </animateMotion>
+            </circle>
+            <path id="p1" d="M60,158 L214,150" fill="none"/>
+
+            <circle r="2.5" fill="#3b7dd8" opacity="0.8">
+              <animateMotion dur="2.8s" repeatCount="indefinite">
+                <mpath href="#p2"/>
+              </animateMotion>
+            </circle>
+            <path id="p2" d="M130,68 L228,126" fill="none"/>
+
+            <circle r="2.5" fill="#E85D1A" opacity="0.9">
+              <animateMotion dur="1.8s" repeatCount="indefinite">
+                <mpath href="#p3"/>
+              </animateMotion>
+            </circle>
+            <path id="p3" d="M140,240 L228,174" fill="none"/>
+
+            <!-- ══════════ CENTER — SAMI BRAIN ══════════ -->
+            <!-- Outer glow -->
+            <circle cx="260" cy="150" r="54" fill="url(#centerGlow)"/>
+            <!-- Shield body -->
+            <path d="M260 102 C260 102 228 114 228 138 L228 162 C228 178 244 192 260 198 C276 192 292 178 292 162 L292 138 C292 114 260 102 260 102Z" fill="url(#shieldGrad)" stroke="#2a4a6e" stroke-width="1"/>
+            <!-- Inner shield highlight -->
+            <path d="M260 110 C260 110 235 120 235 140 L235 161 C235 174 248 185 260 190 C272 185 285 174 285 161 L285 140 C285 120 260 110 260 110Z" fill="none" stroke="#3b5a82" stroke-width="0.8" opacity="0.6"/>
+
+            <!-- AI "brain" neural path inside shield -->
+            <g transform="translate(244,130)">
+              <!-- Neural dots -->
+              <circle cx="4" cy="8" r="2.5" fill="#E85D1A" opacity="0.9"/>
+              <circle cx="16" cy="4" r="2.5" fill="#E85D1A" opacity="0.9"/>
+              <circle cx="28" cy="10" r="2.5" fill="#E85D1A" opacity="0.9"/>
+              <circle cx="8" cy="22" r="2.5" fill="#3b7dd8" opacity="0.9"/>
+              <circle cx="20" cy="18" r="3" fill="#E85D1A"/>
+              <circle cx="32" cy="24" r="2.5" fill="#3b7dd8" opacity="0.9"/>
+              <circle cx="12" cy="34" r="2.5" fill="#E85D1A" opacity="0.7"/>
+              <circle cx="24" cy="32" r="2.5" fill="#3b7dd8" opacity="0.7"/>
+              <!-- Neural connections -->
+              <line x1="4" y1="8" x2="16" y2="4" stroke="#E85D1A" stroke-width="0.8" opacity="0.6"/>
+              <line x1="16" y1="4" x2="28" y2="10" stroke="#E85D1A" stroke-width="0.8" opacity="0.6"/>
+              <line x1="4" y1="8" x2="8" y2="22" stroke="#5a8ac0" stroke-width="0.8" opacity="0.5"/>
+              <line x1="16" y1="4" x2="20" y2="18" stroke="#E85D1A" stroke-width="0.8" opacity="0.6"/>
+              <line x1="28" y1="10" x2="20" y2="18" stroke="#E85D1A" stroke-width="0.8" opacity="0.6"/>
+              <line x1="28" y1="10" x2="32" y2="24" stroke="#5a8ac0" stroke-width="0.8" opacity="0.5"/>
+              <line x1="8" y1="22" x2="20" y2="18" stroke="#5a8ac0" stroke-width="0.8" opacity="0.5"/>
+              <line x1="20" y1="18" x2="32" y2="24" stroke="#E85D1A" stroke-width="0.8" opacity="0.6"/>
+              <line x1="8" y1="22" x2="12" y2="34" stroke="#5a8ac0" stroke-width="0.8" opacity="0.5"/>
+              <line x1="20" y1="18" x2="24" y2="32" stroke="#5a8ac0" stroke-width="0.8" opacity="0.5"/>
+              <line x1="32" y1="24" x2="24" y2="32" stroke="#5a8ac0" stroke-width="0.8" opacity="0.5"/>
+            </g>
+
+            <!-- SAMI label on shield -->
+            <text x="260" y="196" text-anchor="middle" font-size="9" font-weight="800" fill="#E85D1A" letter-spacing="1.5" font-family="system-ui,sans-serif">SAMI</text>
+
+            <!-- Spark icon on shield top -->
+            <text x="260" y="120" text-anchor="middle" font-size="13" fill="#E85D1A" class="spark-blink">✦</text>
+
+            <!-- ══════════ PERIPHERAL NODES ══════════ -->
+
+            <!-- Top-left: Firewall Node -->
+            <g transform="translate(100,40)" class="node-float">
+              <rect x="0" y="0" width="62" height="54" rx="8" fill="url(#nodeGrad)" stroke="#2a4a6e" stroke-width="1"/>
+              <rect x="0" y="0" width="62" height="16" rx="8" fill="#1a3a5c"/>
+              <rect x="0" y="8" width="62" height="8" fill="#1a3a5c"/>
+              <!-- Firewall icon -->
+              <rect x="10" y="20" width="42" height="3" rx="1.5" fill="#3b7dd8" opacity="0.8"/>
+              <rect x="10" y="26" width="42" height="3" rx="1.5" fill="#E85D1A" opacity="0.7"/>
+              <rect x="10" y="32" width="30" height="3" rx="1.5" fill="#3b7dd8" opacity="0.5"/>
+              <text x="31" y="46" text-anchor="middle" font-size="8" fill="#8ba3be" font-family="system-ui">Firewall ×12</text>
+            </g>
+
+            <!-- Top-right: Router/Switch -->
+            <g transform="translate(362,28)" class="node-float-2">
+              <rect x="0" y="0" width="62" height="54" rx="8" fill="url(#nodeGrad)" stroke="#2a4a6e" stroke-width="1"/>
+              <!-- Router icon -->
+              <circle cx="31" cy="22" r="12" fill="none" stroke="#3b7dd8" stroke-width="1.5" opacity="0.7"/>
+              <circle cx="31" cy="22" r="6" fill="none" stroke="#3b7dd8" stroke-width="1" opacity="0.5"/>
+              <line x1="31" y1="10" x2="31" y2="34" stroke="#3b7dd8" stroke-width="1" opacity="0.5"/>
+              <line x1="19" y1="22" x2="43" y2="22" stroke="#3b7dd8" stroke-width="1" opacity="0.5"/>
+              <text x="31" y="46" text-anchor="middle" font-size="8" fill="#8ba3be" font-family="system-ui">NSv · Cloud</text>
+            </g>
+
+            <!-- Left: NSM Node -->
+            <g transform="translate(18,130)" class="node-float-3">
+              <rect x="0" y="0" width="62" height="44" rx="8" fill="#1a2f4e" stroke="#E85D1A" stroke-width="1.5"/>
+              <text x="31" y="18" text-anchor="middle" font-size="8" font-weight="700" fill="#E85D1A" font-family="system-ui">NSM</text>
+              <text x="31" y="30" text-anchor="middle" font-size="7" fill="#8ba3be" font-family="system-ui">247 tenants</text>
+              <rect x="8" y="34" width="46" height="3" rx="1.5" fill="#E85D1A" opacity="0.2"/>
+              <rect x="8" y="34" width="32" height="3" rx="1.5" fill="#E85D1A" opacity="0.7"/>
+            </g>
+
+            <!-- Right: Switch Node -->
+            <g transform="translate(440,122)" class="node-float">
+              <rect x="0" y="0" width="60" height="52" rx="8" fill="url(#nodeGrad)" stroke="#2a4a6e" stroke-width="1"/>
+              <!-- Switch ports -->
+              <g fill="#3b7dd8" opacity="0.7">
+                <rect x="8" y="12" width="6" height="4" rx="1"/>
+                <rect x="17" y="12" width="6" height="4" rx="1"/>
+                <rect x="26" y="12" width="6" height="4" rx="1"/>
+                <rect x="35" y="12" width="6" height="4" rx="1"/>
+                <rect x="44" y="12" width="6" height="4" rx="1"/>
+              </g>
+              <g fill="#E85D1A" opacity="0.8">
+                <rect x="8" y="20" width="6" height="4" rx="1"/>
+                <rect x="17" y="20" width="6" height="4" rx="1"/>
+                <rect x="26" y="20" width="4" height="4" rx="1" opacity="0.4"/>
+                <rect x="35" y="20" width="6" height="4" rx="1"/>
+                <rect x="44" y="20" width="6" height="4" rx="1"/>
+              </g>
+              <text x="30" y="40" text-anchor="middle" font-size="8" fill="#8ba3be" font-family="system-ui">Switch ×48</text>
+            </g>
+
+            <!-- Bottom-left: CVE Alert Node (highlighted) -->
+            <g transform="translate(100,214)" class="node-float-2">
+              <rect x="0" y="0" width="76" height="54" rx="8" fill="#1a0a04" stroke="#E85D1A" stroke-width="1.5"/>
+              <rect x="0" y="0" width="76" height="20" rx="8" fill="#E85D1A" opacity="0.15"/>
+              <rect x="0" y="12" width="76" height="8" fill="#E85D1A" opacity="0.15"/>
+              <text x="38" y="14" text-anchor="middle" font-size="8" font-weight="700" fill="#E85D1A" font-family="system-ui">3 CVE DETECTED</text>
+              <circle cx="10" cy="32" r="3" fill="#E85D1A"/>
+              <text x="18" y="36" font-size="8" fill="#cc9070" font-family="system-ui">CVE-2024-0982</text>
+              <text x="10" y="48" font-size="7" fill="#9a6040" font-family="system-ui">CVSS 9.1 · Critical</text>
+            </g>
+
+            <!-- Bottom-right: Behavioral Node -->
+            <g transform="translate(348,224)" class="node-float-3">
+              <rect x="0" y="0" width="76" height="52" rx="8" fill="#031226" stroke="#3b7dd8" stroke-width="1.5"/>
+              <rect x="0" y="0" width="76" height="18" rx="8" fill="#3b7dd8" opacity="0.15"/>
+              <rect x="0" y="10" width="76" height="8" fill="#3b7dd8" opacity="0.15"/>
+              <text x="38" y="13" text-anchor="middle" font-size="8" font-weight="700" fill="#3b7dd8" font-family="system-ui">ANOMALY SCAN</text>
+              <!-- Mini graph bars -->
+              <rect x="8" y="34" width="5" height="10" rx="1" fill="#3b7dd8" opacity="0.4"/>
+              <rect x="16" y="28" width="5" height="16" rx="1" fill="#3b7dd8" opacity="0.6"/>
+              <rect x="24" y="30" width="5" height="14" rx="1" fill="#3b7dd8" opacity="0.5"/>
+              <rect x="32" y="22" width="5" height="22" rx="1" fill="#E85D1A" opacity="0.9"/>
+              <rect x="40" y="30" width="5" height="14" rx="1" fill="#3b7dd8" opacity="0.5"/>
+              <rect x="48" y="32" width="5" height="12" rx="1" fill="#3b7dd8" opacity="0.4"/>
+              <rect x="56" y="26" width="5" height="18" rx="1" fill="#3b7dd8" opacity="0.55"/>
+              <text x="38" y="50" text-anchor="middle" font-size="7" fill="#5a88c8" font-family="system-ui">Continuous 24/7</text>
+            </g>
+
+            <!-- ── Floating badges / insight chips ── -->
+            <!-- Risk score reduced -->
+            <g transform="translate(180,46)" class="shimmer-ring">
+              <rect x="0" y="0" width="80" height="22" rx="11" fill="#fff" stroke="#e2e6ea" stroke-width="1"/>
+              <circle cx="12" cy="11" r="5" fill="#1a8a4a"/>
+              <text x="11" y="15" text-anchor="middle" font-size="9" fill="#fff" font-family="system-ui">↓</text>
+              <text x="46" y="15" text-anchor="middle" font-size="8.5" fill="#1a2332" font-family="system-ui" font-weight="600">Risk −34%</text>
+            </g>
+
+            <!-- Auto-remediate badge -->
+            <g transform="translate(278,246)" class="shimmer-ring">
+              <rect x="0" y="0" width="88" height="22" rx="11" fill="#fff" stroke="#e2e6ea" stroke-width="1"/>
+              <circle cx="12" cy="11" r="5" fill="#3b7dd8"/>
+              <text x="11" y="15" text-anchor="middle" font-size="9" fill="#fff" font-family="system-ui">⚙</text>
+              <text x="50" y="15" text-anchor="middle" font-size="8.5" fill="#1a2332" font-family="system-ui" font-weight="600">Auto-Fix Ready</text>
+            </g>
+
+          </svg>
+        </div>
+        <!-- /illustration -->
+
+        <!-- Headline -->
+        <h2 class="day0-headline">
+          <span>SAMI</span> is watching — the moment you activate,<br>it starts protecting.
+        </h2>
+        <p class="day0-sub">
+          SAMI correlates threat intelligence, device telemetry, and behavioral signals across all your SonicWall assets — surfacing critical alerts before they become incidents, and recommending fixes you can apply in one click.
+        </p>
+
+        <!-- ════ BENEFITS GRID ════ -->
+        <div class="benefits-grid">
+
+          <!-- 1 CVE Intelligence -->
+          <div class="benefit-card">
+            <div class="benefit-icon-wrap" style="background:#fff3ed;">
+              <svg width="20" height="20" fill="none" stroke="#E85D1A" stroke-width="1.8" viewBox="0 0 24 24">
+                <path d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+              </svg>
+            </div>
+            <div class="b-title">CVE & Vulnerability Alerts</div>
+            <div class="b-desc">Real-time detection of critical CVEs affecting your exact firmware versions — before attackers can exploit them.</div>
+            <span class="b-tag" style="background:#fff3ed;color:#E85D1A;">Threat Intel</span>
+          </div>
+
+          <!-- 2 Behavioral -->
+          <div class="benefit-card">
+            <div class="benefit-icon-wrap" style="background:#eef4ff;">
+              <svg width="20" height="20" fill="none" stroke="#3b7dd8" stroke-width="1.8" viewBox="0 0 24 24">
+                <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+              </svg>
+            </div>
+            <div class="b-title">Behavioral Anomaly Detection</div>
+            <div class="b-desc">Continuous 24/7 learning across all tenants — SAMI flags unusual traffic, policy deviations, and lateral movement patterns.</div>
+            <span class="b-tag" style="background:#eef4ff;color:#3b7dd8;">AI/ML</span>
+          </div>
+
+          <!-- 3 One-Click Remediation -->
+          <div class="benefit-card">
+            <div class="benefit-icon-wrap" style="background:#edfcf3;">
+              <svg width="20" height="20" fill="none" stroke="#1a8a4a" stroke-width="1.8" viewBox="0 0 24 24">
+                <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+              </svg>
+            </div>
+            <div class="b-title">One-Click Remediation</div>
+            <div class="b-desc">Every alert ships with a validated fix recommendation — review, approve, and SAMI pushes the change across your fleet.</div>
+            <span class="b-tag" style="background:#edfcf3;color:#1a8a4a;">Automation</span>
+          </div>
+
+          <!-- 4 Risk Scoring -->
+          <div class="benefit-card">
+            <div class="benefit-icon-wrap" style="background:#fff3ed;">
+              <svg width="20" height="20" fill="none" stroke="#E85D1A" stroke-width="1.8" viewBox="0 0 24 24">
+                <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+              </svg>
+            </div>
+            <div class="b-title">Tenant Risk Scoring</div>
+            <div class="b-desc">Aggregated risk scores per tenant, product, and firmware — so you prioritize the highest-impact work across 247 customers.</div>
+            <span class="b-tag" style="background:#fff3ed;color:#E85D1A;">Prioritization</span>
+          </div>
+
+          <!-- 5 Cross-tenant -->
+          <div class="benefit-card">
+            <div class="benefit-icon-wrap" style="background:#eef4ff;">
+              <svg width="20" height="20" fill="none" stroke="#3b7dd8" stroke-width="1.8" viewBox="0 0 24 24">
+                <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+            </div>
+            <div class="b-title">Cross-Tenant Intelligence</div>
+            <div class="b-desc">Threat seen in one tenant? SAMI proactively alerts all affected tenants running the same config — before the threat spreads.</div>
+            <span class="b-tag" style="background:#eef4ff;color:#3b7dd8;">MSP Scale</span>
+          </div>
+
+          <!-- 6 Ask SAMI -->
+          <div class="benefit-card">
+            <div class="benefit-icon-wrap" style="background:#f3f0ff;">
+              <svg width="20" height="20" fill="none" stroke="#7c5df0" stroke-width="1.8" viewBox="0 0 24 24">
+                <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+              </svg>
+            </div>
+            <div class="b-title">Ask SAMI — Natural Language</div>
+            <div class="b-desc">"Which tenants need a firmware update?" — SAMI answers instantly, synthesizing alerts, risk scores, and policies in plain English.</div>
+            <span class="b-tag" style="background:#f3f0ff;color:#7c5df0;">Conversational AI</span>
+          </div>
+
+        </div>
+        <!-- /benefits grid -->
+
+        <!-- CTAs -->
+        <div class="day0-ctas">
+          <button class="btn-activate">
+            <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            Activate SAMI Now
+          </button>
+          <button class="btn-learn">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            How SAMI Works
+          </button>
+        </div>
+
+        <!-- Social proof strip -->
+        <div class="proof-strip">
+          <div class="proof-item">
+            <svg width="14" height="14" fill="#1a8a4a" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>Avg. <strong>34% risk reduction</strong> in 30 days</span>
+          </div>
+          <div class="proof-sep"></div>
+          <div class="proof-item">
+            <svg width="14" height="14" fill="#3b7dd8" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <span><strong>2.1× faster</strong> incident response</span>
+          </div>
+          <div class="proof-sep"></div>
+          <div class="proof-item">
+            <svg width="14" height="14" fill="#E85D1A" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+            <span>Covers <strong>100% of your SonicWall assets</strong></span>
+          </div>
+          <div class="proof-sep"></div>
+          <div class="proof-item">
+            <svg width="14" height="14" fill="#7c5df0" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span>Used by <strong>12,000+ MSP partners</strong></span>
+          </div>
+        </div>
+
+      </div>
+      <!-- /day0-wrap -->
+
+    </div>
+    <!-- /sami-section -->
+
+  </div>
+</main>
+
+</body>
+</html>

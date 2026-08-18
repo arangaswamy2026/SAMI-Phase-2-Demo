@@ -1,0 +1,1896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+  Design System Version: UUIF 9.2
+  Component Tokens Used:
+    --uuif-brand-navy, --uuif-brand-orange, --uuif-brand-green, --uuif-brand-red, --uuif-brand-yellow, --uuif-brand-blue
+    --uuif-surface-container, --uuif-surface-bg, --uuif-surface-model, --uuif-surface-primary, --uuif-surface-tertiary, --uuif-surface-selected
+    --uuif-text-primary, --uuif-text-secondary, --uuif-text-contrast, --uuif-text-tertiary, --uuif-text-hover, --uuif-text-highlight
+    --uuif-border-primary, --uuif-border-secondary, --uuif-border-tertiary, --uuif-border-transparent
+    --uuif-status-normal, --uuif-status-minor, --uuif-status-major, --uuif-status-high, --uuif-status-failed
+    --uuif-fill-blue-lightest, --uuif-fill-green-xxx-lighter, --uuif-fill-yellow-xxx-lighter, --uuif-fill-red-lightest
+    --uuif-radius-4, --uuif-radius-6, --uuif-radius-8, --uuif-radius-12, --uuif-radius-pill
+    --uuif-shadow-sm, --uuif-shadow-md
+    --uuif-sp-1 through --uuif-sp-8
+    --uuif-font-bold-16, --uuif-font-semibold-14, --uuif-font-semibold-13, --uuif-font-semibold-12, --uuif-font-regular-13, --uuif-font-regular-12
+  Components Used: uuif-btn (secondary, primary), uuif-chip (success, warning, error, info), dashboard-card, count-block, data-table, chip (status badge), severity-icon
+  Gaps Flagged: None — all patterns sourced from UUIF 9.2 spec
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SonicWall Unified Partner Dashboard — UUIF 9.2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
+<style>
+  /* ── UUIF 9.2 TOKEN LAYER ── */
+  :root {
+    --uuif-text-primary: #191c25;
+    --uuif-text-secondary: #4a618f;
+    --uuif-text-tertiary: #888888;
+    --uuif-text-contrast: #ffffff;
+    --uuif-text-disabled: rgba(17,17,17,0.3);
+    --uuif-text-hover: #ff5d00;
+    --uuif-text-selected: #ffffff;
+    --uuif-text-highlight: #0c2b67;
+    --uuif-surface-container: #ffffff;
+    --uuif-surface-bg: #fafafa;
+    --uuif-surface-primary: #5b74a7;
+    --uuif-surface-secondary: #d2dff2;
+    --uuif-surface-tertiary: #f6f8fe;
+    --uuif-surface-highlight: #ff5d00;
+    --uuif-surface-hover: rgba(17,17,17,0.06);
+    --uuif-surface-selected: rgba(255,72,26,0.09);
+    --uuif-surface-disabled: #e8eff9;
+    --uuif-surface-contrast: #111315;
+    --uuif-surface-model: #f0f2f5;
+    --uuif-border-primary: #ff5d00;
+    --uuif-border-secondary: #78a3e5;
+    --uuif-border-tertiary: #cccccc;
+    --uuif-border-transparent: rgba(17,17,17,0.09);
+    --uuif-border-disabled: #d2dff2;
+    --uuif-brand-navy: #001b50;
+    --uuif-brand-blue: #1f3c73;
+    --uuif-brand-orange: #ff5d00;
+    --uuif-brand-green: #59a02e;
+    --uuif-brand-red: #c70f0f;
+    --uuif-brand-yellow: #f3ac3d;
+    --uuif-theme-text-secondary: #5b74a7;
+    --uuif-theme-bg-primary: #001b50;
+    --uuif-theme-bg-secondary: #d2dff2;
+    --uuif-status-normal: #99CC00;
+    --uuif-status-minor: #FFCC00;
+    --uuif-status-major: #FF9900;
+    --uuif-status-high: #FF0000;
+    --uuif-status-failed: #CC0000;
+    --uuif-fill-blue-lightest: #f6f8fe;
+    --uuif-fill-green-xxx-lighter: #e3efdc;
+    --uuif-fill-yellow-xxx-lighter: #ffe9be;
+    --uuif-fill-red-lightest: #fff0f0;
+    --uuif-fill-green-x-darker: #478234;
+    --uuif-fill-orange-x-darker: #c24903;
+    --uuif-radius-4: 4px;
+    --uuif-radius-6: 6px;
+    --uuif-radius-8: 8px;
+    --uuif-radius-12: 12px;
+    --uuif-radius-22: 22px;
+    --uuif-radius-pill: 88px;
+    --uuif-shadow-sm: 0px 1px 6px 2px rgba(0,0,0,0.12);
+    --uuif-shadow-md: 0px 4px 12px 0px rgba(0,0,0,0.16);
+    --uuif-sp-1: 2px;
+    --uuif-sp-2: 4px;
+    --uuif-sp-3: 8px;
+    --uuif-sp-4: 12px;
+    --uuif-sp-5: 16px;
+    --uuif-sp-6: 20px;
+    --uuif-sp-7: 24px;
+    --uuif-sp-8: 32px;
+    --uuif-sp-9: 40px;
+    --uuif-sp-10: 48px;
+  }
+
+  /* ── BASE RESET ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1;
+    color: var(--uuif-text-primary);
+    background: var(--uuif-surface-bg);
+  }
+
+  /* ── PAGE SHELL (§5 Page Layout) ── */
+  .shell {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── PRIMARY NAV RAIL (§6) ── */
+  .primary-nav {
+    width: 60px;
+    background: var(--uuif-brand-navy);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--uuif-sp-4) 0;
+    gap: var(--uuif-sp-1);
+    flex-shrink: 0;
+    z-index: 10;
+  }
+
+  .nav-swoosh {
+    width: 32px;
+    height: 32px;
+    margin-bottom: var(--uuif-sp-4);
+    flex-shrink: 0;
+  }
+
+  .nav-item {
+    width: 60px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: var(--uuif-brand-orange);
+    border-radius: 0 2px 2px 0;
+  }
+
+  .nav-item.active { background: rgba(17,17,17,0.4); }
+
+  .nav-item svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .nav-divider {
+    width: 44px;
+    height: 1px;
+    background: rgba(255,255,255,0.15);
+    margin: var(--uuif-sp-2) 0;
+  }
+
+  /* ── SUBNAV PANEL (§6) ── */
+  .subnav {
+    width: 266px;
+    background: var(--uuif-surface-container);
+    border-right: 1px solid var(--uuif-border-tertiary);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    overflow-y: auto;
+  }
+
+  .subnav-header {
+    padding: var(--uuif-sp-4) var(--uuif-sp-5);
+    border-bottom: 1px solid var(--uuif-border-transparent);
+    flex-shrink: 0;
+  }
+
+  .subnav-product-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #e67f02;
+    margin-top: var(--uuif-sp-1);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .subnav-section {
+    padding: var(--uuif-sp-4) 0 var(--uuif-sp-3) 0;
+    border-bottom: 1px solid var(--uuif-border-transparent);
+  }
+
+  .subnav-section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--uuif-brand-navy);
+    padding: 0 var(--uuif-sp-5) var(--uuif-sp-2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .subnav-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--uuif-sp-2) var(--uuif-sp-5);
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--uuif-text-secondary);
+    cursor: pointer;
+    border-radius: var(--uuif-radius-4);
+    margin: 0 var(--uuif-sp-3);
+  }
+
+  .subnav-link:hover { background: var(--uuif-surface-hover); }
+
+  .subnav-link.active {
+    font-size: 12px;
+    font-weight: 600;
+    color: #e67f02;
+    background: var(--uuif-surface-selected);
+    border-radius: var(--uuif-radius-4);
+  }
+
+  /* ── CONTENT AREA ── */
+  .content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--uuif-surface-bg);
+  }
+
+  /* ── TOP ACTION BAR (§6) ── */
+  .topbar {
+    height: 46px;
+    background: var(--uuif-surface-container);
+    border-bottom: 1px solid var(--uuif-border-transparent);
+    display: flex;
+    align-items: center;
+    padding: 0 var(--uuif-sp-6);
+    gap: var(--uuif-sp-4);
+    flex-shrink: 0;
+  }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: var(--uuif-sp-2);
+    font-size: 12px;
+    color: var(--uuif-theme-text-secondary);
+  }
+
+  .breadcrumb svg { width: 16px; height: 16px; fill: var(--uuif-theme-text-secondary); }
+  .breadcrumb .sep { color: var(--uuif-border-tertiary); }
+
+  .topbar-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: var(--uuif-sp-4);
+  }
+
+  .topbar-icon-btn {
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+
+  .topbar-icon-btn svg { width: 16px; height: 16px; fill: var(--uuif-text-secondary); }
+
+  .topbar-avatar {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--uuif-surface-primary);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--uuif-text-contrast);
+  }
+
+  /* ── PAGE BODY ── */
+  .page-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--uuif-sp-6);
+  }
+
+  /* ── CONCEPT SWITCHER ── */
+  .concept-switcher {
+    background: var(--uuif-brand-navy);
+    padding: 0 var(--uuif-sp-6);
+    display: flex;
+    align-items: center;
+    gap: var(--uuif-sp-3);
+    height: 44px;
+    flex-shrink: 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .cs-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    margin-right: var(--uuif-sp-3);
+  }
+
+  /* uuif-btn secondary (adapted for dark bg) */
+  .cs-btn {
+    padding: 3px 14px;
+    border-radius: var(--uuif-radius-pill);
+    border: 1px solid rgba(255,255,255,0.25);
+    background: transparent;
+    color: rgba(255,255,255,0.6);
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    cursor: pointer;
+  }
+
+  .cs-btn:hover { border-color: var(--uuif-brand-orange); color: var(--uuif-text-contrast); }
+
+  .cs-btn.active {
+    background: var(--uuif-brand-orange);
+    border-color: var(--uuif-brand-orange);
+    color: var(--uuif-text-contrast);
+    font-weight: 600;
+  }
+
+  /* ── DASHBOARD PANELS ── */
+  .dash-panel { display: none; }
+  .dash-panel.active { display: block; }
+
+  /* ── PAGE TITLE AREA ── */
+  .page-title-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: var(--uuif-sp-6);
+  }
+
+  .page-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--uuif-text-highlight);
+    line-height: 1.1;
+  }
+
+  .page-subtitle {
+    font-size: 12px;
+    color: var(--uuif-text-tertiary);
+    margin-top: var(--uuif-sp-1);
+  }
+
+  /* ── UUIF BUTTON (§7) ── */
+  .uuif-btn {
+    padding: 5.5px 20px;
+    border-radius: var(--uuif-radius-pill);
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    cursor: pointer;
+    border: 1px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--uuif-sp-2);
+    line-height: 1;
+  }
+
+  .uuif-btn.secondary {
+    background: var(--uuif-surface-container);
+    border-color: var(--uuif-border-secondary);
+    color: var(--uuif-text-secondary);
+  }
+
+  .uuif-btn.secondary:hover { border-color: var(--uuif-brand-orange); color: var(--uuif-text-hover); }
+
+  .uuif-btn.primary {
+    background: var(--uuif-surface-primary);
+    color: var(--uuif-text-contrast);
+    border-color: transparent;
+  }
+
+  .uuif-btn.sm { padding: 3px 14px; font-size: 13px; }
+
+  /* ── COUNT BLOCK (§10) ── */
+  .uuif-count-block {
+    background: var(--uuif-surface-container);
+    border: 1px solid var(--uuif-border-secondary);
+    border-radius: var(--uuif-radius-8);
+    padding: var(--uuif-sp-4);
+    display: flex;
+    align-items: center;
+    gap: var(--uuif-sp-4);
+  }
+
+  .cb-icon {
+    width: 24px; height: 24px;
+    fill: var(--uuif-brand-orange);
+    flex-shrink: 0;
+  }
+
+  .cb-label {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--uuif-text-secondary);
+    margin-bottom: var(--uuif-sp-1);
+  }
+
+  .cb-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--uuif-text-primary);
+    line-height: 1;
+  }
+
+  /* ── DASHBOARD CARD (§10) ── */
+  .uuif-dashboard-card {
+    background: var(--uuif-surface-container);
+    border: 1px solid var(--uuif-border-tertiary);
+    border-radius: var(--uuif-radius-6);
+    overflow: hidden;
+  }
+
+  .dc-header {
+    background: var(--uuif-surface-model);
+    border-bottom: 1px solid var(--uuif-border-transparent);
+    padding: var(--uuif-sp-3) var(--uuif-sp-5);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--uuif-sp-3);
+  }
+
+  .dc-header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--uuif-sp-3);
+  }
+
+  /* Product source badge — label component from UUIF chip/label */
+  .source-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--uuif-sp-1);
+    height: 22px;
+    padding: 0 var(--uuif-sp-3);
+    border-radius: var(--uuif-radius-4);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--uuif-text-contrast);
+    flex-shrink: 0;
+  }
+
+  /* Per-product accent colors (UUIF brand tokens only) */
+  .source-nsm   { background: var(--uuif-brand-blue); }
+  .source-wnm   { background: var(--uuif-surface-primary); }
+  .source-cc    { background: var(--uuif-brand-red); }
+  .source-cse   { background: var(--uuif-brand-green); }
+
+  .dc-title {
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--uuif-text-highlight);
+  }
+
+  .dc-action {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--uuif-text-hover);
+    cursor: pointer;
+    text-decoration: none;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  .dc-body { padding: var(--uuif-sp-4); }
+  .dc-body-flush { padding: 0; }
+
+  .dc-footer {
+    border-top: 1px solid var(--uuif-border-transparent);
+    padding: var(--uuif-sp-3) var(--uuif-sp-5);
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--uuif-sp-3);
+  }
+
+  /* ── CHIP / STATUS BADGE (§11) ── */
+  .uuif-chip {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    border-radius: var(--uuif-radius-4);
+    padding: 0 7px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border: 1px solid;
+    white-space: nowrap;
+  }
+
+  .uuif-chip.default {
+    background: var(--uuif-surface-tertiary);
+    border-color: var(--uuif-border-secondary);
+    color: var(--uuif-text-secondary);
+  }
+
+  .uuif-chip.success {
+    background: var(--uuif-fill-green-xxx-lighter);
+    border-color: var(--uuif-brand-green);
+    color: var(--uuif-brand-green);
+  }
+
+  .uuif-chip.warning {
+    background: var(--uuif-fill-yellow-xxx-lighter);
+    border-color: var(--uuif-brand-yellow);
+    color: var(--uuif-brand-yellow);
+  }
+
+  .uuif-chip.error {
+    background: var(--uuif-fill-red-lightest);
+    border-color: var(--uuif-brand-red);
+    color: var(--uuif-brand-red);
+  }
+
+  /* ── SEVERITY ICON (§11) ── */
+  .sev-icon {
+    width: 16px; height: 16px;
+    border-radius: var(--uuif-radius-4);
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  .sev-icon.normal  { background: var(--uuif-status-normal); }
+  .sev-icon.minor   { background: var(--uuif-status-minor); }
+  .sev-icon.major   { background: var(--uuif-status-major); }
+  .sev-icon.high    { background: var(--uuif-status-high); }
+  .sev-icon.failed  { background: var(--uuif-status-failed); }
+
+  /* ── DATA TABLE (§11) ── */
+  .uuif-data-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .uuif-data-table th {
+    background: var(--uuif-surface-model);
+    border-bottom: 2px solid var(--uuif-border-primary);
+    padding: var(--uuif-sp-3) var(--uuif-sp-4);
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--uuif-text-secondary);
+    white-space: nowrap;
+  }
+
+  .uuif-data-table td {
+    padding: 7px var(--uuif-sp-4);
+    font-size: 13px;
+    color: var(--uuif-text-primary);
+    border-bottom: 1px solid var(--uuif-border-transparent);
+    vertical-align: middle;
+  }
+
+  .uuif-data-table tr:nth-child(even) td { background: var(--uuif-fill-blue-lightest); }
+  .uuif-data-table tr:hover td { background: var(--uuif-surface-tertiary); }
+
+  /* ── STATUS INFO BANNER (§9) ── */
+  .uuif-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--uuif-sp-4);
+    padding: var(--uuif-sp-4) var(--uuif-sp-5);
+    border-radius: var(--uuif-radius-6);
+    margin-bottom: var(--uuif-sp-6);
+    border: 1px solid;
+  }
+
+  .uuif-banner.info {
+    background: var(--uuif-fill-blue-lightest);
+    border-color: var(--uuif-border-secondary);
+  }
+
+  .uuif-banner.warning {
+    background: var(--uuif-fill-yellow-xxx-lighter);
+    border-color: var(--uuif-brand-yellow);
+  }
+
+  .uuif-banner-icon {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .uuif-banner-icon svg { width: 12px; height: 12px; fill: var(--uuif-text-contrast); }
+  .uuif-banner.info .uuif-banner-icon { background: var(--uuif-border-secondary); }
+  .uuif-banner.warning .uuif-banner-icon { background: var(--uuif-brand-yellow); }
+
+  .uuif-banner-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--uuif-text-secondary);
+    margin-bottom: var(--uuif-sp-1);
+  }
+
+  .uuif-banner-body {
+    font-size: 13px;
+    color: var(--uuif-text-secondary);
+    line-height: 1.5;
+  }
+
+  /* ── PROGRESS BAR (§12) ── */
+  .uuif-pbar-track {
+    height: 6px;
+    background: var(--uuif-border-disabled);
+    border-radius: var(--uuif-radius-pill);
+    overflow: hidden;
+  }
+
+  .uuif-pbar-fill {
+    height: 100%;
+    border-radius: var(--uuif-radius-pill);
+    background: var(--uuif-surface-primary);
+  }
+
+  /* ── TAB BAR (§8) ── */
+  .uuif-tab-bar {
+    background: var(--uuif-surface-container);
+    border-bottom: 1px solid var(--uuif-border-primary);
+    padding: 0 var(--uuif-sp-6);
+    display: flex;
+    gap: var(--uuif-sp-1);
+    margin-bottom: var(--uuif-sp-5);
+  }
+
+  .uuif-tab {
+    height: 40px;
+    padding: 0 var(--uuif-sp-5);
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--uuif-theme-text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    border: 1px solid transparent;
+    border-bottom: none;
+    margin-bottom: -1px;
+    border-radius: var(--uuif-radius-6) var(--uuif-radius-6) 0 0;
+  }
+
+  .uuif-tab.active {
+    font-weight: 700;
+    color: var(--uuif-text-hover);
+    border-color: var(--uuif-border-primary);
+    background: var(--uuif-surface-container);
+  }
+
+  /* ── LAYOUT HELPERS ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--uuif-sp-5); }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--uuif-sp-5); }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--uuif-sp-5); }
+  .grid-cb { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--uuif-sp-4); margin-bottom: var(--uuif-sp-6); }
+  .flex-row { display: flex; align-items: center; gap: var(--uuif-sp-3); }
+  .flex-between { display: flex; align-items: center; justify-content: space-between; }
+  .gap-2 { gap: var(--uuif-sp-2); }
+  .gap-3 { gap: var(--uuif-sp-3); }
+  .mt-3 { margin-top: var(--uuif-sp-3); }
+  .mt-4 { margin-top: var(--uuif-sp-4); }
+  .mt-5 { margin-top: var(--uuif-sp-5); }
+  .mb-3 { margin-bottom: var(--uuif-sp-3); }
+  .mb-4 { margin-bottom: var(--uuif-sp-4); }
+  .mb-5 { margin-bottom: var(--uuif-sp-5); }
+
+  /* ── TYPOGRAPHY HELPERS ── */
+  .t-11 { font-size: 11px; }
+  .t-12 { font-size: 12px; }
+  .t-13 { font-size: 13px; }
+  .t-14 { font-size: 14px; }
+  .fw-600 { font-weight: 600; }
+  .fw-700 { font-weight: 700; }
+  .upper { text-transform: uppercase; letter-spacing: 0.06em; }
+  .col-secondary { color: var(--uuif-text-secondary); }
+  .col-tertiary  { color: var(--uuif-text-tertiary); }
+  .col-highlight { color: var(--uuif-text-highlight); }
+  .col-orange    { color: var(--uuif-brand-orange); }
+  .col-red       { color: var(--uuif-brand-red); }
+  .col-green     { color: var(--uuif-brand-green); }
+  .col-yellow    { color: var(--uuif-brand-yellow); }
+
+  /* Metric value size (count block pattern extension) */
+  .val-lg { font-size: 22px; font-weight: 700; line-height: 1; color: var(--uuif-text-primary); }
+  .val-xl { font-size: 28px; font-weight: 700; line-height: 1; color: var(--uuif-text-primary); }
+
+  /* Inline dot */
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    display: inline-block; flex-shrink: 0;
+  }
+
+  /* Widget row divider */
+  .row-div { height: 1px; background: var(--uuif-border-transparent); margin: var(--uuif-sp-2) 0; }
+
+  /* Tenant row */
+  .tenant-row {
+    display: flex; align-items: center; gap: var(--uuif-sp-3);
+    padding: var(--uuif-sp-2) var(--uuif-sp-3);
+    border-radius: var(--uuif-radius-6);
+    cursor: pointer;
+  }
+
+  .tenant-row:hover { background: var(--uuif-surface-hover); }
+
+  .t-avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--uuif-surface-secondary);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700;
+    color: var(--uuif-brand-blue);
+    flex-shrink: 0;
+    text-transform: uppercase;
+  }
+
+  /* Dashboard widget grid */
+  .widget-grid {
+    display: grid;
+    gap: var(--uuif-sp-5);
+  }
+
+  .widget-grid.layout-2x2 {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+  }
+
+  /* Scrollable table container */
+  .table-scroll { overflow-x: auto; }
+
+  /* Mini bar chart (CSS only, UUIF surface tokens) */
+  .bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--uuif-sp-1);
+    height: 40px;
+    padding: 0 var(--uuif-sp-1);
+  }
+
+  .bar-seg {
+    flex: 1;
+    border-radius: 2px 2px 0 0;
+    background: var(--uuif-surface-secondary);
+    min-height: 4px;
+  }
+
+  .bar-seg.hi { background: var(--uuif-brand-orange); }
+  .bar-seg.md { background: var(--uuif-surface-primary); opacity: 0.6; }
+  .bar-seg.lo { background: var(--uuif-brand-green); opacity: 0.5; }
+  .bar-seg.er { background: var(--uuif-brand-red); opacity: 0.55; }
+
+  /* Donut (SVG inline, no library) */
+  .donut-wrap { display: flex; align-items: center; gap: var(--uuif-sp-5); }
+  .donut-legend { display: flex; flex-direction: column; gap: var(--uuif-sp-2); }
+  .legend-item { display: flex; align-items: center; gap: var(--uuif-sp-2); font-size: 12px; color: var(--uuif-text-secondary); }
+  .legend-swatch { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+  /* Source label row inside widget */
+  .source-row {
+    display: flex; align-items: center; gap: var(--uuif-sp-2);
+    padding: var(--uuif-sp-2) var(--uuif-sp-5);
+    background: var(--uuif-surface-model);
+    border-bottom: 1px solid var(--uuif-border-transparent);
+  }
+
+  .source-desc {
+    font-size: 11px;
+    color: var(--uuif-text-tertiary);
+  }
+
+  /* Pill filter row */
+  .filter-row {
+    display: flex; gap: var(--uuif-sp-2); margin-bottom: var(--uuif-sp-5);
+    flex-wrap: wrap;
+  }
+
+  /* Select control (topbar) */
+  .uuif-select {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 13px;
+    height: 29px;
+    padding: 0 var(--uuif-sp-4);
+    border: 1px solid var(--uuif-border-tertiary);
+    border-radius: var(--uuif-radius-6);
+    background: var(--uuif-surface-container);
+    color: var(--uuif-text-secondary);
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     SHELL
+══════════════════════════════════════════════ -->
+<div class="shell">
+
+  <!-- PRIMARY NAV RAIL -->
+  <nav class="primary-nav">
+    <!-- Swoosh logomark -->
+    <svg class="nav-swoosh" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M16 2C8.268 2 2 8.268 2 16s6.268 14 14 14 14-6.268 14-14S23.732 2 16 2z" fill="#FF5D00"/>
+      <path d="M8 21 Q16 7 24 21 Q16 27 8 21Z" fill="white" opacity="0.92"/>
+    </svg>
+    <!-- Nav icons: fill=#D2DFF2 default, fill=#FF5D00 active -->
+    <div class="nav-item active" title="Dashboard">
+      <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="1" fill="#FF5D00"/><rect x="13" y="3" width="8" height="8" rx="1" fill="#D2DFF2"/><rect x="3" y="13" width="8" height="8" rx="1" fill="#D2DFF2"/><rect x="13" y="13" width="8" height="8" rx="1" fill="#D2DFF2"/></svg>
+    </div>
+    <div class="nav-item" title="Firewalls">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v5c0 5.25 3.9 10.15 9 11.35C17.1 22.15 21 17.25 21 12V7L12 2z" fill="#D2DFF2"/></svg>
+    </div>
+    <div class="nav-divider"></div>
+    <div class="nav-item" title="Wireless">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M1 6.75C4.375 3.375 8.938 1.5 12 1.5s7.625 1.875 11 5.25l-1.5 1.5C18.5 5.25 14.875 3.5 12 3.5s-6.5 1.75-9.5 4.75L1 6.75z" fill="#D2DFF2"/><path d="M4.5 10.25C6.875 7.875 9.313 6.5 12 6.5s5.125 1.375 7.5 3.75l-1.5 1.5C16.125 9.875 14.063 8.5 12 8.5s-4.125 1.375-6 3.25l-1.5-1.5z" fill="#D2DFF2"/><circle cx="12" cy="17" r="2" fill="#D2DFF2"/></svg>
+    </div>
+    <div class="nav-item" title="Endpoint">
+      <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" stroke="#D2DFF2" stroke-width="2" fill="none"/><path d="M8 21h8M12 17v4" stroke="#D2DFF2" stroke-width="2" stroke-linecap="round"/></svg>
+    </div>
+    <div class="nav-item" title="Cloud Edge">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z" fill="#D2DFF2"/></svg>
+    </div>
+    <div class="nav-divider"></div>
+    <div class="nav-item" title="Users" style="margin-top:auto">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="#D2DFF2"/><path d="M4 20c0-4 3.582-7 8-7s8 3 8 7" stroke="#D2DFF2" stroke-width="2" fill="none"/></svg>
+    </div>
+  </nav>
+
+  <!-- SUBNAV -->
+  <nav class="subnav">
+    <div class="subnav-header">
+      <!-- Wordmark SVG fill=#FF5D00 -->
+      <svg width="120" height="18" viewBox="0 0 120 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <text x="0" y="14" font-family="Nunito Sans, sans-serif" font-size="14" font-weight="700" fill="#FF5D00">SONICWALL</text>
+      </svg>
+      <div class="subnav-product-label">Unified Management</div>
+    </div>
+    <div class="subnav-section">
+      <div class="subnav-section-title">
+        <span>PARTNER OVERVIEW</span>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 5l3 3 3-3" stroke="#001b50" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/></svg>
+      </div>
+      <div class="subnav-link active">Dashboard</div>
+      <div class="subnav-link">Risk Triage</div>
+      <div class="subnav-link">Tenant Scorecards</div>
+      <div class="subnav-link">Action Queue</div>
+    </div>
+    <div class="subnav-section">
+      <div class="subnav-section-title">
+        <span>PRODUCTS</span>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 5l3 3 3-3" stroke="#001b50" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/></svg>
+      </div>
+      <div class="subnav-link">NSM — Firewalls</div>
+      <div class="subnav-link">WNM — Wireless</div>
+      <div class="subnav-link">Capture Client</div>
+      <div class="subnav-link">CSE — Cloud Edge</div>
+    </div>
+    <div class="subnav-section">
+      <div class="subnav-section-title">
+        <span>TENANTS</span>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 5l3 3 3-3" stroke="#001b50" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/></svg>
+      </div>
+      <div class="subnav-link">All Tenants (50)</div>
+      <div class="subnav-link">Critical (3)</div>
+      <div class="subnav-link">License Renewals</div>
+    </div>
+    <div class="subnav-section">
+      <div class="subnav-section-title">REPORTS</div>
+      <div class="subnav-link">Weekly Summary</div>
+      <div class="subnav-link">Compliance</div>
+    </div>
+  </nav>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- TOP ACTION BAR -->
+    <div class="topbar">
+      <div class="breadcrumb">
+        <svg viewBox="0 0 16 16"><path d="M8 1L1 7h2v7h4v-4h2v4h4V7h2L8 1z"/></svg>
+        <span class="sep">\</span>
+        <span>Firewalls</span>
+        <span class="sep">\</span>
+        <span>Dashboard</span>
+        <span class="sep">\</span>
+        <span class="fw-600">Overview</span>
+      </div>
+      <div class="topbar-right">
+        <select class="uuif-select"><option>All Tenants (50)</option></select>
+        <select class="uuif-select"><option>North America (NSM)</option></select>
+        <div class="topbar-icon-btn">
+          <svg viewBox="0 0 16 16"><path d="M6.5 1a5.5 5.5 0 014.383 8.823L14 13.04 13.04 14l-3.217-3.117A5.5 5.5 0 116.5 1zm0 1.5a4 4 0 100 8 4 4 0 000-8z"/></svg>
+        </div>
+        <div class="topbar-icon-btn">
+          <svg viewBox="0 0 16 16"><path d="M8 1a5.5 5.5 0 015.5 5.5c0 .796-.162 1.556-.452 2.25L15 10.7l-.7.7-1.95-1.952A5.5 5.5 0 118 1zm0 1.5a4 4 0 100 8 4 4 0 000-8z" opacity="0"/><path d="M13.5 6.5A5.5 5.5 0 018 1v1.5a4 4 0 110 8 4 4 0 01-4-4H2.5A5.5 5.5 0 008 12a5.47 5.47 0 003.548-1.302L14 13.15l.7-.7-2.452-2.452A5.475 5.475 0 0013.5 6.5z" opacity="0"/><path d="M8 2.5a.5.5 0 01.5.5v4.793l2.854 2.853-.708.708L7.5 8.207V3a.5.5 0 01.5-.5z" opacity="0"/><circle cx="8" cy="2" r="5.5" stroke="#4a618f" stroke-width="1.5" fill="none"/><path d="M5 12l-1 3h8l-1-3" stroke="#4a618f" stroke-width="1.2" fill="none"/></svg>
+        </div>
+        <div class="topbar-icon-btn">
+          <svg viewBox="0 0 16 16"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 1.5a5.5 5.5 0 110 11 5.5 5.5 0 010-11zM8 4a.75.75 0 01.75.75v3.5l2 2-.53.53L8 8.56V4.75A.75.75 0 018 4z" fill="#4a618f"/></svg>
+        </div>
+        <div class="topbar-icon-btn">
+          <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" stroke="#4a618f" stroke-width="1.5" fill="none"/><circle cx="8" cy="5.5" r="1" fill="#4a618f"/><rect x="7.25" y="7.5" width="1.5" height="4" rx="0.5" fill="#4a618f"/></svg>
+        </div>
+        <div class="topbar-avatar">HN</div>
+      </div>
+    </div>
+
+    <!-- CONCEPT SWITCHER -->
+    <div class="concept-switcher">
+      <span class="cs-label">Concept</span>
+      <button class="cs-btn active" onclick="showConcept(1)">1 — Risk Triage</button>
+      <button class="cs-btn" onclick="showConcept(2)">2 — Product Matrix</button>
+      <button class="cs-btn" onclick="showConcept(3)">3 — Tenant Scorecard</button>
+      <button class="cs-btn" onclick="showConcept(4)">4 — Action Queue</button>
+    </div>
+
+    <!-- PAGE BODY -->
+    <div class="page-body">
+
+      <!-- ════════════════════════════════════
+           CONCEPT 1 — RISK TRIAGE
+      ════════════════════════════════════ -->
+      <div class="dash-panel active" id="concept-1">
+
+        <!-- Page title -->
+        <div class="page-title-row mb-5">
+          <div>
+            <div class="page-title">Partner Dashboard</div>
+            <div class="page-subtitle t-12 col-tertiary mt-3">All Tenants (50) · North America (NSM) · Last 24 hours</div>
+          </div>
+          <div class="flex-row">
+            <button class="uuif-btn secondary sm">Commit &amp; Deploy</button>
+            <button class="uuif-btn primary sm">Export Report</button>
+          </div>
+        </div>
+
+        <!-- Status info banner -->
+        <div class="uuif-banner info">
+          <div class="uuif-banner-icon info">
+            <svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" stroke="white" stroke-width="1.2" fill="none"/><rect x="5.4" y="5" width="1.2" height="4" rx="0.4" fill="white"/><circle cx="6" cy="3.5" r="0.7" fill="white"/></svg>
+          </div>
+          <div>
+            <div class="uuif-banner-title">Cross-Product Alert</div>
+            <div class="uuif-banner-body">3 critical alerts across <strong>Acme Corp, GlobalTech, NexaCorp</strong> share the same source IP pattern — possible coordinated scan. <strong>NSM</strong> and <strong>Capture Client</strong> data correlated.</div>
+          </div>
+        </div>
+
+        <!-- Count blocks: portfolio summary -->
+        <div class="grid-cb mb-5">
+          <div class="uuif-count-block">
+            <svg class="cb-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+            <div><div class="cb-label t-11 upper">Tenants</div><div class="cb-value">50</div></div>
+          </div>
+          <div class="uuif-count-block">
+            <svg class="cb-icon" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+            <div><div class="cb-label t-11 upper">Devices</div><div class="cb-value">1,247</div></div>
+          </div>
+          <div class="uuif-count-block" style="border-color:var(--uuif-brand-red)">
+            <svg class="cb-icon" viewBox="0 0 24 24" style="fill:var(--uuif-brand-red)"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13" stroke="white" stroke-width="2"/><circle cx="12" cy="17" r="1" fill="white"/></svg>
+            <div><div class="cb-label t-11 upper" style="color:var(--uuif-brand-red)">Open Alerts</div><div class="cb-value" style="color:var(--uuif-brand-red)">68</div></div>
+          </div>
+          <div class="uuif-count-block">
+            <svg class="cb-icon" viewBox="0 0 24 24" style="fill:var(--uuif-brand-orange)"><path d="M18.364 5.636a9 9 0 010 12.728M15.536 8.464a5 5 0 010 7.072M12 12h.01"/><circle cx="12" cy="12" r="1" fill="var(--uuif-brand-orange)"/></svg>
+            <div><div class="cb-label t-11 upper">Offline Devices</div><div class="cb-value col-orange">22</div></div>
+          </div>
+          <div class="uuif-count-block">
+            <svg class="cb-icon" viewBox="0 0 24 24" style="fill:var(--uuif-brand-yellow)"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10" stroke="white" stroke-width="2"/></svg>
+            <div><div class="cb-label t-11 upper">Expired Licences</div><div class="cb-value col-yellow">7</div></div>
+          </div>
+        </div>
+
+        <!-- 4 product widgets 2×2 -->
+        <div class="widget-grid layout-2x2">
+
+          <!-- WIDGET 1: NSM -->
+          <div class="uuif-dashboard-card">
+            <div class="dc-header">
+              <div class="dc-header-left">
+                <span class="source-badge source-nsm">NSM</span>
+                <span class="dc-title">Network Security Manager</span>
+              </div>
+              <a class="dc-action">Open NSM →</a>
+            </div>
+            <!-- source clarification row -->
+            <div class="source-row">
+              <span class="dot" style="background:var(--uuif-brand-blue)"></span>
+              <span class="source-desc">Data source: NSM — Firewalls &amp; Device Management · All Tenants</span>
+            </div>
+            <div class="dc-body">
+              <!-- mini count blocks -->
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--uuif-sp-3);margin-bottom:var(--uuif-sp-4)">
+                <div style="text-align:center;padding:var(--uuif-sp-3) var(--uuif-sp-2);background:var(--uuif-surface-tertiary);border-radius:var(--uuif-radius-6)">
+                  <div class="val-lg">22</div>
+                  <div class="t-11 upper col-secondary mt-3">Firewalls</div>
+                </div>
+                <div style="text-align:center;padding:var(--uuif-sp-3) var(--uuif-sp-2);background:var(--uuif-fill-red-lightest);border-radius:var(--uuif-radius-6)">
+                  <div class="val-lg col-red">22</div>
+                  <div class="t-11 upper col-secondary mt-3">Offline</div>
+                </div>
+                <div style="text-align:center;padding:var(--uuif-sp-3) var(--uuif-sp-2);background:var(--uuif-fill-yellow-xxx-lighter);border-radius:var(--uuif-radius-6)">
+                  <div class="val-lg col-yellow">4</div>
+                  <div class="t-11 upper col-secondary mt-3">Lic. Exp.</div>
+                </div>
+                <div style="text-align:center;padding:var(--uuif-sp-3) var(--uuif-sp-2);background:var(--uuif-surface-tertiary);border-radius:var(--uuif-radius-6)">
+                  <div class="val-lg">44</div>
+                  <div class="t-11 upper col-secondary mt-3">Groups</div>
+                </div>
+              </div>
+              <!-- Online/Offline status -->
+              <div style="margin-bottom:var(--uuif-sp-3)">
+                <div class="flex-between mb-3"><span class="t-12 col-secondary">Online &amp; In Sync</span><span class="fw-700 t-12">0</span></div>
+                <div class="uuif-pbar-track"><div class="uuif-pbar-fill" style="width:0%"></div></div>
+              </div>
+              <div style="margin-bottom:var(--uuif-sp-3)">
+                <div class="flex-between mb-3"><span class="t-12 col-secondary">Offline</span><span class="fw-700 t-12 col-red">22</span></div>
+                <div class="uuif-pbar-track"><div class="uuif-pbar-fill" style="width:100%;background:var(--uuif-brand-red)"></div></div>
+              </div>
+              <div>
+                <div class="flex-between mb-3"><span class="t-12 col-secondary">Group Unassigned</span><span class="fw-700 t-12 col-orange">22</span></div>
+                <div class="uuif-pbar-track"><div class="uuif-pbar-fill" style="width:100%;background:var(--uuif-brand-orange)"></div></div>
+              </div>
+            </div>
+            <!-- top 3 critical tenants -->
+            <div style="border-top:1px solid var(--uuif-border-transparent)">
+              <div style="padding:var(--uuif-sp-2) var(--uuif-sp-5);background:var(--uuif-surface-model)">
+                <span class="t-11 upper col-secondary fw-700">Top Affected Tenants</span>
+              </div>
+              <div class="tenant-row">
+                <span class="sev-icon failed"></span>
+                <div class="t-avatar">AC</div>
+                <span class="t-13 fw-600" style="flex:1">Acme Corp</span>
+                <span class="uuif-chip error">Offline</span>
+              </div>
+              <div class="tenant-row">
+                <span class="sev-icon high"></span>
+                <div class="t-avatar">NX</div>
+                <span class="t-13 fw-600" style="flex:1">NexaCorp</span>
+                <span class="uuif-chip warning">Lic. Exp.</span>
+              </div>
+              <div class="tenant-row">
+                <span class="sev-icon minor"></span>
+                <div class="t-avatar">PT</div>
+                <span class="t-13 fw-600" style="flex:1">PeakTech Ltd</span>
+                <span class="uuif-chip warning">Out of Sync</span>
+              </div>
+            </div>
+            <div class="dc-footer">
+              <button class="uuif-btn secondary sm">View All Firewalls</button>
+            </div>
+          </div>
+
+          <!-- WIDGET 2: WNM -->
+          <div class="uuif-dashboard-card">
+            <div class="dc-header">
+              <div class="dc-header-left">
+                <span class="source-badge source-wnm">WNM</span>
+                <span class="dc-title">Wireless Network Manager</span>
+              </div>
+              <a class="dc-action">Open WNM →</a>
+            </div>
+            <div class="source-row">
+              <span class="dot" style="background:var(--uuif-surface-primary)"></span>
+              <span class="source-desc">Data source: WNM — Access Points &amp; Switches · All Tenants</span>
+            </div>
+            <div class="dc-body">
+              <!-- mini counts -->
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--uuif-sp-3);margin-bottom:var(--uuif-sp-4)">
+                <div style="text-align:center;padding:var(--uuif-sp-3) var(--uuif-sp-2);background:var(--uuif-surface-tertiary);border-radius:var(--uuif-radius-6)">
+                  <div class="val-lg">247</div>
+                  <div class="t-11 upper col-secondary mt-3">APs</div>
+                </div>
+                <div style="text-align:center;padding:var(--uuif-sp-3) var(--uuif-sp-2);background:var(--uuif-fill-green-xxx-lighter);border-radius:var(--uuif-radius-6)">
+                  <div class="val-lg col-green">244</div>
+                  <div class="t-11 upper col-secondary mt-3">Online</div>
+                </div>
+                <div style="text-align:center;padding:var(--uuif-sp-3) var(--uuif-sp-2);background:var(--uuif-fill-yellow-xxx-lighter);border-radius:var(--uuif-radius-6)">
+                  <div class="val-lg col-yellow">3</div>
+                  <div class="t-11 upper col-secondary mt-3">Offline</div>
+                </div>
+                <div style="text-align:center;padding:var(--uuif-sp-3) var(--uuif-sp-2);background:var(--uuif-surface-tertiary);border-radius:var(--uuif-radius-6)">
+                  <div class="val-lg">62</div>
+                  <div class="t-11 upper col-secondary mt-3">Switches</div>
+                </div>
+              </div>
+              <!-- alerts by severity -->
+              <div style="margin-bottom:var(--uuif-sp-3)">
+                <div class="flex-between mb-3"><span class="t-12 col-secondary">HIGH Alerts</span><span class="uuif-chip error">0</span></div>
+                <div class="uuif-pbar-track"><div class="uuif-pbar-fill" style="width:0%;background:var(--uuif-brand-red)"></div></div>
+              </div>
+              <div style="margin-bottom:var(--uuif-sp-3)">
+                <div class="flex-between mb-3"><span class="t-12 col-secondary">MEDIUM Alerts</span><span class="uuif-chip warning">3</span></div>
+                <div class="uuif-pbar-track"><div class="uuif-pbar-fill" style="width:18%;background:var(--uuif-brand-yellow)"></div></div>
+              </div>
+              <div>
+                <div class="flex-between mb-3"><span class="t-12 col-secondary">LOW Alerts</span><span class="uuif-chip default">0</span></div>
+                <div class="uuif-pbar-track"><div class="uuif-pbar-fill" style="width:0%"></div></div>
+              </div>
+            </div>
+            <!-- top affected -->
+            <div style="border-top:1px solid var(--uuif-border-transparent)">
+              <div style="padding:var(--uuif-sp-2) var(--uuif-sp-5);background:var(--uuif-surface-model)">
+                <span class="t-11 upper col-secondary fw-700">Top Affected Tenants</span>
+              </div>
+              <div class="tenant-row">
+                <span class="sev-icon major"></span>
+                <div class="t-avatar">BL</div>
+                <span class="t-13 fw-600" style="flex:1">BlueLine Mfg</span>
+                <span class="uuif-chip warning">3 AP Offline</span>
+              </div>
+              <div class="tenant-row">
+                <span class="sev-icon normal"></span>
+                <div class="t-avatar">SW</div>
+                <span class="t-13 fw-600" style="flex:1">SkyWave Networks</span>
+                <span class="uuif-chip success">All Clear</span>
+              </div>
+              <div class="tenant-row">
+                <span class="sev-icon normal"></span>
+                <div class="t-avatar">OR</div>
+                <span class="t-13 fw-600" style="flex:1">Orion Dynamics</span>
+                <span class="uuif-chip success">All Clear</span>
+              </div>
+            </div>
+            <div class="dc-footer">
+              <button class="uuif-btn secondary sm">View All APs</button>
+            </div>
+          </div>
+
+          <!-- WIDGET 3: CAPTURE CLIENT -->
+          <div class="uuif-dashboard-card">
+            <div class="dc-header">
+              <div class="dc-header-left">
+                <span class="source-badge source-cc">Capture Client</span>
+                <span class="dc-title">Endpoint Security</span>
+              </div>
+              <a class="dc-action">Open CC →</a>
+            </div>
+            <div class="source-row">
+              <span class="dot" style="background:var(--uuif-brand-red)"></span>
+              <span class="source-desc">Data source: Capture Client — Endpoint Threat Detection · All Tenants · Last 30 days</span>
+            </div>
+            <div class="dc-body">
+              <!-- summary counts -->
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--uuif-sp-3);margin-bottom:var(--uuif-sp-4)">
+                <div style="text-align:center;padding:var(--uuif-sp-3) var(--uuif-sp-2);background:var(--uuif-fill-red-lightest);border-radius:var(--uuif-radius-6)">
+                  <div class="val-lg col-red">4</div>
+                  <div class="t-11 upper col-secondary mt-3">Infected</div>
+                </div>
+                <div style="text-align:center;padding:var(--uuif-sp-3) var(--uuif-sp-2);background:var(--uuif-fill-yellow-xxx-lighter);border-radius:var(--uuif-radius-6)">
+                  <div class="val-lg col-yellow">7</div>
+                  <div class="t-11 upper col-secondary mt-3">Unresolved</div>
+                </div>
+                <div style="text-align:center;padding:var(--uuif-sp-3) var(--uuif-sp-2);background:var(--uuif-surface-tertiary);border-radius:var(--uuif-radius-6)">
+                  <div class="val-lg">3</div>
+                  <div class="t-11 upper col-secondary mt-3">Benign</div>
+                </div>
+              </div>
+              <!-- threat severity breakdown -->
+              <div class="flex-between mb-3 mt-4">
+                <span class="t-12 fw-700 col-secondary upper t-11">Threat Severity</span>
+              </div>
+              <div style="display:flex;gap:var(--uuif-sp-3);margin-bottom:var(--uuif-sp-4)">
+                <div class="flex-row gap-2"><span class="sev-icon failed"></span><span class="t-12 col-secondary">Critical</span><span class="fw-700 t-12">2</span></div>
+                <div class="flex-row gap-2"><span class="sev-icon high"></span><span class="t-12 col-secondary">High</span><span class="fw-700 t-12">1</span></div>
+                <div class="flex-row gap-2"><span class="sev-icon major"></span><span class="t-12 col-secondary">Medium</span><span class="fw-700 t-12">1</span></div>
+                <div class="flex-row gap-2"><span class="sev-icon minor"></span><span class="t-12 col-secondary">Low</span><span class="fw-700 t-12">0</span></div>
+              </div>
+              <!-- threat trend bar -->
+              <div class="flex-between mb-3">
+                <span class="t-11 upper col-secondary fw-700">Threat History — Last 7 Days</span>
+                <span class="t-11 col-tertiary">↑ 2 new today</span>
+              </div>
+              <div class="bar-chart">
+                <div class="bar-seg" style="height:10%"></div>
+                <div class="bar-seg" style="height:5%"></div>
+                <div class="bar-seg" style="height:20%"></div>
+                <div class="bar-seg" style="height:15%"></div>
+                <div class="bar-seg er" style="height:55%"></div>
+                <div class="bar-seg er" style="height:80%"></div>
+                <div class="bar-seg er hi" style="height:100%"></div>
+              </div>
+              <div class="flex-row gap-2 mt-3">
+                <span class="dot" style="background:var(--uuif-brand-orange)"></span><span class="t-11 col-tertiary">Not mitigated</span>
+                <span class="dot" style="background:var(--uuif-surface-primary)"></span><span class="t-11 col-tertiary">Mitigated</span>
+                <span class="dot" style="background:var(--uuif-brand-green)"></span><span class="t-11 col-tertiary">Marked Benign</span>
+              </div>
+            </div>
+            <div style="border-top:1px solid var(--uuif-border-transparent)">
+              <div style="padding:var(--uuif-sp-2) var(--uuif-sp-5);background:var(--uuif-surface-model)">
+                <span class="t-11 upper col-secondary fw-700">Top Affected Tenants</span>
+              </div>
+              <div class="tenant-row">
+                <span class="sev-icon failed"></span>
+                <div class="t-avatar">GT</div>
+                <span class="t-13 fw-600" style="flex:1">GlobalTech Intl</span>
+                <span class="uuif-chip error">4 Infected</span>
+              </div>
+              <div class="tenant-row">
+                <span class="sev-icon normal"></span>
+                <div class="t-avatar">MD</div>
+                <span class="t-13 fw-600" style="flex:1">Meridian Partners</span>
+                <span class="uuif-chip success">Clean</span>
+              </div>
+            </div>
+            <div class="dc-footer">
+              <button class="uuif-btn secondary sm">View Threats</button>
+            </div>
+          </div>
+
+          <!-- WIDGET 4: CSE -->
+          <div class="uuif-dashboard-card">
+            <div class="dc-header">
+              <div class="dc-header-left">
+                <span class="source-badge source-cse">CSE</span>
+                <span class="dc-title">Cloud Secure Edge</span>
+              </div>
+              <a class="dc-action">Open CSE →</a>
+            </div>
+            <div class="source-row">
+              <span class="dot" style="background:var(--uuif-brand-green)"></span>
+              <span class="source-desc">Data source: CSE — Zero Trust Access &amp; Connectors · All Tenants · Last 30 days</span>
+            </div>
+            <div class="dc-body">
+              <!-- summary counts -->
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--uuif-sp-3);margin-bottom:var(--uuif-sp-4)">
+                <div style="text-align:center;padding:var(--uuif-sp-3) var(--uuif-sp-2);background:var(--uuif-surface-tertiary);border-radius:var(--uuif-radius-6)">
+                  <div class="val-lg">8</div>
+                  <div class="t-11 upper col-secondary mt-3">Devices</div>
+                </div>
+                <div style="text-align:center;padding:var(--uuif-sp-3) var(--uuif-sp-2);background:var(--uuif-surface-tertiary);border-radius:var(--uuif-radius-6)">
+                  <div class="val-lg">6</div>
+                  <div class="t-11 upper col-secondary mt-3">Users</div>
+                </div>
+                <div style="text-align:center;padding:var(--uuif-sp-3) var(--uuif-sp-2);background:var(--uuif-surface-tertiary);border-radius:var(--uuif-radius-6)">
+                  <div class="val-lg">7</div>
+                  <div class="t-11 upper col-secondary mt-3">Policies</div>
+                </div>
+              </div>
+              <!-- connector status -->
+              <div class="flex-between mb-3 mt-4">
+                <span class="t-11 upper col-secondary fw-700">Connector Status</span>
+              </div>
+              <div style="margin-bottom:var(--uuif-sp-3)">
+                <div class="flex-between mb-3"><span class="t-12 col-secondary">Reporting</span><span class="fw-700 t-12 col-green">1</span></div>
+                <div class="uuif-pbar-track"><div class="uuif-pbar-fill" style="width:100%;background:var(--uuif-brand-green)"></div></div>
+              </div>
+              <div style="margin-bottom:var(--uuif-sp-3)">
+                <div class="flex-between mb-3"><span class="t-12 col-secondary">Pending</span><span class="fw-700 t-12">0</span></div>
+                <div class="uuif-pbar-track"><div class="uuif-pbar-fill" style="width:0%"></div></div>
+              </div>
+              <div>
+                <div class="flex-between mb-3"><span class="t-12 col-secondary">Terminated</span><span class="fw-700 t-12">0</span></div>
+                <div class="uuif-pbar-track"><div class="uuif-pbar-fill" style="width:0%;background:var(--uuif-brand-red)"></div></div>
+              </div>
+              <!-- policy breakdown -->
+              <div class="flex-between mb-3 mt-4">
+                <span class="t-11 upper col-secondary fw-700">Policies by Status</span>
+              </div>
+              <div style="display:flex;gap:var(--uuif-sp-3);">
+                <div class="flex-row gap-2"><span class="dot" style="background:var(--uuif-brand-green)"></span><span class="t-12 col-secondary">Active</span><span class="fw-700 t-12">6</span></div>
+                <div class="flex-row gap-2"><span class="dot" style="background:var(--uuif-border-secondary)"></span><span class="t-12 col-secondary">Inactive</span><span class="fw-700 t-12">1</span></div>
+              </div>
+            </div>
+            <div style="border-top:1px solid var(--uuif-border-transparent)">
+              <div style="padding:var(--uuif-sp-2) var(--uuif-sp-5);background:var(--uuif-surface-model)">
+                <span class="t-11 upper col-secondary fw-700">Flagged Events</span>
+              </div>
+              <div class="tenant-row">
+                <span class="sev-icon major"></span>
+                <div class="t-avatar">RC</div>
+                <span class="t-13 fw-600" style="flex:1">Redcliff Systems</span>
+                <span class="uuif-chip warning">Unreg. Device</span>
+              </div>
+              <div class="tenant-row">
+                <span class="sev-icon normal"></span>
+                <div class="t-avatar">GT</div>
+                <span class="t-13 fw-600" style="flex:1">GlobalTech Intl</span>
+                <span class="uuif-chip success">OK</span>
+              </div>
+            </div>
+            <div class="dc-footer">
+              <button class="uuif-btn secondary sm">View CSE Dashboard</button>
+            </div>
+          </div>
+
+        </div><!-- /widget-grid -->
+
+        <!-- Unified alert table below widgets -->
+        <div class="uuif-dashboard-card mt-5" style="margin-top:var(--uuif-sp-5)">
+          <div class="dc-header">
+            <div class="dc-header-left">
+              <span class="dc-title">Unified Alert Center</span>
+              <span class="uuif-chip default">All Products</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:var(--uuif-sp-3)">
+              <span class="uuif-chip error">Device 5</span>
+              <span class="uuif-chip warning">Config 0</span>
+              <span class="uuif-chip default">User 30</span>
+              <a class="dc-action">View All 35</a>
+            </div>
+          </div>
+          <div class="dc-body-flush table-scroll">
+            <table class="uuif-data-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Local Time</th>
+                  <th>Source App</th>
+                  <th>Category</th>
+                  <th>Priority</th>
+                  <th>Tenant</th>
+                  <th>Message</th>
+                  <th>User</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td class="col-tertiary">2026-05-27 23:40</td>
+                  <td><span class="source-badge source-nsm">NSM</span></td>
+                  <td>Device Management</td>
+                  <td><span class="sev-icon failed" style="display:inline-block"></span></td>
+                  <td class="fw-600">Acme Corp</td>
+                  <td>License applied on firewall reregister_fw_may7</td>
+                  <td class="col-tertiary">nsmadmin</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td class="col-tertiary">2026-05-27 23:26</td>
+                  <td><span class="source-badge source-cc">CC</span></td>
+                  <td>Threat Detection</td>
+                  <td><span class="sev-icon failed" style="display:inline-block"></span></td>
+                  <td class="fw-600">GlobalTech Intl</td>
+                  <td>4 endpoints infected — pending remediation</td>
+                  <td class="col-tertiary">H. Nagaraja</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td class="col-tertiary">2026-05-27 22:59</td>
+                  <td><span class="source-badge source-wnm">WNM</span></td>
+                  <td>Device</td>
+                  <td><span class="sev-icon major" style="display:inline-block"></span></td>
+                  <td class="fw-600">BlueLine Mfg</td>
+                  <td>3 APs offline — Building B, no connectivity</td>
+                  <td class="col-tertiary">sysmon</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td class="col-tertiary">2026-05-27 21:02</td>
+                  <td><span class="source-badge source-cse">CSE</span></td>
+                  <td>Policy</td>
+                  <td><span class="sev-icon major" style="display:inline-block"></span></td>
+                  <td class="fw-600">Redcliff Systems</td>
+                  <td>Unregistered device accessing service — j.sharma</td>
+                  <td class="col-tertiary">policy-engine</td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td class="col-tertiary">2026-05-27 18:55</td>
+                  <td><span class="source-badge source-nsm">NSM</span></td>
+                  <td>User</td>
+                  <td><span class="sev-icon normal" style="display:inline-block"></span></td>
+                  <td class="fw-600">SkyWave Networks</td>
+                  <td>CSC User logged in to tenant swapna-test</td>
+                  <td class="col-tertiary">H. Nagaraja</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div><!-- /concept-1 -->
+
+
+      <!-- ════════════════════════════════════
+           CONCEPT 2 — PRODUCT MATRIX
+      ════════════════════════════════════ -->
+      <div class="dash-panel" id="concept-2">
+
+        <div class="page-title-row mb-5">
+          <div>
+            <div class="page-title">Product Health Matrix</div>
+            <div class="page-subtitle t-12 col-tertiary mt-3">All 4 products · 50 Tenants · Status at a glance</div>
+          </div>
+          <button class="uuif-btn primary sm">Export Matrix</button>
+        </div>
+
+        <!-- 4 product summary count-block rows -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--uuif-sp-5);margin-bottom:var(--uuif-sp-5)">
+
+          <!-- NSM summary -->
+          <div class="uuif-dashboard-card">
+            <div class="dc-header">
+              <div class="dc-header-left">
+                <span class="source-badge source-nsm">NSM</span>
+                <span class="dc-title">Firewall Summary</span>
+              </div>
+              <a class="dc-action">Open NSM →</a>
+            </div>
+            <div class="source-row">
+              <span class="dot" style="background:var(--uuif-brand-blue)"></span>
+              <span class="source-desc">Source: NSM — Network Security Manager · All Tenants</span>
+            </div>
+            <div class="dc-body">
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--uuif-sp-3);">
+                <div class="uuif-count-block" style="flex-direction:column;text-align:center;padding:var(--uuif-sp-3)">
+                  <div class="cb-value col-red">22</div><div class="cb-label t-11" style="margin-top:var(--uuif-sp-1)">Offline</div>
+                </div>
+                <div class="uuif-count-block" style="flex-direction:column;text-align:center;padding:var(--uuif-sp-3)">
+                  <div class="cb-value col-orange">0</div><div class="cb-label t-11" style="margin-top:var(--uuif-sp-1)">In Sync</div>
+                </div>
+                <div class="uuif-count-block" style="flex-direction:column;text-align:center;padding:var(--uuif-sp-3)">
+                  <div class="cb-value col-yellow">4</div><div class="cb-label t-11" style="margin-top:var(--uuif-sp-1)">Lic. Exp.</div>
+                </div>
+                <div class="uuif-count-block" style="flex-direction:column;text-align:center;padding:var(--uuif-sp-3)">
+                  <div class="cb-value">44</div><div class="cb-label t-11" style="margin-top:var(--uuif-sp-1)">Groups</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- WNM summary -->
+          <div class="uuif-dashboard-card">
+            <div class="dc-header">
+              <div class="dc-header-left">
+                <span class="source-badge source-wnm">WNM</span>
+                <span class="dc-title">Wireless Summary</span>
+              </div>
+              <a class="dc-action">Open WNM →</a>
+            </div>
+            <div class="source-row">
+              <span class="dot" style="background:var(--uuif-surface-primary)"></span>
+              <span class="source-desc">Source: WNM — Wireless Network Manager · All Tenants</span>
+            </div>
+            <div class="dc-body">
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--uuif-sp-3);">
+                <div class="uuif-count-block" style="flex-direction:column;text-align:center;padding:var(--uuif-sp-3)">
+                  <div class="cb-value col-green">244</div><div class="cb-label t-11" style="margin-top:var(--uuif-sp-1)">APs On</div>
+                </div>
+                <div class="uuif-count-block" style="flex-direction:column;text-align:center;padding:var(--uuif-sp-3)">
+                  <div class="cb-value col-red">3</div><div class="cb-label t-11" style="margin-top:var(--uuif-sp-1)">APs Off</div>
+                </div>
+                <div class="uuif-count-block" style="flex-direction:column;text-align:center;padding:var(--uuif-sp-3)">
+                  <div class="cb-value">62</div><div class="cb-label t-11" style="margin-top:var(--uuif-sp-1)">Switches</div>
+                </div>
+                <div class="uuif-count-block" style="flex-direction:column;text-align:center;padding:var(--uuif-sp-3)">
+                  <div class="cb-value col-yellow">3</div><div class="cb-label t-11" style="margin-top:var(--uuif-sp-1)">Med Alerts</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CC summary -->
+          <div class="uuif-dashboard-card">
+            <div class="dc-header">
+              <div class="dc-header-left">
+                <span class="source-badge source-cc">Capture Client</span>
+                <span class="dc-title">Endpoint Summary</span>
+              </div>
+              <a class="dc-action">Open CC →</a>
+            </div>
+            <div class="source-row">
+              <span class="dot" style="background:var(--uuif-brand-red)"></span>
+              <span class="source-desc">Source: Capture Client — Endpoint Threat Detection · All Tenants · Last 30 days</span>
+            </div>
+            <div class="dc-body">
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--uuif-sp-3);">
+                <div class="uuif-count-block" style="flex-direction:column;text-align:center;padding:var(--uuif-sp-3);border-color:var(--uuif-brand-red)">
+                  <div class="cb-value col-red">4</div><div class="cb-label t-11" style="margin-top:var(--uuif-sp-1)">Infected</div>
+                </div>
+                <div class="uuif-count-block" style="flex-direction:column;text-align:center;padding:var(--uuif-sp-3)">
+                  <div class="cb-value col-yellow">7</div><div class="cb-label t-11" style="margin-top:var(--uuif-sp-1)">Unresolved</div>
+                </div>
+                <div class="uuif-count-block" style="flex-direction:column;text-align:center;padding:var(--uuif-sp-3)">
+                  <div class="cb-value">3</div><div class="cb-label t-11" style="margin-top:var(--uuif-sp-1)">Benign</div>
+                </div>
+                <div class="uuif-count-block" style="flex-direction:column;text-align:center;padding:var(--uuif-sp-3)">
+                  <div class="cb-value col-green">0</div><div class="cb-label t-11" style="margin-top:var(--uuif-sp-1)">Critical Lic</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CSE summary -->
+          <div class="uuif-dashboard-card">
+            <div class="dc-header">
+              <div class="dc-header-left">
+                <span class="source-badge source-cse">CSE</span>
+                <span class="dc-title">Cloud Edge Summary</span>
+              </div>
+              <a class="dc-action">Open CSE →</a>
+            </div>
+            <div class="source-row">
+              <span class="dot" style="background:var(--uuif-brand-green)"></span>
+              <span class="source-desc">Source: CSE — Cloud Secure Edge · All Tenants · Last 30 days</span>
+            </div>
+            <div class="dc-body">
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--uuif-sp-3);">
+                <div class="uuif-count-block" style="flex-direction:column;text-align:center;padding:var(--uuif-sp-3)">
+                  <div class="cb-value">8</div><div class="cb-label t-11" style="margin-top:var(--uuif-sp-1)">Devices</div>
+                </div>
+                <div class="uuif-count-block" style="flex-direction:column;text-align:center;padding:var(--uuif-sp-3)">
+                  <div class="cb-value">6</div><div class="cb-label t-11" style="margin-top:var(--uuif-sp-1)">Users</div>
+                </div>
+                <div class="uuif-count-block" style="flex-direction:column;text-align:center;padding:var(--uuif-sp-3)">
+                  <div class="cb-value col-green">1</div><div class="cb-label t-11" style="margin-top:var(--uuif-sp-1)">Connector</div>
+                </div>
+                <div class="uuif-count-block" style="flex-direction:column;text-align:center;padding:var(--uuif-sp-3);border-color:var(--uuif-brand-yellow)">
+                  <div class="cb-value col-yellow">1</div><div class="cb-label t-11" style="margin-top:var(--uuif-sp-1)">Flag</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product × Tenant matrix table -->
+        <div class="uuif-dashboard-card">
+          <div class="dc-header">
+            <div class="dc-header-left">
+              <span class="dc-title">Product × Tenant Status Matrix</span>
+              <span class="uuif-chip default">Top 10 by Risk</span>
+            </div>
+            <a class="dc-action">View All 50 Tenants</a>
+          </div>
+          <div class="source-row">
+            <span class="dot" style="background:var(--uuif-brand-orange)"></span>
+            <span class="source-desc">Columns: <strong style="color:var(--uuif-brand-blue)">NSM</strong> · <strong style="color:var(--uuif-surface-primary)">WNM</strong> · <strong style="color:var(--uuif-brand-red)">Capture Client</strong> · <strong style="color:var(--uuif-brand-green)">CSE</strong> — aggregated per tenant</span>
+          </div>
+          <div class="table-scroll">
+            <table class="uuif-data-table">
+              <thead>
+                <tr>
+                  <th>Tenant</th>
+                  <th><span style="color:var(--uuif-brand-blue)">NSM</span> Firewalls</th>
+                  <th><span style="color:var(--uuif-surface-primary)">WNM</span> APs</th>
+                  <th><span style="color:var(--uuif-brand-red)">CC</span> Endpoints</th>
+                  <th><span style="color:var(--uuif-brand-green)">CSE</span> Edge</th>
+                  <th>Overall</th>
+                  <th>Devices</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td class="fw-600">Acme Corp</td><td><span class="uuif-chip error">Offline</span></td><td><span class="uuif-chip success">OK</span></td><td><span class="uuif-chip error">4 Infected</span></td><td><span class="uuif-chip success">OK</span></td><td><span class="sev-icon failed"></span></td><td>142</td></tr>
+                <tr><td class="fw-600">GlobalTech Intl</td><td><span class="uuif-chip warning">Out of Sync</span></td><td><span class="uuif-chip success">OK</span></td><td><span class="uuif-chip error">Threat</span></td><td><span class="uuif-chip default">1 Flag</span></td><td><span class="sev-icon failed"></span></td><td>287</td></tr>
+                <tr><td class="fw-600">NexaCorp</td><td><span class="uuif-chip error">Lic. Expired</span></td><td><span class="uuif-chip success">OK</span></td><td><span class="uuif-chip success">OK</span></td><td><span class="uuif-chip success">OK</span></td><td><span class="sev-icon high"></span></td><td>94</td></tr>
+                <tr><td class="fw-600">BlueLine Mfg</td><td><span class="uuif-chip success">OK</span></td><td><span class="uuif-chip warning">3 Offline</span></td><td><span class="uuif-chip success">OK</span></td><td><span class="uuif-chip success">OK</span></td><td><span class="sev-icon major"></span></td><td>68</td></tr>
+                <tr><td class="fw-600">Redcliff Systems</td><td><span class="uuif-chip success">OK</span></td><td><span class="uuif-chip success">OK</span></td><td><span class="uuif-chip success">OK</span></td><td><span class="uuif-chip warning">Unreg. Device</span></td><td><span class="sev-icon major"></span></td><td>51</td></tr>
+                <tr><td class="fw-600">PeakTech Ltd</td><td><span class="uuif-chip warning">Out of Sync</span></td><td><span class="uuif-chip success">OK</span></td><td><span class="uuif-chip success">OK</span></td><td><span class="uuif-chip success">OK</span></td><td><span class="sev-icon minor"></span></td><td>44</td></tr>
+                <tr><td class="fw-600">SkyWave Networks</td><td><span class="uuif-chip success">OK</span></td><td><span class="uuif-chip success">OK</span></td><td><span class="uuif-chip success">OK</span></td><td><span class="uuif-chip success">OK</span></td><td><span class="sev-icon normal"></span></td><td>189</td></tr>
+                <tr><td class="fw-600">Meridian Partners</td><td><span class="uuif-chip success">OK</span></td><td>—</td><td><span class="uuif-chip success">OK</span></td><td><span class="uuif-chip success">OK</span></td><td><span class="sev-icon normal"></span></td><td>77</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div><!-- /concept-2 -->
+
+
+      <!-- ════════════════════════════════════
+           CONCEPT 3 — TENANT SCORECARD
+      ════════════════════════════════════ -->
+      <div class="dash-panel" id="concept-3">
+
+        <div class="page-title-row mb-5">
+          <div>
+            <div class="page-title">Tenant Scorecards</div>
+            <div class="page-subtitle t-12 col-tertiary mt-3">All 4 products aggregated per tenant · 50 Tenants</div>
+          </div>
+          <div class="flex-row">
+            <button class="uuif-btn secondary sm">Sort: Risk Score</button>
+            <button class="uuif-btn primary sm">Export</button>
+          </div>
+        </div>
+
+        <!-- Portfolio count blocks -->
+        <div class="grid-cb mb-5">
+          <div class="uuif-count-block"><svg class="cb-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><div><div class="cb-label t-11 upper">Tenants</div><div class="cb-value">50</div></div></div>
+          <div class="uuif-count-block" style="border-color:var(--uuif-brand-red)"><svg class="cb-icon" viewBox="0 0 24 24" style="fill:var(--uuif-brand-red)"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg><div><div class="cb-label t-11 upper" style="color:var(--uuif-brand-red)">Critical</div><div class="cb-value col-red">3</div></div></div>
+          <div class="uuif-count-block"><svg class="cb-icon" viewBox="0 0 24 24" style="fill:var(--uuif-brand-yellow)"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg><div><div class="cb-label t-11 upper">Warning</div><div class="cb-value col-yellow">9</div></div></div>
+          <div class="uuif-count-block"><svg class="cb-icon" viewBox="0 0 24 24" style="fill:var(--uuif-brand-green)"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><div><div class="cb-label t-11 upper">Healthy</div><div class="cb-value col-green">38</div></div></div>
+          <div class="uuif-count-block"><svg class="cb-icon" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg><div><div class="cb-label t-11 upper">Devices</div><div class="cb-value">1,247</div></div></div>
+        </div>
+
+        <!-- Scorecard grid -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--uuif-sp-5)">
+
+          <!-- Card: Critical -->
+          <div class="uuif-dashboard-card" style="border-top:3px solid var(--uuif-brand-red)">
+            <div class="dc-header">
+              <div class="dc-header-left">
+                <div class="t-avatar">AC</div>
+                <div><div class="t-14 fw-700">Acme Corp</div><div class="t-11 col-tertiary">142 devices</div></div>
+              </div>
+              <div style="text-align:right"><div class="val-xl col-red">31</div><div class="t-11 upper col-red fw-700">Score</div></div>
+            </div>
+            <!-- 4 product chips — labeled per source -->
+            <div style="padding:var(--uuif-sp-3) var(--uuif-sp-5);display:flex;flex-wrap:wrap;gap:var(--uuif-sp-2);border-bottom:1px solid var(--uuif-border-transparent)">
+              <span class="source-badge source-nsm" style="font-size:10px">NSM</span><span class="uuif-chip error">Offline</span>
+              <span class="source-badge source-wnm" style="font-size:10px">WNM</span><span class="uuif-chip success">OK</span>
+              <span class="source-badge source-cc" style="font-size:10px">CC</span><span class="uuif-chip error">4 Infected</span>
+              <span class="source-badge source-cse" style="font-size:10px">CSE</span><span class="uuif-chip success">OK</span>
+            </div>
+            <div class="dc-body">
+              <div style="background:var(--uuif-fill-red-lightest);border-radius:var(--uuif-radius-4);padding:var(--uuif-sp-3);font-size:12px;color:var(--uuif-brand-red);font-weight:600">⚠ 12 open alerts — immediate action required</div>
+            </div>
+            <div class="dc-footer"><button class="uuif-btn primary sm">Remediate</button></div>
+          </div>
+
+          <!-- Card: Critical 2 -->
+          <div class="uuif-dashboard-card" style="border-top:3px solid var(--uuif-brand-red)">
+            <div class="dc-header">
+              <div class="dc-header-left">
+                <div class="t-avatar">GT</div>
+                <div><div class="t-14 fw-700">GlobalTech Intl</div><div class="t-11 col-tertiary">287 devices</div></div>
+              </div>
+              <div style="text-align:right"><div class="val-xl col-red">44</div><div class="t-11 upper col-red fw-700">Score</div></div>
+            </div>
+            <div style="padding:var(--uuif-sp-3) var(--uuif-sp-5);display:flex;flex-wrap:wrap;gap:var(--uuif-sp-2);border-bottom:1px solid var(--uuif-border-transparent)">
+              <span class="source-badge source-nsm" style="font-size:10px">NSM</span><span class="uuif-chip warning">Out of Sync</span>
+              <span class="source-badge source-wnm" style="font-size:10px">WNM</span><span class="uuif-chip success">OK</span>
+              <span class="source-badge source-cc" style="font-size:10px">CC</span><span class="uuif-chip error">Threat</span>
+              <span class="source-badge source-cse" style="font-size:10px">CSE</span><span class="uuif-chip default">1 Flag</span>
+            </div>
+            <div class="dc-body"><div style="background:var(--uuif-fill-red-lightest);border-radius:var(--uuif-radius-4);padding:var(--uuif-sp-3);font-size:12px;color:var(--uuif-brand-red);font-weight:600">⚠ 8 open alerts</div></div>
+            <div class="dc-footer"><button class="uuif-btn primary sm">Review</button></div>
+          </div>
+
+          <!-- Card: Warning -->
+          <div class="uuif-dashboard-card" style="border-top:3px solid var(--uuif-brand-yellow)">
+            <div class="dc-header">
+              <div class="dc-header-left">
+                <div class="t-avatar">BL</div>
+                <div><div class="t-14 fw-700">BlueLine Mfg</div><div class="t-11 col-tertiary">68 devices</div></div>
+              </div>
+              <div style="text-align:right"><div class="val-xl col-yellow">72</div><div class="t-11 upper col-yellow fw-700">Score</div></div>
+            </div>
+            <div style="padding:var(--uuif-sp-3) var(--uuif-sp-5);display:flex;flex-wrap:wrap;gap:var(--uuif-sp-2);border-bottom:1px solid var(--uuif-border-transparent)">
+              <span class="source-badge source-nsm" style="font-size:10px">NSM</span><span class="uuif-chip success">OK</span>
+              <span class="source-badge source-wnm" style="font-size:10px">WNM</span><span class="uuif-chip warning">3 AP Offline</span>
+              <span class="source-badge source-cc" style="font-size:10px">CC</span><span class="uuif-chip success">OK</span>
+            </div>
+            <div class="dc-body"><div style="background:var(--uuif-fill-yellow-xxx-lighter);border-radius:var(--uuif-radius-4);padding:var(--uuif-sp-3);font-size:12px;color:var(--uuif-brand-yellow);font-weight:600">⚡ 3 warnings — monitor</div></div>
+            <div class="dc-footer"><button class="uuif-btn secondary sm">Monitor</button></div>
+          </div>
+
+          <!-- Card: Healthy -->
+          <div class="uuif-dashboard-card" style="border-top:3px solid var(--uuif-brand-green)">
+            <div class="dc-header">
+              <div class="dc-header-left">
+                <div class="t-avatar" style="background:var(--uuif-fill-green-xxx-lighter);color:var(--uuif-brand-green)">SW</div>
+                <div><div class="t-14 fw-700">SkyWave Networks</div><div class="t-11 col-tertiary">189 devices</div></div>
+              </div>
+              <div style="text-align:right"><div class="val-xl col-green">96</div><div class="t-11 upper col-green fw-700">Score</div></div>
+            </div>
+            <div style="padding:var(--uuif-sp-3) var(--uuif-sp-5);display:flex;flex-wrap:wrap;gap:var(--uuif-sp-2);border-bottom:1px solid var(--uuif-border-transparent)">
+              <span class="source-badge source-nsm" style="font-size:10px">NSM</span><span class="uuif-chip success">OK</span>
+              <span class="source-badge source-wnm" style="font-size:10px">WNM</span><span class="uuif-chip success">OK</span>
+              <span class="source-badge source-cse" style="font-size:10px">CSE</span><span class="uuif-chip success">OK</span>
+            </div>
+            <div class="dc-body"><div style="background:var(--uuif-fill-green-xxx-lighter);border-radius:var(--uuif-radius-4);padding:var(--uuif-sp-3);font-size:12px;color:var(--uuif-brand-green);font-weight:600">✓ All systems healthy</div></div>
+            <div class="dc-footer"><button class="uuif-btn secondary sm">View Details</button></div>
+          </div>
+
+          <!-- Card: Warning 2 -->
+          <div class="uuif-dashboard-card" style="border-top:3px solid var(--uuif-status-major)">
+            <div class="dc-header">
+              <div class="dc-header-left">
+                <div class="t-avatar">RC</div>
+                <div><div class="t-14 fw-700">Redcliff Systems</div><div class="t-11 col-tertiary">51 devices</div></div>
+              </div>
+              <div style="text-align:right"><div class="val-xl" style="color:var(--uuif-status-major)">68</div><div class="t-11 upper fw-700" style="color:var(--uuif-status-major)">Score</div></div>
+            </div>
+            <div style="padding:var(--uuif-sp-3) var(--uuif-sp-5);display:flex;flex-wrap:wrap;gap:var(--uuif-sp-2);border-bottom:1px solid var(--uuif-border-transparent)">
+              <span class="source-badge source-nsm" style="font-size:10px">NSM</span><span class="uuif-chip success">OK</span>
+              <span class="source-badge source-cse" style="font-size:10px">CSE</span><span class="uuif-chip default">1 Flag</span>
+            </div>
+            <div class="dc-body"><div style="background:var(--uuif-fill-yellow-xxx-lighter);border-radius:var(--uuif-radius-4);padding:var(--uuif-sp-3);font-size:12px;color:var(--uuif-brand-yellow);font-weight:600">⚡ Unregistered device — CSE</div></div>
+            <div class="dc-footer"><button class="uuif-btn secondary sm">Review</button></div>
+          </div>
+
+          <!-- +45 more placeholder -->
+          <div class="uuif-dashboard-card" style="display:flex;align-items:center;justify-content:center;min-height:180px;border:2px dashed var(--uuif-border-tertiary);background:transparent;box-shadow:none;">
+            <div style="text-align:center">
+              <div class="val-xl col-tertiary">+45</div>
+              <div class="t-12 col-tertiary mt-3">more tenants</div>
+              <a class="dc-action t-12" style="display:block;margin-top:var(--uuif-sp-3)">View All 50 →</a>
+            </div>
+          </div>
+
+        </div>
+      </div><!-- /concept-3 -->
+
+
+      <!-- ════════════════════════════════════
+           CONCEPT 4 — ACTION QUEUE
+      ════════════════════════════════════ -->
+      <div class="dash-panel" id="concept-4">
+
+        <div class="page-title-row mb-5">
+          <div>
+            <div class="page-title">Action Queue</div>
+            <div class="page-subtitle t-12 col-tertiary mt-3">Today's prioritized work items · All products · 50 Tenants</div>
+          </div>
+          <button class="uuif-btn primary sm">Mark All Done</button>
+        </div>
+
+        <!-- Portfolio count blocks -->
+        <div class="grid-cb mb-5">
+          <div class="uuif-count-block" style="border-color:var(--uuif-brand-red)"><svg class="cb-icon" viewBox="0 0 24 24" style="fill:var(--uuif-brand-red)"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg><div><div class="cb-label t-11 upper" style="color:var(--uuif-brand-red)">Queue Items</div><div class="cb-value col-red">18</div></div></div>
+          <div class="uuif-count-block"><svg class="cb-icon" viewBox="0 0 24 24" style="fill:var(--uuif-brand-green)"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><div><div class="cb-label t-11 upper">Completed</div><div class="cb-value col-green">6</div></div></div>
+          <div class="uuif-count-block"><svg class="cb-icon" viewBox="0 0 24 24" style="fill:var(--uuif-brand-yellow)"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10" stroke="white" stroke-width="2"/></svg><div><div class="cb-label t-11 upper">Expiring Lic.</div><div class="cb-value col-yellow">7</div></div></div>
+          <div class="uuif-count-block"><svg class="cb-icon" viewBox="0 0 24 24" style="fill:var(--uuif-brand-orange)"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg><div><div class="cb-label t-11 upper">Offline Devices</div><div class="cb-value col-orange">22</div></div></div>
+          <div class="uuif-count-block"><svg class="cb-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg><div><div class="cb-label t-11 upper">Est. Time</div><div class="cb-value">2.4h</div></div></div>
+        </div>
+
+        <!-- Two column: action queue + product widgets -->
+        <div style="display:grid;grid-template-columns:340px 1fr;gap:var(--uuif-sp-5)">
+
+          <!-- Left: action queue card -->
+          <div class="uuif-dashboard-card">
+            <div class="dc-header">
+              <span class="dc-title">Today's Action Queue</span>
+              <span class="uuif-chip error">18 Open</span>
+            </div>
+            <div style="padding:var(--uuif-sp-4) var(--uuif-sp-5)">
+
+              <!-- Critical -->
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--uuif-brand-red);margin-bottom:var(--uuif-sp-3)">🔴 Critical</div>
+              <div style="margin-bottom:var(--uuif-sp-3);padding:var(--uuif-sp-3);background:var(--uuif-fill-red-lightest);border-radius:var(--uuif-radius-6)">
+                <div class="flex-between mb-3">
+                  <div class="t-13 fw-600">Restore offline firewalls</div>
+                  <span class="source-badge source-nsm" style="font-size:10px">NSM</span>
+                </div>
+                <div class="t-12 col-secondary">Acme Corp · 22 devices · ~45 min</div>
+                <div class="flex-between mt-3"><button class="uuif-btn primary sm">Start</button><span class="t-11 col-tertiary">2 min ago</span></div>
+              </div>
+              <div style="margin-bottom:var(--uuif-sp-3);padding:var(--uuif-sp-3);background:var(--uuif-fill-red-lightest);border-radius:var(--uuif-radius-6)">
+                <div class="flex-between mb-3">
+                  <div class="t-13 fw-600">Isolate infected endpoints</div>
+                  <span class="source-badge source-cc" style="font-size:10px">CC</span>
+                </div>
+                <div class="t-12 col-secondary">GlobalTech Intl · 4 devices · ~20 min</div>
+                <div class="flex-between mt-3"><button class="uuif-btn primary sm">Start</button><span class="t-11 col-tertiary">14 min ago</span></div>
+              </div>
+
+              <div class="row-div"></div>
+
+              <!-- Warning -->
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--uuif-brand-yellow);margin-bottom:var(--uuif-sp-3);margin-top:var(--uuif-sp-3)">🟡 Warning</div>
+              <div style="margin-bottom:var(--uuif-sp-3);padding:var(--uuif-sp-3);background:var(--uuif-fill-yellow-xxx-lighter);border-radius:var(--uuif-radius-6)">
+                <div class="flex-between mb-3">
+                  <div class="t-13 fw-600">Diagnose offline APs</div>
+                  <span class="source-badge source-wnm" style="font-size:10px">WNM</span>
+                </div>
+                <div class="t-12 col-secondary">BlueLine Mfg · 3 APs · ~15 min</div>
+                <div class="flex-between mt-3"><button class="uuif-btn secondary sm">Review</button><span class="t-11 col-tertiary">1 hr ago</span></div>
+              </div>
+              <div style="margin-bottom:var(--uuif-sp-3);padding:var(--uuif-sp-3);background:var(--uuif-fill-yellow-xxx-lighter);border-radius:var(--uuif-radius-6)">
+                <div class="flex-between mb-3">
+                  <div class="t-13 fw-600">Review unregistered device</div>
+                  <span class="source-badge source-cse" style="font-size:10px">CSE</span>
+                </div>
+                <div class="t-12 col-secondary">Redcliff Systems · j.sharma · ~5 min</div>
+                <div class="flex-between mt-3"><button class="uuif-btn secondary sm">Review</button><span class="t-11 col-tertiary">2 hr ago</span></div>
+              </div>
+
+              <div style="text-align:center;padding:var(--uuif-sp-3) 0">
+                <a class="dc-action t-12">+ 14 more items →</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: 4 product mini-widgets stacked 2x2 -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto;gap:var(--uuif-sp-5)">
+
+            <!-- NSM mini widget -->
+            <div class="uuif-dashboard-card">
+              <div class="dc-header">
+                <div class="dc-header-left">
+                  <span class="source-badge source-nsm">NSM</span>
+                  <span class="dc-title">Firewalls</span>
+                </div>
+                <a class="dc-action">Open →</a>
+              </div>
+              <div class="source-row"><span class="dot" style="background:var(--uuif-brand-blue)"></span><span class="source-desc">Source: NSM — Network Security Manager</span></div>
+              <div class="dc-body">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--uuif-sp-3);margin-bottom:var(--uuif-sp-4)">
+                  <div class="uuif-count-block" style="flex-direction:column;padding:var(--uuif-sp-3)"><div class="cb-value col-red">22</div><div class="cb-label t-11" style="margin-top:var(--uuif-sp-1)">Offline</div></div>
+                  <div class="uuif-count-block" style="flex-direction:column;padding:var(--uuif-sp-3)"><div class="cb-value col-yellow">4</div><div class="cb-label t-11" style="margin-top:var(--uuif-sp-1)">Lic. Exp.</div></div>
+                </div>
+                <div class="flex-between mt-3"><span class="t-12 col-secondary">Open Alerts</span><span class="uuif-chip error">35 Total</span></div>
+                <div class="uuif-pbar-track mt-3"><div class="uuif-pbar-fill" style="width:100%;background:var(--uuif-brand-red)"></div></div>
+              </div>
+            </div>
+
+            <!-- WNM mini widget -->
+            <div class="uuif-dashboard-card">
+              <div class="dc-header">
+                <div class="dc-header-left">
+                  <span class="source-badge source-wnm">WNM</span>
+                  <span class="dc-title">Wireless</span>
+                </div>
+                <a class="dc-action">Open →</a>
+              </div>
+              <div class="source-row"><span class="dot" style="background:var(--uuif-surface-primary)"></span><span class="source-desc">Source: WNM — Wireless Network Manager</span></div>
+              <div class="dc-body">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--uuif-sp-3);margin-bottom:var(--uuif-sp-4)">
+                  <div class="uuif-count-block" style="flex-direction:column;padding:var(--uuif-sp-3)"><div class="cb-value col-green">244</div><div class="cb-label t-11" style="margin-top:var(--uuif-sp-1)">APs Online</div></div>
+                  <div class="uuif-count-block" style="flex-direction:column;padding:var(--uuif-sp-3)"><div class="cb-value col-yellow">3</div><div class="cb-label t-11" style="margin-top:var(--uuif-sp-1)">APs Offline</div></div>
+                </div>
+                <div class="flex-between mt-3"><span class="t-12 col-secondary">Alert Level</span><span class="uuif-chip warning">Medium</span></div>
+                <div class="uuif-pbar-track mt-3"><div class="uuif-pbar-fill" style="width:18%;background:var(--uuif-brand-yellow)"></div></div>
+              </div>
+            </div>
+
+            <!-- CC mini widget -->
+            <div class="uuif-dashboard-card">
+              <div class="dc-header">
+                <div class="dc-header-left">
+                  <span class="source-badge source-cc">Capture Client</span>
+                  <span class="dc-title">Endpoints</span>
+                </div>
+                <a class="dc-action">Open →</a>
+              </div>
+              <div class="source-row"><span class="dot" style="background:var(--uuif-brand-red)"></span><span class="source-desc">Source: Capture Client — Endpoint Security</span></div>
+              <div class="dc-body">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--uuif-sp-3);margin-bottom:var(--uuif-sp-4)">
+                  <div class="uuif-count-block" style="flex-direction:column;padding:var(--uuif-sp-3);border-color:var(--uuif-brand-red)"><div class="cb-value col-red">4</div><div class="cb-label t-11" style="margin-top:var(--uuif-sp-1)">Infected</div></div>
+                  <div class="uuif-count-block" style="flex-direction:column;padding:var(--uuif-sp-3)"><div class="cb-value col-yellow">7</div><div class="cb-label t-11" style="margin-top:var(--uuif-sp-1)">Unresolved</div></div>
+                </div>
+                <div class="flex-between mt-3"><span class="t-12 col-secondary">Threat Level</span><span class="uuif-chip error">Critical</span></div>
+                <div class="uuif-pbar-track mt-3"><div class="uuif-pbar-fill" style="width:30%;background:var(--uuif-brand-red)"></div></div>
+              </div>
+            </div>
+
+            <!-- CSE mini widget -->
+            <div class="uuif-dashboard-card">
+              <div class="dc-header">
+                <div class="dc-header-left">
+                  <span class="source-badge source-cse">CSE</span>
+                  <span class="dc-title">Cloud Edge</span>
+                </div>
+                <a class="dc-action">Open →</a>
+              </div>
+              <div class="source-row"><span class="dot" style="background:var(--uuif-brand-green)"></span><span class="source-desc">Source: CSE — Cloud Secure Edge</span></div>
+              <div class="dc-body">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--uuif-sp-3);margin-bottom:var(--uuif-sp-4)">
+                  <div class="uuif-count-block" style="flex-direction:column;padding:var(--uuif-sp-3)"><div class="cb-value col-green">1</div><div class="cb-label t-11" style="margin-top:var(--uuif-sp-1)">Connector</div></div>
+                  <div class="uuif-count-block" style="flex-direction:column;padding:var(--uuif-sp-3);border-color:var(--uuif-brand-yellow)"><div class="cb-value col-yellow">1</div><div class="cb-label t-11" style="margin-top:var(--uuif-sp-1)">Flag</div></div>
+                </div>
+                <div class="flex-between mt-3"><span class="t-12 col-secondary">Connector Health</span><span class="uuif-chip success">Reporting</span></div>
+                <div class="uuif-pbar-track mt-3"><div class="uuif-pbar-fill" style="width:99%;background:var(--uuif-brand-green)"></div></div>
+              </div>
+            </div>
+
+          </div><!-- /right grid -->
+        </div><!-- /two-col -->
+
+      </div><!-- /concept-4 -->
+
+    </div><!-- /page-body -->
+  </div><!-- /content -->
+</div><!-- /shell -->
+
+<script>
+  function showConcept(n) {
+    document.querySelectorAll('.dash-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.cs-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('concept-' + n).classList.add('active');
+    document.querySelectorAll('.cs-btn')[n - 1].classList.add('active');
+  }
+</script>
+</body>
+</html>

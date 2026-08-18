@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Alert Triage — Competitive Research | SAMI Phase 2</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f4f6f9; color: #1a1a2e; }
+
+  /* Header */
+  .header { background: #1a1a2e; color: #fff; padding: 28px 40px; border-bottom: 3px solid #E55A1C; }
+  .header h1 { font-size: 22px; font-weight: 700; }
+  .header p { font-size: 13px; color: #9ca3af; margin-top: 4px; }
+  .header .meta { display: flex; gap: 24px; margin-top: 12px; }
+  .header .badge { background: rgba(229,90,28,0.15); border: 1px solid #E55A1C; color: #E55A1C; padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* Nav */
+  .nav { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 0 40px; display: flex; gap: 0; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .nav a { display: block; padding: 14px 18px; font-size: 13px; font-weight: 500; color: #6b7280; text-decoration: none; border-bottom: 3px solid transparent; transition: all 0.15s; }
+  .nav a:hover { color: #E55A1C; border-bottom-color: #E55A1C; }
+  .nav a.active { color: #E55A1C; border-bottom-color: #E55A1C; }
+
+  /* Layout */
+  .container { max-width: 1400px; margin: 0 auto; padding: 32px 40px; }
+  .section { margin-bottom: 56px; }
+  .section-header { margin-bottom: 24px; padding-bottom: 12px; border-bottom: 2px solid #e5e7eb; }
+  .section-header h2 { font-size: 18px; font-weight: 700; color: #1a1a2e; }
+  .section-header p { font-size: 13px; color: #6b7280; margin-top: 4px; }
+
+  /* Summary Table */
+  .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
+  .summary-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; }
+  .summary-card h3 { font-size: 13px; font-weight: 700; color: #1a1a2e; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .summary-card p { font-size: 12px; color: #6b7280; line-height: 1.6; }
+  .summary-card .highlight { font-weight: 700; color: #E55A1C; }
+
+  /* Product Cards */
+  .product { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; margin-bottom: 32px; overflow: hidden; }
+  .product-header { padding: 20px 24px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: flex-start; justify-content: space-between; }
+  .product-header-left { flex: 1; }
+  .product-title { font-size: 16px; font-weight: 700; color: #1a1a2e; display: flex; align-items: center; gap: 10px; }
+  .product-subtitle { font-size: 12px; color: #6b7280; margin-top: 4px; }
+  .domain-tag { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 3px 8px; border-radius: 4px; }
+  .domain-cyber { background: #fef2f2; color: #dc2626; }
+  .domain-ops { background: #eff6ff; color: #2563eb; }
+  .product-body { padding: 20px 24px; }
+
+  /* Analysis Grid */
+  .analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .analysis-item { background: #f9fafb; border-radius: 6px; padding: 14px; }
+  .analysis-item h4 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #9ca3af; margin-bottom: 6px; }
+  .analysis-item ul { list-style: none; }
+  .analysis-item ul li { font-size: 12px; color: #374151; padding: 3px 0; padding-left: 14px; position: relative; line-height: 1.4; }
+  .analysis-item ul li::before { content: "→"; position: absolute; left: 0; color: #E55A1C; font-size: 11px; }
+
+  /* Screenshots */
+  .screenshots { display: grid; gap: 12px; margin-top: 16px; }
+  .screenshots.cols-2 { grid-template-columns: 1fr 1fr; }
+  .screenshots.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .screenshots.cols-1 { grid-template-columns: 1fr; }
+  .screenshot-item { border: 1px solid #e5e7eb; border-radius: 6px; overflow: hidden; }
+  .screenshot-item img { width: 100%; display: block; max-height: 420px; object-fit: cover; object-position: top; background: #f0f0f0; }
+  .screenshot-item img.tall { max-height: 600px; }
+  .screenshot-label { padding: 8px 12px; background: #f9fafb; border-top: 1px solid #e5e7eb; font-size: 11px; color: #6b7280; font-weight: 500; }
+
+  /* Source Link */
+  .source-link { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: #E55A1C; text-decoration: none; margin-top: 10px; }
+  .source-link:hover { text-decoration: underline; }
+
+  /* Design Patterns */
+  .patterns-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .patterns-table th { background: #1a1a2e; color: #fff; padding: 10px 14px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .patterns-table td { padding: 10px 14px; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
+  .patterns-table tr:nth-child(even) td { background: #f9fafb; }
+  .patterns-table td:first-child { font-weight: 600; color: #1a1a2e; width: 18%; }
+  .check { color: #16a34a; font-weight: 700; }
+  .partial { color: #ca8a04; font-weight: 700; }
+  .none { color: #dc2626; }
+
+  /* Key Findings */
+  .findings { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .finding-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; border-left: 4px solid #E55A1C; }
+  .finding-card h3 { font-size: 13px; font-weight: 700; color: #1a1a2e; margin-bottom: 10px; }
+  .finding-card p { font-size: 12px; color: #6b7280; line-height: 1.6; }
+  .finding-card .number { font-size: 28px; font-weight: 800; color: #E55A1C; margin-bottom: 4px; }
+
+  /* SAMI Implications */
+  .implications { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; }
+  .implications-header { background: #1a1a2e; color: #fff; padding: 16px 24px; }
+  .implications-header h2 { font-size: 15px; font-weight: 700; }
+  .implications-body { padding: 24px; }
+  .impl-row { display: flex; gap: 20px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #f0f0f0; }
+  .impl-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .impl-num { font-size: 22px; font-weight: 800; color: #E55A1C; min-width: 40px; }
+  .impl-text h4 { font-size: 13px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; }
+  .impl-text p { font-size: 12px; color: #6b7280; line-height: 1.6; }
+  .impl-text .competitor { font-weight: 600; color: #374151; }
+
+  footer { text-align: center; padding: 24px; font-size: 11px; color: #9ca3af; border-top: 1px solid #e5e7eb; margin-top: 40px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>AI Alert Triage — Competitive Research</h1>
+  <p>SAMI Phase 2 · Research conducted May 2026</p>
+  <div class="meta">
+    <span class="badge">Cybersecurity</span>
+    <span class="badge">Cross-Domain</span>
+    <span class="badge">UX Patterns</span>
+  </div>
+</div>
+
+<nav class="nav">
+  <a href="#patterns" class="active">Design Patterns</a>
+  <a href="#cybersecurity">Cybersecurity</a>
+  <a href="#other-domains">Other Domains</a>
+  <a href="#findings">Key Findings</a>
+  <a href="#implications">SAMI Implications</a>
+</nav>
+
+<div class="container">
+
+  <!-- Pattern Summary -->
+  <section class="section" id="patterns">
+    <div class="section-header">
+      <h2>Universal AI Alert Triage Patterns</h2>
+      <p>Common design patterns observed across all vendors — cybersecurity and non-cybersecurity</p>
+    </div>
+
+    <div class="summary-grid">
+      <div class="summary-card">
+        <h3>Signal Compression</h3>
+        <p>Every mature AI triage product collapses raw events into <span class="highlight">grouped incidents</span>. PagerDuty reports <span class="highlight">87–98% noise reduction</span>. CrowdStrike claims <span class="highlight">98% alert reduction</span>. The raw event list is never the user's entry point.</p>
+      </div>
+      <div class="summary-card">
+        <h3>Business Context Injection</h3>
+        <p>AI attaches <span class="highlight">impact language</span> to every surface incident — number of affected assets, users at risk, ARR exposure, SLA breach risk. Users see consequence, not just event. This is the primary difference between SIEM and modern AI triage.</p>
+      </div>
+      <div class="summary-card">
+        <h3>Embedded Rationale</h3>
+        <p>The AI explains <span class="highlight">why</span> something was flagged, inline. Darktrace, CrowdStrike, and Microsoft Sentinel all show AI reasoning alongside the alert card, not on a separate page. <span class="highlight">Trust is built in the triage view.</span></p>
+      </div>
+      <div class="summary-card">
+        <h3>Contextual Actions</h3>
+        <p>Actions are <span class="highlight">specific to the alert type</span>. Not a generic "View" button — instead "Deploy patch", "Force MFA", "Isolate host", "Run playbook". The action is the recommendation, not just a link to more information.</p>
+      </div>
+      <div class="summary-card">
+        <h3>Triage Has Already Happened</h3>
+        <p>Users arrive to <span class="highlight">decisions, not events</span>. The AI has pre-scored, pre-grouped, and pre-prioritized before the analyst lands. The screen communicates "here is what needs your attention" — not "here is everything that happened."</p>
+      </div>
+      <div class="summary-card">
+        <h3>Root Cause Linkage</h3>
+        <p>Related events are visually connected. Microsoft Sentinel's investigation graph, Dynatrace's root cause tree, PagerDuty's Probable Origin — all surface <span class="highlight">why an alert chain exists</span>, not just each individual alert in isolation.</p>
+      </div>
+    </div>
+
+    <table class="patterns-table">
+      <thead>
+        <tr>
+          <th>Pattern</th>
+          <th>CrowdStrike Charlotte AI</th>
+          <th>Darktrace AI Analyst</th>
+          <th>Microsoft Sentinel</th>
+          <th>Cortex XDR 5.0</th>
+          <th>PagerDuty AIOps</th>
+          <th>Dynatrace Davis AI</th>
+          <th>ServiceNow AIOps</th>
+          <th>SAMI (Current)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>AI grouping of raw alerts</td>
+          <td class="check">✓ Full</td>
+          <td class="check">✓ Full</td>
+          <td class="check">✓ Full</td>
+          <td class="check">✓ Full</td>
+          <td class="check">✓ Full</td>
+          <td class="check">✓ Full</td>
+          <td class="check">✓ Full</td>
+          <td class="partial">⚡ Partial</td>
+        </tr>
+        <tr>
+          <td>Inline AI rationale</td>
+          <td class="check">✓ Yes</td>
+          <td class="check">✓ Yes</td>
+          <td class="partial">⚡ UEBA only</td>
+          <td class="check">✓ Yes</td>
+          <td class="none">✗ No</td>
+          <td class="check">✓ Yes</td>
+          <td class="check">✓ Yes</td>
+          <td class="check">✓ SAMI badge</td>
+        </tr>
+        <tr>
+          <td>Business impact context</td>
+          <td class="partial">⚡ Partial</td>
+          <td class="partial">⚡ Partial</td>
+          <td class="none">✗ No</td>
+          <td class="partial">⚡ Partial</td>
+          <td class="none">✗ No</td>
+          <td class="partial">⚡ Service impact</td>
+          <td class="partial">⚡ SLA focus</td>
+          <td class="check">✓ ARR, tenants</td>
+        </tr>
+        <tr>
+          <td>Contextual action buttons</td>
+          <td class="check">✓ Yes</td>
+          <td class="check">✓ Yes</td>
+          <td class="check">✓ Playbooks</td>
+          <td class="check">✓ Yes</td>
+          <td class="partial">⚡ Limited</td>
+          <td class="partial">⚡ Partial</td>
+          <td class="check">✓ Yes</td>
+          <td class="check">✓ Yes</td>
+        </tr>
+        <tr>
+          <td>Root cause visualization</td>
+          <td class="partial">⚡ Partial</td>
+          <td class="check">✓ Entity graph</td>
+          <td class="check">✓ Inv. graph</td>
+          <td class="check">✓ Case view</td>
+          <td class="check">✓ Probable origin</td>
+          <td class="check">✓ Full RCA tree</td>
+          <td class="partial">⚡ Link view</td>
+          <td class="none">✗ No</td>
+        </tr>
+        <tr>
+          <td>Natural language summaries</td>
+          <td class="check">✓ Yes</td>
+          <td class="check">✓ Yes</td>
+          <td class="check">✓ Copilot</td>
+          <td class="check">✓ Yes</td>
+          <td class="none">✗ No</td>
+          <td class="partial">⚡ Partial</td>
+          <td class="check">✓ Now Assist</td>
+          <td class="check">✓ Yes</td>
+        </tr>
+        <tr>
+          <td>Multi-tenant view</td>
+          <td class="none">✗ No</td>
+          <td class="none">✗ No</td>
+          <td class="partial">⚡ Workspace</td>
+          <td class="none">✗ No</td>
+          <td class="none">✗ No</td>
+          <td class="partial">⚡ Limited</td>
+          <td class="none">✗ No</td>
+          <td class="check">✓ Yes — differentiator</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Cybersecurity Section -->
+  <section class="section" id="cybersecurity">
+    <div class="section-header">
+      <h2>Cybersecurity Competitors</h2>
+      <p>Direct SonicWall competitors and adjacent security platforms with AI alert triage</p>
+    </div>
+
+    <!-- CrowdStrike -->
+    <div class="product">
+      <div class="product-header">
+        <div class="product-header-left">
+          <div class="product-title">
+            CrowdStrike — Charlotte AI Detection Triage
+            <span class="domain-tag domain-cyber">Cybersecurity · EDR/XDR</span>
+          </div>
+          <div class="product-subtitle">The Detection Triage Agent automatically triages endpoint, identity, and cloud detections — trained on decisions of elite analysts</div>
+        </div>
+        <a class="source-link" href="https://www.crowdstrike.com/en-us/platform/charlotte-ai/" target="_blank">↗ Source</a>
+      </div>
+      <div class="product-body">
+        <div class="analysis-grid">
+          <div class="analysis-item">
+            <h4>What AI Does</h4>
+            <ul>
+              <li>Trains on decisions of CrowdStrike's own Falcon Complete MDR team</li>
+              <li>Triages endpoint, identity, and cloud detections autonomously</li>
+              <li>Filters false positives before analyst sees them</li>
+              <li>Surfaces only what matters — 98% alert reduction reported</li>
+              <li>Decodes attack commands, summarizes cases in plain language</li>
+            </ul>
+          </div>
+          <div class="analysis-item">
+            <h4>Key UX Decisions</h4>
+            <ul>
+              <li>Triage result embedded inline in the alert card — not a separate AI tab</li>
+              <li>Human-agent collaboration canvas for active investigations</li>
+              <li>Agentic SOAR combines structured playbooks + dynamic AI reasoning</li>
+              <li>Every AI action is auditable with user-authorized approval gates</li>
+              <li>40+ hrs/week time savings reported by customers</li>
+            </ul>
+          </div>
+        </div>
+        <div class="screenshots cols-2">
+          <div class="screenshot-item">
+            <img src="https://assets.crowdstrike.com/is/image/crowdstrikeinc/AUTOMATE-TRIAGE?wid=1400&hei=720&fmt=png-alpha&qlt=95,0&resMode=sharp2&op_usm=3.0,0.3,2,0" alt="CrowdStrike Charlotte AI — Automate Triage" loading="lazy" onerror="this.style.background='#f0f0f0';this.style.minHeight='200px';this.alt='[Image: CrowdStrike Charlotte AI Triage — visit crowdstrike.com/charlotte-ai]'">
+            <div class="screenshot-label">Charlotte AI — Detection Triage Agent view</div>
+          </div>
+          <div class="screenshot-item">
+            <img src="https://assets.crowdstrike.com/is/image/crowdstrikeinc/HUMAN-AGENT-COLLABORATION?wid=1400&hei=720&fmt=png-alpha&qlt=95,0&resMode=sharp2&op_usm=3.0,0.3,2,0" alt="CrowdStrike — Human-Agent Collaboration" loading="lazy" onerror="this.style.background='#f0f0f0';this.style.minHeight='200px'">
+            <div class="screenshot-label">Human-Agent Collaboration Canvas — analyst guides AI in real time</div>
+          </div>
+          <div class="screenshot-item">
+            <img src="https://assets.crowdstrike.com/is/image/crowdstrikeinc/Agentic-SOAR-multi-agent?wid=1400&hei=720&fmt=png-alpha&qlt=95,0&resMode=sharp2&op_usm=3.0,0.3,2,0" alt="CrowdStrike — Agentic SOAR" loading="lazy" onerror="this.style.background='#f0f0f0';this.style.minHeight='200px'">
+            <div class="screenshot-label">Agentic SOAR — multi-agent orchestration with human-in-the-loop</div>
+          </div>
+          <div class="screenshot-item">
+            <img src="https://assets.crowdstrike.com/is/image/crowdstrikeinc/Outcomes_You_Can_Trust_v3-2-scaled-1-1?wid=1400&hei=720&fmt=png-alpha&qlt=95,0&resMode=sharp2&op_usm=3.0,0.3,2,0" alt="CrowdStrike — Outcomes You Can Trust" loading="lazy" onerror="this.style.background='#f0f0f0';this.style.minHeight='200px'">
+            <div class="screenshot-label">Audit trail and control panel — every AI decision is traceable</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Darktrace -->
+    <div class="product">
+      <div class="product-header">
+        <div class="product-header-left">
+          <div class="product-title">
+            Darktrace — Cyber AI Analyst
+            <span class="domain-tag domain-cyber">Cybersecurity · NDR/XDR</span>
+          </div>
+          <div class="product-subtitle">Autonomous investigation at machine scale — mirrors human investigative process using DEMIST-2 and DIGEST ML models</div>
+        </div>
+        <a class="source-link" href="https://www.darktrace.com/cyber-ai-analyst" target="_blank">↗ Source</a>
+      </div>
+      <div class="product-body">
+        <div class="analysis-grid">
+          <div class="analysis-item">
+            <h4>What AI Does</h4>
+            <ul>
+              <li>DEMIST-2 model detects subtle attacker behavior patterns</li>
+              <li>DIGEST model predicts which threats are likely to escalate</li>
+              <li>Autonomously investigates all alerts — including third-party tool alerts</li>
+              <li>Re-investigates existing alerts as new data emerges</li>
+              <li>Fewer than 4% of investigations require human review</li>
+              <li>10× incident response acceleration — 92% triage time reduction</li>
+            </ul>
+          </div>
+          <div class="analysis-item">
+            <h4>Key UX Decisions</h4>
+            <ul>
+              <li>Natural language investigation summaries with clear decision logic</li>
+              <li>Each incident shows recommended next actions — not just status</li>
+              <li>Investigations span all covered surfaces (network, email, cloud, identity)</li>
+              <li>Junior analysts can learn from AI output — explicit skill transfer goal</li>
+              <li>Saved 50,000 investigation hours annually (referenced case)</li>
+              <li>State of Oklahoma: 3,000 model breaches → 18 critical incidents</li>
+            </ul>
+          </div>
+        </div>
+        <div class="screenshots cols-2">
+          <div class="screenshot-item">
+            <img src="https://cdn.prod.website-files.com/626ff19cdd07d1258d49238d/66bcb0a2ab020f4f30bf759b_CyberAI%20-%20Product%20Hero.jpg" alt="Darktrace Cyber AI Analyst — Product Hero" loading="lazy" onerror="this.style.background='#f0f0f0';this.style.minHeight='200px'">
+            <div class="screenshot-label">Cyber AI Analyst — investigation interface overview</div>
+          </div>
+          <div class="screenshot-item">
+            <img src="https://cdn.prod.website-files.com/626ff19cdd07d1258d49238d/66a770b13cbb750cca843dfd_network_cyber-ai-analyst.jpg" alt="Darktrace Filters — Cyber AI Analyst" loading="lazy" onerror="this.style.background='#f0f0f0';this.style.minHeight='200px'">
+            <div class="screenshot-label">Alert filtering and triage prioritization view</div>
+          </div>
+          <div class="screenshot-item">
+            <img src="https://cdn.prod.website-files.com/626ff19cdd07d1258d49238d/66aa1be1a20d4345995c47cf_cyber-ai-analytst_ui.jpg" alt="Darktrace — Cyber AI Analyst Full UI" loading="lazy" onerror="this.style.background='#f0f0f0';this.style.minHeight='200px'">
+            <div class="screenshot-label">Full analyst UI — AI investigations with recommended actions</div>
+          </div>
+          <div class="screenshot-item">
+            <img src="https://cdn.prod.website-files.com/626ff19cdd07d1258d49238d/66c5b661af7be9edf517ecbb_b68d6435cc396b322d3a4335332cccf7_platform_hero-ui-updated.jpg" alt="Darktrace Platform Dashboard" loading="lazy" onerror="this.style.background='#f0f0f0';this.style.minHeight='200px'">
+            <div class="screenshot-label">Darktrace ActiveAI Security Platform — cross-surface overview</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Microsoft Sentinel -->
+    <div class="product">
+      <div class="product-header">
+        <div class="product-header-left">
+          <div class="product-title">
+            Microsoft Sentinel — AI Incident Investigation
+            <span class="domain-tag domain-cyber">Cybersecurity · SIEM/SOAR</span>
+          </div>
+          <div class="product-subtitle">Full case management platform — AI groups alerts into incidents, surfaces Top Insights, and provides visual investigation graph</div>
+        </div>
+        <a class="source-link" href="https://learn.microsoft.com/en-us/azure/sentinel/investigate-incidents" target="_blank">↗ Source</a>
+      </div>
+      <div class="product-body">
+        <div class="analysis-grid">
+          <div class="analysis-item">
+            <h4>What AI Does</h4>
+            <ul>
+              <li>Groups multiple alerts into a single incident with entity correlation</li>
+              <li>Top Insights widget: ML-curated queries auto-run on incident entities</li>
+              <li>Similar Incidents surface: contextualizes threat in historical environment</li>
+              <li>UEBA insights: behavioral anomaly scoring per user/entity</li>
+              <li>Copilot integration: natural language incident summary on demand</li>
+              <li>Visual investigation graph maps relationships between entities</li>
+            </ul>
+          </div>
+          <div class="analysis-item">
+            <h4>Key UX Decisions</h4>
+            <ul>
+              <li>Incident page is the investigation surface — everything in one screen</li>
+              <li>Incident Timeline widget reconstructs attack chronology visually</li>
+              <li>Entity side panel: info, timeline, and insights per entity in context</li>
+              <li>Logs panel opens inside incident — no context switch to explore data</li>
+              <li>Activity log tracks all AI and human actions for audit trail</li>
+            </ul>
+          </div>
+        </div>
+        <div class="screenshots cols-2">
+          <div class="screenshot-item">
+            <img src="https://learn.microsoft.com/en-us/azure/sentinel/media/investigate-incidents/incident-details-overview.png" alt="Microsoft Sentinel — Incident Details Overview" loading="lazy" onerror="this.style.background='#f0f0f0';this.style.minHeight='200px'">
+            <div class="screenshot-label">Incident Details Overview — all investigation context in one screen</div>
+          </div>
+          <div class="screenshot-item">
+            <img src="https://learn.microsoft.com/en-us/azure/sentinel/media/investigate-incidents/investigation-map.png" alt="Microsoft Sentinel — Investigation Graph" loading="lazy" onerror="this.style.background='#f0f0f0';this.style.minHeight='200px'">
+            <div class="screenshot-label">Visual Investigation Graph — entity relationship mapping</div>
+          </div>
+          <div class="screenshot-item">
+            <img src="https://learn.microsoft.com/en-us/azure/sentinel/media/investigate-incidents/incident-timeline.png" alt="Microsoft Sentinel — Incident Timeline" loading="lazy" onerror="this.style.background='#f0f0f0';this.style.minHeight='200px'">
+            <div class="screenshot-label">Incident Timeline — attack story reconstruction</div>
+          </div>
+          <div class="screenshot-item">
+            <img src="https://learn.microsoft.com/en-us/azure/sentinel/media/investigate-incidents/entities-tab.png" alt="Microsoft Sentinel — Entities Tab" loading="lazy" onerror="this.style.background='#f0f0f0';this.style.minHeight='200px'">
+            <div class="screenshot-label">Entities Tab — per-entity dossier with behavioral insights</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Palo Alto -->
+    <div class="product">
+      <div class="product-header">
+        <div class="product-header-left">
+          <div class="product-title">
+            Palo Alto Networks — Cortex XDR 5.0 Agentic Assistant
+            <span class="domain-tag domain-cyber">Cybersecurity · XDR</span>
+          </div>
+          <div class="product-subtitle">Agentic AI workforce embedded in case management — AI-driven summarization, rebuilt case management with Resolution Center</div>
+        </div>
+        <a class="source-link" href="https://www.paloaltonetworks.com/blog/security-operations/introducing-cortex-xdr-5-0-the-new-standard-for-endpoint-security/" target="_blank">↗ Source</a>
+      </div>
+      <div class="product-body">
+        <div class="analysis-grid">
+          <div class="analysis-item">
+            <h4>What AI Does</h4>
+            <ul>
+              <li>AI-driven summarization translates complex alerts into plain language</li>
+              <li>Visualizations map connections between alerts, assets, and users</li>
+              <li>Agentic Assistant embedded in investigation workflow proactively suggests next steps</li>
+              <li>Case Investigation agent cuts through multi-stage incident complexity</li>
+              <li>Resolution Center consolidates remediation into a single structured response</li>
+              <li>AI agents handle triage, enrichment, host containment — 24/7</li>
+            </ul>
+          </div>
+          <div class="analysis-item">
+            <h4>Key UX Decisions</h4>
+            <ul>
+              <li>Console redesigned as intelligent collaborative workspace — not alert list</li>
+              <li>Agentic Assistant always visible in investigation — never a separate tool</li>
+              <li>Every agent action governed by same RBAC as human analysts</li>
+              <li>Human-in-the-loop approval required for impactful actions</li>
+              <li>Complete audit log for every AI decision</li>
+              <li>No-code custom agent builder for team-specific workflows</li>
+            </ul>
+          </div>
+        </div>
+        <div class="screenshots cols-1">
+          <div class="screenshot-item">
+            <img src="https://www.paloaltonetworks.com/content/dam/pan/en_US/images/cortex/xdr/cortex-xdr-screenshot-case-view.png" alt="Cortex XDR 5.0 Case View" loading="lazy" onerror="this.src='https://www.paloaltonetworks.com/blog/wp-content/uploads/2026/02/cortex-xdr-5-case-view.png';this.onerror=function(){this.style.background='#f0f0f0';this.style.minHeight='200px';this.parentElement.querySelector('.screenshot-label').textContent='Cortex XDR 5.0 — Visit paloaltonetworks.com/cortex/cortex-xdr for live screenshots'}">
+            <div class="screenshot-label">Cortex XDR 5.0 — Rebuilt case management with cross-issue relationship view (Feb 2026)</div>
+          </div>
+        </div>
+        <p style="font-size:11px;color:#9ca3af;margin-top:10px;">Note: Cortex XDR 5.0 launched Feb 2026. Screenshots are dynamically rendered on their site. <a href="https://www.paloaltonetworks.com/cortex/cortex-xdr" target="_blank" style="color:#E55A1C;">View live at paloaltonetworks.com →</a></p>
+      </div>
+    </div>
+
+    <!-- Cisco XDR -->
+    <div class="product">
+      <div class="product-header">
+        <div class="product-header-left">
+          <div class="product-title">
+            Cisco XDR — Foundation AI Incident Correlation
+            <span class="domain-tag domain-cyber">Cybersecurity · XDR</span>
+          </div>
+          <div class="product-subtitle">AI receives telemetry from all integrated sources, performs event aggregation and correlation at machine speed</div>
+        </div>
+        <a class="source-link" href="https://www.cisco.com/c/en/us/products/collateral/security/xdr/xdr-ai-empowers-soc-analysts-wp.html" target="_blank">↗ Source</a>
+      </div>
+      <div class="product-body">
+        <div class="analysis-grid">
+          <div class="analysis-item">
+            <h4>What AI Does</h4>
+            <ul>
+              <li>Foundation AI (foundation-sec-8b-Instruct LLM) integrated into XDR</li>
+              <li>Initiates immediate analysis of any incident on demand</li>
+              <li>Delivers comprehensive summary including detections and correlations</li>
+              <li>Correlates events from Cisco Secure Firewall, endpoint, email, network</li>
+              <li>Produces high-fidelity "incident bundle" from raw telemetry</li>
+            </ul>
+          </div>
+          <div class="analysis-item">
+            <h4>Key UX Decisions</h4>
+            <ul>
+              <li>Plug-and-play incident correlation with minimal configuration</li>
+              <li>Designed for analysts without deep XDR experience (lower skill floor)</li>
+              <li>AI Assistant reduces complexity of managing disparate security tools</li>
+              <li>Agentic AI announced at Cisco Live 2025 — autonomous triage</li>
+            </ul>
+          </div>
+        </div>
+        <p style="font-size:11px;color:#9ca3af;margin-top:8px;">Screenshots require demo access. <a href="https://www.cisco.com/site/us/en/products/security/xdr/index.html" target="_blank" style="color:#E55A1C;">View at cisco.com/xdr →</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Other Domains -->
+  <section class="section" id="other-domains">
+    <div class="section-header">
+      <h2>Other Domains — AI Alert Triage</h2>
+      <p>IT Operations, DevOps, and Observability platforms with mature AI triage — analog use cases to SAMI</p>
+    </div>
+
+    <!-- PagerDuty -->
+    <div class="product">
+      <div class="product-header">
+        <div class="product-header-left">
+          <div class="product-title">
+            PagerDuty AIOps — Event Intelligence
+            <span class="domain-tag domain-ops">IT Operations · Incident Management</span>
+          </div>
+          <div class="product-subtitle">ML-driven alert grouping, noise reduction, and probable origin detection — 87–98% noise reduction reported</div>
+        </div>
+        <a class="source-link" href="https://www.pagerduty.com/platform/aiops/event-intelligence/" target="_blank">↗ Source</a>
+      </div>
+      <div class="product-body">
+        <div class="analysis-grid">
+          <div class="analysis-item">
+            <h4>What AI Does</h4>
+            <ul>
+              <li>Intelligent Alert Grouping: ML correlates related alerts in real time</li>
+              <li>Content-Based Grouping: groups by alert content similarity</li>
+              <li>Auto-Pause Incident Notifications: ML detects transient/flapping alerts</li>
+              <li>Probable Origin: auto-generated list of likely root cause locations</li>
+              <li>Outlier Incident detection: identifies rare or anomalous occurrences</li>
+              <li>Past & Related Incidents: surfaces historical context for triage</li>
+            </ul>
+          </div>
+          <div class="analysis-item">
+            <h4>Key UX Decisions</h4>
+            <ul>
+              <li>"Grouping Now" label shows AI is actively working on an incident</li>
+              <li>Probable Origin appears as ranked list — analyst knows where to start</li>
+              <li>Auto-pause for flapping alerts eliminates SonicWall's primary noise problem</li>
+              <li>Change Correlation: links incidents to recent configuration changes</li>
+              <li>Real-time event orchestration with custom logic rules</li>
+            </ul>
+          </div>
+        </div>
+        <div class="screenshots cols-3">
+          <div class="screenshot-item">
+            <img src="https://cdn.pagerduty.com/wp-content/uploads/2022/10/intelligent-alert-grouping-settings-reduce-noise-20-min-grouping-window-recommended.png" alt="PagerDuty — Intelligent Alert Grouping Settings" loading="lazy" onerror="this.style.background='#f0f0f0';this.style.minHeight='160px'">
+            <div class="screenshot-label">Intelligent Alert Grouping — ML-powered settings</div>
+          </div>
+          <div class="screenshot-item">
+            <img src="https://cdn.pagerduty.com/wp-content/uploads/2021/11/probable-origin-a-1.png" alt="PagerDuty — Probable Origin" loading="lazy" onerror="this.style.background='#f0f0f0';this.style.minHeight='160px'">
+            <div class="screenshot-label">Probable Origin — AI-ranked root cause candidates</div>
+          </div>
+          <div class="screenshot-item">
+            <img src="https://cdn.pagerduty.com/wp-content/uploads/2021/11/auto-pause-incidents-1.png" alt="PagerDuty — Auto-Pause Incidents" loading="lazy" onerror="this.style.background='#f0f0f0';this.style.minHeight='160px'">
+            <div class="screenshot-label">Auto-Pause — flapping alert suppression (critical for NSM)</div>
+          </div>
+          <div class="screenshot-item">
+            <img src="https://cdn.pagerduty.com/wp-content/uploads/2021/06/5.2-outlier-incident-anomaly-2up.png" alt="PagerDuty — Outlier Incident" loading="lazy" onerror="this.style.background='#f0f0f0';this.style.minHeight='160px'">
+            <div class="screenshot-label">Outlier Incident detection — rare and anomalous pattern surfacing</div>
+          </div>
+          <div class="screenshot-item">
+            <img src="https://cdn.pagerduty.com/wp-content/uploads/2020/09/past-incidents.png" alt="PagerDuty — Past Incidents" loading="lazy" onerror="this.style.background='#f0f0f0';this.style.minHeight='160px'">
+            <div class="screenshot-label">Past & Related Incidents — historical context for triage</div>
+          </div>
+          <div class="screenshot-item">
+            <img src="https://cdn.pagerduty.com/wp-content/uploads/2022/06/eo-2up-12-iso.png" alt="PagerDuty — Event Orchestration" loading="lazy" onerror="this.style.background='#f0f0f0';this.style.minHeight='160px'">
+            <div class="screenshot-label">Event Orchestration — automated next-best-action routing</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dynatrace -->
+    <div class="product">
+      <div class="product-header">
+        <div class="product-header-left">
+          <div class="product-title">
+            Dynatrace Davis AI — Problem Detection & Root Cause
+            <span class="domain-tag domain-ops">Observability · AIOps</span>
+          </div>
+          <div class="product-subtitle">All events sharing the same root cause are correlated into a single trackable Problem — with real-time root cause analysis</div>
+        </div>
+        <a class="source-link" href="https://docs.dynatrace.com/docs/discover-dynatrace/platform/davis-ai" target="_blank">↗ Source</a>
+      </div>
+      <div class="product-body">
+        <div class="analysis-grid">
+          <div class="analysis-item">
+            <h4>What AI Does</h4>
+            <ul>
+              <li>Correlates all events sharing the exact root cause into one "Problem"</li>
+              <li>Problems have defined lifespans — updated in real time as new events arrive</li>
+              <li>Problems app feeds: open problems pinned at top regardless of filters</li>
+              <li>Root cause analysis identifies the triggering entity automatically</li>
+              <li>Anomaly detection on custom data streams (not just built-in metrics)</li>
+            </ul>
+          </div>
+          <div class="analysis-item">
+            <h4>Key UX Decisions</h4>
+            <ul>
+              <li>Problems app replaces the raw alert list entirely — no event log visible by default</li>
+              <li>Filter bar: status, affected entities, root cause entity, severity</li>
+              <li>Open problems always on top — triage priority is structural, not user-configured</li>
+              <li>Problem card shows impact breadth immediately (services, hosts, users affected)</li>
+            </ul>
+          </div>
+        </div>
+        <p style="font-size:11px;color:#9ca3af;margin-top:8px;">Screenshots require Dynatrace trial. <a href="https://www.dynatrace.com/platform/artificial-intelligence/" target="_blank" style="color:#E55A1C;">View Davis AI platform →</a></p>
+      </div>
+    </div>
+
+    <!-- ServiceNow -->
+    <div class="product">
+      <div class="product-header">
+        <div class="product-header-left">
+          <div class="product-title">
+            ServiceNow Predictive AIOps — Event Intelligence
+            <span class="domain-tag domain-ops">ITSM/AIOps · Enterprise IT</span>
+          </div>
+          <div class="product-subtitle">AI and ML correlate and deduplicate alerts — up to 99% noise reduction; Now Assist provides plain-language alert summaries</div>
+        </div>
+        <a class="source-link" href="https://www.servicenow.com/products/predictive-aiops.html" target="_blank">↗ Source</a>
+      </div>
+      <div class="product-body">
+        <div class="analysis-grid">
+          <div class="analysis-item">
+            <h4>What AI Does</h4>
+            <ul>
+              <li>Express List auto-groups alerts — click group shows Link View topology</li>
+              <li>Now Assist for ITOM: replaces cryptic alert descriptions with plain language</li>
+              <li>AI suggests which issues may have caused the alert</li>
+              <li>Collective knowledge base surfaced per alert — not just rules</li>
+              <li>Up to 99% noise reduction reported in production deployments</li>
+            </ul>
+          </div>
+          <div class="analysis-item">
+            <h4>Key UX Decisions</h4>
+            <ul>
+              <li>Express List concept: grouped alerts with topology visualization on click</li>
+              <li>Service Operations Workspace: out-of-the-box AIOps dashboards</li>
+              <li>AI-generated "intelligent alert analysis" with suggested next steps</li>
+              <li>Link View: visual topology of affected CIs on alert group selection</li>
+            </ul>
+          </div>
+        </div>
+        <p style="font-size:11px;color:#9ca3af;margin-top:8px;"><a href="https://www.servicenow.com/products/predictive-aiops.html" target="_blank" style="color:#E55A1C;">View ServiceNow Predictive AIOps →</a></p>
+      </div>
+    </div>
+
+    <!-- Splunk ITSI -->
+    <div class="product">
+      <div class="product-header">
+        <div class="product-header-left">
+          <div class="product-title">
+            Splunk ITSI — Event iQ Alert Correlation
+            <span class="domain-tag domain-ops">Observability · Security Analytics</span>
+          </div>
+          <div class="product-subtitle">AI-driven alert correlation groups related alerts, highlights critical incidents, and adds context for faster triage</div>
+        </div>
+        <a class="source-link" href="https://www.splunk.com/en_us/blog/observability/event-iq-splunk-it-service-intelligence-itsi.html" target="_blank">↗ Source</a>
+      </div>
+      <div class="product-body">
+        <div class="analysis-grid">
+          <div class="analysis-item">
+            <h4>What AI Does</h4>
+            <ul>
+              <li>Event iQ creates AI-driven alert correlations to reduce noise</li>
+              <li>Groups related alerts and highlights critical incidents</li>
+              <li>Service KPI health scoring surfaces degradation before outage</li>
+              <li>Episode review: notable events grouped for triage with Severity/Status/Owner</li>
+              <li>Alert Storm detection with dedicated episode views for mass-alert events</li>
+            </ul>
+          </div>
+          <div class="analysis-item">
+            <h4>Key UX Decisions</h4>
+            <ul>
+              <li>Episodes are the triage unit — not individual alerts</li>
+              <li>Service Insights view: KPI health tiles replace raw metric streams</li>
+              <li>Swim lane view of service health over time — visual context for triage</li>
+              <li>Alert Storm dashboards: ITSI Alert and Episode Volume Trend Analysis</li>
+            </ul>
+          </div>
+        </div>
+        <p style="font-size:11px;color:#9ca3af;margin-top:8px;"><a href="https://www.splunk.com/en_us/blog/observability/event-iq-splunk-it-service-intelligence-itsi.html" target="_blank" style="color:#E55A1C;">View Splunk Event iQ →</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Key Findings -->
+  <section class="section" id="findings">
+    <div class="section-header">
+      <h2>Key Findings</h2>
+      <p>What the competitive landscape tells us about AI alert triage design</p>
+    </div>
+    <div class="findings">
+      <div class="finding-card">
+        <div class="number">01</div>
+        <h3>The raw event list is never the primary surface</h3>
+        <p>Every mature platform — from CrowdStrike to PagerDuty to Dynatrace — has moved the raw event log to a secondary or tertiary view. The primary surface is AI-grouped incidents or problems. SonicWall's current Notifications tab is the equivalent of what these platforms removed 3–5 years ago.</p>
+      </div>
+      <div class="finding-card">
+        <div class="number">02</div>
+        <h3>Flapping alerts are auto-suppressed — not listed</h3>
+        <p>PagerDuty's Auto-Pause detects and suppresses transient/flapping alerts using ML. Dynatrace Davis never shows repeated interface up/down events as separate problems — they're correlated into one. The NSM Notifications tab currently shows 10+ repeated "interface X3 up/down" rows as separate entries.</p>
+      </div>
+      <div class="finding-card">
+        <div class="number">03</div>
+        <h3>AI rationale is inline — not a separate AI tab</h3>
+        <p>Every product shows the AI's reasoning inside the alert card itself. CrowdStrike embeds the Detection Triage Agent result in the same card. Darktrace shows investigation rationale inline. SAMI's current SAMI badge approach is directionally correct — but the content depth varies across cards.</p>
+      </div>
+      <div class="finding-card">
+        <div class="number">04</div>
+        <h3>Business context is what differentiates mature products</h3>
+        <p>Microsoft Sentinel and Palo Alto still focus primarily on technical severity. CrowdStrike and Darktrace are adding business impact language. SAMI is actually ahead of most competitors here — surfacing ARR at risk, tenant counts, and device blast radius is a genuine differentiator that should be expanded, not reduced.</p>
+      </div>
+      <div class="finding-card">
+        <div class="number">05</div>
+        <h3>Multi-tenant context is a genuine white space</h3>
+        <p>None of the reviewed products have a native multi-tenant AI triage surface. CrowdStrike, Darktrace, and Palo Alto are all single-tenant architectures. SAMI's ability to surface "4 tenants, 12 firewalls affected" in a single alert card is a capability no competitor has replicated. This is the strongest design differentiator in the current SAMI concept.</p>
+      </div>
+      <div class="finding-card">
+        <div class="number">06</div>
+        <h3>"Snooze" on behavioral anomalies is a design anti-pattern</h3>
+        <p>No competitor puts a Snooze button at the same visual priority as an action button on high-severity behavioral alerts. CrowdStrike requires human-in-the-loop approval for impactful actions. Microsoft Sentinel requires explicit status changes. SAMI's current Snooze CTA on the credential stuffing card creates a design risk — both operationally and in terms of perceived seriousness.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SAMI Implications -->
+  <section class="section" id="implications">
+    <div class="implications">
+      <div class="implications-header">
+        <h2>SAMI Design Implications — What to Borrow, What to Avoid, What to Defend</h2>
+      </div>
+      <div class="implications-body">
+        <div class="impl-row">
+          <div class="impl-num">↑</div>
+          <div class="impl-text">
+            <h4>Borrow: Flapping alert suppression (PagerDuty Auto-Pause)</h4>
+            <p>SAMI should auto-suppress repeated interface up/down events that historically self-resolve. <span class="competitor">PagerDuty</span> uses ML to learn which alert patterns are transient — SAMI should apply the same logic to SonicOS interface state events. This alone would eliminate ~80% of the noise in the current NSM Notifications tab.</p>
+          </div>
+        </div>
+        <div class="impl-row">
+          <div class="impl-num">↑</div>
+          <div class="impl-text">
+            <h4>Borrow: Probable Origin / Root Cause Linking (PagerDuty, Dynatrace, Sentinel)</h4>
+            <p>SAMI Need Attention cards should show "triggered by" linkage — e.g., "3 gateways offline likely caused by BGP route change at Delta Logistics." <span class="competitor">Dynatrace Davis</span> and <span class="competitor">PagerDuty Probable Origin</span> both surface root cause candidates automatically. This would reduce the triage burden significantly for MSP partners.</p>
+          </div>
+        </div>
+        <div class="impl-row">
+          <div class="impl-num">↑</div>
+          <div class="impl-text">
+            <h4>Borrow: Incident Timeline / Attack Chronology (Microsoft Sentinel)</h4>
+            <p>When a SAMI alert spans multiple events over time, a timeline view inside the expanded card would significantly increase triage confidence. <span class="competitor">Microsoft Sentinel's</span> Incident Timeline widget is the gold standard — showing alerts and bookmarks on a visual timeline within the incident page.</p>
+          </div>
+        </div>
+        <div class="impl-row">
+          <div class="impl-num">→</div>
+          <div class="impl-text">
+            <h4>Defend: Business context with ARR, tenant counts, device blast radius</h4>
+            <p>SAMI's "$287K ARR at renewal risk" and "4 Tenants · 12 Firewalls" language is more mature than most competitors. <span class="competitor">CrowdStrike</span> and <span class="competitor">Darktrace</span> do not surface ARR or MSP-level business context. This is a genuine differentiator — expand it, do not simplify it away in refinement.</p>
+          </div>
+        </div>
+        <div class="impl-row">
+          <div class="impl-num">→</div>
+          <div class="impl-text">
+            <h4>Defend: Multi-tenant grouping in a single alert card</h4>
+            <p>No competitor surfaces cross-tenant impact in a single alert. "Acme Corp, Beta Networks, Westfield IT — 9 firewalls" is architecturally unique to SAMI's position. Lean into this — competitors cannot replicate it without rearchitecting their tenancy model.</p>
+          </div>
+        </div>
+        <div class="impl-row">
+          <div class="impl-num">↓</div>
+          <div class="impl-text">
+            <h4>Avoid: "Snooze" on critical behavioral alerts</h4>
+            <p>Remove or demote the Snooze action on behavioral anomaly and credential stuffing cards. <span class="competitor">CrowdStrike</span> requires human-in-the-loop approval for high-impact actions. A Snooze button at the same prominence as "Force MFA Now" sends the wrong signal operationally — and creates liability for MSP partners.</p>
+          </div>
+        </div>
+        <div class="impl-row">
+          <div class="impl-num">↓</div>
+          <div class="impl-text">
+            <h4>Avoid: Duplicating CVE alerts across both panels</h4>
+            <p>The current SAMI concept shows CVEs in both "Need Attention" (left) and "SAMI Recommendations" (right). <span class="competitor">Microsoft Sentinel</span> avoids this by using distinct panels for distinct functions: incidents list vs. entity insights. The two SAMI panels need a clear functional separation — Reactive (Need Attention) vs. Proactive (Recommendations) — with no content duplication.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  AI Alert Triage Research · SAMI Phase 2 · May 2026 · Aravind Rangaswamy, SonicWall Product Design
+</footer>
+
+</body>
+</html>

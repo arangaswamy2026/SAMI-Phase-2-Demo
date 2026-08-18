@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Option 6 — Asymmetric Grid · SonicWall Unified Dashboard</title>
+<!--
+  Design System Version: UUIF 9.2
+  Layout: Panoramic — full-width hero chart at top, stats overlaid, 2-col below (products | SAMI+News), notifications at bottom
+  Component Tokens Used: all --uuif-* tokens
+  Gaps Flagged: News & Articles widget (no DS pattern — extended from Dashboard Card)
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --uuif-brand-navy:#001b50; --uuif-brand-orange:#ff5d00; --uuif-brand-green:#59a02e;
+  --uuif-brand-red:#c70f0f; --uuif-brand-yellow:#f3ac3d; --uuif-brand-blue:#1f3c73;
+  --uuif-text-primary:#191c25; --uuif-text-secondary:#4a618f; --uuif-text-tertiary:#888;
+  --uuif-text-highlight:#0c2b67; --uuif-text-contrast:#fff; --uuif-text-hover:#ff5d00;
+  --uuif-surface-container:#fff; --uuif-surface-bg:#f0f2f7;
+  --uuif-surface-primary:#5b74a7; --uuif-surface-tertiary:#f6f8fe;
+  --uuif-surface-model:#f0f2f5; --uuif-surface-selected:rgba(255,72,26,.09);
+  --uuif-border-primary:#ff5d00; --uuif-border-secondary:#78a3e5;
+  --uuif-border-tertiary:#ccc; --uuif-border-transparent:rgba(17,17,17,.09);
+  --uuif-border-new:#d4e3f9; --uuif-icon-primary:#5885cc; --uuif-icon-secondary:#9dafd3;
+  --uuif-status-normal:#99CC00; --uuif-status-major:#FF9900; --uuif-status-failed:#CC0000;
+  --uuif-fill-blue-lightest:#f6f8fe; --uuif-fill-green-xxx-lighter:#e3efdc;
+  --uuif-fill-yellow-xxx-lighter:#ffe9be; --uuif-fill-red-lightest:#fff0f0;
+  --uuif-shadow-sm:0px 1px 6px 2px rgba(0,0,0,.10);
+  --uuif-shadow-md:0px 4px 12px 0px rgba(0,0,0,.16);
+  --uuif-radius-4:4px; --uuif-radius-6:6px; --uuif-radius-8:8px;
+  --uuif-radius-12:12px; --uuif-radius-pill:88px;
+  --nav-w:60px; --sub-w:200px; --bar-h:48px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:'Nunito Sans',sans-serif;font-size:13px;background:var(--uuif-surface-bg);color:var(--uuif-text-primary);}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--uuif-border-tertiary);border-radius:3px;}
+
+/* ── PRIMARY NAV RAIL (fixed) ── */
+.nav-rail{position:fixed;top:0;left:0;bottom:0;width:var(--nav-w);background:var(--uuif-brand-navy);display:flex;flex-direction:column;align-items:center;z-index:400;}
+.nav-logo{width:var(--nav-w);height:52px;display:flex;align-items:center;justify-content:center;padding:12px 14px;}
+.nav-item{position:relative;width:var(--nav-w);height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:transparent;cursor:pointer;color:var(--uuif-icon-secondary);font-family:'Nunito Sans',sans-serif;font-size:9px;line-height:1;transition:background 120ms;}
+.nav-item:hover{background:rgba(255,255,255,.07);}
+.nav-item.active{background:rgba(0,0,0,.3);color:var(--uuif-brand-orange);}
+.nav-item.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--uuif-brand-orange);border-radius:0 2px 2px 0;}
+.nav-item svg{width:22px;height:22px;flex-shrink:0;}
+.nav-divider{width:36px;height:1px;background:rgba(255,255,255,.12);margin:2px 0;}
+.nav-spacer{flex:1;}
+/* ── SUBNAV PANEL (fixed) ── */
+.subnav{position:fixed;top:0;left:var(--nav-w);bottom:0;width:var(--sub-w);background:var(--uuif-surface-container);border-right:1px solid var(--uuif-border-transparent);z-index:300;display:flex;flex-direction:column;overflow-y:auto;}
+.subnav-header{padding:14px 16px 10px;border-bottom:1px solid var(--uuif-border-transparent);}
+.subnav-wordmark{display:flex;align-items:center;gap:7px;margin-bottom:3px;}
+.subnav-wordmark-text{font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;letter-spacing:.06em;color:var(--uuif-brand-orange);}
+.subnav-slash{color:rgba(0,27,80,.3);font-size:13px;margin:0 2px;}
+.subnav-app{font-family:'Nunito Sans',sans-serif;font-size:12px;font-weight:600;color:var(--uuif-text-secondary);}
+.subnav-section-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--uuif-brand-navy);padding:14px 16px 4px;}
+.subnav-accordion{display:flex;align-items:center;justify-content:space-between;padding:6px 16px;cursor:pointer;font-size:13px;font-weight:600;color:var(--uuif-text-primary);}
+.subnav-accordion svg{width:14px;height:14px;stroke:var(--uuif-text-tertiary);transition:transform 200ms;}
+.subnav-accordion.open svg{transform:rotate(90deg);}
+.subnav-item{display:block;padding:5px 16px 5px 28px;font-size:12px;font-weight:400;color:var(--uuif-text-secondary);cursor:pointer;border-left:2px solid transparent;text-decoration:none;transition:color 120ms;}
+.subnav-item:hover{color:var(--uuif-text-hover);}
+.subnav-item.active{font-weight:700;color:var(--uuif-brand-orange);border-left-color:var(--uuif-brand-orange);background:rgba(255,93,0,.06);}
+/* ── TITLE BAR (fixed) ── */
+.title-bar{position:fixed;top:0;left:calc(var(--nav-w) + var(--sub-w));right:0;height:var(--bar-h);background:var(--uuif-surface-container);border-bottom:1px solid var(--uuif-border-transparent);display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:200;}
+.title-bar-left{display:flex;align-items:center;gap:8px;}
+.breadcrumb{font-size:13px;color:var(--uuif-text-secondary);}
+.breadcrumb .sep{margin:0 5px;opacity:.4;font-size:11px;}
+.breadcrumb .cur{color:var(--uuif-text-primary);font-weight:600;}
+.scope-selector{position:absolute;left:50%;transform:translateX(-50%);width:291px;height:29px;border-radius:var(--uuif-radius-4);border:1px solid var(--uuif-border-tertiary);background:var(--uuif-surface-container);display:flex;align-items:center;gap:6px;padding:0 8px;cursor:pointer;}
+.scope-selector-text{font-size:13px;color:var(--uuif-text-primary);flex:1;}
+.scope-divider{width:1px;height:16px;background:var(--uuif-border-transparent);}
+.title-bar-right{display:flex;align-items:center;}
+.tbi{width:48px;height:48px;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:.6;border:none;background:transparent;position:relative;}
+.tbi:hover{opacity:1;}
+.notif-dot{position:absolute;top:9px;right:9px;width:7px;height:7px;border-radius:50%;background:var(--uuif-brand-orange);border:1.5px solid #fff;}
+.avatar-btn{display:flex;align-items:center;gap:4px;cursor:pointer;border:none;background:transparent;padding:0 8px;}
+.avatar{width:29px;height:29px;border-radius:50%;background:linear-gradient(135deg,var(--uuif-brand-orange),var(--uuif-brand-navy));display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:800;}
+/* ── LAYOUT BODY ── */
+.body-wrap{margin-left:calc(var(--nav-w) + var(--sub-w));padding-top:var(--bar-h);min-height:100vh;}
+.body-content{padding:16px 20px 32px;display:flex;flex-direction:column;gap:16px;}
+
+/* ── CARD BASE ── */
+.card{background:var(--uuif-surface-container);border:1px solid var(--uuif-border-transparent);border-radius:var(--uuif-radius-8);box-shadow:var(--uuif-shadow-sm);overflow:hidden;}
+
+/* ── BUTTONS ── */
+.btn-primary{background:var(--uuif-brand-orange);color:#fff;border:none;border-radius:var(--uuif-radius-pill);padding:6px 16px;font-size:12px;font-weight:700;font-family:'Nunito Sans',sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary:hover{opacity:.88;}
+.btn-secondary{background:#fff;color:var(--uuif-text-secondary);border:1px solid var(--uuif-border-secondary);border-radius:var(--uuif-radius-pill);padding:5px 14px;font-size:12px;font-weight:600;font-family:'Nunito Sans',sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
+.btn-secondary:hover{border-color:var(--uuif-brand-orange);color:var(--uuif-text-hover);}
+.btn-icon{background:transparent;border:1px solid var(--uuif-border-transparent);border-radius:var(--uuif-radius-4);width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--uuif-text-secondary);}
+.btn-icon:hover{background:var(--uuif-surface-tertiary);}
+.btn-icon svg{width:14px;height:14px;}
+
+/* ── CHIPS ── */
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:var(--uuif-radius-pill);font-size:11px;font-weight:600;border:1px solid;}
+.chip-green{background:var(--uuif-fill-green-xxx-lighter);color:#2d6b13;border-color:#b3d98a;}
+.chip-orange{background:var(--uuif-fill-yellow-xxx-lighter);color:#8a4800;border-color:#f5c97a;}
+.chip-dot{width:6px;height:6px;border-radius:50%;}
+.chip-dot-green{background:var(--uuif-brand-green);}
+.chip-dot-orange{background:var(--uuif-brand-orange);}
+
+/* ══════════════════════════════════
+   ORG SUMMARY BANNER
+══════════════════════════════════ */
+.org-banner{
+  background:var(--uuif-surface-container);border-radius:var(--uuif-radius-6);
+  border:1px solid var(--uuif-border-transparent);box-shadow:var(--uuif-shadow-sm);
+  display:flex;align-items:center;gap:0;overflow:hidden;
+}
+.org-banner-identity{display:flex;align-items:center;gap:10px;padding:11px 18px;background:var(--uuif-surface-model);border-right:1px solid var(--uuif-border-transparent);flex-shrink:0;}
+.org-banner-icon{width:30px;height:30px;border-radius:var(--uuif-radius-6);background:var(--uuif-fill-blue-lightest);border:1px solid var(--uuif-border-new);display:flex;align-items:center;justify-content:center;}
+.org-banner-icon svg{width:16px;height:16px;fill:var(--uuif-icon-primary);}
+.org-banner-name{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--uuif-text-highlight);white-space:nowrap;}
+.org-banner-stats{display:flex;align-items:stretch;flex:1;}
+.org-banner-stat{display:flex;flex-direction:column;gap:1px;padding:9px 20px;border-right:1px solid var(--uuif-border-transparent);}
+.org-banner-stat-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--uuif-text-tertiary);}
+.org-banner-stat-value{font-family:'Nunito',sans-serif;font-size:20px;font-weight:700;color:var(--uuif-text-highlight);line-height:1.1;}
+.org-banner-stat-value.attn{color:var(--uuif-brand-orange);}
+.org-banner-stat-value.ok{color:var(--uuif-brand-green);}
+.org-banner-action{padding:0 18px;flex-shrink:0;display:flex;align-items:center;}
+
+/* ══════════════════════════════════
+   TWO-COLUMN LAYOUT
+══════════════════════════════════ */
+.two-col{display:flex;gap:14px;align-items:flex-start;}
+.two-col-left{flex:1;display:flex;flex-direction:column;gap:14px;min-width:0;}
+.two-col-right{width:290px;flex-shrink:0;display:flex;flex-direction:column;}
+.news-sidebar-col{display:flex;flex-direction:column;}
+
+/* ── PRODUCT GRID (left col) ── */
+.section-hdr{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.section-hdr-title{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--uuif-text-highlight);}
+.section-hdr-sub{font-size:11px;color:var(--uuif-text-tertiary);}
+.section-hdr-action{margin-left:auto;}
+
+/* opt6: 2-column asymmetric grid — wide(2fr) + narrow(1fr) */
+.product-grid{display:grid;grid-template-columns:2fr 1fr;gap:10px;}
+
+.prod-card{background:var(--uuif-surface-container);border:1px solid var(--uuif-border-transparent);border-radius:var(--uuif-radius-8);box-shadow:var(--uuif-shadow-sm);overflow:hidden;}
+.prod-card-header{display:flex;align-items:center;gap:8px;padding:9px 12px 8px;border-bottom:1px solid var(--uuif-border-transparent);}
+.prod-card-icon{width:26px;height:26px;border-radius:var(--uuif-radius-6);background:var(--uuif-surface-tertiary);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.prod-card-icon svg{width:14px;height:14px;color:var(--uuif-icon-primary);}
+.prod-card-name{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--uuif-text-highlight);flex:1;}
+.prod-card-link{font-size:10px;font-weight:600;color:var(--uuif-icon-primary);cursor:pointer;}
+.prod-card-link:hover{color:var(--uuif-brand-orange);}
+
+.prod-hero-row{display:flex;gap:0;border-bottom:1px solid var(--uuif-border-transparent);}
+.prod-hero-stat{flex:1;padding:10px 12px;display:flex;flex-direction:column;gap:2px;}
+.prod-hero-stat:first-child{border-right:1px solid var(--uuif-border-transparent);}
+.prod-stat-label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--uuif-text-tertiary);}
+.prod-stat-value{font-family:'Nunito',sans-serif;font-size:22px;font-weight:700;color:var(--uuif-text-highlight);line-height:1.1;}
+.prod-stat-value.attn{color:var(--uuif-brand-orange);}
+.prod-stat-value.ok{color:var(--uuif-brand-green);}
+
+.prod-chart-area{padding:8px 12px 10px;}
+.prod-chart-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--uuif-text-tertiary);margin-bottom:6px;}
+
+/* Compact donut */
+.donut-wrap{display:flex;align-items:center;gap:10px;}
+.donut-legend{display:flex;flex-direction:column;gap:3px;flex:1;}
+.legend-row{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--uuif-text-secondary);}
+.legend-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.legend-val{margin-left:auto;font-weight:700;color:var(--uuif-text-highlight);font-size:10px;}
+
+/* Inline bar chart */
+.bar-chart{display:flex;flex-direction:column;gap:4px;}
+.bar-row{display:flex;align-items:center;gap:6px;}
+.bar-label{font-size:9px;color:var(--uuif-text-secondary);width:48px;text-align:right;flex-shrink:0;}
+.bar-track{flex:1;height:6px;background:var(--uuif-surface-model);border-radius:3px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:3px;}
+.bar-val{font-size:9px;font-weight:700;color:var(--uuif-text-highlight);width:22px;flex-shrink:0;}
+
+/* Sparkline */
+.sparkline-wrap{padding-top:2px;}
+
+/* ══════════════════════════════════
+   SIDEBAR — SAMI WIDGET
+══════════════════════════════════ */
+.sidebar-col{display:flex;flex-direction:column;gap:12px;}
+
+.widget-card{background:var(--uuif-surface-container);border:1px solid var(--uuif-border-transparent);border-radius:var(--uuif-radius-8);box-shadow:var(--uuif-shadow-sm);overflow:hidden;}
+.widget-header{display:flex;align-items:center;gap:8px;padding:10px 14px 9px;border-bottom:1px solid var(--uuif-border-transparent);}
+.widget-icon{width:26px;height:26px;border-radius:var(--uuif-radius-6);background:var(--uuif-surface-selected);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.widget-icon svg{width:14px;height:14px;color:var(--uuif-brand-orange);}
+.widget-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--uuif-text-highlight);}
+.widget-badge{margin-left:4px;background:var(--uuif-fill-red-lightest);color:var(--uuif-brand-red);font-size:9px;font-weight:700;padding:1px 6px;border-radius:var(--uuif-radius-pill);}
+.widget-link{margin-left:auto;font-size:10px;font-weight:600;color:var(--uuif-icon-primary);cursor:pointer;}
+.widget-link:hover{color:var(--uuif-brand-orange);}
+
+/* SAMI alert items */
+.sami-item{padding:10px 14px;border-bottom:1px solid var(--uuif-border-transparent);}
+.sami-item:last-child{border-bottom:none;}
+.sami-item-header{display:flex;align-items:center;gap:6px;margin-bottom:5px;}
+.sami-type-chip{display:inline-flex;align-items:center;gap:3px;background:rgba(17,17,17,.05);border-radius:var(--uuif-radius-pill);padding:2px 7px 2px 5px;font-size:9px;font-weight:600;color:var(--uuif-text-secondary);}
+.sami-type-chip svg{width:9px;height:9px;flex-shrink:0;}
+.sami-attn-chip{display:inline-flex;align-items:center;gap:3px;background:rgba(199,15,15,.07);border:1px solid rgba(199,15,15,.22);color:var(--uuif-brand-red);font-size:9px;font-weight:700;border-radius:var(--uuif-radius-pill);padding:2px 7px 2px 5px;}
+.sami-attn-chip svg{width:9px;height:9px;}
+.sami-item-time{margin-left:auto;font-size:10px;color:var(--uuif-text-tertiary);}
+.sami-item-title{font-size:12px;font-weight:700;color:var(--uuif-text-primary);line-height:1.35;margin-bottom:5px;}
+.sami-ai-block{background:var(--uuif-surface-selected);border:1px solid rgba(255,93,0,.15);border-radius:var(--uuif-radius-4);padding:6px 9px;position:relative;overflow:hidden;}
+.sami-ai-block::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(to bottom,var(--uuif-brand-orange),#ff8330 60%,rgba(255,131,48,.3));}
+.sami-ai-tag{display:inline-flex;align-items:center;gap:3px;background:linear-gradient(90deg,var(--uuif-brand-orange) 0%,#ff8330 100%);color:#fff;font-size:8px;font-weight:800;border-radius:var(--uuif-radius-pill);padding:1px 6px;letter-spacing:.4px;text-transform:uppercase;margin-bottom:4px;}
+.sami-ai-tag svg{width:8px;height:8px;}
+.sami-ai-text{font-size:11px;color:var(--uuif-text-secondary);line-height:1.4;padding-left:3px;}
+.sami-item-actions{display:flex;gap:6px;margin-top:7px;justify-content:flex-end;}
+
+/* ══════════════════════════════════
+   NEWS WIDGET
+══════════════════════════════════ */
+.news-card-list{display:flex;flex-direction:column;gap:0;}
+.news-article{border-bottom:1px solid var(--uuif-border-transparent);overflow:hidden;}
+.news-article:last-child{border-bottom:none;}
+
+.news-art-banner{
+  height:58px;background:linear-gradient(135deg,#001228 0%,#0a1e3d 50%,#001b50 100%);
+  display:flex;align-items:center;justify-content:center;gap:16px;
+  position:relative;overflow:hidden;
+}
+.news-art-banner::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--uuif-brand-orange),#ff8330 50%,rgba(255,93,0,.3));}
+.news-banner-icon{opacity:.7;}
+.news-banner-dots{display:flex;gap:4px;align-items:center;}
+.news-banner-dot{width:3px;height:3px;border-radius:50%;background:rgba(255,93,0,.5);}
+
+.news-art-body{padding:10px 14px 11px;}
+.news-art-date{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--uuif-text-tertiary);margin-bottom:4px;}
+.news-art-title{font-size:12px;font-weight:700;color:var(--uuif-text-primary);line-height:1.4;margin-bottom:5px;}
+.news-art-excerpt{font-size:11px;color:var(--uuif-text-tertiary);line-height:1.4;margin-bottom:7px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.news-art-readmore{font-size:11px;font-weight:700;color:var(--uuif-brand-orange);cursor:pointer;display:inline-flex;align-items:center;gap:4px;}
+.news-art-readmore:hover{text-decoration:underline;}
+
+/* ══════════════════════════════════
+   NOTIFICATIONS (compact)
+══════════════════════════════════ */
+.notif-section{}
+.notif-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.notif-header h2{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--uuif-text-highlight);}
+.notif-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--uuif-radius-pill);font-size:10px;font-weight:700;}
+.notif-crit{background:var(--uuif-fill-red-lightest);color:var(--uuif-brand-red);}
+.notif-warn{background:var(--uuif-fill-yellow-xxx-lighter);color:#8a4800;}
+.notif-info{background:var(--uuif-fill-blue-lightest);color:var(--uuif-text-secondary);}
+
+.notif-list{display:flex;flex-direction:column;gap:0;}
+.notif-row{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--uuif-border-transparent);cursor:pointer;transition:background .1s;}
+.notif-row:last-child{border-bottom:none;}
+.notif-row:hover{background:var(--uuif-surface-tertiary);}
+.sev-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.sev-crit{background:var(--uuif-brand-red);}
+.sev-warn{background:var(--uuif-status-major);}
+.sev-info{background:var(--uuif-icon-primary);}
+.notif-row-content{flex:1;min-width:0;}
+.notif-row-title{font-size:12.5px;font-weight:700;color:var(--uuif-text-primary);}
+.notif-row-sub{font-size:11px;color:var(--uuif-text-tertiary);margin-top:1px;}
+.notif-row-meta{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0;}
+.prod-badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:var(--uuif-radius-pill);font-size:10px;font-weight:700;background:var(--uuif-fill-blue-lightest);color:var(--uuif-text-secondary);border:1px solid var(--uuif-border-new);}
+.notif-time{font-size:10px;color:var(--uuif-text-tertiary);}
+.status-crit{background:var(--uuif-fill-red-lightest);color:var(--uuif-brand-red);border:1px solid #f5a0a0;border-radius:var(--uuif-radius-pill);padding:2px 8px;font-size:10px;font-weight:700;}
+.status-warn{background:var(--uuif-fill-yellow-xxx-lighter);color:#8a4800;border:1px solid #f5c97a;border-radius:var(--uuif-radius-pill);padding:2px 8px;font-size:10px;font-weight:700;}
+
+/* ── FOOTER ── */
+.footer{padding:10px 20px;font-size:10px;color:var(--uuif-text-tertiary);border-top:1px solid var(--uuif-border-transparent);background:#fff;display:flex;align-items:center;gap:8px;margin-top:16px;}
+.footer-dot{color:var(--uuif-border-tertiary);}
+
+/* ─── MINI STATS ROW ─── */
+.mini-stats-row{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--uuif-border-transparent);}
+.mini-stat{padding:8px 14px;display:flex;flex-direction:column;gap:2px;border-right:1px solid var(--uuif-border-transparent);}
+.mini-stat:last-child{border-right:none;}
+.mini-stat-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--uuif-text-tertiary);}
+.mini-stat-value{font-family:'Nunito',sans-serif;font-size:16px;font-weight:700;color:var(--uuif-text-highlight);line-height:1;}
+.mini-stat-value.v-warn{color:var(--uuif-brand-yellow);}
+.mini-stat-value.v-err{color:var(--uuif-brand-red);}
+.mini-stat-value.v-ok{color:var(--uuif-brand-green);}
+/* ─── AP/SWITCHES SPLIT WIDGET ─── */
+.ap-sw-split{display:flex;gap:0;}
+.ap-sw-section{flex:1;padding:10px 12px 0;}
+.ap-sw-divider{width:1px;background:var(--uuif-border-transparent);flex-shrink:0;}
+.ap-sw-section-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--uuif-text-tertiary);margin-bottom:4px;}
+.ap-sw-hero{display:flex;align-items:baseline;gap:4px;margin-bottom:8px;}
+.ap-sw-total{font-family:'Nunito',sans-serif;font-size:22px;font-weight:700;color:var(--uuif-text-highlight);line-height:1;}
+.ap-sw-total-label{font-size:10px;color:var(--uuif-text-tertiary);}
+.hbar-chart{display:flex;flex-direction:column;gap:5px;margin-bottom:8px;}
+.hbar-row{display:flex;align-items:center;gap:5px;}
+.hbar-label{font-size:9px;color:var(--uuif-text-secondary);width:60px;flex-shrink:0;text-align:right;}
+.hbar-track{flex:1;height:7px;background:var(--uuif-surface-model);border-radius:3px;overflow:hidden;}
+.hbar-fill{height:100%;border-radius:3px;}
+.hbar-val{font-size:9px;font-weight:700;color:var(--uuif-text-highlight);width:14px;flex-shrink:0;text-align:right;}
+.ap-sw-mini{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--uuif-border-transparent);margin-top:2px;}
+.ap-sw-mini-stat{padding:6px 8px;display:flex;flex-direction:column;gap:1px;border-right:1px solid var(--uuif-border-transparent);}
+.ap-sw-mini-stat:last-child{border-right:none;}
+.ap-sw-mini-label{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--uuif-text-tertiary);}
+.ap-sw-mini-value{font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:var(--uuif-text-highlight);line-height:1;}
+.ap-sw-mini-value.warn{color:var(--uuif-brand-yellow);}
+.ap-sw-mini-value.ok{color:var(--uuif-brand-green);}
+.ap-sw-bottom{border-top:1px solid var(--uuif-border-transparent);padding:8px 12px;}
+/* ─── THREAT HISTORY SPARKLINE HERO ─── */
+.cc-hero{padding:10px 12px 6px;}
+.cc-hero-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--uuif-text-tertiary);margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;}
+.cc-hero-legend{display:flex;gap:10px;}
+.cc-legend-item{display:flex;align-items:center;gap:3px;font-size:8px;color:var(--uuif-text-tertiary);}
+.cc-legend-dot{width:7px;height:7px;border-radius:2px;flex-shrink:0;}
+/* ─── SECTION GROUP ─── */
+.cc-section{padding:0 12px 0;}
+.cc-section-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--uuif-text-tertiary);padding:8px 0 4px;border-top:1px solid var(--uuif-border-transparent);display:flex;align-items:center;justify-content:space-between;}
+.cc-section-title:first-child{border-top:none;}
+.cc-total-hero{font-family:'Nunito',sans-serif;font-size:22px;font-weight:700;color:var(--uuif-text-highlight);line-height:1;margin-bottom:6px;}
+.cc-total-hero.v-ok{color:var(--uuif-brand-green);}
+.cc-total-hero.v-warn{color:var(--uuif-brand-yellow);}
+.cc-hbars{display:flex;flex-direction:column;gap:4px;margin-bottom:6px;}
+.cc-hbar-row{display:flex;align-items:center;gap:5px;}
+.cc-hbar-label{font-size:9px;color:var(--uuif-text-secondary);width:100px;flex-shrink:0;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cc-hbar-track{flex:1;height:6px;background:var(--uuif-surface-model);border-radius:3px;overflow:hidden;}
+.cc-hbar-fill{height:100%;border-radius:3px;transition:width .3s ease;}
+.cc-hbar-val{font-size:9px;font-weight:700;color:var(--uuif-text-highlight);min-width:14px;text-align:right;flex-shrink:0;}
+/* ─── COMPACT DONUT SECTION (replaces all hbar sections) ─── */
+.ds-wrap{display:flex;align-items:center;gap:10px;padding:0 0 6px;}
+.ds-legend{display:flex;flex-direction:column;gap:4px;flex:1;}
+.ds-legend-row{display:flex;align-items:center;gap:5px;font-size:9px;color:var(--uuif-text-secondary);}
+.ds-legend-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.ds-legend-val{margin-left:auto;font-weight:700;font-size:9px;color:var(--uuif-text-highlight);}
+/* ─── CSE STATS ROW ─── */
+.cse-stats-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-bottom:1px solid var(--uuif-border-transparent);}
+.cse-stat{padding:8px 10px;display:flex;flex-direction:column;gap:1px;border-right:1px solid var(--uuif-border-transparent);}
+.cse-stat:last-child{border-right:none;}
+.cse-stat-label{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--uuif-text-tertiary);}
+.cse-stat-value{font-family:'Nunito',sans-serif;font-size:18px;font-weight:700;color:var(--uuif-text-highlight);line-height:1;}
+
+/* ─── FILLED PIE CHART (Firewalls) ─── */
+.fw-pie-wrap{padding:12px 14px 10px;display:flex;flex-direction:row;align-items:center;gap:14px;}
+.fw-pie-legend{display:flex;flex-direction:column;gap:6px;flex:1;}
+.fw-leg-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--uuif-text-secondary);}
+.fw-leg-swatch{width:11px;height:11px;border-radius:2px;flex-shrink:0;}
+.fw-leg-val{margin-left:auto;font-weight:700;font-size:13px;}
+
+/* ─── STACKED SINGLE BAR ─── */
+.stk-section{padding:8px 12px 4px;}
+.stk-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--uuif-text-tertiary);margin-bottom:5px;display:flex;align-items:center;justify-content:space-between;}
+.stk-total{font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;color:var(--uuif-text-highlight);line-height:1;}
+.stk-bar-wrap{width:100%;height:28px;border-radius:var(--uuif-radius-4);overflow:hidden;display:flex;margin-bottom:6px;background:var(--uuif-surface-model);}
+.stk-seg{height:100%;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-size:10px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;transition:width .3s;}
+.stk-labels{display:flex;gap:0;width:100%;margin-bottom:4px;}
+.stk-label-item{display:flex;flex-direction:column;align-items:center;font-size:8.5px;min-width:0;}
+.stk-pct{font-weight:700;color:var(--uuif-text-secondary);}
+.stk-name{color:var(--uuif-text-tertiary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;}
+.stk-legend-row{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--uuif-text-secondary);margin-bottom:2px;}
+.stk-legend-dot{width:7px;height:7px;border-radius:2px;flex-shrink:0;}
+.stk-legend-val{margin-left:auto;font-weight:700;color:var(--uuif-text-highlight);font-size:9px;}
+.stk-section-divider{border:none;border-top:1px solid var(--uuif-border-transparent);margin:4px 0;}
+
+/* ─── WNM section separator ─── */
+.wnm-section-hdr{padding:8px 12px 0;border-top:1px solid var(--uuif-border-transparent);display:flex;align-items:center;justify-content:space-between;}
+.wnm-section-hdr:first-child{border-top:none;}
+.wnm-section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--uuif-text-tertiary);}
+.wnm-mini-stats{display:flex;gap:12px;}
+.wnm-mini-stat{display:flex;flex-direction:column;align-items:center;gap:1px;}
+.wnm-mini-val{font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:var(--uuif-text-highlight);line-height:1;}
+.wnm-mini-val.ok{color:var(--uuif-brand-green);}
+.wnm-mini-val.warn{color:var(--uuif-brand-yellow);}
+.wnm-mini-val.err{color:var(--uuif-brand-red);}
+.wnm-mini-label{font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--uuif-text-tertiary);}
+.wnm-footer{padding:8px 12px;display:flex;justify-content:space-between;border-top:1px solid var(--uuif-border-transparent);}
+.wnm-footer-item{font-size:10px;color:var(--uuif-text-tertiary);}
+/* ─── ALERTS STAT ROW (NSM) ─── */
+.alert-stat-row{display:flex;align-items:center;gap:0;padding:8px 14px;border-top:1px solid var(--uuif-border-transparent);flex-wrap:wrap;}
+.alert-stat-item{display:flex;align-items:center;gap:6px;padding:4px 12px 4px 0;border-right:1px solid var(--uuif-border-transparent);margin-right:12px;}
+.alert-stat-item:last-child{border-right:none;margin-right:0;}
+.alert-stat-icon{width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.alert-stat-label{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--uuif-text-tertiary);}
+.alert-stat-val{font-family:'Nunito',sans-serif;font-size:16px;font-weight:700;color:var(--uuif-text-highlight);line-height:1;}
+.alert-stat-ok .alert-stat-icon{background:rgba(89,160,46,.12);}
+.alert-stat-ok svg{color:#59a02e;}
+.alert-stat-ok .alert-stat-val{color:#59a02e;}
+.alert-stat-crit .alert-stat-icon{background:rgba(199,15,15,.1);}
+.alert-stat-crit svg{color:#c70f0f;}
+.alert-stat-crit .alert-stat-val{color:#c70f0f;}
+.alert-stat-warn .alert-stat-icon{background:rgba(243,172,61,.12);}
+.alert-stat-warn svg{color:#f3ac3d;}
+.alert-stat-warn .alert-stat-val{color:#f3ac3d;}
+.alert-stat-info .alert-stat-icon{background:rgba(88,133,204,.1);}
+.alert-stat-info svg{color:#5885cc;}
+.alert-stat-info .alert-stat-val{color:#5885cc;}
+/* ─── WNM STAT GRID (like Firewalls stats row) ─── */
+.wnm-stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-bottom:1px solid var(--uuif-border-transparent);}
+.wnm-stat-cell{padding:8px 10px;border-right:1px solid var(--uuif-border-transparent);display:flex;flex-direction:column;gap:2px;}
+.wnm-stat-cell:last-child{border-right:none;}
+.wnm-stat-label{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--uuif-text-tertiary);}
+.wnm-stat-value{font-family:'Nunito',sans-serif;font-size:18px;font-weight:800;color:var(--uuif-text-highlight);line-height:1;}
+.wnm-stat-value.v-ok{color:var(--uuif-brand-green);}
+.wnm-stat-value.v-warn{color:var(--uuif-brand-yellow);}
+.wnm-stat-value.v-err{color:var(--uuif-brand-red);}
+/* ─── NEWS SIDEBAR (right col, vertical stack) ─── */
+.news-full{margin-top:0;}
+.news-sidebar-hdr{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.news-sidebar-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--uuif-text-highlight);}
+.news-sidebar-card{background:var(--uuif-surface-container);border:1px solid var(--uuif-border-transparent);border-radius:var(--uuif-radius-8);box-shadow:var(--uuif-shadow-sm);overflow:hidden;margin-bottom:10px;cursor:pointer;transition:box-shadow .15s;}
+.news-sidebar-card:last-child{margin-bottom:0;}
+.news-sidebar-card:hover{box-shadow:var(--uuif-shadow-md);}
+.news-sidebar-thumb{height:72px;position:relative;overflow:hidden;flex-shrink:0;}
+.news-sidebar-cat{position:absolute;top:7px;left:8px;background:var(--uuif-brand-orange);color:#fff;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;border-radius:var(--uuif-radius-4);padding:2px 6px;}
+.news-sidebar-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,rgba(0,27,80,.5) 100%);}
+.news-sidebar-body{padding:9px 12px 11px;}
+.news-sidebar-date{font-size:9px;color:var(--uuif-text-tertiary);margin-bottom:3px;text-transform:uppercase;letter-spacing:.04em;font-weight:600;}
+.news-sidebar-card-title{font-size:12px;font-weight:700;color:var(--uuif-text-primary);line-height:1.4;margin-bottom:5px;}
+.news-sidebar-excerpt{font-size:10.5px;color:var(--uuif-text-tertiary);line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:6px;}
+.news-sidebar-readmore{font-size:10.5px;font-weight:700;color:var(--uuif-brand-orange);display:inline-flex;align-items:center;gap:3px;}
+/* kept for compat */ .news-full-header{display:none;} .news-grid-3{display:none;} .news-card-v{display:none;}
+.news-card-v{background:var(--uuif-surface-container);border:1px solid var(--uuif-border-transparent);border-radius:var(--uuif-radius-8);box-shadow:var(--uuif-shadow-sm);overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:box-shadow .15s;}
+.news-card-v:hover{box-shadow:var(--uuif-shadow-md);}
+.news-thumb{height:100px;position:relative;overflow:hidden;flex-shrink:0;}
+.news-thumb-bg{width:100%;height:100%;object-fit:cover;display:block;}
+.news-thumb-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,27,80,.0) 40%,rgba(0,27,80,.65) 100%);}
+.news-thumb-cat{position:absolute;top:8px;left:8px;background:var(--uuif-brand-orange);color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;border-radius:var(--uuif-radius-4);padding:2px 7px;}
+.news-card-body{padding:12px 14px 14px;flex:1;display:flex;flex-direction:column;}
+.news-card-date{font-size:10px;font-weight:600;color:var(--uuif-text-tertiary);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em;}
+.news-card-title{font-size:13px;font-weight:700;color:var(--uuif-text-primary);line-height:1.4;margin-bottom:6px;flex:1;}
+.news-card-excerpt{font-size:11px;color:var(--uuif-text-tertiary);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:8px;}
+.news-card-readmore{font-size:11px;font-weight:700;color:var(--uuif-brand-orange);display:inline-flex;align-items:center;gap:4px;margin-top:auto;}
+.news-card-readmore:hover{text-decoration:underline;}
+/* ─── NEWS WIDGET CARD ─── */
+.news-widget-card{background:var(--uuif-surface-container);border:1px solid var(--uuif-border-transparent);border-radius:var(--uuif-radius-8);box-shadow:var(--uuif-shadow-sm);overflow:hidden;display:flex;flex-direction:column;flex:1;}
+.news-widget-header{display:flex;align-items:center;gap:8px;padding:10px 14px 9px;border-bottom:1px solid var(--uuif-border-transparent);flex-shrink:0;}
+.news-widget-icon{width:26px;height:26px;border-radius:var(--uuif-radius-6);background:var(--uuif-fill-blue-lightest);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.news-widget-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--uuif-text-highlight);}
+.news-widget-body{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
+
+/* ─── NOTIFICATIONS (from final3) ─── */
+.notif-section2{margin-top:14px;}
+.notif-title-pane{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.notif-title-pane h2{font-size:14px;font-weight:700;color:var(--uuif-text-highlight);}
+.notif-count-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:var(--uuif-radius-pill);font-size:11px;font-weight:700;}
+.notif-count-crit{background:var(--uuif-fill-red-lightest);color:var(--uuif-brand-red);}
+.notif-count-warn{background:var(--uuif-fill-yellow-xxx-lighter);color:#8a4800;}
+.notif-count-info{background:var(--uuif-fill-blue-lightest);color:var(--uuif-text-secondary);}
+.map-container{width:100%;height:240px;background:linear-gradient(160deg,#e8eef8 0%,#d4dff2 40%,#c8d8ee 100%);border-radius:var(--uuif-radius-6);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.map-placeholder{font-size:12px;color:var(--uuif-text-tertiary);font-weight:600;letter-spacing:.04em;text-transform:uppercase;}
+.map-legend{position:absolute;bottom:10px;left:12px;display:flex;gap:10px;background:rgba(255,255,255,.85);border-radius:var(--uuif-radius-4);padding:5px 10px;}
+.map-legend-item{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:var(--uuif-text-secondary);}
+.map-legend-dot{width:7px;height:7px;border-radius:50%;}
+.map-dot{position:absolute;border-radius:50%;box-shadow:0 0 0 3px rgba(255,255,255,.6);}
+.view-toggle{display:flex;background:var(--uuif-surface-tertiary);border-radius:var(--uuif-radius-4);border:1px solid var(--uuif-border-transparent);overflow:hidden;}
+.view-toggle-btn{padding:5px 12px;font-size:11px;font-weight:600;color:var(--uuif-text-tertiary);cursor:pointer;display:flex;align-items:center;gap:4px;transition:background .12s,color .12s;border:none;background:transparent;font-family:'Nunito Sans',sans-serif;}
+.view-toggle-btn.active{background:#fff;color:var(--uuif-text-highlight);box-shadow:var(--uuif-shadow-sm);}
+.view-toggle-btn svg{width:13px;height:13px;}
+.tabs2{display:flex;gap:0;border-bottom:1px solid var(--uuif-border-transparent);margin-bottom:0;}
+.tab2{padding:9px 18px;font-size:12.5px;font-weight:600;color:var(--uuif-text-tertiary);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s,border-color .15s;white-space:nowrap;}
+.tab2:hover{color:var(--uuif-text-primary);}
+.tab2.active{color:var(--uuif-text-highlight);border-bottom-color:var(--uuif-brand-orange);}
+.toolbar{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--uuif-border-transparent);background:var(--uuif-surface-bg);}
+.toolbar-search{flex:1;max-width:260px;display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--uuif-border-tertiary);border-radius:var(--uuif-radius-4);padding:5px 10px;}
+.toolbar-search svg{width:13px;height:13px;color:var(--uuif-text-tertiary);flex-shrink:0;}
+.toolbar-search input{border:none;outline:none;font-size:12px;color:var(--uuif-text-primary);background:transparent;font-family:'Nunito Sans',sans-serif;width:100%;}
+.toolbar-filter-btn{display:flex;align-items:center;gap:5px;padding:5px 12px;border:1px solid var(--uuif-border-tertiary);border-radius:var(--uuif-radius-4);background:#fff;font-size:12px;font-weight:600;color:var(--uuif-text-secondary);cursor:pointer;transition:border-color .12s;}
+.toolbar-filter-btn:hover{border-color:var(--uuif-border-secondary);}
+.toolbar-filter-btn svg{width:13px;height:13px;}
+.toolbar-right{margin-left:auto;display:flex;align-items:center;gap:6px;}
+.select-sm{appearance:none;background:#fff;border:1px solid var(--uuif-border-tertiary);border-radius:var(--uuif-radius-4);padding:5px 24px 5px 8px;font-size:12px;font-family:'Nunito Sans',sans-serif;color:var(--uuif-text-secondary);cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;}
+.data-table{width:100%;border-collapse:collapse;}
+.data-table th{padding:8px 12px;text-align:left;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--uuif-text-tertiary);background:var(--uuif-surface-tertiary);border-bottom:1px solid var(--uuif-border-transparent);white-space:nowrap;}
+.data-table td{padding:9px 12px;border-bottom:1px solid var(--uuif-border-transparent);font-size:12.5px;color:var(--uuif-text-primary);}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:var(--uuif-fill-blue-lightest);}
+.pagination{display:flex;align-items:center;gap:4px;padding:10px 12px;border-top:1px solid var(--uuif-border-transparent);}
+.pagination .pg-info{font-size:11px;color:var(--uuif-text-tertiary);margin-right:auto;}
+.pg-btn{width:26px;height:26px;border-radius:var(--uuif-radius-4);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--uuif-border-transparent);color:var(--uuif-text-secondary);background:#fff;transition:background .12s,color .12s;}
+.pg-btn:hover{background:var(--uuif-surface-tertiary);color:var(--uuif-text-highlight);}
+.pg-btn.active{background:var(--uuif-brand-navy);color:#fff;border-color:var(--uuif-brand-navy);}
+.status-info{background:var(--uuif-fill-blue-lightest);color:var(--uuif-text-secondary);border:1px solid var(--uuif-border-new);border-radius:var(--uuif-radius-pill);padding:2px 8px;font-size:10px;font-weight:700;}
+</style>
+</head>
+<body>
+
+<nav class="nav-rail" aria-label="Primary navigation">
+  <div class="nav-logo">
+    <svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-label="SonicWall logo">
+      <circle cx="17" cy="17" r="16" fill="rgba(255,93,0,.12)"/>
+      <path d="M8 17c0-4.97 4.03-9 9-9 2.49 0 4.74 1.01 6.36 2.64L9 22.36A8.96 8.96 0 018 17z" fill="#FF5D00"/>
+      <path d="M26 17c0 4.97-4.03 9-9 9-2.49 0-4.74-1.01-6.36-2.64L25 11.64A8.96 8.96 0 0126 17z" fill="#FF5D00" opacity=".45"/>
+    </svg>
+  </div>
+  <button class="nav-item active" aria-label="Dashboard" aria-current="page">
+    <svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>
+    <span>Home</span>
+  </button>
+  <button class="nav-item" aria-label="Tenants">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    <span>Tenants</span>
+  </button>
+  <div class="nav-divider"></div>
+  <button class="nav-item" aria-label="NSM Firewalls">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5h18v2H3zM3 9h18v2H3zM3 13h18v2H3zM2 3h2v18H2zM20 3h2v18h-2z"/></svg>
+    <span>NSM</span>
+  </button>
+  <button class="nav-item" aria-label="Wireless">
+    <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="18" r="2"/><path d="M8.5 13.5a5 5 0 017 0M4 9a11 11 0 0116 0" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+    <span>Wireless</span>
+  </button>
+  <button class="nav-item" aria-label="Capture Client">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L3 7v7c0 4.75 3.83 8.74 9 9.9 5.17-1.16 9-5.15 9-9.9V7L12 2z"/></svg>
+    <span>Capture</span>
+  </button>
+  <button class="nav-item" aria-label="Cloud Secure Edge">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 10a5 5 0 00-9.16-2.5A4 4 0 105 16h13a3 3 0 000-6z"/></svg>
+    <span>CSE</span>
+  </button>
+  <div class="nav-divider"></div>
+  <button class="nav-item" aria-label="SAMI AI">
+    <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M7 11h3l2 4 3-7 2 3h3" stroke="#001b50" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>SAMI</span>
+  </button>
+  <div class="nav-spacer"></div>
+  <div class="nav-divider"></div>
+  <button class="nav-item" aria-label="Downloads">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 4v12M6 11l6 5 6-5M4 20h16"/></svg>
+    <span>Downloads</span>
+  </button>
+  <button class="nav-item" aria-label="Help">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+    <span>Help</span>
+  </button>
+</nav>
+
+<aside class="subnav" aria-label="Section navigation">
+  <div class="subnav-header">
+    <div class="subnav-wordmark">
+      <svg width="18" height="18" viewBox="0 0 34 34" fill="none">
+        <path d="M8 17c0-4.97 4.03-9 9-9 2.49 0 4.74 1.01 6.36 2.64L9 22.36A8.96 8.96 0 018 17z" fill="#FF5D00"/>
+        <path d="M26 17c0 4.97-4.03 9-9 9-2.49 0-4.74-1.01-6.36-2.64L25 11.64A8.96 8.96 0 0126 17z" fill="#FF5D00" opacity=".45"/>
+      </svg>
+      <span class="subnav-wordmark-text">SONICWALL</span>
+      <span class="subnav-slash">/</span>
+      <span class="subnav-app">Unified Management</span>
+    </div>
+  </div>
+  <div class="subnav-section-label">Dashboard</div>
+  <div class="subnav-accordion open" tabindex="0">
+    <span>Dashboard</span>
+    <svg viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+  </div>
+  <a class="subnav-item active" href="#">Unified Dashboard</a>
+  <div class="subnav-section-label" style="margin-top:8px">SAMI</div>
+  <div class="subnav-accordion open" tabindex="0">
+    <span>SAMI</span>
+    <svg viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+  </div>
+  <a class="subnav-item" href="#">Overview</a>
+  <a class="subnav-item" href="#">CVE Vulnerabilities</a>
+  <a class="subnav-item" href="#">Behavioral Anomalies</a>
+  <a class="subnav-item" href="#">Policy Gaps</a>
+</aside>
+
+<header class="title-bar" role="banner">
+  <div class="title-bar-left">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      Home<span class="sep">\</span>Dashboard<span class="sep">\</span><span class="cur">Unified Dashboard</span>
+    </nav>
+  </div>
+  <div class="scope-selector" role="combobox" aria-label="Tenant scope selector">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+      <circle cx="8" cy="8" r="6.5" stroke="var(--uuif-icon-secondary)" stroke-width="1.5"/>
+      <ellipse cx="8" cy="8" rx="3" ry="6.5" stroke="var(--uuif-icon-secondary)" stroke-width="1.5"/>
+      <path d="M1.5 8h13" stroke="var(--uuif-icon-secondary)" stroke-width="1.5"/>
+    </svg>
+    <div class="scope-divider"></div>
+    <span class="scope-selector-text">All Tenants (Global)</span>
+    <svg width="10" height="10" viewBox="0 0 16 16" fill="var(--uuif-text-tertiary)"><path d="M4 6l4 4 4-4"/></svg>
+  </div>
+  <div class="title-bar-right">
+    <button class="tbi" aria-label="Announcements">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--uuif-text-primary)"><path d="M3 5a2 2 0 012-2h14a2 2 0 012 2v14l-5-3H5a2 2 0 01-2-2V5z"/></svg>
+    </button>
+    <button class="tbi" aria-label="Notifications">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--uuif-text-primary)"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+      <span class="notif-dot"></span>
+    </button>
+    <button class="tbi" aria-label="Service Status">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--uuif-text-primary)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+    </button>
+    <button class="tbi" aria-label="Help">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--uuif-text-primary)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+    </button>
+    <button class="avatar-btn" aria-label="User account menu">
+      <div class="avatar">AK</div>
+      <svg width="9" height="9" viewBox="0 0 16 16" fill="var(--uuif-text-tertiary)"><path d="M4 6l4 4 4-4"/></svg>
+    </button>
+  </div>
+</header>
+
+<main class="body-wrap">
+  <div class="body-content">
+
+    <!-- ORG BANNER -->
+    <div class="org-banner">
+      <div class="org-banner-identity">
+        <div class="org-banner-icon"><svg viewBox="0 0 24 24"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/></svg></div>
+        <span class="org-banner-name">Org Summary</span>
+      </div>
+      <div class="org-banner-stats">
+        <div class="org-banner-stat"><span class="org-banner-stat-label">Tenants</span><span class="org-banner-stat-value">98</span></div>
+        <div class="org-banner-stat"><span class="org-banner-stat-label">Need Attention</span><span class="org-banner-stat-value attn">5</span></div>
+        <div class="org-banner-stat"><span class="org-banner-stat-label">Active Products</span><span class="org-banner-stat-value ok">6</span></div>
+        <div class="org-banner-stat"><span class="org-banner-stat-label">MSP Partners</span><span class="org-banner-stat-value">12</span></div>
+        <div class="org-banner-stat"><span class="org-banner-stat-label">Total Devices</span><span class="org-banner-stat-value">134</span></div>
+        <div class="org-banner-stat" style="border-right:none;"><span class="org-banner-stat-label">Security Score</span><span class="org-banner-stat-value ok">81%</span></div>
+      </div>
+      <div class="org-banner-action"><button class="btn-primary">+ Create Tenant</button></div>
+    </div>
+
+    <!-- TWO-COL: Products + Sidebar -->
+    <div class="two-col">
+
+      <!-- LEFT: PRODUCT GRID + NOTIFICATIONS -->
+      <div class="two-col-left">
+        <div class="section-hdr">
+          <div class="section-hdr-title">Product Overview</div>
+          <div class="section-hdr-sub" style="margin-left:8px;">6 products · all tenants</div>
+          <div class="section-hdr-action"><span class="chip chip-orange"><span class="chip-dot chip-dot-orange"></span>11 need attention</span></div>
+        </div>
+
+        <div class="product-grid">
+
+          <!-- Firewalls -->
+          <div class="prod-card">
+            <div class="prod-card-header">
+              <div class="prod-card-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5h18v2H3zM3 9h18v2H3zM3 13h18v2H3zM2 3h2v18H2zM20 3h2v18h-2z"/></svg></div>
+              <span class="prod-card-name">NSM · Firewalls</span>
+              <a class="prod-card-link">View more ›</a>
+            </div>
+
+            <!-- Stats first: 4-col grid -->
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-bottom:1px solid var(--uuif-border-transparent);">
+              <div style="padding:10px 10px;border-right:1px solid var(--uuif-border-transparent);display:flex;flex-direction:column;gap:2px;">
+                <span style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--uuif-text-tertiary);">Total</span>
+                <span style="font-family:'Nunito',sans-serif;font-size:22px;font-weight:800;color:var(--uuif-text-highlight);line-height:1;">112</span>
+              </div>
+              <div style="padding:10px 10px;border-right:1px solid var(--uuif-border-transparent);display:flex;flex-direction:column;gap:2px;">
+                <span style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--uuif-text-tertiary);">Managed</span>
+                <span style="font-family:'Nunito',sans-serif;font-size:22px;font-weight:800;color:var(--uuif-text-highlight);line-height:1;">22</span>
+              </div>
+              <div style="padding:10px 10px;border-right:1px solid var(--uuif-border-transparent);display:flex;flex-direction:column;gap:2px;">
+                <span style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--uuif-text-tertiary);">Exp. Licenses</span>
+                <span style="font-family:'Nunito',sans-serif;font-size:22px;font-weight:800;color:var(--uuif-brand-yellow);line-height:1;">4</span>
+              </div>
+              <div style="padding:10px 10px;display:flex;flex-direction:column;gap:2px;">
+                <span style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--uuif-text-tertiary);">Need Attn</span>
+                <span style="font-family:'Nunito',sans-serif;font-size:22px;font-weight:800;color:var(--uuif-brand-red);line-height:1;">8</span>
+              </div>
+            </div>
+
+            <!-- Filled pie chart (no centre text) -->
+            <div class="fw-pie-wrap">
+              <svg width="160" height="160" viewBox="0 0 100 100">
+                <path d="M50,50 L50,4 A46,46 0 0,1 94.6,37.3 Z" fill="#59a02e"/>
+                <path d="M50,50 L94.6,37.3 A46,46 0 1,1 30.7,9.8 Z" fill="#cc0000"/>
+                <path d="M50,50 L30.7,9.8 A46,46 0 0,1 9.6,29.4 Z" fill="#FF9900"/>
+                <path d="M50,50 L9.6,29.4 A46,46 0 0,1 50,4 Z" fill="#78a3e5"/>
+              </svg>
+              <div class="fw-pie-legend">
+                <div class="fw-leg-item"><span class="fw-leg-swatch" style="background:#59a02e;"></span>Online &amp; In Sync<span class="fw-leg-val" style="color:var(--uuif-brand-green);">5</span></div>
+                <div class="fw-leg-item"><span class="fw-leg-swatch" style="background:#cc0000;"></span>Offline<span class="fw-leg-val" style="color:var(--uuif-brand-red);">10</span></div>
+                <div class="fw-leg-item"><span class="fw-leg-swatch" style="background:#FF9900;"></span>Online &amp; Out of Sync<span class="fw-leg-val" style="color:#FF9900;">3</span></div>
+                <div class="fw-leg-item"><span class="fw-leg-swatch" style="background:#78a3e5;"></span>Other<span class="fw-leg-val" style="color:var(--uuif-text-tertiary);">4</span></div>
+              </div>
+            </div>
+            <!-- Alerts by Type — stacked bar -->
+            <div class="stk-section" style="padding-bottom:10px;">
+              <hr class="stk-section-divider"/>
+              <div class="stk-title">Alerts by Type<span class="stk-total">12</span></div>
+              <div class="stk-bar-wrap" style="height:32px;">
+                <div class="stk-seg" style="width:83.3%;background:#5885cc;font-size:10px;">10</div>
+                <div class="stk-seg" style="width:16.7%;background:#cc0000;font-size:10px;">2</div>
+              </div>
+              <div class="stk-labels">
+                <div class="stk-label-item" style="width:83.3%;"><span class="stk-pct">83.3%</span><span class="stk-name" style="color:#5885cc;">User</span></div>
+                <div class="stk-label-item" style="width:16.7%;"><span class="stk-pct">16.7%</span><span class="stk-name" style="color:#cc0000;">Device</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- WNM -->
+          <div class="prod-card">
+            <div class="prod-card-header">
+              <div class="prod-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="18" r="2" fill="currentColor" stroke="none"/><path d="M8.5 13.5a5 5 0 017 0M4 9a11 11 0 0116 0" stroke-linecap="round"/></svg></div>
+              <span class="prod-card-name">WNM</span>
+              <a class="prod-card-link">View more ›</a>
+            </div>
+
+            <!-- Access Points section -->
+            <div style="padding:12px 14px 6px;display:flex;align-items:center;gap:8px;">
+              <div style="width:22px;height:22px;border-radius:var(--uuif-radius-6);background:var(--uuif-fill-blue-lightest);border:1px solid var(--uuif-border-new);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--uuif-icon-primary)" stroke-width="1.5" width="13" height="13"><circle cx="12" cy="18" r="2" fill="var(--uuif-icon-primary)" stroke="none"/><path d="M8.5 13.5a5 5 0 017 0M4 9a11 11 0 0116 0" stroke-linecap="round"/></svg>
+              </div>
+              <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--uuif-text-highlight);">Access Points</span>
+            </div>
+            <div class="wnm-stat-grid">
+              <div class="wnm-stat-cell"><span class="wnm-stat-label">Total</span><span class="wnm-stat-value">3</span></div>
+              <div class="wnm-stat-cell"><span class="wnm-stat-label">Online</span><span class="wnm-stat-value v-ok">2</span></div>
+              <div class="wnm-stat-cell"><span class="wnm-stat-label">Exp. Lic.</span><span class="wnm-stat-value v-warn">0</span></div>
+              <div class="wnm-stat-cell"><span class="wnm-stat-label">Need Attn</span><span class="wnm-stat-value v-err">1</span></div>
+            </div>
+            <div class="stk-section" style="padding-top:6px;">
+              <!-- AP stacked bar: Online=2 (67%), Offline=1 (33%), Unmanaged=0 -->
+              <div class="stk-bar-wrap">
+                <div class="stk-seg" style="width:66.7%;background:#59a02e;">2</div>
+                <div class="stk-seg" style="width:33.3%;background:#cc0000;">1</div>
+              </div>
+              <div class="stk-labels">
+                <div class="stk-label-item" style="width:66.7%;"><span class="stk-pct">66.7%</span><span class="stk-name" style="color:#59a02e;">Online</span></div>
+                <div class="stk-label-item" style="width:33.3%;"><span class="stk-pct">33.3%</span><span class="stk-name" style="color:#cc0000;">Offline</span></div>
+              </div>
+            </div>
+
+            <!-- Switches section -->
+            <div style="padding:12px 14px 6px;display:flex;align-items:center;gap:8px;border-top:2px solid var(--uuif-border-transparent);margin-top:8px;">
+              <div style="width:22px;height:22px;border-radius:var(--uuif-radius-6);background:var(--uuif-fill-blue-lightest);border:1px solid var(--uuif-border-new);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <svg viewBox="0 0 24 24" fill="var(--uuif-icon-primary)" width="13" height="13"><rect x="2" y="7" width="20" height="10" rx="2"/></svg>
+              </div>
+              <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--uuif-text-highlight);">Switches</span>
+            </div>
+            <div class="wnm-stat-grid">
+              <div class="wnm-stat-cell"><span class="wnm-stat-label">Total</span><span class="wnm-stat-value">9</span></div>
+              <div class="wnm-stat-cell"><span class="wnm-stat-label">Online</span><span class="wnm-stat-value v-ok">9</span></div>
+              <div class="wnm-stat-cell"><span class="wnm-stat-label">Exp. Lic.</span><span class="wnm-stat-value v-ok">0</span></div>
+              <div class="wnm-stat-cell"><span class="wnm-stat-label">Need Attn</span><span class="wnm-stat-value v-ok">0</span></div>
+            </div>
+            <div class="stk-section" style="padding-top:6px;padding-bottom:4px;">
+              <!-- Switches stacked bar: Online=9 (100%) -->
+              <div class="stk-bar-wrap">
+                <div class="stk-seg" style="width:100%;background:#59a02e;">9</div>
+              </div>
+              <div class="stk-labels">
+                <div class="stk-label-item" style="width:100%;"><span class="stk-pct">100%</span><span class="stk-name" style="color:#59a02e;">Online</span></div>
+              </div>
+            </div>
+
+            <div class="wnm-footer">
+              <span class="wnm-footer-item">13 clients connected</span>
+              <span class="wnm-footer-item">48 ports active</span>
+            </div>
+          </div>
+
+          <!-- Capture Client & Managed -->
+          <div class="prod-card">
+            <div class="prod-card-header">
+              <div class="prod-card-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L3 7v7c0 4.75 3.83 8.74 9 9.9 5.17-1.16 9-5.15 9-9.9V7L12 2z"/></svg></div>
+              <span class="prod-card-name">Capture Client &amp; Managed</span>
+              <a class="prod-card-link">More ›</a>
+            </div>
+
+            <!-- Hero: Threat History — taller, more visual weight -->
+            <div class="cc-hero">
+              <div class="cc-hero-title" style="flex-direction:column;align-items:flex-start;gap:4px;">
+                <span>Threat History — Last 7 Days</span>
+                <div class="cc-hero-legend" style="flex-wrap:wrap;gap:8px;">
+                  <span class="cc-legend-item"><span class="cc-legend-dot" style="background:#cc0000;"></span>Not Mitigated</span>
+                  <span class="cc-legend-item"><span class="cc-legend-dot" style="background:#59a02e;"></span>Mitigated</span>
+                  <span class="cc-legend-item"><span class="cc-legend-dot" style="background:#5885cc;"></span>Benign</span>
+                </div>
+              </div>
+              <svg width="100%" height="90" viewBox="0 0 220 90" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="ccg1h" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#cc0000" stop-opacity=".25"/><stop offset="100%" stop-color="#cc0000" stop-opacity="0"/></linearGradient>
+                  <linearGradient id="ccg2h" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#59a02e" stop-opacity=".2"/><stop offset="100%" stop-color="#59a02e" stop-opacity="0"/></linearGradient>
+                </defs>
+                <!-- Y axis labels -->
+                <text x="0" y="12" font-size="7" fill="rgba(17,17,17,.3)" font-family="Nunito Sans,sans-serif">1.0</text>
+                <text x="0" y="30" font-size="7" fill="rgba(17,17,17,.3)" font-family="Nunito Sans,sans-serif">0.7</text>
+                <text x="0" y="48" font-size="7" fill="rgba(17,17,17,.3)" font-family="Nunito Sans,sans-serif">0.4</text>
+                <text x="0" y="66" font-size="7" fill="rgba(17,17,17,.3)" font-family="Nunito Sans,sans-serif">0.1</text>
+                <!-- Grid lines -->
+                <line x1="18" y1="8" x2="220" y2="8" stroke="rgba(17,17,17,.06)" stroke-width="1"/>
+                <line x1="18" y1="26" x2="220" y2="26" stroke="rgba(17,17,17,.06)" stroke-width="1"/>
+                <line x1="18" y1="44" x2="220" y2="44" stroke="rgba(17,17,17,.06)" stroke-width="1"/>
+                <line x1="18" y1="62" x2="220" y2="62" stroke="rgba(17,17,17,.06)" stroke-width="1"/>
+                <line x1="18" y1="75" x2="220" y2="75" stroke="rgba(17,17,17,.08)" stroke-width="1"/>
+                <!--
+                  Scale: y=75 (0), y=8 (1.0). Range 67px.
+                  Not Mitigated counts: M=3,T=5,W=1,T=0,F=4,S=0,S=0 (max=5)
+                  Normalised: M=0.25,T=0.42,W=0.08,T=0,F=0.33,S=0,S=0
+                  y = 75 - v*67: M=58,T=47,W=70,T=75,F=53,S=75,S=75
+                  Mitigated counts: M=4,T=6,W=2,T=1,F=5,S=1,S=0 (max=5)
+                  Normalised: M=0.33,T=0.5,W=0.17,T=0.08,F=0.42,S=0.08,S=0
+                  y: M=53,T=42,W=64,T=70,F=47,S=70,S=75
+                  Benign: M=1,T=1,W=0,T=1,F=1,S=0,S=0 → norm 0.08→y=70
+                  X positions: 18,46,74,102,130,158,186
+                -->
+                <!-- Not Mitigated (red) area + line -->
+                <polygon points="18,58 46,47 74,70 102,75 130,53 158,75 186,75 220,75 220,90 18,90" fill="url(#ccg1h)"/>
+                <polyline points="18,58 46,47 74,70 102,75 130,53 158,75 186,75 220,75" fill="none" stroke="#cc0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <!-- Mitigated (green) area + line -->
+                <polygon points="18,53 46,42 74,64 102,70 130,47 158,70 186,75 220,75 220,90 18,90" fill="url(#ccg2h)"/>
+                <polyline points="18,53 46,42 74,64 102,70 130,47 158,70 186,75 220,75" fill="none" stroke="#59a02e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <!-- Benign (blue dashed) -->
+                <polyline points="18,70 46,70 74,75 102,70 130,70 158,75 186,75 220,75" fill="none" stroke="#5885cc" stroke-width="1.5" stroke-dasharray="4 3" stroke-linecap="round"/>
+                <!-- Data point dots -->
+                <circle cx="18" cy="58" r="3" fill="#cc0000" stroke="#fff" stroke-width="1.5"/>
+                <circle cx="46" cy="47" r="3.5" fill="#cc0000" stroke="#fff" stroke-width="1.5"/>
+                <circle cx="130" cy="53" r="3" fill="#cc0000" stroke="#fff" stroke-width="1.5"/>
+                <circle cx="46" cy="42" r="3.5" fill="#59a02e" stroke="#fff" stroke-width="1.5"/>
+                <circle cx="130" cy="47" r="3" fill="#59a02e" stroke="#fff" stroke-width="1.5"/>
+                <!-- X labels -->
+                <text x="18" y="88" font-size="7" fill="rgba(17,17,17,.3)" font-family="Nunito Sans,sans-serif" text-anchor="middle">M</text>
+                <text x="46" y="88" font-size="7" fill="rgba(17,17,17,.3)" font-family="Nunito Sans,sans-serif" text-anchor="middle">T</text>
+                <text x="74" y="88" font-size="7" fill="rgba(17,17,17,.3)" font-family="Nunito Sans,sans-serif" text-anchor="middle">W</text>
+                <text x="102" y="88" font-size="7" fill="rgba(17,17,17,.3)" font-family="Nunito Sans,sans-serif" text-anchor="middle">T</text>
+                <text x="130" y="88" font-size="7" fill="rgba(17,17,17,.3)" font-family="Nunito Sans,sans-serif" text-anchor="middle">F</text>
+                <text x="158" y="88" font-size="7" fill="rgba(17,17,17,.3)" font-family="Nunito Sans,sans-serif" text-anchor="middle">S</text>
+                <text x="186" y="88" font-size="7" fill="rgba(17,17,17,.3)" font-family="Nunito Sans,sans-serif" text-anchor="middle">S</text>
+              </svg>
+            </div>
+
+            <!-- Affected Devices — stacked bar -->
+            <div class="stk-section">
+              <div class="stk-title">
+                Affected Devices
+                <span class="stk-total" style="color:var(--uuif-brand-red);">7</span>
+              </div>
+              <!-- Total=7: Infected=2(28.6%), Pending=1(14.3%), Offline=3(42.9%), Decommissioned=1(14.3%) -->
+              <div class="stk-bar-wrap">
+                <div class="stk-seg" style="width:28.6%;background:#cc0000;">2</div>
+                <div class="stk-seg" style="width:14.3%;background:#FF9900;">1</div>
+                <div class="stk-seg" style="width:42.9%;background:#888;">3</div>
+                <div class="stk-seg" style="width:14.3%;background:#ccc;color:var(--uuif-text-secondary);">1</div>
+              </div>
+              <div class="stk-labels">
+                <div class="stk-label-item" style="width:28.6%;"><span class="stk-pct">28.6%</span><span class="stk-name" style="color:#cc0000;">Infected</span></div>
+                <div class="stk-label-item" style="width:14.3%;"><span class="stk-pct">14.3%</span><span class="stk-name" style="color:#FF9900;">Pending</span></div>
+                <div class="stk-label-item" style="width:42.9%;"><span class="stk-pct">42.9%</span><span class="stk-name" style="color:#888;">Offline</span></div>
+                <div class="stk-label-item" style="width:14.3%;"><span class="stk-pct">14.3%</span><span class="stk-name" style="color:#aaa;">Decomm.</span></div>
+              </div>
+            </div>
+
+            <!-- Unresolved Threats — stacked bar -->
+            <div class="stk-section">
+              <hr class="stk-section-divider"/>
+              <div class="stk-title">
+                Unresolved Threats
+                <span class="stk-total" style="color:var(--uuif-brand-red);">13</span>
+              </div>
+              <!-- Total=13: Not Mitigated=5(38.5%), Mitigated=6(46.2%), Benign=2(15.4%) -->
+              <div class="stk-bar-wrap">
+                <div class="stk-seg" style="width:38.5%;background:#cc0000;">5</div>
+                <div class="stk-seg" style="width:46.2%;background:#59a02e;">6</div>
+                <div class="stk-seg" style="width:15.4%;background:#5885cc;">2</div>
+              </div>
+              <div class="stk-labels">
+                <div class="stk-label-item" style="width:38.5%;"><span class="stk-pct">38.5%</span><span class="stk-name" style="color:#cc0000;">Not Mitigated</span></div>
+                <div class="stk-label-item" style="width:46.2%;"><span class="stk-pct">46.2%</span><span class="stk-name" style="color:#59a02e;">Mitigated</span></div>
+                <div class="stk-label-item" style="width:15.4%;"><span class="stk-pct">15.4%</span><span class="stk-name" style="color:#5885cc;">Benign</span></div>
+              </div>
+            </div>
+
+            <!-- Vulnerable Applications — stacked bar -->
+            <div class="stk-section" style="padding-bottom:10px;">
+              <hr class="stk-section-divider"/>
+              <div class="stk-title">
+                Vulnerable Applications
+                <span class="stk-total" style="color:var(--uuif-brand-yellow);">18</span>
+              </div>
+              <!-- Total=18: Critical=2(11.1%), High=5(27.8%), Medium=7(38.9%), Low=4(22.2%) -->
+              <div class="stk-bar-wrap">
+                <div class="stk-seg" style="width:11.1%;background:#cc0000;">2</div>
+                <div class="stk-seg" style="width:27.8%;background:#FF9900;">5</div>
+                <div class="stk-seg" style="width:38.9%;background:#f3ac3d;">7</div>
+                <div class="stk-seg" style="width:22.2%;background:#5885cc;">4</div>
+              </div>
+              <div class="stk-labels">
+                <div class="stk-label-item" style="width:11.1%;"><span class="stk-pct">11.1%</span><span class="stk-name" style="color:#cc0000;">Critical</span></div>
+                <div class="stk-label-item" style="width:27.8%;"><span class="stk-pct">27.8%</span><span class="stk-name" style="color:#FF9900;">High</span></div>
+                <div class="stk-label-item" style="width:38.9%;"><span class="stk-pct">38.9%</span><span class="stk-name" style="color:#f3ac3d;">Medium</span></div>
+                <div class="stk-label-item" style="width:22.2%;"><span class="stk-pct">22.2%</span><span class="stk-name" style="color:#5885cc;">Low</span></div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Capture Client MDR removed -->
+          <!-- Cloud Secure Edge -->
+          <div class="prod-card">
+            <div class="prod-card-header">
+              <div class="prod-card-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 10a5 5 0 00-9.16-2.5A4 4 0 105 16h13a3 3 0 000-6z"/></svg></div>
+              <span class="prod-card-name">Cloud Secure Edge</span>
+              <a class="prod-card-link">More ›</a>
+            </div>
+
+            <!-- Stats strip -->
+            <div class="cse-stats-strip">
+              <div class="cse-stat"><span class="cse-stat-label">Devices</span><span class="cse-stat-value">8</span></div>
+              <div class="cse-stat"><span class="cse-stat-label">Users</span><span class="cse-stat-value">6</span></div>
+              <div class="cse-stat"><span class="cse-stat-label">Policies</span><span class="cse-stat-value">7</span></div>
+            </div>
+            <div class="cse-stats-strip" style="border-bottom:none;">
+              <div class="cse-stat"><span class="cse-stat-label">Roles</span><span class="cse-stat-value">4</span></div>
+              <div class="cse-stat"><span class="cse-stat-label">Services</span><span class="cse-stat-value">2</span></div>
+              <div class="cse-stat"><span class="cse-stat-label">Connectors</span><span class="cse-stat-value">1</span></div>
+            </div>
+
+            <!-- All Devices by OS — stacked bar -->
+            <div class="stk-section">
+              <div class="stk-title">All Devices by OS<span class="stk-total">8</span></div>
+              <div class="stk-bar-wrap">
+                <div class="stk-seg" style="width:50%;background:#5885cc;">4</div>
+                <div class="stk-seg" style="width:25%;background:#59a02e;">2</div>
+                <div class="stk-seg" style="width:12.5%;background:#f3ac3d;">1</div>
+                <div class="stk-seg" style="width:12.5%;background:#aac4e8;">1</div>
+              </div>
+              <div class="stk-labels">
+                <div class="stk-label-item" style="width:50%;"><span class="stk-pct">50%</span><span class="stk-name" style="color:#5885cc;">Win</span></div>
+                <div class="stk-label-item" style="width:25%;"><span class="stk-pct">25%</span><span class="stk-name" style="color:#59a02e;">Mac</span></div>
+                <div class="stk-label-item" style="width:12.5%;"><span class="stk-pct">12.5%</span><span class="stk-name" style="color:#f3ac3d;">And</span></div>
+                <div class="stk-label-item" style="width:12.5%;"><span class="stk-pct">12.5%</span><span class="stk-name" style="color:#aac4e8;">iOS</span></div>
+              </div>
+            </div>
+
+            <!-- Most Active Users by Services Accessed -->
+            <div class="stk-section" style="padding-bottom:10px;">
+              <hr class="stk-section-divider"/>
+              <div class="stk-title" style="margin-bottom:6px;">Most Active Users <span style="font-size:8px;font-weight:500;color:var(--uuif-text-tertiary);text-transform:none;letter-spacing:0;">· by Services</span></div>
+              <div style="display:flex;flex-direction:column;gap:5px;">
+                <div style="display:flex;align-items:center;gap:5px;"><span style="font-size:9px;color:var(--uuif-text-secondary);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">john.smith@acme.com</span><div style="width:52px;height:6px;background:var(--uuif-surface-model);border-radius:3px;overflow:hidden;flex-shrink:0;"><div style="width:100%;height:100%;background:#5885cc;border-radius:3px;"></div></div><span style="font-size:9px;font-weight:700;color:var(--uuif-text-highlight);width:16px;text-align:right;flex-shrink:0;">24</span></div>
+                <div style="display:flex;align-items:center;gap:5px;"><span style="font-size:9px;color:var(--uuif-text-secondary);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">sarah.k@betanet.com</span><div style="width:52px;height:6px;background:var(--uuif-surface-model);border-radius:3px;overflow:hidden;flex-shrink:0;"><div style="width:75%;height:100%;background:#5885cc;border-radius:3px;"></div></div><span style="font-size:9px;font-weight:700;color:var(--uuif-text-highlight);width:16px;text-align:right;flex-shrink:0;">18</span></div>
+                <div style="display:flex;align-items:center;gap:5px;"><span style="font-size:9px;color:var(--uuif-text-secondary);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">admin@westfield.com</span><div style="width:52px;height:6px;background:var(--uuif-surface-model);border-radius:3px;overflow:hidden;flex-shrink:0;"><div style="width:62.5%;height:100%;background:#5885cc;border-radius:3px;"></div></div><span style="font-size:9px;font-weight:700;color:var(--uuif-text-highlight);width:16px;text-align:right;flex-shrink:0;">15</span></div>
+                <div style="display:flex;align-items:center;gap:5px;"><span style="font-size:9px;color:var(--uuif-text-secondary);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">m.patel@crown.com</span><div style="width:52px;height:6px;background:var(--uuif-surface-model);border-radius:3px;overflow:hidden;flex-shrink:0;"><div style="width:50%;height:100%;background:#5885cc;border-radius:3px;"></div></div><span style="font-size:9px;font-weight:700;color:var(--uuif-text-highlight);width:16px;text-align:right;flex-shrink:0;">12</span></div>
+                <div style="display:flex;align-items:center;gap:5px;"><span style="font-size:9px;color:var(--uuif-text-secondary);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">ops@delta.com</span><div style="width:52px;height:6px;background:var(--uuif-surface-model);border-radius:3px;overflow:hidden;flex-shrink:0;"><div style="width:37.5%;height:100%;background:#5885cc;border-radius:3px;"></div></div><span style="font-size:9px;font-weight:700;color:var(--uuif-text-highlight);width:16px;text-align:right;flex-shrink:0;">9</span></div>
+              </div>
+            </div>
+
+          </div>
+
+        </div><!-- /product-grid -->
+
+      </div><!-- /two-col-left -->
+
+      <!-- RIGHT: SAMI + NEWS column -->
+      <div class="two-col-right">
+
+        <!-- SAMI AI Insights widget -->
+        <div class="widget-card" style="margin-bottom:10px;">
+          <div class="widget-header">
+            <div class="widget-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--uuif-brand-orange)" stroke-width="2" style="width:14px;height:14px;"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <span class="widget-title">SAMI AI Insights</span>
+            <span class="widget-badge">3 alerts</span>
+            <a class="widget-link">View all ›</a>
+          </div>
+          <!-- Alert 1 -->
+          <div class="sami-item">
+            <div class="sami-item-header">
+              <span class="sami-type-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:9px;height:9px;"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/></svg>CVE</span>
+              <span class="sami-attn-chip">Critical</span>
+              <span class="sami-item-time">Just now</span>
+            </div>
+            <div class="sami-item-title">SSL VPN Auth Bypass (CVE-2026-1142) — 12 Firewalls, 4 Tenants</div>
+            <div class="sami-ai-block">
+              <div class="sami-ai-tag"><svg viewBox="0 0 10 10" fill="currentColor" width="8" height="8"><path d="M5 1l.93 2.57L8.5 4.5l-2.57.93L5 8l-.93-2.57L1.5 4.5l2.57-.93z"/></svg>SAMI AI</div>
+              <div class="sami-ai-text">CVSS 9.8 critical. Active exploit in the wild. 4 tenants exposed. Patch pre-staged.</div>
+            </div>
+            <div class="sami-item-actions">
+              <button class="btn-secondary" style="padding:3px 10px;font-size:11px;">Schedule</button>
+              <button class="btn-primary" style="padding:3px 10px;font-size:11px;">Deploy patch</button>
+            </div>
+          </div>
+          <!-- Alert 2 -->
+          <div class="sami-item">
+            <div class="sami-item-header">
+              <span class="sami-type-chip">Device</span>
+              <span class="sami-attn-chip">Attention</span>
+              <span class="sami-item-time">3 hrs ago</span>
+            </div>
+            <div class="sami-item-title">3 Gateways Unreachable — Northgate Health &amp; Delta Logistics</div>
+            <div class="sami-ai-block">
+              <div class="sami-ai-tag"><svg viewBox="0 0 10 10" fill="currentColor" width="8" height="8"><path d="M5 1l.93 2.57L8.5 4.5l-2.57.93L5 8l-.93-2.57L1.5 4.5l2.57-.93z"/></svg>SAMI AI</div>
+              <div class="sami-ai-text">Lost after BGP route change. Branches without perimeter protection.</div>
+            </div>
+            <div class="sami-item-actions">
+              <button class="btn-secondary" style="padding:3px 10px;font-size:11px;">Notify</button>
+              <button class="btn-primary" style="padding:3px 10px;font-size:11px;">Diagnose</button>
+            </div>
+          </div>
+          <div style="padding:8px 14px 10px;border-top:1px solid var(--uuif-border-transparent);display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:10px;color:var(--uuif-text-tertiary);">+1 more alert</span>
+            <a style="font-size:10px;font-weight:600;color:var(--uuif-icon-primary);cursor:pointer;">View all ›</a>
+          </div>
+        </div>
+
+        <!-- News & Articles widget -->
+        <div class="news-widget-card">
+          <div class="news-widget-header">
+            <div class="news-widget-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--uuif-icon-primary)" stroke-width="2" style="width:13px;height:13px;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="11" y2="17"/></svg></div>
+            <span class="news-widget-title">News &amp; Articles</span>
+            <a style="margin-left:auto;font-size:10px;font-weight:600;color:var(--uuif-icon-primary);cursor:pointer;">See all ›</a>
+          </div>
+          <div class="news-widget-body">
+            <div class="news-sidebar-card" style="margin:10px 10px 0;border-radius:var(--uuif-radius-6);"><div class="news-sidebar-thumb"><div style="width:100%;height:100%;background:linear-gradient(135deg,#001228,#0d2147,#1a3460);display:flex;align-items:center;justify-content:center;gap:14px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,93,0,.9)" stroke-width="1.5"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(88,133,204,.9)" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></div><div class="news-sidebar-overlay"></div><span class="news-sidebar-cat">Threat Intel</span></div><div class="news-sidebar-body"><div class="news-sidebar-date">May 8, 2026</div><div class="news-sidebar-card-title">No Password, No MFA — How a Single Binary Owns Your Cloud Identity</div><div class="news-sidebar-excerpt">The SonicWall Capture Labs team identified an infostealer combining three data-harvesting techniques targeting cloud credentials.</div><span class="news-sidebar-readmore">Read More <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span></div></div>
+            <div class="news-sidebar-card" style="margin:10px 10px 10px;border-radius:var(--uuif-radius-6);"><div class="news-sidebar-thumb"><div style="width:100%;height:100%;background:linear-gradient(135deg,#1a0500 0%,#3d1000 50%,#5a1800 100%);display:flex;align-items:center;justify-content:center;gap:14px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,93,0,.9)" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,153,0,.85)" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="news-sidebar-overlay"></div><span class="news-sidebar-cat">Research</span></div><div class="news-sidebar-body"><div class="news-sidebar-date">May 6, 2026</div><div class="news-sidebar-card-title">SonicWall Threat Report Q2 2026: Ransomware Surges 41%</div><div class="news-sidebar-excerpt">Manufacturing and healthcare sectors see sharpest increases as attackers automate initial access via VPN endpoints.</div><span class="news-sidebar-readmore">Read More <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span></div></div>
+            <div class="news-sidebar-card" style="margin:10px 10px 10px;border-radius:var(--uuif-radius-6);"><div class="news-sidebar-thumb"><div style="width:100%;height:100%;background:linear-gradient(135deg,#1a001b,#3d003d,#5a0050);display:flex;align-items:center;justify-content:center;gap:14px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,93,0,.9)" stroke-width="1.5"><path d="M21 2H3v16h5v4l4-4h9V2z"/></svg><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(88,133,204,.8)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div><div class="news-sidebar-overlay"></div><span class="news-sidebar-cat">Advisory</span></div><div class="news-sidebar-body"><div class="news-sidebar-date">Apr 29, 2026</div><div class="news-sidebar-card-title">Critical Patch Advisory: SonicOS 7.1.3 Addresses 3 CVEs</div><div class="news-sidebar-excerpt">Admins should prioritize upgrade on all Gen 7 appliances — one CVE has active exploitation in the wild.</div><span class="news-sidebar-readmore">Read More <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span></div></div>
+          </div><!-- /news-widget-body -->
+        </div><!-- /news-widget-card -->
+      </div><!-- /two-col-right -->
+    </div><!-- /two-col -->
+
+    <!-- Notifications & Alerts — full width outside two-col -->
+    <div class="notif-section2">
+      <div class="notif-title-pane">
+        <h2>Notifications &amp; Alerts</h2>
+        <span class="notif-count-badge notif-count-crit">● 3 Critical</span>
+        <span class="notif-count-badge notif-count-warn">● 5 Warnings</span>
+        <span class="notif-count-badge notif-count-info">● 9 Info</span>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+          <div class="view-toggle">
+            <button class="view-toggle-btn active" id="btnMap" onclick="switchNotifView('map')">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
+              Map
+            </button>
+            <button class="view-toggle-btn" id="btnList" onclick="switchNotifView('list')">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+              List
+            </button>
+          </div>
+          <button class="btn-secondary" style="padding:5px 12px;font-size:12px;">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;"><path d="M7 11h10v2H7zm-4-7v2h18V4H3zm8 14c0 .55.45 1 1 1s1-.45 1-1v-2h-2v2z"/></svg>
+            Filters
+          </button>
+          <button class="btn-secondary" style="padding:5px 12px;font-size:12px;">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+            Mark All Read
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <!-- Product sub-tabs -->
+        <div class="tabs2" style="padding:0 14px;">
+          <div class="tab2 active">All Products</div>
+          <div class="tab2">Firewalls</div>
+          <div class="tab2">Access Points</div>
+          <div class="tab2">Switches</div>
+          <div class="tab2">Capture Client</div>
+          <div class="tab2">Capture Client MDR</div>
+        </div>
+
+        <!-- MAP VIEW -->
+        <div id="viewMap" style="padding:14px;">
+          <div class="map-container">
+            <div class="map-placeholder">Geographic Alert Distribution · Interactive Map</div>
+            <div class="map-dot" style="width:14px;height:14px;background:#CC0000;top:38%;left:22%;"></div>
+            <div class="map-dot" style="width:10px;height:10px;background:#CC0000;top:55%;left:26%;"></div>
+            <div class="map-dot" style="width:12px;height:12px;background:#FF9900;top:44%;left:47%;"></div>
+            <div class="map-dot" style="width:10px;height:10px;background:#FF9900;top:36%;left:52%;"></div>
+            <div class="map-dot" style="width:10px;height:10px;background:#FF9900;top:62%;left:68%;"></div>
+            <div class="map-dot" style="width:10px;height:10px;background:#5885cc;top:30%;left:75%;"></div>
+            <div class="map-dot" style="width:8px;height:8px;background:#5885cc;top:50%;left:82%;"></div>
+            <div class="map-legend">
+              <div class="map-legend-item"><span class="map-legend-dot" style="background:#CC0000;"></span>Critical</div>
+              <div class="map-legend-item"><span class="map-legend-dot" style="background:#FF9900;"></span>Warning</div>
+              <div class="map-legend-item"><span class="map-legend-dot" style="background:#5885cc;"></span>Info</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LIST VIEW -->
+        <div id="viewList" style="display:none;">
+          <div class="toolbar">
+            <div class="toolbar-search">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+              <input type="text" placeholder="Search alerts…"/>
+            </div>
+            <button class="toolbar-filter-btn">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/></svg>
+              Severity
+            </button>
+            <button class="toolbar-filter-btn">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+              Date Range
+            </button>
+            <div class="toolbar-right">
+              <select class="select-sm">
+                <option>50 per page</option>
+                <option>25 per page</option>
+                <option>100 per page</option>
+              </select>
+              <button class="btn-icon" title="Export">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+              </button>
+            </div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="width:32px;"><input type="checkbox" style="cursor:pointer;"/></th>
+                  <th>Severity</th>
+                  <th>Alert</th>
+                  <th>Product</th>
+                  <th>Tenant</th>
+                  <th>Device</th>
+                  <th>Time</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><input type="checkbox"/></td><td><span class="sev-dot sev-crit"></span></td><td><strong>Firewall offline — no heartbeat</strong><br><span style="font-size:11px;color:var(--uuif-text-tertiary);">Device has not responded in 15 min</span></td><td><span class="prod-badge">Firewalls</span></td><td>Acme Corp</td><td>FW-CORP-01</td><td style="white-space:nowrap;color:var(--uuif-text-tertiary);">2m ago</td><td><span class="status-crit">Critical</span></td><td><button class="btn-icon"><svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg></button></td></tr>
+                <tr><td><input type="checkbox"/></td><td><span class="sev-dot sev-crit"></span></td><td><strong>License expired — action required</strong><br><span style="font-size:11px;color:var(--uuif-text-tertiary);">Security services license has expired</span></td><td><span class="prod-badge">Firewalls</span></td><td>TechStart LLC</td><td>FW-BRANCH-04</td><td style="white-space:nowrap;color:var(--uuif-text-tertiary);">18m ago</td><td><span class="status-crit">Critical</span></td><td><button class="btn-icon"><svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg></button></td></tr>
+                <tr><td><input type="checkbox"/></td><td><span class="sev-dot sev-crit"></span></td><td><strong>Endpoint at risk — MDR alert</strong><br><span style="font-size:11px;color:var(--uuif-text-tertiary);">Suspicious process detected on endpoint</span></td><td><span class="prod-badge">CC MDR</span></td><td>Global Inc</td><td>WIN-WRK-089</td><td style="white-space:nowrap;color:var(--uuif-text-tertiary);">32m ago</td><td><span class="status-crit">Critical</span></td><td><button class="btn-icon"><svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg></button></td></tr>
+                <tr><td><input type="checkbox"/></td><td><span class="sev-dot sev-warn"></span></td><td><strong>High CPU utilization</strong><br><span style="font-size:11px;color:var(--uuif-text-tertiary);">CPU above 85% for &gt; 10 minutes</span></td><td><span class="prod-badge">Firewalls</span></td><td>Retail Plus</td><td>FW-HQ-02</td><td style="white-space:nowrap;color:var(--uuif-text-tertiary);">1h ago</td><td><span class="status-warn">Warning</span></td><td><button class="btn-icon"><svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg></button></td></tr>
+                <tr><td><input type="checkbox"/></td><td><span class="sev-dot sev-warn"></span></td><td><strong>AP disconnected from controller</strong><br><span style="font-size:11px;color:var(--uuif-text-tertiary);">Access point lost controller contact</span></td><td><span class="prod-badge">Access Points</span></td><td>Acme Corp</td><td>AP-LOBBY-03</td><td style="white-space:nowrap;color:var(--uuif-text-tertiary);">2h ago</td><td><span class="status-warn">Warning</span></td><td><button class="btn-icon"><svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg></button></td></tr>
+                <tr><td><input type="checkbox"/></td><td><span class="sev-dot sev-warn"></span></td><td><strong>Firmware update available</strong><br><span style="font-size:11px;color:var(--uuif-text-tertiary);">SonicOS 7.1.3 available for 6 devices</span></td><td><span class="prod-badge">Firewalls</span></td><td>Multiple</td><td>6 devices</td><td style="white-space:nowrap;color:var(--uuif-text-tertiary);">3h ago</td><td><span class="status-warn">Warning</span></td><td><button class="btn-icon"><svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg></button></td></tr>
+                <tr><td><input type="checkbox"/></td><td><span class="sev-dot sev-warn"></span></td><td><strong>VPN tunnel flapping</strong><br><span style="font-size:11px;color:var(--uuif-text-tertiary);">Site-to-site tunnel unstable — 4 reconnects</span></td><td><span class="prod-badge">Firewalls</span></td><td>ManuCo</td><td>FW-SITE-B</td><td style="white-space:nowrap;color:var(--uuif-text-tertiary);">4h ago</td><td><span class="status-warn">Warning</span></td><td><button class="btn-icon"><svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg></button></td></tr>
+                <tr><td><input type="checkbox"/></td><td><span class="sev-dot sev-info"></span></td><td><strong>New tenant provisioned</strong><br><span style="font-size:11px;color:var(--uuif-text-tertiary);">Tenant "EduTech Solutions" created successfully</span></td><td><span class="prod-badge">NSM</span></td><td>EduTech Solutions</td><td>—</td><td style="white-space:nowrap;color:var(--uuif-text-tertiary);">6h ago</td><td><span class="status-info">Info</span></td><td><button class="btn-icon"><svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg></button></td></tr>
+                <tr><td><input type="checkbox"/></td><td><span class="sev-dot sev-info"></span></td><td><strong>Policy update applied</strong><br><span style="font-size:11px;color:var(--uuif-text-tertiary);">Security policy pushed to 12 devices</span></td><td><span class="prod-badge">Cloud Secure Edge</span></td><td>Acme Corp</td><td>12 devices</td><td style="white-space:nowrap;color:var(--uuif-text-tertiary);">8h ago</td><td><span class="status-info">Info</span></td><td><button class="btn-icon"><svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg></button></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <span class="pg-info">Showing 1–9 of 17 alerts</span>
+            <button class="pg-btn">‹</button>
+            <button class="pg-btn active">1</button>
+            <button class="pg-btn">2</button>
+            <button class="pg-btn">›</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- (duplicate news removed — see two-col-right above) -->
+      <div style="display:none;">
+        <div class="news-widget-body">
+
+            <!-- Article 1 -->
+            <div class="news-sidebar-card" style="margin:10px 10px 0;border-radius:var(--uuif-radius-6);">
+              <div class="news-sidebar-thumb">
+                <div style="width:100%;height:100%;background:linear-gradient(135deg,#001228 0%,#0d2147 50%,#1a3460 100%);display:flex;align-items:center;justify-content:center;gap:14px;">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,93,0,.9)" stroke-width="1.5"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(88,133,204,.9)" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                </div>
+                <div class="news-sidebar-overlay"></div>
+                <span class="news-sidebar-cat">Threat Intel</span>
+              </div>
+              <div class="news-sidebar-body">
+                <div class="news-sidebar-date">May 8, 2026</div>
+                <div class="news-sidebar-card-title">No Password, No MFA — How a Single Binary Owns Your Cloud Identity</div>
+                <div class="news-sidebar-excerpt">The SonicWall Capture Labs threat research team has identified an infostealer combining three data-harvesting techniques.</div>
+                <span class="news-sidebar-readmore">Read More <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+              </div>
+            </div>
+
+            <!-- Article 2 -->
+            <div class="news-sidebar-card" style="margin:10px 10px 0;border-radius:var(--uuif-radius-6);">
+              <div class="news-sidebar-thumb">
+                <div style="width:100%;height:100%;background:linear-gradient(135deg,#1a0500 0%,#3d1000 50%,#5a1800 100%);display:flex;align-items:center;justify-content:center;gap:14px;">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,93,0,.9)" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,153,0,.85)" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                </div>
+                <div class="news-sidebar-overlay"></div>
+                <span class="news-sidebar-cat">Research</span>
+              </div>
+              <div class="news-sidebar-body">
+                <div class="news-sidebar-date">May 6, 2026</div>
+                <div class="news-sidebar-card-title">SonicWall Threat Report Q2 2026: Ransomware Surges 41%</div>
+                <div class="news-sidebar-excerpt">Manufacturing and healthcare sectors see sharpest increases as attackers automate initial access via VPN endpoints.</div>
+                <span class="news-sidebar-readmore">Read More <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+              </div>
+            </div>
+
+
+            <!-- Article 4 -->
+            <div class="news-sidebar-card" style="margin:10px 10px 10px;border-radius:var(--uuif-radius-6);">
+              <div class="news-sidebar-thumb">
+                <div style="width:100%;height:100%;background:linear-gradient(135deg,#1a001b 0%,#3d003d 50%,#5a0050 100%);display:flex;align-items:center;justify-content:center;gap:14px;">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,93,0,.9)" stroke-width="1.5"><path d="M21 2H3v16h5v4l4-4h9V2z"/></svg>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(88,133,204,.8)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+                </div>
+                <div class="news-sidebar-overlay"></div>
+                <span class="news-sidebar-cat">Advisory</span>
+              </div>
+              <div class="news-sidebar-body">
+                <div class="news-sidebar-date">Apr 29, 2026</div>
+                <div class="news-sidebar-card-title">Critical Patch Advisory: SonicOS 7.1.3 Addresses 3 CVEs</div>
+                <div class="news-sidebar-excerpt">Admins should prioritize upgrade on all Gen 7 appliances — one CVE has active exploitation in the wild.</div>
+                <span class="news-sidebar-readmore">Read More <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+              </div>
+            </div>
+
+          </div><!-- /hidden-duplicate -->
+      </div><!-- /hidden -->
+
+    </div><!-- /notif-section2 -->
+
+    <footer class="footer" style="margin-top:16px;">
+      SonicWall Unified Management <span class="footer-dot">·</span> UUIF 9.2 <span class="footer-dot">·</span> Option 6 — Asymmetric Grid
+      <span style="margin-left:auto;display:flex;align-items:center;gap:5px;"><span style="width:6px;height:6px;border-radius:50%;background:var(--uuif-brand-green);display:inline-block;"></span>Last updated: just now</span>
+    </footer>
+
+  </div><!-- /body-content -->
+</main>
+
+<script>
+document.querySelectorAll('.subnav-item').forEach(l => l.addEventListener('click', function(){
+  document.querySelectorAll('.subnav-item').forEach(x => x.classList.remove('active'));
+  this.classList.add('active');
+}));
+
+function switchNotifView(mode) {
+  var mapView  = document.getElementById('viewMap');
+  var listView = document.getElementById('viewList');
+  var btnMap   = document.getElementById('btnMap');
+  var btnList  = document.getElementById('btnList');
+  if (mode === 'map') {
+    mapView.style.display  = 'block';
+    listView.style.display = 'none';
+    btnMap.classList.add('active');
+    btnList.classList.remove('active');
+  } else {
+    mapView.style.display  = 'none';
+    listView.style.display = 'block';
+    btnMap.classList.remove('active');
+    btnList.classList.add('active');
+  }
+}
+
+document.querySelectorAll('.tab2').forEach(function(tab) {
+  tab.addEventListener('click', function() {
+    var tabs = this.closest('.tabs2').querySelectorAll('.tab2');
+    tabs.forEach(function(t){ t.classList.remove('active'); });
+    this.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

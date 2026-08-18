@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOT 4 · AI Triage in Notification Table · SonicWall NSM</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ══ TOKENS (matched from NSM + SAMI) ══════════════════════════════ */
+:root {
+  --bg:#F9FAFB; --white:#FFFFFF; --border:#E5E7EB; --border-light:#F3F4F6;
+  --text-1:#111827; --text-2:#374151; --text-3:#6B7280; --text-4:#9CA3AF;
+  --orange:#F97316; --orange-bg:#FFF7ED; --orange-border:#FED7AA;
+  --red:#EF4444; --red-bg:#FEF2F2; --red-border:#FECACA;
+  --green:#22C55E; --green-bg:#F0FDF4; --green-border:#BBF7D0;
+  --blue:#3B82F6; --blue-bg:#EFF6FF; --blue-border:#BFDBFE;
+  --amber:#F59E0B; --amber-bg:#FFFBEB; --amber-border:#FDE68A;
+  --indigo:#6366F1; --indigo-bg:#EEF2FF; --indigo-border:#C7D2FE;
+  --teal:#14B8A6; --teal-bg:#F0FDFA; --teal-border:#99F6E4;
+  --navy:#001b50;
+  --font:'Inter',sans-serif;
+  --radius:8px; --radius-lg:12px;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.05);
+  --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
+  --shadow-lg:0 10px 15px rgba(0,0,0,.1),0 4px 6px rgba(0,0,0,.05);
+  --shadow-xl:0 20px 25px rgba(0,0,0,.1),0 10px 10px rgba(0,0,0,.04);
+  --sidebar-w:52px; --topbar-h:48px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--bg)}
+body{font-family:var(--font);font-size:13px;color:var(--text-1);-webkit-font-smoothing:antialiased}
+button{font-family:var(--font);cursor:pointer}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+/* ══ APP SHELL ══════════════════════════════════════════════════════ */
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* SIDEBAR — matches NSM real product */
+.sidebar{
+  width:var(--sidebar-w);background:var(--navy);
+  display:flex;flex-direction:column;align-items:center;
+  padding:10px 0;flex-shrink:0;
+}
+.sb-logo{
+  width:32px;height:32px;border-radius:8px;
+  background:#ff5d00;display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:800;color:white;margin-bottom:18px;
+}
+.sb-btn{
+  width:38px;height:38px;border-radius:var(--radius);border:none;
+  background:transparent;display:flex;align-items:center;justify-content:center;
+  color:rgba(255,255,255,0.5);font-size:16px;margin-bottom:4px;
+  cursor:pointer;transition:all .15s;position:relative;
+}
+.sb-btn:hover{background:rgba(255,255,255,.1);color:rgba(255,255,255,.85)}
+.sb-btn.active{background:rgba(255,255,255,.12);color:white}
+.sb-btn.active::before{content:'';position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:0 2px 2px 0;background:#ff5d00}
+.sb-badge{
+  position:absolute;top:4px;right:4px;
+  min-width:15px;height:15px;border-radius:8px;
+  background:#EF4444;color:white;font-size:8.5px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;padding:0 3px;
+}
+.sb-divider{width:28px;height:1px;background:rgba(255,255,255,.1);margin:8px 0}
+.sb-bottom{margin-top:auto}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+
+/* TOPBAR — matches NSM */
+.topbar{
+  height:var(--topbar-h);background:var(--white);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 16px;gap:10px;
+  flex-shrink:0;box-shadow:var(--shadow-sm);z-index:20;
+}
+.tb-crumb{font-size:15px;font-weight:600;color:var(--text-1)}
+.tb-spacer{flex:1}
+.tb-search{
+  display:flex;align-items:center;gap:6px;
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:6px;padding:5px 12px;font-size:12.5px;
+  color:var(--text-3);cursor:pointer;min-width:200px;
+}
+.tb-select{
+  display:flex;align-items:center;gap:6px;
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:6px;padding:5px 12px;font-size:12.5px;
+  color:var(--text-2);cursor:pointer;font-weight:500;
+}
+.tb-icon{width:30px;height:30px;border-radius:var(--radius);border:none;background:transparent;cursor:pointer;font-size:14px;color:var(--text-3);display:flex;align-items:center;justify-content:center}
+.tb-icon:hover{background:var(--bg)}
+.tb-notif-dot{position:absolute;top:4px;right:4px;width:7px;height:7px;border-radius:50%;background:var(--red);border:1.5px solid white}
+.tb-avatar{width:28px;height:28px;border-radius:50%;background:var(--navy);color:white;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+
+/* CONTENT */
+.content{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px 24px}
+
+/* ══ PAGE HEADER ════════════════════════════════════════════════════ */
+.page-head{margin-bottom:16px}
+.page-head h1{font-size:20px;font-weight:700;color:var(--text-1);margin-bottom:2px}
+.page-head p{font-size:13px;color:var(--text-3)}
+
+/* ══ OVERVIEW TILES (top row, matches real product) ════════════════ */
+.overview-section{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:16px;box-shadow:var(--shadow-sm)}
+.overview-header{padding:12px 18px 10px;border-bottom:1px solid var(--border-light);display:flex;align-items:center;justify-content:space-between}
+.overview-header-left{font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3)}
+.overview-header-right{font-size:11.5px;color:var(--text-3)}
+.overview-tiles{display:flex;gap:0;overflow-x:auto;padding:0}
+.overview-tile{
+  flex:1;min-width:140px;padding:14px 18px;border-right:1px solid var(--border-light);
+  cursor:pointer;transition:background .15s;
+}
+.overview-tile:last-child{border-right:none}
+.overview-tile:hover{background:var(--bg)}
+.ot-icon{font-size:12px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.ot-label{font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.ot-num{font-size:24px;font-weight:800;color:var(--text-1);line-height:1;margin-bottom:3px}
+.ot-attn{display:flex;gap:6px;align-items:center;font-size:11.5px}
+.attn-chip{display:inline-flex;align-items:center;gap:3px;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700}
+.chip-warn{background:var(--amber-bg);color:#92400E;border:1px solid var(--amber-border)}
+.chip-crit{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}
+.chip-eol{background:var(--bg);color:var(--text-3);border:1px solid var(--border)}
+
+/* ORG SUMMARY */
+.org-summary{
+  background:var(--navy);color:white;border-radius:var(--radius-lg);
+  padding:16px 20px;min-width:180px;flex-shrink:0;
+  display:flex;flex-direction:column;gap:8px;
+}
+.os-row{display:flex;justify-content:space-between;align-items:flex-end}
+.os-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.45);margin-bottom:2px}
+.os-num{font-size:28px;font-weight:800;color:white;line-height:1}
+.os-btn{width:100%;padding:8px;border-radius:6px;background:rgba(255,255,255,.12);border:none;color:white;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)}
+.os-btn:hover{background:rgba(255,255,255,.2)}
+
+/* ══ SAMI TRIAGE BANNER ══════════════════════════════════════════════
+   This is the key new component — appears at the top of the notification
+   section to explain what SAMI did before the partner sees the table.
+*/
+.sami-triage-banner{
+  background:linear-gradient(135deg,#1E1B4B 0%,#312E81 100%);
+  border-radius:var(--radius-lg);
+  padding:14px 20px;
+  margin-bottom:0;
+  display:flex;align-items:center;gap:16px;
+  border-bottom:2px solid rgba(99,102,241,.4);
+}
+.stb-badge{
+  background:#ff5d00;color:white;
+  font-size:10px;font-weight:800;padding:3px 8px;
+  border-radius:5px;letter-spacing:.06em;flex-shrink:0;
+  align-self:flex-start;margin-top:1px;
+}
+.stb-text{flex:1}
+.stb-headline{font-size:13.5px;font-weight:700;color:white;margin-bottom:3px}
+.stb-sub{font-size:12px;color:rgba(255,255,255,.6);line-height:1.45}
+.stb-stats{display:flex;gap:20px;flex-shrink:0}
+.stb-stat{text-align:center}
+.stb-stat-num{font-size:24px;font-weight:900;color:white;line-height:1;font-variant-numeric:tabular-nums}
+.stb-stat-lbl{font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
+.stb-toggle{
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
+  color:rgba(255,255,255,.8);font-size:11.5px;font-weight:600;
+  padding:6px 12px;border-radius:6px;cursor:pointer;flex-shrink:0;
+  font-family:var(--font);transition:all .15s;
+}
+.stb-toggle:hover{background:rgba(255,255,255,.2)}
+
+/* ══ NOTIFICATION SECTION ════════════════════════════════════════════ */
+.notif-section{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden}
+.notif-header{
+  padding:12px 18px 0;
+  border-bottom:1px solid var(--border);
+}
+.notif-header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.nh-title{font-size:14px;font-weight:700;color:var(--text-1)}
+.nh-sub{font-size:12px;color:var(--text-3);margin-top:1px}
+.nh-actions{display:flex;gap:8px;align-items:center}
+
+/* View toggle */
+.view-toggle{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:2px;gap:2px}
+.vt-btn{padding:4px 12px;border-radius:4px;border:none;font-size:11.5px;font-weight:600;color:var(--text-3);background:transparent;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px}
+.vt-btn.active{background:var(--white);color:var(--text-1);box-shadow:var(--shadow-sm)}
+.vt-btn .vt-count{background:var(--orange);color:white;border-radius:10px;padding:0 5px;font-size:10px;font-weight:700;min-width:16px;text-align:center}
+
+/* Filter tabs */
+.notif-tabs{display:flex;gap:0;overflow-x:auto}
+.ntab{
+  padding:8px 16px;border:none;background:transparent;
+  font-size:12.5px;font-weight:500;color:var(--text-3);
+  cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;
+  transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:6px;
+  font-family:var(--font);
+}
+.ntab:hover{color:var(--text-1)}
+.ntab.active{color:#ff5d00;border-bottom-color:#ff5d00;font-weight:600}
+.ntab-badge{
+  background:var(--bg);color:var(--text-3);border:1px solid var(--border);
+  font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;
+}
+.ntab.active .ntab-badge{background:rgba(255,93,0,.1);color:#ff5d00;border-color:rgba(255,93,0,.3)}
+
+/* Toolbar */
+.notif-toolbar{
+  padding:10px 18px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;background:var(--bg);
+}
+.nt-search{
+  display:flex;align-items:center;gap:7px;flex:1;max-width:360px;
+  background:var(--white);border:1px solid var(--border);
+  border-radius:6px;padding:6px 10px;font-size:12.5px;
+}
+.nt-search input{border:none;outline:none;background:transparent;font-size:12.5px;font-family:var(--font);color:var(--text-1);flex:1}
+.nt-search input::placeholder{color:var(--text-4)}
+.nt-counts{display:flex;gap:16px;align-items:center}
+.nt-count{font-size:13px;font-weight:700}
+.nt-count span{font-weight:400;color:var(--text-3);font-size:12px}
+.nt-count.c-total{color:var(--orange)}
+.nt-count.c-security{color:var(--red)}
+.nt-count.c-system{color:var(--blue)}
+.nt-count.c-license{color:var(--amber)}
+.nt-spacer{flex:1}
+.nt-btn{
+  display:flex;align-items:center;gap:5px;padding:5px 10px;
+  border-radius:6px;border:1px solid var(--border);background:var(--white);
+  font-size:12px;font-weight:600;color:var(--text-2);cursor:pointer;
+  font-family:var(--font);transition:all .15s;
+}
+.nt-btn:hover{background:var(--bg)}
+.range-select{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:6px;padding:5px 10px;font-size:12px;font-weight:600;
+  color:var(--text-2);cursor:pointer;font-family:var(--font);
+}
+
+/* ══ TABLE ══════════════════════════════════════════════════════════ */
+.notif-table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{
+  padding:9px 14px;font-size:11px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.07em;
+  color:var(--text-3);background:var(--bg);
+  border-bottom:1px solid var(--border);
+  text-align:left;white-space:nowrap;
+}
+th.check-col{width:36px;padding:9px 12px}
+td{
+  padding:10px 14px;font-size:12.5px;color:var(--text-2);
+  border-bottom:1px solid var(--border-light);
+  vertical-align:middle;
+}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#FAFAFA}
+tr.row-selected td{background:var(--blue-bg)}
+
+/* Priority badges — exact match to NSM product */
+.pri{font-size:11.5px;font-weight:700}
+.pri-emergency{color:#B91C1C}
+.pri-critical{color:#DC2626}
+.pri-warning{color:var(--amber)}
+.pri-alert{color:var(--orange)}
+.pri-notice{color:var(--blue)}
+.pri-info{color:var(--text-3)}
+.pri-debug{color:var(--text-4)}
+
+.tenant-link{display:flex;align-items:center;gap:5px;color:var(--text-2);font-weight:500}
+.tenant-link .partner-icon{font-size:11px;color:var(--text-4)}
+
+.alert-state-select{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:5px;padding:3px 8px;font-size:11.5px;
+  color:var(--text-2);cursor:pointer;font-family:var(--font);
+}
+.type-chip{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:500;color:var(--text-2)}
+.action-link{color:var(--blue);font-size:12px;font-weight:600;text-decoration:none;cursor:pointer}
+.action-link:hover{text-decoration:underline}
+
+/* ══ AI GROUP ROW — THE KEY NEW COMPONENT ═══════════════════════════
+   This is what SAMI injects above a cluster of related raw alerts.
+   It collapses/expands the raw rows beneath it.
+*/
+.ai-group-row td{padding:0;border-bottom:none}
+.ai-group-header{
+  background:linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
+  border-top:2px solid var(--indigo);
+  padding:10px 14px;
+  display:flex;align-items:flex-start;gap:12px;
+  cursor:pointer;
+  transition:background .15s;
+}
+.ai-group-header:hover{background:linear-gradient(135deg,#E0E7FF 0%,#C7D2FE 100%)}
+.ai-group-header.aig-red{background:linear-gradient(135deg,#FEF2F2 0%,#FEE2E2 100%);border-top-color:var(--red)}
+.ai-group-header.aig-red:hover{background:linear-gradient(135deg,#FEE2E2 0%,#FECACA 100%)}
+.ai-group-header.aig-amber{background:linear-gradient(135deg,#FFFBEB 0%,#FEF3C7 100%);border-top-color:var(--amber)}
+.ai-group-header.aig-amber:hover{background:linear-gradient(135deg,#FEF3C7 0%,#FDE68A 100%)}
+.ai-group-header.aig-blue{background:linear-gradient(135deg,#EFF6FF 0%,#DBEAFE 100%);border-top-color:var(--blue)}
+.ai-group-header.aig-blue:hover{background:linear-gradient(135deg,#DBEAFE 0%,#BFDBFE 100%)}
+.ai-group-header.aig-green{background:linear-gradient(135deg,#F0FDF4 0%,#DCFCE7 100%);border-top-color:var(--green)}
+.aig-sami-mark{
+  background:#ff5d00;color:white;
+  font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px;
+  letter-spacing:.05em;flex-shrink:0;margin-top:1px;
+}
+.aig-left{flex:1}
+.aig-title{font-size:13px;font-weight:700;color:var(--text-1);margin-bottom:3px;line-height:1.35}
+.aig-meta{font-size:11.5px;color:var(--text-3);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.aig-meta-item{display:flex;align-items:center;gap:3px}
+.aig-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.aig-count{
+  font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;
+  background:rgba(99,102,241,.12);color:var(--indigo);border:1px solid var(--indigo-border);
+  white-space:nowrap;
+}
+.aig-count.cnt-red{background:rgba(239,68,68,.1);color:var(--red);border-color:var(--red-border)}
+.aig-count.cnt-amber{background:rgba(245,158,11,.1);color:#92400E;border-color:var(--amber-border)}
+.aig-count.cnt-blue{background:rgba(59,130,246,.1);color:var(--blue);border-color:var(--blue-border)}
+.aig-count.cnt-green{background:rgba(34,197,94,.1);color:#15803D;border-color:var(--green-border)}
+.aig-action-btn{
+  display:flex;align-items:center;gap:5px;padding:5px 12px;
+  border-radius:6px;border:none;font-size:11.5px;font-weight:700;
+  cursor:pointer;font-family:var(--font);transition:all .15s;white-space:nowrap;
+}
+.aig-btn-primary{background:var(--indigo);color:white}
+.aig-btn-primary:hover{background:#4F46E5}
+.aig-btn-primary.red{background:var(--red)}
+.aig-btn-primary.red:hover{background:#DC2626}
+.aig-btn-primary.amber{background:var(--amber);color:white}
+.aig-btn-primary.amber:hover{background:#D97706}
+.aig-btn-secondary{background:var(--white);border:1px solid var(--border);color:var(--text-2)}
+.aig-btn-secondary:hover{background:var(--bg)}
+.aig-expand-icon{font-size:11px;color:var(--text-3);transition:transform .2s;flex-shrink:0}
+.aig-expand-icon.open{transform:rotate(180deg)}
+
+/* Raw rows nested under a group — slightly indented */
+.raw-row td{background:#FEFEFF}
+.raw-row td:first-child{padding-left:28px}
+.raw-row.hidden{display:none}
+.raw-indent{display:flex;align-items:center;gap:6px}
+.raw-tree-line{
+  width:16px;height:16px;flex-shrink:0;
+  border-left:2px solid var(--indigo-border);border-bottom:2px solid var(--indigo-border);
+  border-radius:0 0 0 4px;
+  margin-right:4px;
+}
+.raw-row.tree-red .raw-tree-line{border-color:var(--red-border)}
+.raw-row.tree-amber .raw-tree-line{border-color:var(--amber-border)}
+.raw-row.tree-blue .raw-tree-line{border-color:var(--blue-border)}
+
+/* Standalone alert rows (not grouped) */
+.solo-row td{background:var(--white)}
+
+/* ══ WHY DRAWER ══════════════════════════════════════════════════════ */
+.wd-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);backdrop-filter:blur(2px);z-index:200}
+.wd-overlay.open{display:block}
+.wd-panel{
+  position:fixed;right:0;top:0;bottom:0;width:440px;
+  background:var(--white);border-left:1px solid var(--border);
+  box-shadow:var(--shadow-xl);display:flex;flex-direction:column;
+  transform:translateX(100%);transition:transform .28s ease;z-index:210;
+}
+.wd-panel.open{transform:translateX(0)}
+.wd-head{padding:16px 18px 14px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px}
+.wd-badge{background:#ff5d00;color:white;font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:4px;letter-spacing:.05em;flex-shrink:0;margin-top:2px}
+.wd-head-body{flex:1}
+.wd-title{font-size:14.5px;font-weight:800;color:var(--text-1);margin-bottom:2px;line-height:1.3}
+.wd-sub{font-size:11.5px;color:var(--text-3)}
+.wd-close{width:24px;height:24px;border-radius:5px;border:1px solid var(--border);background:var(--white);cursor:pointer;font-size:12px;color:var(--text-3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.wd-close:hover{background:var(--bg)}
+.wd-body{flex:1;overflow-y:auto;padding:16px 18px}
+.wd-section{margin-bottom:18px}
+.wd-sec-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text-4);margin-bottom:8px}
+.wd-signal{display:flex;align-items:flex-start;gap:8px;padding:9px 11px;background:var(--bg);border:1px solid var(--border-light);border-radius:var(--radius);margin-bottom:5px}
+.wd-sig-icon{font-size:13px;flex-shrink:0;margin-top:1px}
+.wd-sig-text{font-size:12.5px;color:var(--text-2);line-height:1.5}
+.wd-sig-text strong{color:var(--text-1);font-weight:700}
+.wd-timeline{display:flex;flex-direction:column;gap:0}
+.wd-tl-item{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--border-light)}
+.wd-tl-item:last-child{border-bottom:none}
+.wd-tl-left{display:flex;flex-direction:column;align-items:center;gap:0;width:60px;flex-shrink:0}
+.wd-tl-time{font-size:11px;font-weight:700;color:var(--text-3);white-space:nowrap}
+.wd-tl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.wd-tl-right{font-size:12.5px;color:var(--text-2);line-height:1.5}
+.wd-tl-right strong{color:var(--text-1);font-weight:700}
+.wd-conf-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.wd-conf-label{font-size:12px;color:var(--text-3);flex:1}
+.wd-conf-bar-wrap{flex:1.5;height:5px;background:var(--border-light);border-radius:3px;overflow:hidden}
+.wd-conf-bar{height:100%;border-radius:3px}
+.wd-conf-pct{font-size:12px;font-weight:700;color:var(--text-1);min-width:32px;text-align:right}
+.wd-footer{padding:14px 18px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0}
+.wd-btn-primary{flex:1;padding:10px 16px;border-radius:var(--radius);background:#ff5d00;color:white;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)}
+.wd-btn-primary:hover{background:#E05200}
+.wd-btn-secondary{padding:10px 14px;border-radius:var(--radius);background:var(--white);color:var(--text-2);border:1px solid var(--border);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)}
+.wd-btn-secondary:hover{background:var(--bg)}
+
+/* ══ ACTION CONFIRM MODAL ════════════════════════════════════════════ */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(3px);z-index:300;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-box{
+  background:var(--white);border-radius:16px;width:480px;max-width:95vw;
+  box-shadow:var(--shadow-xl);animation:modalIn .2s ease;overflow:hidden;
+}
+@keyframes modalIn{from{opacity:0;transform:scale(.97) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-stripe{height:4px}
+.stripe-red{background:linear-gradient(90deg,var(--red),#F87171)}
+.stripe-indigo{background:linear-gradient(90deg,var(--indigo),#818CF8)}
+.stripe-orange{background:linear-gradient(90deg,#ff5d00,var(--orange))}
+.modal-body{padding:22px 26px 18px}
+.modal-eyebrow{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--text-4);margin-bottom:6px}
+.modal-title{font-size:19px;font-weight:800;color:var(--text-1);margin-bottom:4px;line-height:1.2}
+.modal-desc{font-size:13px;color:var(--text-3);margin-bottom:18px;line-height:1.5}
+.modal-impact{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:16px}
+.mi-row{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text-2);line-height:1.55;margin-bottom:6px}
+.mi-row:last-child{margin-bottom:0}
+.mi-row strong{color:var(--text-1);font-weight:700}
+.modal-steps-label{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text-4);margin-bottom:8px}
+.modal-steps{display:flex;flex-direction:column;gap:6px;margin-bottom:20px}
+.modal-step{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-2)}
+.ms-dot{width:6px;height:6px;border-radius:50%;background:#ff5d00;flex-shrink:0}
+.modal-btns{display:flex;gap:10px}
+.modal-btn-confirm{flex:1;padding:11px 18px;border-radius:var(--radius);background:#ff5d00;color:white;border:none;font-size:13.5px;font-weight:700;cursor:pointer;font-family:var(--font)}
+.modal-btn-confirm:hover{background:#E05200}
+.modal-btn-cancel{padding:11px 16px;border-radius:var(--radius);background:var(--white);color:var(--text-2);border:1.5px solid var(--border);font-size:13.5px;font-weight:600;cursor:pointer;font-family:var(--font)}
+.modal-btn-cancel:hover{background:var(--bg)}
+
+/* ══ PROCESS EXPLAINER (side panel showing the "how") ═══════════════ */
+.explainer-bar{
+  background:var(--white);border-left:1px solid var(--border);
+  width:320px;flex-shrink:0;overflow-y:auto;
+  border-right:none;
+}
+.eb-head{padding:14px 16px;border-bottom:1px solid var(--border);background:var(--navy)}
+.eb-head-title{font-size:13px;font-weight:700;color:white;margin-bottom:2px}
+.eb-head-sub{font-size:11px;color:rgba(255,255,255,.5)}
+.eb-section{padding:14px 16px;border-bottom:1px solid var(--border)}
+.eb-step-num{
+  width:20px;height:20px;border-radius:50%;background:#ff5d00;
+  color:white;font-size:10px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.eb-step-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
+.eb-step-row:last-child{margin-bottom:0}
+.eb-step-body{flex:1}
+.eb-step-title{font-size:12.5px;font-weight:700;color:var(--text-1);margin-bottom:3px}
+.eb-step-desc{font-size:11.5px;color:var(--text-3);line-height:1.5}
+.eb-section-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text-4);margin-bottom:10px}
+.eb-number-row{display:flex;gap:10px;margin-bottom:12px}
+.eb-num-box{flex:1;background:var(--bg);border:1px solid var(--border-light);border-radius:var(--radius);padding:10px 12px;text-align:center}
+.eb-num-val{font-size:22px;font-weight:800;line-height:1;margin-bottom:2px}
+.eb-num-lbl{font-size:10px;font-weight:600;color:var(--text-4);text-transform:uppercase;letter-spacing:.06em}
+.eb-rule{display:flex;align-items:flex-start;gap:7px;margin-bottom:7px;font-size:11.5px;color:var(--text-2)}
+.eb-rule-dot{width:5px;height:5px;border-radius:50%;background:var(--indigo);flex-shrink:0;margin-top:4px}
+.eb-rule strong{color:var(--text-1);font-weight:700}
+
+/* Utility */
+.flex-center{display:flex;align-items:center;gap:6px}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:var(--radius);font-size:12px;font-weight:600;font-family:var(--font);border:1px solid transparent;cursor:pointer;transition:all .15s}
+.btn-primary{background:#ff5d00;color:white;border-color:#ff5d00}
+.btn-primary:hover{background:#E05200}
+.btn-secondary{background:var(--white);color:var(--text-2);border-color:var(--border)}
+.btn-secondary:hover{background:var(--bg)}
+.btn-ghost{background:transparent;color:var(--text-3);border-color:var(--border)}
+.btn-ghost:hover{background:var(--bg)}
+.checkbox{width:14px;height:14px;cursor:pointer;accent-color:#ff5d00}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:livePulse 2s infinite;flex-shrink:0}
+@keyframes livePulse{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}50%{box-shadow:0 0 0 4px rgba(34,197,94,0)}}
+
+/* Layout wrapper with explainer panel */
+.outer-wrap{display:flex;height:100%;overflow:hidden}
+.dashboard-area{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-logo">S</div>
+    <button class="sb-btn active"><span>⊞</span></button>
+    <button class="sb-btn"><span>◫</span><span class="sb-badge">6</span></button>
+    <button class="sb-btn"><span>☰</span></button>
+    <button class="sb-btn"><span>◉</span><span class="sb-badge" style="background:var(--amber)">3</span></button>
+    <div class="sb-divider"></div>
+    <button class="sb-btn"><span>🛡</span></button>
+    <button class="sb-btn"><span>📡</span></button>
+    <button class="sb-btn"><span>⚡</span></button>
+    <div class="sb-bottom">
+      <button class="sb-btn"><span>⚙</span></button>
+      <button class="sb-btn"><span style="font-size:12px;font-weight:800;color:rgba(255,255,255,0.6)">HN</span></button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <span class="tb-crumb">Dashboard</span>
+      <div class="tb-spacer"></div>
+      <div class="tb-search">🔍 <span style="color:var(--text-4)">Search friendly name / issue type / priority…</span></div>
+      <div class="tb-select">👥 All Tenants (Global) ▾</div>
+      <button class="tb-icon" style="position:relative">🔔<div class="tb-notif-dot"></div></button>
+      <button class="tb-icon">💬</button>
+      <button class="tb-icon">⚙️</button>
+      <div class="tb-avatar">HN</div>
+    </div>
+
+    <!-- OUTER WRAP: dashboard + explainer panel -->
+    <div class="outer-wrap">
+
+      <!-- MAIN DASHBOARD CONTENT -->
+      <div class="dashboard-area" id="dashArea">
+
+        <!-- OVERVIEW TILES -->
+        <div style="display:flex;gap:14px;margin-bottom:16px;align-items:stretch">
+          <div class="overview-section" style="flex:1">
+            <div class="overview-header">
+              <div class="overview-header-left">Overview · Active Product</div>
+              <div class="overview-header-right">◀ ▶</div>
+            </div>
+            <div class="overview-tiles">
+              <div class="overview-tile">
+                <div class="ot-label">🔥 Firewall</div>
+                <div class="ot-num">111</div>
+                <div class="ot-attn"><span style="font-size:11px;color:var(--text-3)">Need Attention</span></div>
+                <div style="margin-top:4px;display:flex;gap:5px"><span class="attn-chip chip-warn">⚠ 2</span><span class="attn-chip chip-eol">EOL 6</span></div>
+              </div>
+              <div class="overview-tile">
+                <div class="ot-label">☁ Cloud Secure Edge</div>
+                <div class="ot-num">2</div>
+                <div style="margin-top:4px"><span style="font-size:11.5px;color:var(--text-3)">Active Licenses</span></div>
+              </div>
+              <div class="overview-tile">
+                <div class="ot-label">📶 Access Point</div>
+                <div class="ot-num">10</div>
+                <div style="margin-top:4px"><span class="attn-chip chip-crit">1</span></div>
+              </div>
+              <div class="overview-tile">
+                <div class="ot-label">🔀 Switch</div>
+                <div class="ot-num">9</div>
+                <div style="margin-top:4px"><span class="attn-chip chip-crit">1</span></div>
+              </div>
+              <div class="overview-tile">
+                <div class="ot-label">💻 Capture Client</div>
+                <div class="ot-num">1</div>
+                <div style="margin-top:4px"><span class="attn-chip chip-crit">1</span></div>
+              </div>
+              <div class="overview-tile">
+                <div class="ot-label">🔒 Capture MDR</div>
+                <div class="ot-num">2</div>
+                <div style="margin-top:4px"><span style="font-size:11.5px;color:var(--text-3)">Need Attention: 0</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="org-summary">
+            <div>
+              <div class="os-label">Tenants</div>
+              <div class="os-num">98</div>
+            </div>
+            <div>
+              <div class="os-label">Need Attention</div>
+              <div class="os-num" style="color:#FCA5A5">3</div>
+            </div>
+            <button class="os-btn" style="margin-top:4px">+ Create Tenant</button>
+          </div>
+        </div>
+
+        <!-- SAMI TRIAGE BANNER — explains what AI did before partner sees table -->
+        <div class="sami-triage-banner" style="border-radius:var(--radius-lg) var(--radius-lg) 0 0">
+          <div class="stb-badge">SAMI</div>
+          <div class="stb-text">
+            <div class="stb-headline">AI triaged 524 alerts → 14 correlated issues. 10 auto-resolved. 4 need you.</div>
+            <div class="stb-sub">SAMI grouped related alerts by root cause, device cluster, and tenant. Raw alerts are preserved below each group — click any group to expand.</div>
+          </div>
+          <div class="stb-stats">
+            <div class="stb-stat"><div class="stb-stat-num" style="color:#6EE7B7">510</div><div class="stb-stat-lbl">Noise reduced</div></div>
+            <div class="stb-stat"><div class="stb-stat-num" style="color:#FCA5A5">4</div><div class="stb-stat-lbl">Need action</div></div>
+          </div>
+          <button class="stb-toggle" onclick="toggleAllRaw()">Show all raw alerts</button>
+        </div>
+
+        <!-- NOTIFICATION SECTION -->
+        <div class="notif-section">
+          <div class="notif-header">
+            <div class="notif-header-top">
+              <div>
+                <div class="nh-title">Notifications
+                  <span style="margin-left:8px;background:var(--red-bg);color:var(--red);border:1px solid var(--red-border);font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:10px;">4 Need Action</span>
+                </div>
+                <div class="nh-sub">Notifications for Product Alerts · AI triage active</div>
+              </div>
+              <div class="nh-actions">
+                <div class="view-toggle">
+                  <button class="vt-btn active" id="btnGrouped" onclick="setView('grouped')">✦ SAMI Grouped <span class="vt-count">14</span></button>
+                  <button class="vt-btn" id="btnRaw" onclick="setView('raw')">Raw Alerts <span class="vt-count" style="background:var(--text-3)">524</span></button>
+                </div>
+                <button class="btn btn-ghost" style="font-size:11.5px">⬇ Export</button>
+                <button class="btn btn-ghost" style="font-size:11.5px">↺ Refresh</button>
+              </div>
+            </div>
+            <!-- Tabs: device types -->
+            <div class="notif-tabs">
+              <button class="ntab active" onclick="setTab(this,'fw')">Firewalls <span class="ntab-badge">8</span></button>
+              <button class="ntab" onclick="setTab(this,'ap')">Access Points <span class="ntab-badge">3</span></button>
+              <button class="ntab" onclick="setTab(this,'sw')">Switches <span class="ntab-badge">2</span></button>
+              <button class="ntab" onclick="setTab(this,'cc')">Capture Client <span class="ntab-badge">1</span></button>
+              <button class="ntab" onclick="setTab(this,'mdr')">Capture Client MDR <span class="ntab-badge">0</span></button>
+            </div>
+          </div>
+
+          <!-- Toolbar -->
+          <div class="notif-toolbar">
+            <div class="nt-search"><span style="color:var(--text-4)">🔍</span><input placeholder="Search friendly name / issue type / priority / tenant…"></div>
+            <div class="nt-counts">
+              <div class="nt-count c-total">524 <span>total</span></div>
+              <div class="nt-count c-security">1 <span>security</span></div>
+              <div class="nt-count c-system">519 <span>system</span></div>
+              <div class="nt-count c-license">4 <span>license</span></div>
+            </div>
+            <div class="nt-spacer"></div>
+            <div class="flex-center" style="gap:6px;font-size:12px;color:var(--text-3)">
+              <div class="live-dot"></div> 7 Days
+            </div>
+            <select class="range-select"><option>7 Days</option><option>24 Hours</option><option>30 Days</option></select>
+            <button class="nt-btn">🗺 Map</button>
+            <button class="nt-btn" style="background:var(--indigo-bg);border-color:var(--indigo-border);color:var(--indigo)">☰ List</button>
+          </div>
+
+          <!-- ══ TABLE — SAMI GROUPED VIEW ══ -->
+          <div class="notif-table-wrap" id="groupedView">
+            <table id="mainTable">
+              <thead>
+                <tr>
+                  <th class="check-col"><input type="checkbox" class="checkbox"></th>
+                  <th>Local Time ↓</th>
+                  <th>SAMI Analysis / Message</th>
+                  <th>Priority</th>
+                  <th>Tenant</th>
+                  <th>Alert State</th>
+                  <th>Type</th>
+                  <th>Friendly Name</th>
+                  <th>Category</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody">
+
+                <!-- ══ GROUP 1: CRITICAL — Coordinated lateral movement ═══════
+                     Raw inputs: 47 Emergency/Warning alerts across 3 tenants
+                     SAMI output: 1 correlated group with root cause + action
+                -->
+                <tr class="ai-group-row">
+                  <td colspan="10">
+                    <div class="ai-group-header aig-red" onclick="toggleGroup('g1')">
+                      <span class="aig-sami-mark">SAMI</span>
+                      <div class="aig-left">
+                        <div class="aig-title">🔴 Coordinated lateral movement — same adversary TTP across 3 tenants · 7 endpoints auto-isolated</div>
+                        <div class="aig-meta">
+                          <span class="aig-meta-item">📅 14 May 2026 02:07–08:09</span>
+                          <span class="aig-meta-item">👥 Acme Corp · Westfield IT · Riverside Mfg</span>
+                          <span class="aig-meta-item" style="color:var(--red);font-weight:700">Root cause: shared C2 beacon · same IP cluster 45.77.x.x</span>
+                        </div>
+                      </div>
+                      <div class="aig-right">
+                        <span class="aig-count cnt-red">47 raw alerts</span>
+                        <button class="aig-action-btn aig-btn-primary red" onclick="event.stopPropagation();openModal('lateral')">Escalate to clients →</button>
+                        <button class="aig-action-btn aig-btn-secondary" onclick="event.stopPropagation();openWhy('lateral')">Why? →</button>
+                        <span class="aig-expand-icon open" id="g1-icon">▼</span>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <!-- Raw rows for group 1 -->
+                <tr class="raw-row tree-red" id="g1-r1"><td><input type="checkbox" class="checkbox"></td><td style="white-space:nowrap;font-size:12px">14 May 2026<br>02:07:32</td><td><div class="raw-indent"><div class="raw-tree-line"></div>Device Remote Branch 2 interface X2 down — <em>unusual for this time window</em></div></td><td class="pri pri-warning">Warning</td><td><span class="tenant-link"><span class="partner-icon">🔗</span>Acme Tenant 1</span></td><td><select class="alert-state-select"><option>New</option><option>Acknowledged</option></select></td><td><span class="type-chip">☑ Interfaces</span></td><td>Remote Branch 2</td><td>SYSTEM</td><td>—</td></tr>
+                <tr class="raw-row tree-red" id="g1-r2"><td><input type="checkbox" class="checkbox"></td><td style="white-space:nowrap;font-size:12px">14 May 2026<br>02:16:20</td><td><div class="raw-indent"><div class="raw-tree-line"></div>Device Remote Branch 2 interface X0 down</div></td><td class="pri pri-warning">Warning</td><td><span class="tenant-link"><span class="partner-icon">🔗</span>Acme Tenant 1</span></td><td><select class="alert-state-select"><option>New</option></select></td><td><span class="type-chip">☑ Interfaces</span></td><td>Remote Branch 2</td><td>SYSTEM</td><td>—</td></tr>
+                <tr class="raw-row tree-red" id="g1-r3"><td><input type="checkbox" class="checkbox"></td><td style="white-space:nowrap;font-size:12px">14 May 2026<br>02:28:38</td><td><div class="raw-indent"><div class="raw-tree-line"></div>Connection to Remote Branch 1 failed — <em>3rd failure in 90 min</em></div></td><td class="pri pri-emergency">Emergency</td><td><span class="tenant-link"><span class="partner-icon">🔗</span>Acme Tenant 1</span></td><td><select class="alert-state-select"><option>New</option></select></td><td><span class="type-chip">☑ Health Status</span></td><td>Remote Branch 1</td><td>SYSTEM</td><td>—</td></tr>
+                <tr class="raw-row tree-red hidden" id="g1-r4"><td><input type="checkbox" class="checkbox"></td><td style="white-space:nowrap;font-size:12px">14 May 2026<br>06:12:00</td><td><div class="raw-indent"><div class="raw-tree-line"></div>Unusual outbound traffic pattern — Westfield IT endpoint cluster</div></td><td class="pri pri-emergency">Emergency</td><td><span class="tenant-link"><span class="partner-icon">🔗</span>Westfield IT</span></td><td><select class="alert-state-select"><option>New</option></select></td><td><span class="type-chip">☑ Health Status</span></td><td>WIT-FW-01</td><td>SECURITY</td><td>—</td></tr>
+                <tr class="raw-row tree-red hidden" id="g1-r5"><td><input type="checkbox" class="checkbox"></td><td style="white-space:nowrap;font-size:12px">14 May 2026<br>08:09:14</td><td><div class="raw-indent"><div class="raw-tree-line"></div>Riverside Mfg — lateral movement pattern, 2 endpoints isolated by SAMI</div></td><td class="pri pri-emergency">Emergency</td><td><span class="tenant-link"><span class="partner-icon">🔗</span>Riverside Mfg</span></td><td><select class="alert-state-select"><option>New</option></select></td><td><span class="type-chip">☑ Health Status</span></td><td>RM-FW-03</td><td>SECURITY</td><td>—</td></tr>
+                <tr class="raw-row tree-red hidden" id="g1-r6"><td colspan="10" style="padding:8px 14px 8px 42px;background:#FEF9F9"><span style="font-size:11.5px;color:var(--text-4);font-style:italic">+ 42 more related alerts grouped by SAMI — </span><button onclick="openWhy('lateral')" style="font-size:11.5px;color:var(--red);font-weight:700;background:none;border:none;cursor:pointer;padding:0">view full timeline →</button></td></tr>
+
+                <!-- ══ GROUP 2: WARNING — License expiry cluster ═══════════════
+                     Raw inputs: 4 separate license alerts, same expiry window
+                     SAMI output: 1 grouped renewal action
+                -->
+                <tr class="ai-group-row">
+                  <td colspan="10">
+                    <div class="ai-group-header aig-amber" onclick="toggleGroup('g2')">
+                      <span class="aig-sami-mark">SAMI</span>
+                      <div class="aig-left">
+                        <div class="aig-title">🟡 License expiry cluster — 4 tenants, $287K ARR at risk · SKUs pre-built for 3</div>
+                        <div class="aig-meta">
+                          <span class="aig-meta-item">📅 Expiring 25 May–08 Jun 2026</span>
+                          <span class="aig-meta-item">👥 swapna6 · Acme Tenant 1 · Westfield IT · Multiregion_june_US</span>
+                          <span class="aig-meta-item" style="color:#92400E;font-weight:700">Root cause: renewal not initiated for any of 4 accounts</span>
+                        </div>
+                      </div>
+                      <div class="aig-right">
+                        <span class="aig-count cnt-amber">4 raw alerts</span>
+                        <button class="aig-action-btn aig-btn-primary amber" onclick="event.stopPropagation();openModal('renewal')">Start renewals →</button>
+                        <button class="aig-action-btn aig-btn-secondary" onclick="event.stopPropagation();openWhy('renewal')">Why? →</button>
+                        <span class="aig-expand-icon open" id="g2-icon">▼</span>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <!-- Raw rows for group 2 -->
+                <tr class="raw-row tree-amber" id="g2-r1"><td><input type="checkbox" class="checkbox"></td><td style="white-space:nowrap;font-size:12px">14 May 2026<br>17:01:35</td><td><div class="raw-indent"><div class="raw-tree-line" style="border-color:var(--amber-border)"></div>SonicWave 621 North America — WNM subscription expires 30 days on 2026/04/14</div></td><td class="pri pri-critical">Critical</td><td><span class="tenant-link"><span class="partner-icon">🔗</span>swapna6</span></td><td><select class="alert-state-select"><option>New</option></select></td><td><span class="type-chip">☑ Device Status</span></td><td>SonicWave 621 NA</td><td>LICENSE</td><td><a class="action-link">View Source</a></td></tr>
+                <tr class="raw-row tree-amber" id="g2-r2"><td><input type="checkbox" class="checkbox"></td><td style="white-space:nowrap;font-size:12px">13 May 2026<br>17:01:25</td><td><div class="raw-indent"><div class="raw-tree-line" style="border-color:var(--amber-border)"></div>SonicWave 621 — license expires within 15 days on 2026/05/28</div></td><td class="pri pri-warning">Warning</td><td><span class="tenant-link"><span class="partner-icon">🔗</span>Acme Tenant 1</span></td><td><select class="alert-state-select"><option>New</option></select></td><td><span class="type-chip">☑ Device Status</span></td><td>SonicWave 621</td><td>LICENSE</td><td><a class="action-link">View Source</a></td></tr>
+                <tr class="raw-row tree-amber" id="g2-r3"><td><input type="checkbox" class="checkbox"></td><td style="white-space:nowrap;font-size:12px">10 May 2026<br>21:31:31</td><td><div class="raw-indent"><div class="raw-tree-line" style="border-color:var(--amber-border)"></div>License expires: Multiregion_june_US-CC000000A6E2 at 06/08/2026</div></td><td class="pri pri-alert">Alert</td><td><span class="tenant-link"><span class="partner-icon">🔗</span>Multiregion_june_US</span></td><td><select class="alert-state-select"><option>New</option></select></td><td><span class="type-chip">☑ License</span></td><td>Capture Client – Multiregion</td><td>LICENSE</td><td><a class="action-link">View Source</a></td></tr>
+                <tr class="raw-row tree-amber hidden" id="g2-r4"><td><input type="checkbox" class="checkbox"></td><td style="white-space:nowrap;font-size:12px">14 May 2026<br>17:01:38</td><td><div class="raw-indent"><div class="raw-tree-line" style="border-color:var(--amber-border)"></div>SonicWall Switch SWS12-8POE — WNM subscription expires 30 days on 2026/04/14</div></td><td class="pri pri-critical">Critical</td><td><span class="tenant-link"><span class="partner-icon">🔗</span>swapna6</span></td><td><select class="alert-state-select"><option>New</option></select></td><td><span class="type-chip">☑ Device Status</span></td><td>SONICWALL SWITCH SWS12-8POE</td><td>LICENSE</td><td><a class="action-link">View Source</a></td></tr>
+
+                <!-- ══ GROUP 3: SYSTEM — Interface flap loop (noise) ═══════════
+                     Raw inputs: 14 alternating X2/X3 up/down alerts on same device
+                     SAMI output: 1 group identifying it's a port flap, not a breach
+                -->
+                <tr class="ai-group-row">
+                  <td colspan="10">
+                    <div class="ai-group-header aig-blue" onclick="toggleGroup('g3')">
+                      <span class="aig-sami-mark">SAMI</span>
+                      <div class="aig-left">
+                        <div class="aig-title">🔵 Interface flap loop — Remote Branch 2 X2/X3 cycling · likely upstream switch fault, not a security event</div>
+                        <div class="aig-meta">
+                          <span class="aig-meta-item">📅 13–14 May 2026 02:01–22:44</span>
+                          <span class="aig-meta-item">👥 Acme Tenant 1 · IP 122.171.19.150</span>
+                          <span class="aig-meta-item" style="color:var(--blue);font-weight:700">Root cause: oscillating link state on upstream switch port</span>
+                        </div>
+                      </div>
+                      <div class="aig-right">
+                        <span class="aig-count cnt-blue">14 raw alerts</span>
+                        <button class="aig-action-btn aig-btn-primary" style="background:var(--blue)" onclick="event.stopPropagation();openModal('flap')">Check switch port →</button>
+                        <button class="aig-action-btn aig-btn-secondary" onclick="event.stopPropagation();openWhy('flap')">Why? →</button>
+                        <span class="aig-expand-icon open" id="g3-icon">▼</span>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <!-- Raw rows group 3 — shows the noisy alternating pattern -->
+                <tr class="raw-row tree-blue" id="g3-r1"><td><input type="checkbox" class="checkbox"></td><td style="white-space:nowrap;font-size:12px">14 May 2026<br>22:44:46</td><td><div class="raw-indent"><div class="raw-tree-line" style="border-color:var(--blue-border)"></div>Device Remote Branch 2 interface X3 up</div></td><td class="pri pri-info">Info</td><td><span class="tenant-link"><span class="partner-icon">🔗</span>Acme Tenant 1</span></td><td><select class="alert-state-select"><option>New</option></select></td><td><span class="type-chip">☑ Interfaces</span></td><td>Remote Branch 2</td><td>SYSTEM</td><td>—</td></tr>
+                <tr class="raw-row tree-blue" id="g3-r2"><td><input type="checkbox" class="checkbox"></td><td style="white-space:nowrap;font-size:12px">13 May 2026<br>22:43:45</td><td><div class="raw-indent"><div class="raw-tree-line" style="border-color:var(--blue-border)"></div>Device Remote Branch 2 interface X3 down</div></td><td class="pri pri-warning">Warning</td><td><span class="tenant-link"><span class="partner-icon">🔗</span>Acme Tenant 1</span></td><td><select class="alert-state-select"><option>New</option></select></td><td><span class="type-chip">☑ Interfaces</span></td><td>Remote Branch 2</td><td>SYSTEM</td><td>—</td></tr>
+                <tr class="raw-row tree-blue" id="g3-r3"><td><input type="checkbox" class="checkbox"></td><td style="white-space:nowrap;font-size:12px">13 May 2026<br>07:05:09</td><td><div class="raw-indent"><div class="raw-tree-line" style="border-color:var(--blue-border)"></div>Device Remote Branch 2 interface X2 up</div></td><td class="pri pri-info">Info</td><td><span class="tenant-link"><span class="partner-icon">🔗</span>Acme Tenant 1</span></td><td><select class="alert-state-select"><option>New</option></select></td><td><span class="type-chip">☑ Interfaces</span></td><td>Remote Branch 2</td><td>SYSTEM</td><td>—</td></tr>
+                <tr class="raw-row tree-blue hidden" id="g3-r4"><td colspan="10" style="padding:8px 14px 8px 42px;background:#F0F6FF"><span style="font-size:11.5px;color:var(--text-4);font-style:italic">+ 11 more X2/X3 up/down cycles on same device — </span><button onclick="openWhy('flap')" style="font-size:11.5px;color:var(--blue);font-weight:700;background:none;border:none;cursor:pointer;padding:0">view full timeline →</button></td></tr>
+
+                <!-- ══ GROUP 4: RESOLVED — SAMI auto-resolved ════════════════
+                     SAMI already fixed this one — shows as resolved group
+                -->
+                <tr class="ai-group-row">
+                  <td colspan="10">
+                    <div class="ai-group-header aig-green" onclick="toggleGroup('g4')">
+                      <span class="aig-sami-mark">SAMI</span>
+                      <div class="aig-left">
+                        <div class="aig-title">✅ Disk scan completed — 3 Capture Client endpoints · all clean · SAMI auto-resolved</div>
+                        <div class="aig-meta">
+                          <span class="aig-meta-item">📅 11 May 2026 01:37:54</span>
+                          <span class="aig-meta-item">👥 ccqanoam_premier</span>
+                          <span class="aig-meta-item" style="color:#15803D;font-weight:700">Auto-resolved · No action required</span>
+                        </div>
+                      </div>
+                      <div class="aig-right">
+                        <span class="aig-count cnt-green">3 raw alerts</span>
+                        <span style="font-size:11.5px;color:#15803D;font-weight:700;padding:0 4px">✓ Resolved</span>
+                        <button class="aig-action-btn aig-btn-secondary" onclick="event.stopPropagation();openWhy('scan')">Why? →</button>
+                        <span class="aig-expand-icon open" id="g4-icon">▼</span>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="raw-row" id="g4-r1" style="opacity:.65"><td><input type="checkbox" class="checkbox"></td><td style="white-space:nowrap;font-size:12px">11 May 2026<br>01:37:54</td><td><div class="raw-indent"><div class="raw-tree-line" style="border-color:var(--green-border)"></div>Disk scan completed successfully on Win2019-10-5-157-120</div></td><td class="pri pri-warning">Warning</td><td><span class="tenant-link"><span class="partner-icon">🔗</span>ccqanoam_premier</span></td><td><select class="alert-state-select"><option>Resolved</option></select></td><td><span class="type-chip">☑ Device</span></td><td>Capture Client</td><td>SECURITY</td><td>—</td></tr>
+                <tr class="raw-row hidden" id="g4-r2" style="opacity:.65"><td colspan="10" style="padding:8px 14px 8px 42px;background:#F0FDF4"><span style="font-size:11.5px;color:var(--text-4);font-style:italic">+ 2 more scan complete alerts · all auto-resolved by SAMI</span></td></tr>
+
+                <!-- ══ STANDALONE ROW — system report, no grouping needed ══════ -->
+                <tr class="solo-row">
+                  <td><input type="checkbox" class="checkbox"></td>
+                  <td style="white-space:nowrap;font-size:12px">12 May 2026<br>22:53:20</td>
+                  <td>A report is ready for download: hello_bvt</td>
+                  <td class="pri pri-emergency">Emergency</td>
+                  <td><span class="tenant-link"><span class="partner-icon">🔗</span>helloprodbvts1</span></td>
+                  <td><select class="alert-state-select"><option>New</option></select></td>
+                  <td><span class="type-chip">☑ Management</span></td>
+                  <td>Capture Client-helloprodbvts1</td>
+                  <td>SYSTEM</td>
+                  <td>—</td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+
+          <!-- RAW VIEW (hidden by default) -->
+          <div id="rawView" style="display:none;padding:20px;text-align:center;color:var(--text-3)">
+            <div style="font-size:14px;font-weight:700;color:var(--text-1);margin-bottom:8px">Raw alert view — 524 alerts</div>
+            <div style="font-size:12.5px;margin-bottom:16px">This is what you'd see without SAMI triage. 524 individual rows sorted by timestamp with no grouping, no root cause, no recommended action.</div>
+            <div style="background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:var(--radius);padding:12px 16px;max-width:500px;margin:0 auto;font-size:12.5px;color:#92400E">
+              ⚠ At typical MSP scale, manually triaging 524 alerts per 7-day window across 98 tenants takes an estimated <strong>3.2 hours/day</strong> per technician. SAMI reduces this to a <strong>4-minute review</strong> of 14 grouped issues.
+            </div>
+            <button class="btn btn-primary" style="margin-top:16px" onclick="setView('grouped')">← Return to SAMI Grouped view</button>
+          </div>
+
+        </div><!-- /notif-section -->
+      </div><!-- /dashboard-area -->
+
+      <!-- ══ PROCESS EXPLAINER PANEL ════════════════════════════════ -->
+      <div class="explainer-bar">
+        <div class="eb-head">
+          <div class="eb-head-title">How SAMI Triage Works</div>
+          <div class="eb-head-sub">SOT 4 · AI as triage layer inside the notification table</div>
+        </div>
+
+        <div class="eb-section">
+          <div class="eb-section-label">The problem it solves</div>
+          <div class="eb-number-row">
+            <div class="eb-num-box"><div class="eb-num-val" style="color:var(--red)">524</div><div class="eb-num-lbl">Raw alerts</div></div>
+            <div class="eb-num-box"><div class="eb-num-val" style="color:var(--green)">14</div><div class="eb-num-lbl">After triage</div></div>
+          </div>
+          <div style="font-size:11.5px;color:var(--text-3);line-height:1.5">524 raw device alerts — interface flaps, health checks, license notices — generate overwhelming noise. A partner managing 98 tenants cannot triage this manually without missing critical threats buried in routine noise.</div>
+        </div>
+
+        <div class="eb-section">
+          <div class="eb-section-label">SAMI's triage process — 5 steps</div>
+          <div class="eb-step-row">
+            <div class="eb-step-num">1</div>
+            <div class="eb-step-body">
+              <div class="eb-step-title">Ingest & timestamp all alerts</div>
+              <div class="eb-step-desc">Every alert from all 98 tenants ingested in real-time. SAMI records device ID, tenant, source IP, alert type, and timestamp.</div>
+            </div>
+          </div>
+          <div class="eb-step-row">
+            <div class="eb-step-num">2</div>
+            <div class="eb-step-body">
+              <div class="eb-step-title">Cluster by root cause</div>
+              <div class="eb-step-desc">ML clustering groups alerts by shared device, IP range, timing pattern, and alert type. 14 interface flap alerts on the same device = 1 group, not 14 rows.</div>
+            </div>
+          </div>
+          <div class="eb-step-row">
+            <div class="eb-step-num">3</div>
+            <div class="eb-step-body">
+              <div class="eb-step-title">Cross-tenant correlation</div>
+              <div class="eb-step-desc">SAMI compares patterns across tenants. Same C2 beacon on 3 different tenant firewalls = coordinated threat, not 3 independent incidents.</div>
+            </div>
+          </div>
+          <div class="eb-step-row">
+            <div class="eb-step-num">4</div>
+            <div class="eb-step-body">
+              <div class="eb-step-title">Classify: noise vs. action</div>
+              <div class="eb-step-desc">Each group classified as: Critical (escalate now), Warning (schedule action), Info (noise/auto-resolved). Raw alerts preserved and accessible.</div>
+            </div>
+          </div>
+          <div class="eb-step-row">
+            <div class="eb-step-num">5</div>
+            <div class="eb-step-body">
+              <div class="eb-step-title">Surface with one recommended action</div>
+              <div class="eb-step-desc">Every group surfaces a single CTA. Escalate to clients. Start renewals. Check switch port. Partner clicks once — SAMI executes.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="eb-section">
+          <div class="eb-section-label">Grouping rules SAMI applies</div>
+          <div class="eb-rule"><div class="eb-rule-dot"></div><div><strong>Same device, ≤2h window:</strong> oscillating up/down alerts → 1 interface flap group</div></div>
+          <div class="eb-rule"><div class="eb-rule-dot"></div><div><strong>Same IP subnet, multiple tenants:</strong> potential cross-tenant threat → escalate immediately</div></div>
+          <div class="eb-rule"><div class="eb-rule-dot"></div><div><strong>License alerts, same expiry window:</strong> batch into a single renewal action</div></div>
+          <div class="eb-rule"><div class="eb-rule-dot"></div><div><strong>Security alert + correlated system alerts:</strong> promote severity to Critical</div></div>
+          <div class="eb-rule"><div class="eb-rule-dot"></div><div><strong>Known benign pattern (disk scan, report ready):</strong> auto-resolve, reduce to info</div></div>
+        </div>
+
+        <div class="eb-section">
+          <div class="eb-section-label">What partners can do</div>
+          <div class="eb-rule"><div class="eb-rule-dot" style="background:var(--green)"></div><div>Toggle between SAMI Grouped and Raw view at any time — no data hidden</div></div>
+          <div class="eb-rule"><div class="eb-rule-dot" style="background:var(--green)"></div><div>Expand each group to see individual raw alerts beneath it</div></div>
+          <div class="eb-rule"><div class="eb-rule-dot" style="background:var(--green)"></div><div>Click "Why?" on any group to see SAMI's confidence and reasoning</div></div>
+          <div class="eb-rule"><div class="eb-rule-dot" style="background:var(--green)"></div><div>Act on a group with a single CTA — SAMI handles execution</div></div>
+          <div class="eb-rule"><div class="eb-rule-dot" style="background:var(--red)"></div><div>If SAMI grouped incorrectly, partner can split a group and file feedback</div></div>
+        </div>
+
+      </div><!-- /explainer-bar -->
+    </div><!-- /outer-wrap -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ══ WHY DRAWER ══════════════════════════════════════════════════ -->
+<div class="wd-overlay" id="wdOverlay" onclick="closeWhy()"></div>
+<div class="wd-panel" id="wdPanel">
+  <div class="wd-head">
+    <div class="wd-badge">SAMI</div>
+    <div class="wd-head-body">
+      <div class="wd-title" id="wdTitle">Why am I seeing this group?</div>
+      <div class="wd-sub" id="wdSub">AI root cause analysis</div>
+    </div>
+    <button class="wd-close" onclick="closeWhy()">✕</button>
+  </div>
+  <div class="wd-body" id="wdBody"></div>
+  <div class="wd-footer" id="wdFooter"></div>
+</div>
+
+<!-- ══ ACTION MODAL ════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <div class="modal-stripe" id="modalStripe"></div>
+    <div class="modal-body">
+      <div class="modal-eyebrow" id="modalEyebrow"></div>
+      <div class="modal-title" id="modalTitle"></div>
+      <div class="modal-desc" id="modalDesc"></div>
+      <div class="modal-impact" id="modalImpact"></div>
+      <div class="modal-steps-label">SAMI will</div>
+      <div class="modal-steps" id="modalSteps"></div>
+      <div class="modal-btns">
+        <button class="modal-btn-confirm" id="modalConfirm" onclick="confirmAction()">Confirm</button>
+        <button class="modal-btn-cancel" onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══ GROUP TOGGLE ═══════════════════════════════════════════════════ */
+const groupRows = {
+  g1: ['g1-r1','g1-r2','g1-r3','g1-r4','g1-r5','g1-r6'],
+  g2: ['g2-r1','g2-r2','g2-r3','g2-r4'],
+  g3: ['g3-r1','g3-r2','g3-r3','g3-r4'],
+  g4: ['g4-r1','g4-r2'],
+};
+const groupState = {g1:true,g2:true,g3:true,g4:true};
+
+function toggleGroup(id) {
+  groupState[id] = !groupState[id];
+  const icon = document.getElementById(id+'-icon');
+  groupRows[id].forEach(rid => {
+    const el = document.getElementById(rid);
+    if(el) el.classList.toggle('hidden', !groupState[id]);
+  });
+  icon.classList.toggle('open', groupState[id]);
+}
+
+let allRawShown = false;
+function toggleAllRaw() {
+  allRawShown = !allRawShown;
+  Object.keys(groupRows).forEach(gid => {
+    groupRows[gid].forEach(rid => {
+      const el = document.getElementById(rid);
+      if(el) el.classList.toggle('hidden', !allRawShown);
+    });
+    groupState[gid] = allRawShown;
+    const icon = document.getElementById(gid+'-icon');
+    if(icon) icon.classList.toggle('open', allRawShown);
+  });
+}
+
+/* ══ VIEW TOGGLE (grouped / raw) ════════════════════════════════════ */
+function setView(v) {
+  document.getElementById('groupedView').style.display = v==='grouped' ? '' : 'none';
+  document.getElementById('rawView').style.display = v==='raw' ? '' : 'none';
+  document.getElementById('btnGrouped').classList.toggle('active', v==='grouped');
+  document.getElementById('btnRaw').classList.toggle('active', v==='raw');
+}
+
+/* ══ TABS ════════════════════════════════════════════════════════════ */
+function setTab(el,tab) {
+  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+/* ══ WHY DRAWER DATA ═════════════════════════════════════════════════ */
+const whyData = {
+  lateral: {
+    title:'Coordinated lateral movement — 3 tenants',
+    sub:'Cross-tenant threat correlation · 47 raw alerts → 1 group · Confidence 89%',
+    signals:[
+      {icon:'📡',text:'<strong>Identical C2 beacon fingerprint</strong> detected across Acme Corp (3 endpoints), Westfield IT (2), and Riverside Mfg (2) between 02:07–08:09 AM on 14 May 2026.'},
+      {icon:'🌐',text:'<strong>Same source IP cluster</strong> (45.77.88.x range, AS 23764) seen initiating connections on non-standard ports on all 3 tenants. Threat intel feed confirms this range associated with known APT group.'},
+      {icon:'⏱',text:'<strong>Attack sequence timing:</strong> Acme hit first at 02:07, Westfield at 06:12, Riverside at 08:09. Classic lateral pivot across managed tenants using MSP trust relationship.'},
+      {icon:'🤖',text:'<strong>7 endpoints auto-isolated</strong> by SAMI within 4 seconds of detection. No confirmed data exfiltration. SAMI is holding escalation to clients pending your approval.'},
+    ],
+    timeline:[
+      {time:'02:07',dot:'#EF4444',text:'<strong>Acme Corp</strong> — Remote Branch 2 X2 interface down. SAMI flags unusual timing.'},
+      {time:'02:28',dot:'#EF4444',text:'<strong>Acme Corp</strong> — Remote Branch 1 connection failed. 3rd failure in 90 min. SAMI escalates internally.'},
+      {time:'06:12',dot:'#EF4444',text:'<strong>Westfield IT</strong> — Unusual outbound traffic detected. Same IP range as Acme. SAMI correlates. Endpoints isolated.'},
+      {time:'08:09',dot:'#EF4444',text:'<strong>Riverside Mfg</strong> — Lateral movement confirmed. SAMI auto-isolates 2 more endpoints. Cross-tenant pattern confirmed.'},
+    ],
+    confidence:[
+      {label:'Shared adversary TTPs',pct:89,color:'#EF4444'},
+      {label:'C2 beacon match',pct:94,color:'#EF4444'},
+      {label:'Auto-isolation accuracy',pct:97,color:'#22C55E'},
+    ],
+    cta:'Approve escalation to clients',
+    cta2:'View forensic timeline',
+    modal:'lateral'
+  },
+  renewal: {
+    title:'License expiry cluster — 4 tenants · $287K ARR at risk',
+    sub:'Renewal intelligence · 4 raw alerts → 1 group · Confidence 99%',
+    signals:[
+      {icon:'💰',text:'<strong>4 separate license expiry alerts</strong> across different tenants and device types share a common pattern: all expiring within a 14-day window (May 25–Jun 8 2026). SAMI groups them as a single renewal action.'},
+      {icon:'📦',text:'<strong>Pre-built SKUs available</strong> for 3 of 4 accounts. swapna6 requires a custom quote due to multi-region licensing complexity.'},
+      {icon:'📊',text:'<strong>Acme Corp health score: 78/100</strong> — high product engagement, strong renewal likelihood. Highest urgency given 24-day window.'},
+      {icon:'⚠',text:'<strong>Post-expiry impact:</strong> configuration changes disabled 30 days after expiry. Reporting and log collection stop. Client SLA risk is high.'},
+    ],
+    timeline:[
+      {time:'May 25',dot:'#F59E0B',text:'<strong>SonicWave 621 NA (swapna6)</strong> — WNM subscription expires. Configuration lock starts.'},
+      {time:'May 28',dot:'#F59E0B',text:'<strong>SonicWave 621 (Acme Tenant 1)</strong> — 15-day window closes.'},
+      {time:'Jun 8',dot:'#F59E0B',text:'<strong>Capture Client (Multiregion_june_US)</strong> — final expiry in this cluster.'},
+    ],
+    confidence:[
+      {label:'Expiry date accuracy',pct:99,color:'#F59E0B'},
+      {label:'Churn risk if unrenewed',pct:74,color:'#F59E0B'},
+      {label:'SKU fit for upsell',pct:81,color:'#22C55E'},
+    ],
+    cta:'Start renewal for all 4 accounts',
+    cta2:'Review individual SKUs',
+    modal:'renewal'
+  },
+  flap: {
+    title:'Interface flap loop — Remote Branch 2 X2/X3',
+    sub:'Noise reduction · 14 raw alerts → 1 group · Confidence 91%',
+    signals:[
+      {icon:'🔀',text:'<strong>14 alternating up/down alerts</strong> on the same device (Remote Branch 2, IP 122.171.19.150) across interfaces X2 and X3 over 20 hours. This is a classic port flap pattern.'},
+      {icon:'🔌',text:'<strong>Root cause: upstream switch port</strong> oscillating. Not a security event. Likely a physical cable fault or auto-negotiation mismatch on the upstream switch.'},
+      {icon:'🛡',text:'<strong>No security indicators present.</strong> Traffic baseline on this device is normal. SAMI classified this as SYSTEM · Interfaces, not SECURITY.'},
+      {icon:'📋',text:'<strong>Recommended action:</strong> check the physical switch port connected to Remote Branch 2. Log into Acme Tenant 1 switch and run interface diagnostics.'},
+    ],
+    timeline:[
+      {time:'13 May 07:05',dot:'#3B82F6',text:'X2 up'},
+      {time:'13 May 22:43',dot:'#3B82F6',text:'X3 down'},
+      {time:'13 May 22:44',dot:'#3B82F6',text:'X3 up'},
+      {time:'14 May 02:07',dot:'#3B82F6',text:'X2 down — <strong>11 more cycles follow over next 20 hours</strong>'},
+    ],
+    confidence:[
+      {label:'Port flap root cause',pct:91,color:'#3B82F6'},
+      {label:'Not a security event',pct:96,color:'#22C55E'},
+      {label:'Upstream switch fault',pct:78,color:'#3B82F6'},
+    ],
+    cta:'Open switch diagnostics for Acme Tenant 1',
+    cta2:'Snooze for 24h',
+    modal:'flap'
+  },
+  scan: {
+    title:'Disk scan completed — Capture Client endpoints',
+    sub:'Auto-resolved · 3 raw alerts → 1 group · Confidence 99%',
+    signals:[
+      {icon:'✅',text:'<strong>Routine disk scan completed successfully</strong> on 3 endpoints at ccqanoam_premier. All clean. No threats detected.'},
+      {icon:'🤖',text:'<strong>SAMI auto-resolved</strong> this group. No partner action required. Alerts moved to Resolved state automatically.'},
+      {icon:'📋',text:'Scan reports available for download in the tenant\'s Capture Client console if audit documentation is needed.'},
+    ],
+    timeline:[
+      {time:'11 May 01:37',dot:'#22C55E',text:'Disk scan completed — Win2019-10-5-157-120 · Clean'},
+      {time:'11 May 01:38',dot:'#22C55E',text:'Disk scan completed — Win2019-10-5-157-121 · Clean'},
+      {time:'11 May 01:39',dot:'#22C55E',text:'Disk scan completed — Win2019-10-5-157-122 · Clean'},
+    ],
+    confidence:[
+      {label:'Clean scan confirmation',pct:99,color:'#22C55E'},
+      {label:'Auto-resolve accuracy',pct:99,color:'#22C55E'},
+    ],
+    cta:'Download scan reports',
+    cta2:'View tenant detail',
+    modal:null
+  },
+};
+
+function openWhy(key) {
+  const d = whyData[key]; if(!d) return;
+  document.getElementById('wdTitle').textContent = d.title;
+  document.getElementById('wdSub').textContent = d.sub;
+  const body = document.getElementById('wdBody');
+  body.innerHTML = `
+    <div class="wd-section">
+      <div class="wd-sec-label">Why SAMI grouped these alerts</div>
+      ${d.signals.map(s=>`<div class="wd-signal"><div class="wd-sig-icon">${s.icon}</div><div class="wd-sig-text">${s.text}</div></div>`).join('')}
+    </div>
+    <div class="wd-section">
+      <div class="wd-sec-label">Alert timeline</div>
+      <div class="wd-timeline">
+        ${d.timeline.map(t=>`
+          <div class="wd-tl-item">
+            <div class="wd-tl-left">
+              <div class="wd-tl-time">${t.time}</div>
+              <div class="wd-tl-dot" style="background:${t.dot}"></div>
+            </div>
+            <div class="wd-tl-right">${t.text}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div class="wd-section">
+      <div class="wd-sec-label">Confidence breakdown</div>
+      ${d.confidence.map(c=>`
+        <div class="wd-conf-row">
+          <div class="wd-conf-label">${c.label}</div>
+          <div class="wd-conf-bar-wrap"><div class="wd-conf-bar" style="width:${c.pct}%;background:${c.color}"></div></div>
+          <div class="wd-conf-pct">${c.pct}%</div>
+        </div>`).join('')}
+    </div>
+    <div class="wd-section">
+      <div class="wd-sec-label">How SAMI decided to group this</div>
+      <div class="wd-signal">
+        <div class="wd-sig-icon">🧠</div>
+        <div class="wd-sig-text">SAMI applies ML clustering to all inbound alerts across your 98 managed tenants. Grouping uses a combination of: shared device ID, source IP subnet overlap, temporal proximity (2h window), alert type similarity, and cross-tenant signal correlation. Each group is assigned a root cause label and confidence score. Groups below 60% confidence are shown as standalone rows rather than grouped.</div>
+      </div>
+    </div>`;
+  document.getElementById('wdFooter').innerHTML = `
+    <button class="wd-btn-primary" onclick="${d.modal ? `closeWhy();openModal('${d.modal}')` : 'closeWhy()'}">${d.cta}</button>
+    <button class="wd-btn-secondary" onclick="closeWhy()">${d.cta2}</button>`;
+  document.getElementById('wdOverlay').classList.add('open');
+  document.getElementById('wdPanel').classList.add('open');
+}
+function closeWhy() {
+  document.getElementById('wdOverlay').classList.remove('open');
+  document.getElementById('wdPanel').classList.remove('open');
+}
+
+/* ══ ACTION MODAL DATA ══════════════════════════════════════════════ */
+const modalData = {
+  lateral:{
+    stripe:'stripe-red',eyebrow:'SAMI · Critical · Cross-Tenant',
+    title:'Escalate to 3 affected clients',
+    desc:'SAMI will draft and send incident notifications to Acme Corp, Westfield IT, and Riverside Mfg, summarising the threat, containment steps taken, and recommended next steps.',
+    impact:[
+      {icon:'🔒',text:'<strong>7 endpoints remain isolated</strong> until clients confirm investigation complete.'},
+      {icon:'📧',text:'<strong>3 incident reports</strong> auto-drafted by SAMI using your letterhead template.'},
+      {icon:'⏱',text:'Estimated time saved vs. manual: <strong>4.5 hours</strong>.'},
+    ],
+    steps:['Draft incident report for each tenant using SAMI template','Send notifications to primary tenant contacts','Log incident in your ITSM system (Jira/ServiceNow)','Schedule follow-up check-in calls for 24h post-escalation'],
+    confirm:'Confirm escalation to 3 clients'
+  },
+  renewal:{
+    stripe:'stripe-orange',eyebrow:'SAMI · Renewal Intelligence',
+    title:'Start renewal process for 4 accounts',
+    desc:'SAMI will generate renewal quotes for 3 accounts with pre-built SKUs and flag swapna6 for manual quote review.',
+    impact:[
+      {icon:'💰',text:'<strong>$287K ARR</strong> protected if renewed before expiry.'},
+      {icon:'📦',text:'<strong>3 SKUs ready to send</strong> — Acme Tenant 1, Westfield IT, Multiregion_june_US.'},
+      {icon:'📋',text:'swapna6 flagged for <strong>manual review</strong> — multi-region complexity.'},
+    ],
+    steps:['Generate renewal proposals for 3 pre-built SKU accounts','Email proposals to primary contacts via your CRM','Flag swapna6 renewal for account manager review','Set 7-day follow-up reminders for all 4 accounts'],
+    confirm:'Generate & send renewal proposals'
+  },
+  flap:{
+    stripe:'stripe-indigo',eyebrow:'SAMI · System · Interface Diagnostics',
+    title:'Run switch port diagnostics — Acme Tenant 1',
+    desc:'SAMI will log into the upstream switch at Acme Tenant 1 and run interface diagnostics on the port connected to Remote Branch 2.',
+    impact:[
+      {icon:'🔀',text:'Diagnose the <strong>oscillating link state</strong> on upstream switch port.'},
+      {icon:'🔧',text:'If cable fault detected: <strong>flag for on-site engineer visit</strong>.'},
+      {icon:'⚙',text:'If auto-negotiation issue: <strong>force port to 1Gbps full duplex</strong> automatically.'},
+    ],
+    steps:['SSH into Acme Tenant 1 upstream switch','Run show interface diagnostics on affected port','Attempt auto-negotiation fix if applicable','Generate diagnostic report for your records'],
+    confirm:'Run diagnostics on Acme Tenant 1'
+  },
+};
+
+let currentModal = null;
+function openModal(key) {
+  const d = modalData[key]; if(!d) return;
+  currentModal = key;
+  document.getElementById('modalStripe').className = 'modal-stripe ' + d.stripe;
+  document.getElementById('modalEyebrow').textContent = d.eyebrow;
+  document.getElementById('modalTitle').textContent = d.title;
+  document.getElementById('modalDesc').textContent = d.desc;
+  document.getElementById('modalImpact').innerHTML = d.impact.map(i=>`<div class="mi-row"><span>${i.icon}</span><span>${i.text}</span></div>`).join('');
+  document.getElementById('modalSteps').innerHTML = d.steps.map(s=>`<div class="modal-step"><div class="ms-dot"></div><span>${s}</span></div>`).join('');
+  document.getElementById('modalConfirm').textContent = d.confirm;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+function confirmAction() {
+  closeModal();
+  // Brief visual feedback
+  const banner = document.querySelector('.sami-triage-banner .stb-text .stb-headline');
+  if(banner) {
+    const orig = banner.textContent;
+    banner.textContent = '✓ Action confirmed — SAMI is executing…';
+    banner.style.color = '#6EE7B7';
+    setTimeout(()=>{ banner.textContent = orig; banner.style.color = ''; }, 2500);
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if(e.key==='Escape') { closeWhy(); closeModal(); }
+});
+</script>
+</body>
+</html>

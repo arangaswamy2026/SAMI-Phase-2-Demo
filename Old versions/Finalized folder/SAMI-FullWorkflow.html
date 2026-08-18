@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAMI — CVE-2026-1142 Deployment Workflow</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; color: #1a2332; font-size: 13px; }
+
+/* ── Sidebar ──────────────────────────────────────── */
+.sidebar { position:fixed; left:0; top:0; width:48px; height:100vh; background:#0d1526; display:flex; flex-direction:column; align-items:center; z-index:100; }
+.sidebar-logo { width:48px; height:48px; background:#E85D1A; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.sidebar-logo svg { width:26px; height:26px; fill:white; }
+.sidebar-icon { width:48px; height:44px; display:flex; align-items:center; justify-content:center; color:#7a8ba0; cursor:pointer; position:relative; }
+.sidebar-icon:hover { color:#fff; }
+.sidebar-icon.active { color:#fff; border-left:2px solid #E85D1A; }
+.sidebar-icon .badge { position:absolute; top:7px; right:7px; background:#E85D1A; color:white; font-size:9px; font-weight:700; border-radius:8px; min-width:16px; height:16px; display:flex; align-items:center; justify-content:center; padding:0 3px; }
+.sidebar-spacer { flex:1; }
+
+/* ── Topbar ───────────────────────────────────────── */
+.topbar { position:fixed; left:48px; right:0; top:0; height:44px; background:#fff; border-bottom:1px solid #e2e6ea; display:flex; align-items:center; padding:0 16px; z-index:99; gap:8px; }
+.breadcrumb { display:flex; align-items:center; gap:4px; font-size:12.5px; color:#555; flex:1; }
+.breadcrumb a { color:#3b7dd8; text-decoration:none; }
+.breadcrumb a:hover { text-decoration:underline; }
+.tenant-selector { display:flex; align-items:center; gap:6px; border:1px solid #d0d7de; border-radius:20px; padding:4px 12px; font-size:12.5px; cursor:pointer; background:#fff; }
+.tenant-selector .dot { width:8px; height:8px; background:#E85D1A; border-radius:50%; }
+.topbar-icons { display:flex; align-items:center; gap:10px; }
+.icon-btn { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#555; position:relative; }
+.icon-btn:hover { background:#f0f2f5; }
+.notif-badge { position:absolute; top:2px; right:2px; width:8px; height:8px; background:#E85D1A; border-radius:50%; }
+.avatar { width:30px; height:30px; border-radius:50%; background:#1a3a5c; color:#fff; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+
+/* ── Page shell ───────────────────────────────────── */
+.page { margin-left:48px; padding-top:44px; height:100vh; display:flex; flex-direction:column; }
+.p2-content { padding:16px; flex:1; display:flex; flex-direction:column; overflow:hidden; }
+.p2-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:14px; flex-shrink:0; }
+.p2-header-left { display:flex; align-items:flex-start; gap:10px; }
+.back-btn { width:28px; height:28px; border:none; background:transparent; cursor:pointer; color:#E85D1A; display:flex; align-items:center; justify-content:center; margin-top:2px; border-radius:4px; text-decoration:none; }
+.back-btn:hover { background:#fff3ed; }
+.p2-title { font-size:20px; font-weight:800; color:#1a2332; }
+.p2-sub { font-size:12px; color:#888; margin-top:3px; }
+.export-btn { background:#fff; border:1px solid #d0d7de; border-radius:20px; padding:6px 14px; font-size:12px; cursor:pointer; color:#333; display:flex; align-items:center; gap:5px; }
+
+/* ── Three-panel ──────────────────────────────────── */
+.three-panel { display:flex; gap:0; flex:1; overflow:hidden; }
+
+/* Left nav */
+.nav-panel { width:180px; background:#fff; border-radius:6px 0 0 6px; border:1px solid #e2e6ea; flex-shrink:0; overflow:hidden; display:flex; flex-direction:column; }
+.need-attn-header { background:#1a2332; color:#fff; padding:10px 14px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+.need-attn-badge { background:#E85D1A; color:#fff; font-size:10px; font-weight:700; border-radius:10px; padding:1px 7px; }
+.by-category { padding:10px 14px 6px; font-size:10px; font-weight:700; text-transform:uppercase; color:#aaa; letter-spacing:0.5px; }
+.nav-item { display:flex; align-items:center; justify-content:space-between; padding:7px 14px; font-size:12.5px; color:#333; cursor:pointer; }
+.nav-item:hover { background:#f5f7fa; }
+.nav-item.active { color:#E85D1A; font-weight:600; background:#fff8f5; }
+.nav-item .nav-count { font-size:11px; color:#888; }
+.nav-item.active .nav-count { color:#E85D1A; }
+
+/* Middle list */
+.list-panel { width:300px; background:#fff; border-left:1px solid #e2e6ea; border-right:1px solid #e2e6ea; flex-shrink:0; overflow-y:auto; border-top:1px solid #e2e6ea; border-bottom:1px solid #e2e6ea; }
+.list-panel-header { padding:10px 14px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.3px; color:#1a2332; border-bottom:1px solid #eee; background:#fff; position:sticky; top:0; z-index:1; }
+.list-panel-header span { color:#888; font-weight:400; }
+.list-item { padding:12px 14px; border-bottom:1px solid #eee; cursor:pointer; transition:background 0.15s; }
+.list-item:hover { background:#f8f9fb; }
+.list-item.active { background:#fff8f5; border-left:3px solid #E85D1A; padding-left:11px; }
+.li-meta { display:flex; align-items:center; justify-content:space-between; margin-bottom:5px; }
+.li-type { font-size:10.5px; font-weight:600; display:flex; align-items:center; gap:4px; }
+.li-type.cve { color:#E85D1A; }
+.li-type.cve::before { content:''; width:5px; height:5px; background:#E85D1A; border-radius:50%; }
+.li-type.device { color:#c0392b; }
+.li-type.device::before { content:''; width:5px; height:5px; background:#c0392b; border-radius:50%; }
+.li-type.behavioral-a { color:#3b7dd8; }
+.li-type.behavioral-a::before { content:''; width:5px; height:5px; background:#3b7dd8; border-radius:50%; }
+.li-type.policy-g { color:#6b3bcc; }
+.li-type.policy-g::before { content:''; width:5px; height:5px; background:#6b3bcc; border-radius:50%; }
+.li-type.sub-risk { color:#1a6b3c; }
+.li-type.sub-risk::before { content:''; width:5px; height:5px; background:#1a6b3c; border-radius:50%; }
+.li-crit { width:18px; height:18px; border-radius:50%; background:#e53e3e; color:white; font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.li-time { font-size:10.5px; color:#999; }
+.li-title { font-size:12.5px; font-weight:700; color:#1a2332; margin-bottom:5px; line-height:1.3; }
+.li-desc { font-size:11.5px; color:#666; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+
+/* ── Detail panel ─────────────────────────────────── */
+.detail-panel { flex:1; background:#fff; border:1px solid #e2e6ea; border-left:none; border-radius:0 6px 6px 0; overflow:hidden; display:flex; flex-direction:column; }
+
+/* Step indicator */
+.step-bar { display:flex; align-items:center; padding:10px 20px; border-bottom:1px solid #eee; gap:0; flex-shrink:0; background:#fafbfc; }
+.step-item { display:flex; align-items:center; gap:6px; font-size:11px; color:#aaa; font-weight:500; }
+.step-dot { width:22px; height:22px; border-radius:50%; border:2px solid #ddd; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:#bbb; flex-shrink:0; background:#fff; transition:all 0.3s; }
+.step-item.active .step-dot { border-color:#E85D1A; color:#E85D1A; background:#fff8f5; }
+.step-item.active .step-label { color:#E85D1A; font-weight:700; }
+.step-item.done .step-dot { background:#E85D1A; border-color:#E85D1A; color:#fff; }
+.step-item.done .step-label { color:#555; }
+.step-connector { flex:1; height:2px; background:#eee; margin:0 6px; min-width:20px; }
+.step-connector.done { background:#E85D1A; }
+
+/* Detail scrollable body */
+.detail-scroll { flex:1; overflow-y:auto; }
+
+/* Detail header */
+.detail-header { padding:14px 20px 12px; border-bottom:1px solid #eee; flex-shrink:0; }
+.detail-badge { display:inline-flex; align-items:center; gap:6px; margin-bottom:8px; }
+.tag-pill { font-size:11px; font-weight:700; border-radius:4px; padding:3px 9px; border:1px solid; }
+.detail-title { font-size:15px; font-weight:800; color:#1a2332; line-height:1.3; margin-bottom:8px; }
+.detail-scope { display:flex; gap:14px; font-size:11.5px; color:#666; align-items:center; flex-wrap:wrap; }
+
+/* SAMI insight note */
+.sami-insight { margin:12px 20px 0; background:#fff8f5; border-left:3px solid #E85D1A; border-radius:0 6px 6px 0; padding:10px 14px; font-size:12px; color:#444; line-height:1.6; display:flex; gap:8px; align-items:flex-start; }
+.sami-insight .si-tag { background:#E85D1A; color:#fff; font-size:9px; font-weight:700; border-radius:3px; padding:2px 5px; flex-shrink:0; margin-top:2px; }
+
+/* ── ASSESSMENT STATE ─────────────────────────────── */
+.section-block { padding:14px 20px; border-bottom:1px solid #f0f2f5; }
+.sb-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#888; margin-bottom:10px; }
+
+/* Tenant grid */
+.tenant-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.tenant-card { border:1px solid #e2e6ea; border-radius:8px; padding:11px 13px; transition:border-color 0.2s; position:relative; overflow:hidden; }
+.tenant-card::before { content:''; position:absolute; top:0; left:0; width:3px; height:100%; }
+.tenant-card.priority::before { background:#e53e3e; }
+.tenant-card.tonight::before { background:#E85D1A; }
+.tenant-card.deferred::before { background:#f5a623; }
+.tenant-card.pending::before { background:#6b3bcc; }
+.tc-top { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:6px; }
+.tc-name { font-size:12.5px; font-weight:700; color:#1a2332; }
+.tc-badge { font-size:9.5px; font-weight:700; border-radius:10px; padding:2px 8px; }
+.tc-badge.priority { background:#fde8e8; color:#c0392b; }
+.tc-badge.tonight { background:#fff3ed; color:#E85D1A; }
+.tc-badge.deferred { background:#fff8e8; color:#b87a00; }
+.tc-badge.pending { background:#f3eeff; color:#6b3bcc; }
+.tc-devices { font-size:11px; color:#555; margin-bottom:5px; }
+.tc-window { font-size:11px; color:#888; display:flex; align-items:center; gap:4px; }
+.tc-window svg { flex-shrink:0; }
+.tc-probe { font-size:11px; color:#c0392b; font-weight:600; margin-top:4px; display:flex; align-items:center; gap:4px; }
+
+/* Evidence items */
+.ev-row { display:flex; align-items:flex-start; gap:8px; padding:5px 0; border-bottom:1px solid #f5f5f5; font-size:12px; color:#333; }
+.ev-row:last-child { border:none; }
+.ev-ic { width:20px; height:20px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0; margin-top:1px; }
+
+/* Detail footer */
+.detail-footer { padding:11px 20px; border-top:1px solid #eee; display:flex; align-items:center; justify-content:space-between; background:#fff; flex-shrink:0; }
+.footer-left { font-size:12px; color:#3b7dd8; cursor:pointer; }
+.footer-left:hover { text-decoration:underline; }
+.footer-actions { display:flex; gap:8px; }
+.btn-ghost { background:#fff; border:1px solid #d0d7de; border-radius:4px; padding:7px 14px; font-size:12.5px; cursor:pointer; color:#333; font-weight:500; }
+.btn-ghost:hover { background:#f5f7fa; }
+.btn-primary { background:#E85D1A; color:#fff; border:none; border-radius:4px; padding:7px 16px; font-size:12.5px; cursor:pointer; font-weight:700; display:flex; align-items:center; gap:5px; }
+.btn-primary:hover { background:#d14d10; }
+.btn-primary:disabled { background:#ccc; cursor:not-allowed; }
+
+/* ── PLANNING STATE ───────────────────────────────── */
+.plan-timeline { position:relative; padding:4px 0 0; }
+.plan-batch { margin-bottom:16px; }
+.pb-time { font-size:11px; font-weight:700; color:#3b7dd8; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+.pb-time::after { content:''; flex:1; height:1px; background:#e8edf2; }
+.pb-devices { display:flex; flex-direction:column; gap:6px; }
+.plan-device { display:flex; align-items:center; justify-content:space-between; padding:8px 12px; border:1px solid #e2e6ea; border-radius:6px; }
+.pd-left { display:flex; align-items:center; gap:8px; }
+.pd-name { font-size:12.5px; font-weight:600; color:#1a2332; }
+.pd-tenant { font-size:11px; color:#888; }
+.pd-right { display:flex; align-items:center; gap:8px; }
+.pd-status-tag { font-size:10px; font-weight:700; border-radius:10px; padding:2px 8px; }
+.pd-status-tag.go { background:#edfaf3; color:#1a6b3c; }
+.pd-status-tag.warn { background:#fff8e8; color:#b87a00; }
+.pd-status-tag.defer { background:#f3eeff; color:#6b3bcc; }
+
+/* SAMI reasoning block */
+.sami-reasoning { background:#f9f0ff; border:1px solid #e0d0f8; border-radius:8px; padding:12px 14px; margin-bottom:10px; }
+.sr-head { display:flex; align-items:center; gap:6px; margin-bottom:7px; }
+.sr-tag { background:#6b3bcc; color:#fff; font-size:9px; font-weight:700; border-radius:3px; padding:2px 5px; }
+.sr-label { font-size:11px; font-weight:700; color:#4a2b8a; }
+.sr-conf { font-size:10px; color:#888; margin-left:auto; }
+.sr-body { font-size:11.5px; color:#4a2b8a; line-height:1.6; }
+
+/* Warning callout */
+.warn-callout { background:#fffbe8; border:1px solid #f5d87e; border-radius:8px; padding:11px 14px; margin-top:10px; display:flex; gap:8px; align-items:flex-start; }
+.wc-icon { font-size:15px; flex-shrink:0; }
+.wc-body { font-size:11.5px; color:#7a5200; line-height:1.6; }
+.wc-body strong { color:#5a3800; }
+
+/* ── PREFLIGHT STATE ──────────────────────────────── */
+.preflight-running { text-align:center; padding:12px 20px 8px; }
+.pf-spinner { width:28px; height:28px; border:3px solid #f0f2f5; border-top-color:#E85D1A; border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 8px; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.pf-status-text { font-size:12.5px; color:#555; font-weight:600; }
+
+.check-list { display:flex; flex-direction:column; gap:0; }
+.check-item { display:flex; align-items:flex-start; gap:10px; padding:9px 20px; border-bottom:1px solid #f0f2f5; opacity:0; transform:translateY(4px); transition:opacity 0.3s, transform 0.3s; }
+.check-item.visible { opacity:1; transform:translateY(0); }
+.ci-icon { width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0; margin-top:1px; }
+.ci-icon.pass { background:#edfaf3; }
+.ci-icon.warn { background:#fff8e8; }
+.ci-icon.fail { background:#fde8e8; }
+.ci-icon.loading { background:#f0f2f5; animation:pulse 1s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+.ci-text { flex:1; }
+.ci-label { font-size:12.5px; font-weight:600; color:#1a2332; margin-bottom:2px; }
+.ci-sub { font-size:11.5px; color:#666; line-height:1.4; }
+.ci-sub.warn { color:#b87a00; }
+.ci-sub.pass { color:#1a6b3c; }
+
+/* Preflight SAMI auto-fix */
+.autofix-note { background:#edfaf3; border:1px solid #9be4be; border-radius:6px; padding:10px 14px; margin:0 20px 14px; display:flex; gap:8px; align-items:flex-start; }
+.af-tag { background:#1a6b3c; color:#fff; font-size:9px; font-weight:700; border-radius:3px; padding:2px 5px; flex-shrink:0; margin-top:1px; }
+.af-text { font-size:11.5px; color:#1a4a2e; line-height:1.6; }
+
+/* ── DEPLOYING STATE ──────────────────────────────── */
+.deploy-progress-header { padding:12px 20px 0; }
+.dph-title { font-size:13px; font-weight:700; color:#1a2332; margin-bottom:2px; }
+.dph-sub { font-size:11.5px; color:#888; }
+.overall-progress { margin:10px 20px; height:5px; background:#f0f2f5; border-radius:10px; overflow:hidden; }
+.overall-bar { height:100%; background:linear-gradient(90deg,#E85D1A,#f5a623); border-radius:10px; transition:width 0.8s ease; }
+
+.deploy-batch { padding:10px 20px; border-bottom:1px solid #f0f2f5; }
+.db-tenant { font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#888; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+.db-tenant .dt-done { color:#1a6b3c; font-size:11px; }
+
+.device-row { display:flex; align-items:center; gap:10px; padding:6px 0; }
+.dr-name { font-size:12px; font-weight:600; color:#1a2332; min-width:90px; }
+.dr-bar-wrap { flex:1; height:6px; background:#f0f2f5; border-radius:10px; overflow:hidden; }
+.dr-bar { height:100%; border-radius:10px; transition:width 1.2s ease; }
+.dr-bar.done { background:#1a6b3c; }
+.dr-bar.active { background:linear-gradient(90deg,#E85D1A,#f5a623); }
+.dr-bar.queued { background:#ddd; width:0% !important; }
+.dr-status { font-size:11px; min-width:80px; text-align:right; }
+.dr-status.done { color:#1a6b3c; font-weight:600; }
+.dr-status.active { color:#E85D1A; font-weight:600; }
+.dr-status.queued { color:#aaa; }
+.dr-status.drained { color:#3b7dd8; }
+.dr-time { font-size:10.5px; color:#aaa; min-width:42px; text-align:right; }
+
+/* SAMI live commentary */
+.sami-commentary { margin:10px 20px; background:#fff8f5; border-left:3px solid #E85D1A; border-radius:0 6px 6px 0; padding:9px 12px; font-size:11.5px; color:#555; line-height:1.5; display:flex; gap:7px; transition:opacity 0.4s; }
+.sami-commentary .sc-tag { background:#E85D1A; color:#fff; font-size:9px; font-weight:700; border-radius:3px; padding:2px 5px; flex-shrink:0; margin-top:1px; height:fit-content; }
+
+/* Deferred notice */
+.deferred-notice { margin:0 20px; background:#f5f7fa; border:1px solid #e2e6ea; border-radius:6px; padding:10px 14px; }
+.dn-row { display:flex; align-items:center; gap:8px; padding:4px 0; font-size:12px; color:#555; }
+.dn-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.dn-dot.pending { background:#6b3bcc; }
+.dn-dot.scheduled { background:#f5a623; }
+
+/* ── COMPLETE STATE ───────────────────────────────── */
+.complete-hero { text-align:center; padding:20px 20px 16px; }
+.ch-icon { font-size:36px; margin-bottom:8px; }
+.ch-title { font-size:17px; font-weight:800; color:#1a2332; margin-bottom:4px; }
+.ch-sub { font-size:12.5px; color:#666; }
+
+.summary-stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin:0 20px 16px; }
+.ss-card { background:#f5f7fa; border-radius:8px; padding:10px 12px; text-align:center; }
+.ss-val { font-size:22px; font-weight:800; line-height:1; margin-bottom:3px; }
+.ss-val.green { color:#1a6b3c; }
+.ss-val.orange { color:#E85D1A; }
+.ss-val.purple { color:#6b3bcc; }
+.ss-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.3px; color:#888; }
+
+.outcome-list { padding:0 20px 16px; display:flex; flex-direction:column; gap:8px; }
+.outcome-row { display:flex; align-items:center; gap:10px; padding:10px 14px; border:1px solid #e2e6ea; border-radius:8px; }
+.or-icon { font-size:16px; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.or-icon.done { background:#edfaf3; }
+.or-icon.pending { background:#f3eeff; }
+.or-icon.scheduled { background:#fff8e8; }
+.or-body { flex:1; }
+.or-tenant { font-size:12.5px; font-weight:700; color:#1a2332; }
+.or-detail { font-size:11.5px; color:#666; margin-top:2px; }
+.or-status { font-size:11px; font-weight:700; border-radius:10px; padding:3px 9px; }
+.or-status.done { background:#edfaf3; color:#1a6b3c; }
+.or-status.pending { background:#f3eeff; color:#6b3bcc; }
+.or-status.scheduled { background:#fff8e8; color:#b87a00; }
+
+/* Fade in */
+.fade-in { animation:fadeIn 0.35s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:translateY(0);} }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo"><svg viewBox="0 0 24 24"><path d="M12 2C8 2 4 6 4 10c0 4 2 7 5 9v3h6v-3c3-2 5-5 5-9 0-4-4-8-8-8z"/></svg></div>
+  <div class="sidebar-icon active"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div>
+  <div class="sidebar-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="badge">8</span></div>
+  <div class="sidebar-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+  <div class="sidebar-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+  <div class="sidebar-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+  <div class="sidebar-spacer"></div>
+  <div class="sidebar-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="badge">3</span></div>
+</nav>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="breadcrumb">
+    <a href="sami-page1-dashboard-v2-2026-05-20.html">Home</a><span style="color:#ccc">›</span>
+    <a href="sami-page2-recommendation-v2-2026-05-20.html">Dashboard</a><span style="color:#ccc">›</span>
+    <span style="color:#333;font-weight:600">SAMI Recommendation</span>
+  </div>
+  <div class="tenant-selector"><div class="dot"></div> All Tenants (Global) <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+  <div class="topbar-icons">
+    <div class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="notif-badge"></div></div>
+    <div class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+    <div class="avatar">HN</div>
+  </div>
+</header>
+
+<!-- PAGE -->
+<div class="page">
+  <div class="p2-content">
+    <!-- Header -->
+    <div class="p2-header">
+      <div class="p2-header-left">
+        <a class="back-btn" href="sami-page2-recommendation-v2-2026-05-20.html">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        </a>
+        <div>
+          <div class="p2-title">SAMI Recommendation</div>
+          <div class="p2-sub">5 items need your attention &nbsp;·&nbsp; May 18, 2026 · 08:14 AM</div>
+        </div>
+      </div>
+      <button class="export-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export digest</button>
+    </div>
+
+    <!-- Three panel -->
+    <div class="three-panel">
+
+      <!-- Left nav -->
+      <div class="nav-panel">
+        <div class="need-attn-header">Need Attention <span class="need-attn-badge">5</span></div>
+        <div class="by-category">By Category</div>
+        <div class="nav-item active">CVE Vulnerabilities <span class="nav-count">3</span></div>
+        <div class="nav-item">Policy Gaps <span class="nav-count">4</span></div>
+        <div class="nav-item">Behavioral <span class="nav-count">3</span></div>
+        <div class="nav-item">Renewals <span class="nav-count">3</span></div>
+        <div class="nav-item">Device Alerts <span class="nav-count">3</span></div>
+      </div>
+
+      <!-- Middle list -->
+      <div class="list-panel">
+        <div class="list-panel-header">Need Attention <span>5 critical</span></div>
+
+        <div class="list-item active">
+          <div class="li-meta"><div style="display:flex;align-items:center;gap:6px;"><div class="li-crit">!</div><div class="li-type cve">CVE Vulnerability</div></div><div class="li-time">2 hrs ago</div></div>
+          <div class="li-title">SSL VPN Auth Bypass (CVE-2026-1142) — 12 Firewalls Across 4 Tenants</div>
+          <div class="li-desc">CVSS 9.8. Unauthenticated RCE on SonicOS &lt; 7.1.2-1023. Active PoC in the wild. Acme Corp, Beta Networks, Westfield IT, Crown Logistics affected.</div>
+        </div>
+        <div class="list-item">
+          <div class="li-meta"><div style="display:flex;align-items:center;gap:6px;"><div class="li-crit">!</div><div class="li-type device">Device Alert</div></div><div class="li-time">3 hrs ago</div></div>
+          <div class="li-title">3 Gateways Unreachable — Northgate Health &amp; Delta Logistics</div>
+          <div class="li-desc">FW-NH-02, FW-NH-03, and FW-DL-01 offline after BGP route change.</div>
+        </div>
+        <div class="list-item">
+          <div class="li-meta"><div style="display:flex;align-items:center;gap:6px;"><div class="li-crit">!</div><div class="li-type behavioral-a">Behavioral Anomaly</div></div><div class="li-time">1 hr ago</div></div>
+          <div class="li-title">Credential Stuffing — Beta Networks &amp; Crown Logistics Super-Admin Accounts</div>
+          <div class="li-desc">18 failed logins from 3 geographies. Both accounts lack MFA.</div>
+        </div>
+        <div class="list-item">
+          <div class="li-meta"><div style="display:flex;align-items:center;gap:6px;"><div class="li-crit">!</div><div class="li-type policy-g">Policy Gap</div></div><div class="li-time" style="color:#f5a623;">Drift &gt;45d</div></div>
+          <div class="li-title">Permit-Any Outbound Bypassing DPI-SSL — 3 Tenants, 9 Firewalls</div>
+          <div class="li-desc">Default-allow at WAN edge. C2 traffic can exfiltrate uninspected.</div>
+        </div>
+        <div class="list-item">
+          <div class="li-meta"><div style="display:flex;align-items:center;gap:6px;"><div class="li-crit">!</div><div class="li-type sub-risk">Subscription Risk</div></div><div class="li-time">Today</div></div>
+          <div class="li-title">ATP Expiring &lt;9 Days — 3 Tenants, 21 Firewalls, $87K ARR</div>
+          <div class="li-desc">Acme Corp, Beta Networks, Delta Logistics. Capture ATP sandboxing disabled on expiry.</div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Interactive detail panel -->
+      <div class="detail-panel" id="detailPanel"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── State & Data ────────────────────────────────────────
+let currentStep = 'assessment'; // assessment | planning | preflight | deploying | complete
+let deployTimer = null;
+let deviceProgress = {};
+let preflightStep = 0;
+
+const TENANTS = [
+  {
+    id:'acme', name:'Acme Corp', devices:['FW-ACME-01','FW-ACME-02','FW-ACME-03','FW-ACME-04'],
+    type:'tonight', badge:'Tonight', badgeCls:'tonight',
+    window:'Change window: Thu 10pm – 2am',
+    probe: null,
+    note:'Standard change window opens tonight at 10pm. SAMI has pre-notified their IT contact.',
+    borderCls:'tonight'
+  },
+  {
+    id:'beta', name:'Beta Networks', devices:['FW-BETA-01','FW-BETA-02','FW-BETA-03'],
+    type:'priority', badge:'⚡ Priority', badgeCls:'priority',
+    window:'No change restriction · 24h IT team',
+    probe:'Active probe on FW-BETA-01 detected',
+    note:'Active exploit attempts already detected. Beta Networks has no change window restrictions. Deploy first.',
+    borderCls:'priority'
+  },
+  {
+    id:'westfield', name:'Westfield IT', devices:['FW-WF-01','FW-WF-02','FW-WF-03'],
+    type:'deferred', badge:'Mon 10pm', badgeCls:'deferred',
+    window:'Change freeze: Fri–Sun (peak trading)',
+    probe: null,
+    note:'Weekend change freeze in effect until Monday 8am. Deployment deferred to Monday 10pm to avoid trading disruption.',
+    borderCls:'deferred'
+  },
+  {
+    id:'crown', name:'Crown Logistics', devices:['FW-CL-01','FW-CL-02'],
+    type:'pending', badge:'Approval needed', badgeCls:'pending',
+    window:'24/7 operations · change approval required',
+    probe: null,
+    note:'Operations run 24/7. Their change process requires explicit approval from the IT Director before any firewall modification.',
+    borderCls:'pending'
+  }
+];
+
+const PREFLIGHT_CHECKS = [
+  { label:'Config backup', sub:'Snapshot created for all 12 devices across 4 tenants', status:'pass', icon:'✅', cls:'pass', delay:600 },
+  { label:'Firmware compatibility', sub:'Patch 7.1.2-1023 verified against all 12 device models and OS versions', status:'pass', icon:'✅', cls:'pass', delay:1200 },
+  { label:'Rollback snapshot staged', sub:'Pre-patch state saved — rollback executable in &lt;2 min per device if needed', status:'pass', icon:'✅', cls:'pass', delay:1900 },
+  { label:'Active SSL VPN sessions', sub:'12 active user sessions on FW-ACME-03 — patching requires brief SSL VPN restart', status:'warn', icon:'⚠️', cls:'warn', delay:2700 },
+  { label:'Change notifications sent', sub:'Beta Networks and Acme Corp IT contacts notified · Crown Logistics approval request sent', status:'pass', icon:'✅', cls:'pass', delay:3400 },
+  { label:'Policy conflict check', sub:'No rule conflicts detected · DPI-SSL, VPN tunnels, and routing tables verified clean', status:'pass', icon:'✅', cls:'pass', delay:4100 }
+];
+
+// Deployment batch: Beta first (priority), then Acme (tonight)
+const DEPLOY_TONIGHT = [
+  { name:'FW-BETA-01', tenant:'Beta Networks', tenantId:'beta' },
+  { name:'FW-BETA-02', tenant:'Beta Networks', tenantId:'beta' },
+  { name:'FW-BETA-03', tenant:'Beta Networks', tenantId:'beta' },
+  { name:'FW-ACME-01', tenant:'Acme Corp', tenantId:'acme', drain:true },
+  { name:'FW-ACME-02', tenant:'Acme Corp', tenantId:'acme', customConfig:true },
+  { name:'FW-ACME-03', tenant:'Acme Corp', tenantId:'acme' },
+  { name:'FW-ACME-04', tenant:'Acme Corp', tenantId:'acme' },
+];
+
+// ── Render helpers ──────────────────────────────────────
+const SVG_TENANT = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>`;
+const SVG_FW     = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
+const SVG_CLOCK  = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
+
+function stepBar() {
+  const steps = [
+    { id:'assessment', label:'Assessment' },
+    { id:'planning',   label:'Plan'       },
+    { id:'preflight',  label:'Pre-flight' },
+    { id:'deploying',  label:'Deploy'     },
+    { id:'complete',   label:'Complete'   }
+  ];
+  const order = steps.map(s => s.id);
+  const cur = order.indexOf(currentStep);
+  return `<div class="step-bar">` + steps.map((s, i) => {
+    const cls = i < cur ? 'done' : i === cur ? 'active' : '';
+    const dotContent = i < cur ? '✓' : (i + 1);
+    const conn = i < steps.length - 1
+      ? `<div class="step-connector ${i < cur ? 'done' : ''}"></div>`
+      : '';
+    return `<div class="step-item ${cls}">
+      <div class="step-dot">${dotContent}</div>
+      <span class="step-label">${s.label}</span>
+    </div>${conn}`;
+  }).join('') + `</div>`;
+}
+
+function detailHeader() {
+  return `
+    <div class="detail-header">
+      <div class="detail-badge">
+        <span class="tag-pill" style="color:#E85D1A;background:#fff3ed;border-color:#ffd0b0;">CVE Vulnerability · CVSS 9.8 Critical</span>
+      </div>
+      <div class="detail-title">SSL VPN Auth Bypass (CVE-2026-1142) — 12 Firewalls Across 4 Tenants</div>
+      <div class="detail-scope">
+        <span style="display:flex;align-items:center;gap:4px;">${SVG_TENANT} Acme Corp · Beta Networks · Westfield IT · Crown Logistics</span>
+        <span style="display:flex;align-items:center;gap:4px;">${SVG_FW} 12 Firewalls</span>
+      </div>
+    </div>`;
+}
+
+// ── ASSESSMENT ──────────────────────────────────────────
+function renderAssessment() {
+  const panel = document.getElementById('detailPanel');
+  panel.innerHTML = `
+    ${stepBar()}
+    <div class="detail-scroll fade-in">
+      ${detailHeader()}
+      <div class="sami-insight">
+        <span class="si-tag">SAMI</span>
+        <span>CVE-2026-1142 enables unauthenticated RCE on SonicOS &lt; 7.1.2-1023. Public PoC exploit has been active for 4 days — probe attempts already detected on 2 of your devices. Patch is pre-staged and compatibility-verified. I've assessed deployment feasibility across all 4 tenants and built a risk-ordered plan that respects each tenant's change window and operational constraints.</span>
+      </div>
+
+      <div class="section-block">
+        <div class="sb-title">Tenant Impact — 4 tenants, 12 firewalls</div>
+        <div class="tenant-grid">
+          ${TENANTS.map(t => `
+          <div class="tenant-card ${t.borderCls}">
+            <div class="tc-top">
+              <div class="tc-name">${t.name}</div>
+              <span class="tc-badge ${t.badgeCls}">${t.badge}</span>
+            </div>
+            <div class="tc-devices">${SVG_FW} ${t.devices.length} firewalls · SonicOS &lt; 7.1.2-1023</div>
+            <div class="tc-window">${SVG_CLOCK} ${t.window}</div>
+            ${t.probe ? `<div class="tc-probe">⚡ ${t.probe}</div>` : ''}
+          </div>`).join('')}
+        </div>
+      </div>
+
+      <div class="section-block">
+        <div class="sb-title">Evidence</div>
+        <div class="ev-row"><div class="ev-ic" style="background:#fff0e8;">🛡</div> CVSS 9.8 (Critical) · NVD-confirmed · SonicWall PSIRT advisory SNWLID-2026-0014</div>
+        <div class="ev-row"><div class="ev-ic" style="background:#f0f0f0;">📊</div> 12 firewalls across 4 tenants running vulnerable firmware ≤ 7.1.1-907</div>
+        <div class="ev-row"><div class="ev-ic" style="background:#fff0e8;">⚠️</div> Exploit probe attempts detected on FW-BETA-01 and FW-ACME-03 in the last 24h</div>
+        <div class="ev-row"><div class="ev-ic" style="background:#edfaf3;">✅</div> Patch 7.1.2-1023 pre-staged and compatibility-verified across all 12 devices</div>
+        <div class="ev-row"><div class="ev-ic" style="background:#edfaf3;">✅</div> Rollback snapshot ready — pre-patch state restorable in &lt;2 min per device</div>
+      </div>
+    </div>
+    <div class="detail-footer">
+      <span class="footer-left">View 12 affected devices</span>
+      <div class="footer-actions">
+        <button class="btn-ghost" onclick="setState('planning')">Review deployment plan</button>
+        <button class="btn-primary" onclick="setState('planning')">Begin patching plan →</button>
+      </div>
+    </div>`;
+}
+
+// ── PLANNING ────────────────────────────────────────────
+function renderPlanning() {
+  const panel = document.getElementById('detailPanel');
+  panel.innerHTML = `
+    ${stepBar()}
+    <div class="detail-scroll fade-in">
+      ${detailHeader()}
+
+      <div class="sami-insight">
+        <span class="si-tag">SAMI</span>
+        <span>I've ordered the deployment by active threat risk and change window feasibility. Beta Networks is first — active exploit attempts are live on their network right now. Acme Corp can be patched in tonight's change window. Crown Logistics needs your sign-off before I can proceed. Westfield IT must wait for their weekend freeze to lift.</span>
+      </div>
+
+      <div class="section-block">
+        <div class="sb-title">Recommended deployment schedule</div>
+        <div class="plan-timeline">
+
+          <div class="plan-batch">
+            <div class="pb-time">⚡ Now — Immediate (Beta Networks · Active threat)</div>
+            <div class="pb-devices">
+              ${TENANTS[1].devices.map(d => `
+              <div class="plan-device">
+                <div class="pd-left">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E85D1A" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  <div><div class="pd-name">${d}</div><div class="pd-tenant">Beta Networks</div></div>
+                </div>
+                <span class="pd-status-tag go">Ready</span>
+              </div>`).join('')}
+            </div>
+          </div>
+
+          <div class="plan-batch">
+            <div class="pb-time">🕙 Tonight 10pm — Change window (Acme Corp)</div>
+            <div class="pb-devices">
+              ${TENANTS[0].devices.map((d, i) => `
+              <div class="plan-device">
+                <div class="pd-left">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E85D1A" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  <div>
+                    <div class="pd-name">${d}${i === 1 ? ' ⚠' : ''}</div>
+                    <div class="pd-tenant">Acme Corp${i === 0 ? ' · drain sessions first' : i === 1 ? ' · custom config review' : ''}</div>
+                  </div>
+                </div>
+                <span class="pd-status-tag ${i === 1 ? 'warn' : 'go'}">${i === 1 ? 'Review' : 'Ready'}</span>
+              </div>`).join('')}
+            </div>
+          </div>
+
+          <div class="plan-batch">
+            <div class="pb-time">📋 Pending approval — Crown Logistics (2 FW)</div>
+            <div class="pb-devices">
+              ${TENANTS[3].devices.map(d => `
+              <div class="plan-device" style="opacity:0.7;">
+                <div class="pd-left">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b3bcc" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  <div><div class="pd-name">${d}</div><div class="pd-tenant">Crown Logistics · awaiting IT Director approval</div></div>
+                </div>
+                <span class="pd-status-tag defer">Pending</span>
+              </div>`).join('')}
+            </div>
+          </div>
+
+          <div class="plan-batch">
+            <div class="pb-time">📅 Monday 10pm — Change freeze lifts (Westfield IT)</div>
+            <div class="pb-devices">
+              ${TENANTS[2].devices.map(d => `
+              <div class="plan-device" style="opacity:0.7;">
+                <div class="pd-left">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f5a623" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  <div><div class="pd-name">${d}</div><div class="pd-tenant">Westfield IT · change freeze Fri–Sun</div></div>
+                </div>
+                <span class="pd-status-tag defer">Deferred</span>
+              </div>`).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-block" style="border:none;">
+        <div class="sami-reasoning">
+          <div class="sr-head">
+            <span class="sr-tag">SAMI REASONING</span>
+            <span class="sr-label">Why this order?</span>
+            <span class="sr-conf">Confidence: 94%</span>
+          </div>
+          <div class="sr-body">Beta Networks has active exploit probes — every minute of delay increases compromise risk. Acme Corp's change window opens tonight, and SAMI has 14 months of successful patch history with them. Crown Logistics operates warehousing automation that cannot tolerate unplanned restarts — their IT Director must approve. Westfield IT's weekend retail freeze prohibits network changes that could impact their POS integration.</div>
+        </div>
+
+        <div class="warn-callout">
+          <span class="wc-icon">⚠</span>
+          <div class="wc-body">
+            <strong>FW-ACME-02 has a custom SSL offload configuration</strong> — it terminates SSL for their e-commerce load balancer. SAMI recommends a 15-minute config review before patching this device to avoid disrupting their checkout flow. This is already factored into tonight's schedule.
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="detail-footer">
+      <span class="footer-left" onclick="setState('assessment')">← Back to assessment</span>
+      <div class="footer-actions">
+        <button class="btn-ghost">Adjust schedule</button>
+        <button class="btn-primary" onclick="setState('preflight')">Confirm plan — run pre-flight →</button>
+      </div>
+    </div>`;
+}
+
+// ── PREFLIGHT ───────────────────────────────────────────
+function renderPreflight() {
+  const panel = document.getElementById('detailPanel');
+  preflightStep = 0;
+  panel.innerHTML = `
+    ${stepBar()}
+    <div class="detail-scroll fade-in">
+      ${detailHeader()}
+      <div class="preflight-running" id="pfRunning">
+        <div class="pf-spinner"></div>
+        <div class="pf-status-text" id="pfStatusText">Running pre-deployment checks…</div>
+      </div>
+      <div class="check-list" id="checkList"></div>
+      <div id="autofixWrap" style="display:none;"></div>
+    </div>
+    <div class="detail-footer">
+      <span class="footer-left" onclick="setState('planning')">← Back to plan</span>
+      <div class="footer-actions">
+        <button class="btn-ghost">Pause</button>
+        <button class="btn-primary" id="proceedBtn" disabled onclick="setState('deploying')">Proceed to deployment →</button>
+      </div>
+    </div>`;
+
+  runPreflightChecks();
+}
+
+function runPreflightChecks() {
+  const list = document.getElementById('checkList');
+  PREFLIGHT_CHECKS.forEach((chk, i) => {
+    setTimeout(() => {
+      const div = document.createElement('div');
+      div.className = 'check-item visible';
+      div.innerHTML = `
+        <div class="ci-icon ${chk.cls}">${chk.icon}</div>
+        <div class="ci-text">
+          <div class="ci-label">${chk.label}</div>
+          <div class="ci-sub ${chk.cls}">${chk.sub}</div>
+        </div>`;
+      list.appendChild(div);
+
+      if (chk.status === 'warn') {
+        setTimeout(() => {
+          document.getElementById('autofixWrap').style.display = 'block';
+          document.getElementById('autofixWrap').innerHTML = `
+            <div class="autofix-note">
+              <span class="af-tag">SAMI AUTO-RESOLVED</span>
+              <div class="af-text">12 active SSL VPN sessions detected on FW-ACME-03. SAMI has scheduled a graceful 4-minute session drain before patching this device. Users will see a reconnect prompt — Acme Corp IT has been notified. No data loss. All other devices are unaffected.</div>
+            </div>`;
+        }, 600);
+      }
+
+      if (i === PREFLIGHT_CHECKS.length - 1) {
+        setTimeout(() => {
+          document.getElementById('pfRunning').innerHTML = `<div style="font-size:13px;font-weight:700;color:#1a6b3c;padding-bottom:4px;">✅ All checks passed — ready to deploy tonight's batch (7 of 12 devices)</div>`;
+          const btn = document.getElementById('proceedBtn');
+          if (btn) { btn.disabled = false; btn.style.background = '#E85D1A'; }
+        }, 800);
+      }
+    }, chk.delay);
+  });
+}
+
+// ── DEPLOYING ───────────────────────────────────────────
+function renderDeploying() {
+  DEPLOY_TONIGHT.forEach(d => {
+    deviceProgress[d.name] = { pct: 0, status: 'queued', time: null };
+  });
+
+  const panel = document.getElementById('detailPanel');
+  panel.innerHTML = `
+    ${stepBar()}
+    <div class="detail-scroll fade-in">
+      ${detailHeader()}
+      <div class="deploy-progress-header">
+        <div class="dph-title">Deploying patch 7.1.2-1023 — Tonight's batch: 7 of 12 devices</div>
+        <div class="dph-sub">Crown Logistics (2 FW) pending approval · Westfield IT (3 FW) scheduled Monday 10pm</div>
+      </div>
+      <div class="overall-progress"><div class="overall-bar" id="overallBar" style="width:0%"></div></div>
+
+      <div id="deployBatches"></div>
+
+      <div id="samiCommentary" class="sami-commentary" style="opacity:0;">
+        <span class="sc-tag">SAMI</span>
+        <span id="commentaryText"></span>
+      </div>
+
+      <div style="padding:10px 20px 6px;">
+        <div class="sb-title" style="margin-bottom:8px;">Remaining devices (not in tonight's batch)</div>
+        <div class="deferred-notice">
+          <div class="dn-row"><div class="dn-dot pending"></div> Crown Logistics — FW-CL-01, FW-CL-02 · IT Director approval pending · approval request sent 08:14 AM</div>
+          <div class="dn-row"><div class="dn-dot scheduled"></div> Westfield IT — FW-WF-01, FW-WF-02, FW-WF-03 · Scheduled Monday May 25 · 10:00 PM · reminder set</div>
+        </div>
+      </div>
+    </div>
+    <div class="detail-footer">
+      <span class="footer-left">View live device logs</span>
+      <div class="footer-actions">
+        <button class="btn-ghost" id="pauseBtn">Pause deployment</button>
+        <button class="btn-primary" id="completeBtn" style="display:none;" onclick="setState('complete')">View patch summary →</button>
+      </div>
+    </div>`;
+
+  renderDeployBatches();
+  startDeploymentSim();
+}
+
+function renderDeployBatches() {
+  const container = document.getElementById('deployBatches');
+  if (!container) return;
+  const betaDevices = DEPLOY_TONIGHT.filter(d => d.tenantId === 'beta');
+  const acmeDevices = DEPLOY_TONIGHT.filter(d => d.tenantId === 'acme');
+
+  container.innerHTML = `
+    <div class="deploy-batch">
+      <div class="db-tenant">Beta Networks <span id="betaDone" class="dt-done"></span></div>
+      ${betaDevices.map(d => deviceRowHTML(d)).join('')}
+    </div>
+    <div class="deploy-batch">
+      <div class="db-tenant">Acme Corp <span id="acmeDone" class="dt-done"></span></div>
+      ${acmeDevices.map(d => deviceRowHTML(d)).join('')}
+    </div>`;
+}
+
+function deviceRowHTML(d) {
+  const p = deviceProgress[d.name];
+  return `<div class="device-row" id="row-${d.name.replace('-','_')}">
+    <div class="dr-name">${d.name}${d.customConfig ? ' ⚙' : ''}</div>
+    <div class="dr-bar-wrap"><div class="dr-bar queued" id="bar-${d.name.replace('-','_')}" style="width:0%"></div></div>
+    <div class="dr-status queued" id="status-${d.name.replace('-','_')}">Queued</div>
+    <div class="dr-time" id="time-${d.name.replace('-','_')}"></div>
+  </div>`;
+}
+
+function updateDevice(name, pct, statusLabel, statusCls, time) {
+  const key = name.replace(/-/g, '_');
+  const bar = document.getElementById('bar-' + key);
+  const status = document.getElementById('status-' + key);
+  const timeEl = document.getElementById('time-' + key);
+  if (!bar) return;
+  bar.style.width = pct + '%';
+  bar.className = 'dr-bar ' + (pct >= 100 ? 'done' : pct > 0 ? 'active' : 'queued');
+  status.textContent = statusLabel;
+  status.className = 'dr-status ' + statusCls;
+  if (time) timeEl.textContent = time;
+  // overall bar
+  const total = DEPLOY_TONIGHT.length;
+  const done = DEPLOY_TONIGHT.filter(d => {
+    const b = document.getElementById('bar-' + d.name.replace(/-/g,'_'));
+    return b && parseFloat(b.style.width) >= 100;
+  }).length;
+  const ob = document.getElementById('overallBar');
+  if (ob) ob.style.width = ((done / total) * 100) + '%';
+}
+
+function setCommentary(text) {
+  const el = document.getElementById('samiCommentary');
+  const t = document.getElementById('commentaryText');
+  if (!el || !t) return;
+  el.style.opacity = '0';
+  setTimeout(() => {
+    t.textContent = text;
+    el.style.opacity = '1';
+  }, 200);
+}
+
+function startDeploymentSim() {
+  const timeline = [
+    { t:400,  fn: () => updateDevice('FW-BETA-01', 30, 'Patching…', 'active', '') },
+    { t:1200, fn: () => updateDevice('FW-BETA-01', 65, 'Patching…', 'active', '') },
+    { t:2000, fn: () => { updateDevice('FW-BETA-01', 100, '✓ Complete', 'done', '1m 48s'); updateDevice('FW-BETA-02', 20, 'Patching…', 'active', ''); } },
+    { t:2600, fn: () => updateDevice('FW-BETA-02', 55, 'Patching…', 'active', '') },
+    { t:3400, fn: () => { updateDevice('FW-BETA-02', 100, '✓ Complete', 'done', '2m 04s'); updateDevice('FW-BETA-03', 15, 'Patching…', 'active', ''); } },
+    { t:4200, fn: () => updateDevice('FW-BETA-03', 60, 'Patching…', 'active', '') },
+    { t:5000, fn: () => {
+        updateDevice('FW-BETA-03', 100, '✓ Complete', 'done', '2m 11s');
+        const b = document.getElementById('betaDone');
+        if (b) b.textContent = '✓ All patched';
+        setCommentary('Beta Networks: all 3 firewalls patched and verified. SSL VPN operational on all devices. No active exploit paths remain. Starting Acme Corp batch — draining active sessions on FW-ACME-03 first.');
+        updateDevice('FW-ACME-01', 8, 'Draining…', 'drained', '');
+      }
+    },
+    { t:5800, fn: () => { updateDevice('FW-ACME-01', 35, 'Patching…', 'active', ''); updateDevice('FW-ACME-02', 10, 'Config review…', 'drained', ''); } },
+    { t:6600, fn: () => { updateDevice('FW-ACME-01', 75, 'Patching…', 'active', ''); updateDevice('FW-ACME-02', 45, 'Patching…', 'active', ''); } },
+    { t:7400, fn: () => { updateDevice('FW-ACME-01', 100, '✓ Complete', 'done', '2m 33s'); updateDevice('FW-ACME-02', 80, 'Patching…', 'active', ''); updateDevice('FW-ACME-03', 20, 'Patching…', 'active', ''); } },
+    { t:8200, fn: () => { updateDevice('FW-ACME-02', 100, '✓ Complete', 'done', '2m 51s'); updateDevice('FW-ACME-03', 60, 'Patching…', 'active', ''); updateDevice('FW-ACME-04', 15, 'Patching…', 'active', ''); } },
+    { t:9100, fn: () => { updateDevice('FW-ACME-03', 100, '✓ Complete', 'done', '2m 17s'); updateDevice('FW-ACME-04', 55, 'Patching…', 'active', ''); } },
+    { t:9900, fn: () => {
+        updateDevice('FW-ACME-04', 100, '✓ Complete', 'done', '2m 09s');
+        const a = document.getElementById('acmeDone');
+        if (a) a.textContent = '✓ All patched';
+        const ob = document.getElementById('overallBar');
+        if (ob) ob.style.width = '100%';
+        setCommentary('All 7 devices patched successfully. SSL VPN verified operational across Beta Networks and Acme Corp. FW-ACME-02 custom SSL config intact — e-commerce SSL termination confirmed healthy. Awaiting Crown Logistics approval for remaining 2 devices.');
+        setTimeout(() => {
+          const btn = document.getElementById('completeBtn');
+          const pb = document.getElementById('pauseBtn');
+          if (btn) btn.style.display = 'flex';
+          if (pb) pb.style.display = 'none';
+        }, 1200);
+      }
+    }
+  ];
+
+  timeline.forEach(item => setTimeout(item.fn, item.t));
+}
+
+// ── COMPLETE ────────────────────────────────────────────
+function renderComplete() {
+  const panel = document.getElementById('detailPanel');
+  panel.innerHTML = `
+    ${stepBar()}
+    <div class="detail-scroll fade-in">
+      <div class="complete-hero">
+        <div class="ch-icon">✅</div>
+        <div class="ch-title">Tonight's batch complete — 7 of 12 devices patched</div>
+        <div class="ch-sub">CVE-2026-1142 remediated on all deployed devices · May 18, 2026 · 11:47 PM</div>
+      </div>
+
+      <div class="summary-stats">
+        <div class="ss-card"><div class="ss-val green">7</div><div class="ss-label">Patched tonight</div></div>
+        <div class="ss-card"><div class="ss-val orange">2</div><div class="ss-label">Awaiting approval</div></div>
+        <div class="ss-card"><div class="ss-val purple">3</div><div class="ss-label">Scheduled Mon</div></div>
+      </div>
+
+      <div class="outcome-list">
+        <div class="outcome-row">
+          <div class="or-icon done">✅</div>
+          <div class="or-body">
+            <div class="or-tenant">Beta Networks — 3 of 3 firewalls</div>
+            <div class="or-detail">Patched 11:12 PM · SSL VPN verified · exploit path closed · probe attempts stopped at 11:18 PM</div>
+          </div>
+          <span class="or-status done">Patched</span>
+        </div>
+        <div class="outcome-row">
+          <div class="or-icon done">✅</div>
+          <div class="or-body">
+            <div class="or-tenant">Acme Corp — 4 of 4 firewalls</div>
+            <div class="or-detail">Patched 11:43 PM · SSL VPN verified · FW-ACME-02 custom config intact · e-commerce SSL healthy</div>
+          </div>
+          <span class="or-status done">Patched</span>
+        </div>
+        <div class="outcome-row">
+          <div class="or-icon pending">📋</div>
+          <div class="or-body">
+            <div class="or-tenant">Crown Logistics — 2 firewalls</div>
+            <div class="or-detail">IT Director approval pending · approval request sent 08:14 AM · SAMI will auto-deploy on approval</div>
+          </div>
+          <span class="or-status pending">Awaiting approval</span>
+        </div>
+        <div class="outcome-row">
+          <div class="or-icon scheduled">📅</div>
+          <div class="or-body">
+            <div class="or-tenant">Westfield IT — 3 firewalls</div>
+            <div class="or-detail">Scheduled Mon May 25 · 10:00 PM · change freeze lifts Mon 8am · reminder queued for Sun 6pm</div>
+          </div>
+          <span class="or-status scheduled">Scheduled</span>
+        </div>
+      </div>
+
+      <div class="section-block" style="border:none;">
+        <div class="sami-insight">
+          <span class="si-tag">SAMI</span>
+          <span>Exploit probe attempts against Beta Networks stopped completely at 11:18 PM — 6 minutes after patching FW-BETA-01. All 7 patched devices are running firmware 7.1.2-1023 and SSL VPN has been verified operational. I'll monitor Crown Logistics for any new probe activity while approval is pending and will notify you immediately if risk escalates. The patch report is ready for your records.</span>
+        </div>
+      </div>
+    </div>
+    <div class="detail-footer">
+      <span class="footer-left">Download patch report</span>
+      <div class="footer-actions">
+        <button class="btn-ghost" onclick="setState('assessment')">← Back to assessment</button>
+        <button class="btn-primary" onclick="window.location.href='sami-page1-dashboard-v2-2026-05-20.html'">Return to dashboard →</button>
+      </div>
+    </div>`;
+}
+
+// ── State machine ───────────────────────────────────────
+function setState(s) {
+  currentStep = s;
+  switch(s) {
+    case 'assessment': renderAssessment(); break;
+    case 'planning':   renderPlanning();   break;
+    case 'preflight':  renderPreflight();  break;
+    case 'deploying':  renderDeploying();  break;
+    case 'complete':   renderComplete();   break;
+  }
+}
+
+// Boot
+renderAssessment();
+</script>
+</body>
+</html>

@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI Recommendations UI — Design Inspiration | SAMI Insights</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f4f6f9;
+    --surface: #ffffff;
+    --border: #e2e8f0;
+    --text: #1a202c;
+    --muted: #64748b;
+    --accent: #2563eb;
+    --tag-bg: #eff6ff;
+    --tag-text: #1d4ed8;
+    --section-header: #0f172a;
+    --chip-red: #fee2e2;
+    --chip-red-text: #b91c1c;
+    --chip-blue: #dbeafe;
+    --chip-blue-text: #1d4ed8;
+    --chip-green: #dcfce7;
+    --chip-green-text: #15803d;
+    --chip-purple: #f3e8ff;
+    --chip-purple-text: #7e22ce;
+    --chip-orange: #fff7ed;
+    --chip-orange-text: #c2410c;
+    font-size: 14px;
+    color-scheme: light;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    padding: 32px 24px;
+  }
+
+  /* ── Page Header ── */
+  .page-header {
+    max-width: 1100px;
+    margin: 0 auto 40px;
+  }
+  .page-header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--section-header);
+  }
+  .page-header p {
+    color: var(--muted);
+    margin-top: 6px;
+    font-size: 13px;
+  }
+  .page-header .meta {
+    display: flex;
+    gap: 12px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+  .meta-chip {
+    background: var(--tag-bg);
+    color: var(--tag-text);
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .3px;
+  }
+
+  /* ── Grid ── */
+  .grid {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+  }
+
+  /* ── Product Card ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .card-header {
+    padding: 16px 20px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .card-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .product-logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: -1px;
+  }
+  .logo-cs { background: #cc0000; color: #fff; }
+  .logo-pd { background: #06ac38; color: #fff; }
+  .logo-wz { background: #2563eb; color: #fff; }
+  .logo-dd { background: #632ca6; color: #fff; }
+
+  .card-header h2 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--section-header);
+  }
+  .card-header .product-sub {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .source-link {
+    font-size: 11px;
+    color: var(--accent);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .source-link:hover { text-decoration: underline; }
+
+  /* ── Mock UI Panel ── */
+  .mock-ui {
+    padding: 16px 20px;
+    flex: 1;
+  }
+
+  /* == CrowdStrike == */
+  .cs-shell {
+    background: #13131a;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #2a2a3a;
+  }
+  .cs-topbar {
+    background: #1c1c28;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #2a2a3a;
+  }
+  .cs-topbar-title {
+    font-size: 11px;
+    color: #e2e8f0;
+    font-weight: 600;
+  }
+  .cs-topbar-badge {
+    background: #cc0000;
+    color: #fff;
+    font-size: 9px;
+    padding: 1px 6px;
+    border-radius: 999px;
+    font-weight: 700;
+  }
+  .cs-body {
+    display: flex;
+    min-height: 200px;
+  }
+  .cs-sidebar {
+    width: 48px;
+    background: #1c1c28;
+    border-right: 1px solid #2a2a3a;
+    padding: 12px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .cs-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
+    background: #2a2a3a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+  }
+  .cs-icon.active { background: #cc0000; }
+  .cs-main {
+    flex: 1;
+    padding: 12px;
+    overflow: hidden;
+  }
+  .cs-panel-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #e2e8f0;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cs-actions-btn {
+    margin-left: auto;
+    background: #cc0000;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 9px;
+    cursor: pointer;
+  }
+  .cs-metric-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .cs-metric {
+    background: #1c1c28;
+    border-radius: 5px;
+    padding: 7px 8px;
+    border: 1px solid #2a2a3a;
+  }
+  .cs-metric-label { font-size: 9px; color: #64748b; margin-bottom: 2px; }
+  .cs-metric-val { font-size: 13px; font-weight: 700; color: #e2e8f0; }
+  .cs-ai-box {
+    background: #1a1a2e;
+    border: 1px solid #cc0000;
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-top: 8px;
+  }
+  .cs-ai-label {
+    font-size: 9px;
+    font-weight: 700;
+    color: #cc0000;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .cs-ai-text { font-size: 10px; color: #a0aec0; line-height: 1.5; }
+
+  /* ── Annotations ── */
+  .annotations {
+    padding: 14px 20px 16px;
+    background: #f8fafc;
+    border-top: 1px solid var(--border);
+  }
+  .annotations h3 {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 10px;
+  }
+  .annotation-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .annotation-item {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .ann-tag {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 7px;
+    border-radius: 999px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .ann-text {
+    font-size: 11px;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  /* ── Takeaways section ── */
+  .takeaways {
+    max-width: 1100px;
+    margin: 32px auto 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+  }
+  .takeaways h2 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--section-header);
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .takeaways-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+  }
+  .takeaway-col h3 {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 10px;
+  }
+  .takeaway-item {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    margin-bottom: 8px;
+  }
+  .takeaway-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+  .takeaway-text { font-size: 12px; color: var(--text); line-height: 1.5; }
+
+  /* ── SAMI compare box ── */
+  .sami-compare {
+    max-width: 1100px;
+    margin: 24px auto 0;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 12px;
+    padding: 20px 28px;
+  }
+  .sami-compare h2 {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1d4ed8;
+    margin-bottom: 12px;
+  }
+  .sami-compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .sami-col h3 {
+    font-size: 11px;
+    font-weight: 700;
+    color: #3b82f6;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    margin-bottom: 8px;
+  }
+  .sami-item {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    margin-bottom: 6px;
+  }
+  .sami-icon { font-size: 12px; flex-shrink: 0; margin-top: 1px; }
+  .sami-text { font-size: 12px; color: #1e40af; line-height: 1.5; }
+
+  /* == PagerDuty == */
+  .pd-shell {
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+  }
+  .pd-topbar {
+    background: #0f172a;
+    padding: 7px 12px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-bottom: 1px solid #1e293b;
+  }
+  .pd-nav-item {
+    font-size: 9px;
+    color: #94a3b8;
+    padding: 3px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .pd-nav-item.active { background: #06ac38; color: #fff; font-weight: 600; }
+  .pd-body { display: flex; min-height: 220px; }
+  .pd-main { flex: 1; padding: 12px; }
+  .pd-right { width: 120px; background: #f8fafc; border-left: 1px solid #e2e8f0; padding: 10px; }
+  .pd-title { font-size: 12px; font-weight: 700; color: #0f172a; margin-bottom: 6px; }
+  .pd-filter-row {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .pd-filter {
+    font-size: 9px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: #e2e8f0;
+    color: #475569;
+    cursor: pointer;
+  }
+  .pd-filter.active { background: #0f172a; color: #fff; }
+  .pd-incident-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .pd-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .pd-dot.red { background: #ef4444; }
+  .pd-dot.yellow { background: #f59e0b; }
+  .pd-dot.green { background: #22c55e; }
+  .pd-inc-text { font-size: 10px; color: #334155; flex: 1; }
+  .pd-inc-badge {
+    font-size: 8px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-weight: 600;
+  }
+  .pd-badge-red { background: #fee2e2; color: #b91c1c; }
+  .pd-badge-yellow { background: #fef9c3; color: #854d0e; }
+  .pd-ai-strip {
+    margin-top: 8px;
+    background: #f0fdf4;
+    border: 1px solid #86efac;
+    border-radius: 6px;
+    padding: 8px 10px;
+  }
+  .pd-ai-header {
+    font-size: 9px;
+    font-weight: 700;
+    color: #15803d;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 4px;
+  }
+  .pd-ai-chips {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .pd-ai-chip {
+    background: #fff;
+    border: 1px solid #86efac;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 9px;
+    color: #166534;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .pd-ai-chip::before { content: "→"; font-size: 9px; }
+  .pd-right-title { font-size: 9px; font-weight: 700; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .4px; }
+  .pd-oncall-name { font-size: 10px; color: #0f172a; font-weight: 600; margin-bottom: 3px; }
+  .pd-oncall-sub { font-size: 9px; color: #64748b; margin-bottom: 6px; }
+  .pd-cal-row { display: flex; gap: 3px; margin-bottom: 4px; }
+  .pd-cal-day { font-size: 8px; color: #94a3b8; text-align: center; width: 15px; }
+  .pd-cal-day.today { color: #06ac38; font-weight: 700; }
+
+  /* == Wiz == */
+  .wiz-shell {
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+  }
+  .wiz-header {
+    background: #fff;
+    padding: 8px 12px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .wiz-badge-critical {
+    background: #fee2e2;
+    color: #b91c1c;
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 700;
+  }
+  .wiz-title { font-size: 11px; font-weight: 600; color: #1a202c; flex: 1; }
+  .wiz-body { display: flex; min-height: 230px; }
+  .wiz-left { flex: 1; padding: 10px 12px; border-right: 1px solid #e2e8f0; }
+  .wiz-right { width: 52%; padding: 10px 12px; background: #fafafa; }
+  .wiz-section-label {
+    font-size: 9px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 4px;
+  }
+  .wiz-tabs {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 8px;
+  }
+  .wiz-tab {
+    font-size: 9px;
+    padding: 3px 7px;
+    border-radius: 4px;
+    color: #64748b;
+    cursor: pointer;
+  }
+  .wiz-tab.active { background: #e0f2fe; color: #0369a1; font-weight: 600; }
+  .wiz-meta-row { display: flex; gap: 16px; margin-bottom: 8px; }
+  .wiz-meta-item { }
+  .wiz-meta-key { font-size: 9px; color: #94a3b8; margin-bottom: 1px; }
+  .wiz-meta-val { font-size: 10px; color: #1a202c; font-weight: 500; }
+  .wiz-env-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 9px;
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+  .wiz-attack-label { font-size: 9px; color: #64748b; margin-bottom: 5px; font-weight: 600; }
+  .wiz-graph-placeholder {
+    background: #f1f5f9;
+    border-radius: 6px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    color: #94a3b8;
+    font-style: italic;
+  }
+
+  .wiz-ai-panel {}
+  .wiz-ai-topbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .wiz-ai-icon {
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, #8b5cf6, #2563eb);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: #fff;
+  }
+  .wiz-ai-name { font-size: 11px; font-weight: 700; color: #1a202c; }
+  .wiz-ai-sub { font-size: 9px; color: #94a3b8; }
+  .wiz-ai-bubble {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0 8px 8px 8px;
+    padding: 8px 10px;
+    margin-bottom: 8px;
+  }
+  .wiz-ai-status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 6px;
+    font-size: 9px;
+    color: #16a34a;
+    font-weight: 600;
+  }
+  .wiz-ai-status::before { content: "✓"; }
+  .wiz-risk-title { font-size: 10px; font-weight: 700; color: #1a202c; margin-bottom: 5px; }
+  .wiz-risk-intro { font-size: 9px; color: #475569; margin-bottom: 5px; line-height: 1.5; }
+  .wiz-risk-bullets { padding-left: 12px; margin-bottom: 6px; }
+  .wiz-risk-bullets li { font-size: 9px; color: #475569; margin-bottom: 3px; line-height: 1.4; }
+  .wiz-remediation-title { font-size: 10px; font-weight: 700; color: #1a202c; margin-bottom: 5px; }
+  .wiz-step {
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+    margin-bottom: 5px;
+  }
+  .wiz-step-num {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #2563eb;
+    color: #fff;
+    font-size: 8px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .wiz-step-text { font-size: 9px; color: #475569; line-height: 1.4; }
+  .wiz-code-block {
+    background: #1e293b;
+    border-radius: 4px;
+    padding: 5px 7px;
+    font-family: monospace;
+    font-size: 8px;
+    color: #7dd3fc;
+    margin: 4px 0 4px 20px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .wiz-input {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 9px;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8px;
+  }
+  .wiz-send-btn {
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    cursor: pointer;
+  }
+  .wiz-actions {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .wiz-action-btn {
+    font-size: 9px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    color: #475569;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  /* == Datadog == */
+  .dd-shell {
+    background: #1a1a2e;
+    border-radius: 8px;
+    border: 1px solid #2a2a3a;
+    overflow: hidden;
+  }
+  .dd-topbar {
+    background: #141420;
+    padding: 7px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #2a2a3a;
+  }
+  .dd-status-badge {
+    background: #166534;
+    color: #86efac;
+    font-size: 9px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    font-weight: 700;
+  }
+  .dd-title { font-size: 10px; color: #e2e8f0; font-weight: 600; flex: 1; }
+  .dd-timing { font-size: 9px; color: #64748b; }
+  .dd-body { display: flex; min-height: 225px; }
+  .dd-sidebar-icons {
+    width: 34px;
+    background: #141420;
+    border-right: 1px solid #2a2a3a;
+    padding: 10px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .dd-icon {
+    width: 18px; height: 18px;
+    border-radius: 4px;
+    background: #2a2a3a;
+    font-size: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .dd-icon.active { background: #7c3aed; }
+  .dd-chat {
+    width: 45%;
+    padding: 10px;
+    border-right: 1px solid #2a2a3a;
+    display: flex;
+    flex-direction: column;
+  }
+  .dd-graph {
+    flex: 1;
+    padding: 10px;
+    position: relative;
+  }
+  .dd-user-bubble {
+    background: #2a2a3a;
+    border-radius: 8px 8px 8px 0;
+    padding: 6px 8px;
+    font-size: 9px;
+    color: #e2e8f0;
+    margin-bottom: 8px;
+    align-self: flex-start;
+    max-width: 90%;
+  }
+  .dd-ai-bubble {
+    background: #1e2235;
+    border: 1px solid #3a3a5a;
+    border-radius: 0 8px 8px 8px;
+    padding: 8px 10px;
+    flex: 1;
+    margin-bottom: 8px;
+  }
+  .dd-ai-brand {
+    font-size: 9px;
+    font-weight: 700;
+    color: #a78bfa;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .dd-ai-text { font-size: 9px; color: #94a3b8; margin-bottom: 6px; line-height: 1.5; }
+  .dd-action-title { font-size: 9px; font-weight: 700; color: #e2e8f0; margin-bottom: 4px; }
+  .dd-action-step {
+    display: flex;
+    gap: 5px;
+    align-items: flex-start;
+    margin-bottom: 4px;
+  }
+  .dd-action-num {
+    width: 13px; height: 13px;
+    border-radius: 50%;
+    background: #7c3aed;
+    color: #fff;
+    font-size: 8px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .dd-action-text { font-size: 9px; color: #a0aec0; line-height: 1.4; }
+  .dd-action-sub { font-size: 8px; color: #64748b; padding-left: 18px; margin-bottom: 3px; }
+  .dd-btn-row {
+    display: flex;
+    gap: 6px;
+    margin-top: auto;
+  }
+  .dd-btn {
+    font-size: 9px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    border: 1px solid #3a3a5a;
+    background: transparent;
+    color: #a78bfa;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .dd-graph-node {
+    position: absolute;
+    border-radius: 4px;
+    padding: 4px 7px;
+    font-size: 8px;
+    color: #e2e8f0;
+    border: 1px solid;
+    white-space: nowrap;
+  }
+  .dd-node-red { background: #2d0a0a; border-color: #ef4444; }
+  .dd-node-yellow { background: #2d2000; border-color: #f59e0b; }
+  .dd-node-green { background: #022c22; border-color: #22c55e; }
+  .dd-node-blue { background: #0d1b3e; border-color: #3b82f6; }
+  .dd-conclusion {
+    position: absolute;
+    bottom: 10px;
+    left: 10px; right: 10px;
+    background: #1e2235;
+    border: 1px solid #3a3a5a;
+    border-radius: 6px;
+    padding: 5px 8px;
+    font-size: 8px;
+    color: #94a3b8;
+    line-height: 1.4;
+  }
+  .dd-conclusion strong { color: #a78bfa; font-size: 8px; }
+
+  /* ── SAMI ref strip ── */
+  .sami-ref {
+    max-width: 1100px;
+    margin: 28px auto 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .sami-ref-header {
+    background: #0f172a;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .sami-ref-header h2 { font-size: 13px; font-weight: 700; color: #f1f5f9; }
+  .sami-ref-header span { font-size: 11px; color: #64748b; }
+  .sami-ref-body { padding: 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .sami-pattern {
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+  }
+  .sami-pattern-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--section-header);
+    margin-bottom: 6px;
+  }
+  .sami-pattern-desc {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.5;
+    margin-bottom: 8px;
+  }
+  .sami-pattern-source {
+    font-size: 10px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .sami-pattern-source::before { content: "Seen in: "; color: var(--muted); font-weight: 400; }
+
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; }
+    .takeaways-grid { grid-template-columns: 1fr; }
+    .sami-compare-grid { grid-template-columns: 1fr; }
+    .sami-ref-body { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Page Header -->
+<div class="page-header">
+  <h1>AI Recommendations UI — Design Inspiration</h1>
+  <p>Visual reference for SAMI Insights Phase 2 · Captured May 2026</p>
+  <div class="meta">
+    <span class="meta-chip">Security Products</span>
+    <span class="meta-chip">AI Panel Patterns</span>
+    <span class="meta-chip">Alert Triage UX</span>
+    <span class="meta-chip">Remediation Flows</span>
+  </div>
+</div>
+
+<!-- 2×2 Grid -->
+<div class="grid">
+
+  <!-- ── 1. CrowdStrike ── -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-left">
+        <div class="product-logo logo-cs">CS</div>
+        <div>
+          <div class="card-header h2" style="font-size:13px;font-weight:700;color:#0f172a;">CrowdStrike Falcon</div>
+          <div class="product-sub">Charlotte AI · Asset & Risk Management</div>
+        </div>
+      </div>
+      <a class="source-link" href="https://www.crowdstrike.com/en-us/blog/crowdstrike-transforms-falcon-ux-charlotte-ai/" target="_blank">↗ Source</a>
+    </div>
+    <div class="mock-ui">
+      <div class="cs-shell">
+        <div class="cs-topbar">
+          <span class="cs-topbar-title">Customer ID ▾</span>
+          <span class="cs-topbar-badge">Charlotte AI</span>
+        </div>
+        <div class="cs-body">
+          <div class="cs-sidebar">
+            <div class="cs-icon">⌂</div>
+            <div class="cs-icon active">◉</div>
+            <div class="cs-icon">☁</div>
+            <div class="cs-icon">⚑</div>
+            <div class="cs-icon">⊞</div>
+          </div>
+          <div class="cs-main">
+            <div class="cs-panel-title">
+              Asset Overview ☆
+              <button class="cs-actions-btn">Actions ▾</button>
+            </div>
+            <div class="cs-metric-row">
+              <div class="cs-metric">
+                <div class="cs-metric-label">Total Assets</div>
+                <div class="cs-metric-val" style="color:#7dd3fc;">56,462</div>
+              </div>
+              <div class="cs-metric">
+                <div class="cs-metric-label">With Sensor</div>
+                <div class="cs-metric-val" style="color:#4ade80;">19.6k</div>
+              </div>
+              <div class="cs-metric">
+                <div class="cs-metric-label">Exposed</div>
+                <div class="cs-metric-val" style="color:#f87171;">8.4k</div>
+              </div>
+            </div>
+            <div style="background:#1c1c28;border-radius:5px;padding:7px 8px;border:1px solid #2a2a3a;margin-bottom:8px;">
+              <div class="cs-metric-label" style="margin-bottom:4px;">Coverage by Provider</div>
+              <div style="display:flex;gap:4px;align-items:center;">
+                <div style="height:6px;flex:3;background:#cc0000;border-radius:2px;"></div>
+                <div style="height:6px;flex:2;background:#3b82f6;border-radius:2px;"></div>
+                <div style="height:6px;flex:1;background:#f59e0b;border-radius:2px;"></div>
+                <div style="height:6px;flex:1;background:#2a2a3a;border-radius:2px;"></div>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:4px;">
+                <span style="font-size:8px;color:#94a3b8;">● CrowdStrike 13.6K</span>
+                <span style="font-size:8px;color:#64748b;">● Tenable 2.3K</span>
+                <span style="font-size:8px;color:#64748b;">● Other 2K</span>
+              </div>
+            </div>
+            <div class="cs-ai-box">
+              <div class="cs-ai-label">✦ Charlotte AI Recommends</div>
+              <div class="cs-ai-text">19.6K assets lack sensor coverage. Priority: deploy on 8.4K internet-exposed nodes before weekend. CVSS 9.8 exploit public.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="annotations">
+      <h3>Design Patterns</h3>
+      <div class="annotation-list">
+        <div class="annotation-item">
+          <span class="ann-tag" style="background:var(--chip-red);color:var(--chip-red-text);">Dark UI</span>
+          <span class="ann-text">Full dark-mode shell — icon-only collapsible sidebar keeps content density high.</span>
+        </div>
+        <div class="annotation-item">
+          <span class="ann-tag" style="background:var(--chip-blue);color:var(--chip-blue-text);">AI Strip</span>
+          <span class="ann-text">AI recommendation surfaced as a branded callout box at the bottom of the data view — never interrupts flow.</span>
+        </div>
+        <div class="annotation-item">
+          <span class="ann-tag" style="background:var(--chip-green);color:var(--chip-green-text);">Context</span>
+          <span class="ann-text">Persona-aware dashboards via Charlotte AI — users describe what they want, layout auto-generates.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2. PagerDuty ── -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-left">
+        <div class="product-logo logo-pd">PD</div>
+        <div>
+          <div class="card-header h2" style="font-size:13px;font-weight:700;color:#0f172a;">PagerDuty Advance</div>
+          <div class="product-sub">Generative AI · Incident Intelligence</div>
+        </div>
+      </div>
+      <a class="source-link" href="https://www.pagerduty.com/platform/generative-ai/" target="_blank">↗ Source</a>
+    </div>
+    <div class="mock-ui">
+      <div class="pd-shell">
+        <div class="pd-topbar">
+          <span class="pd-nav-item">Incidents</span>
+          <span class="pd-nav-item">Services</span>
+          <span class="pd-nav-item active">AI ✦</span>
+          <span class="pd-nav-item">Analytics</span>
+        </div>
+        <div class="pd-body">
+          <div class="pd-main">
+            <div class="pd-title">Incidents on All Teams</div>
+            <div class="pd-filter-row">
+              <span class="pd-filter active">Open</span>
+              <span class="pd-filter">Triggered</span>
+              <span class="pd-filter">Acknowledged</span>
+              <span class="pd-filter">Resolved</span>
+            </div>
+            <div class="pd-incident-row">
+              <div class="pd-dot red"></div>
+              <div class="pd-inc-text">DB Pipeline — High CPU Saturation</div>
+              <span class="pd-inc-badge pd-badge-red">P1</span>
+            </div>
+            <div class="pd-incident-row">
+              <div class="pd-dot yellow"></div>
+              <div class="pd-inc-text">Cluster Service — Slow Response</div>
+              <span class="pd-inc-badge pd-badge-yellow">P2</span>
+            </div>
+            <div class="pd-incident-row">
+              <div class="pd-dot yellow"></div>
+              <div class="pd-inc-text">Query Engine — Slow Down</div>
+              <span class="pd-inc-badge pd-badge-yellow">P2</span>
+            </div>
+            <div class="pd-ai-strip">
+              <div class="pd-ai-header">✦ Advance AI Suggestions</div>
+              <div class="pd-ai-chips">
+                <div class="pd-ai-chip">Surface helpful insights for faster resolution</div>
+                <div class="pd-ai-chip">Generate audience-specific status updates</div>
+                <div class="pd-ai-chip">Gather most important automation results</div>
+              </div>
+            </div>
+          </div>
+          <div class="pd-right">
+            <div class="pd-right-title">On-Call Now</div>
+            <div class="pd-oncall-name">A. Kethini</div>
+            <div class="pd-oncall-sub">DB Pipeline-op</div>
+            <div class="pd-cal-row">
+              <div class="pd-cal-day">M</div><div class="pd-cal-day today">T</div>
+              <div class="pd-cal-day">W</div><div class="pd-cal-day">T</div>
+              <div class="pd-cal-day">F</div>
+            </div>
+            <div style="font-size:9px;color:#64748b;margin-top:6px;">Next rotation in 3d</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="annotations">
+      <h3>Design Patterns</h3>
+      <div class="annotation-list">
+        <div class="annotation-item">
+          <span class="ann-tag" style="background:var(--chip-green);color:var(--chip-green-text);">Embedded AI</span>
+          <span class="ann-text">AI capabilities surfaced as clickable chips <em>within</em> the incident list — not a separate page or mode.</span>
+        </div>
+        <div class="annotation-item">
+          <span class="ann-tag" style="background:var(--chip-blue);color:var(--chip-blue-text);">3-Action Model</span>
+          <span class="ann-text">Exactly 3 suggested actions — prioritized by AI, not by the user scrolling through options.</span>
+        </div>
+        <div class="annotation-item">
+          <span class="ann-tag" style="background:var(--chip-orange);color:var(--chip-orange-text);">Light Mode</span>
+          <span class="ann-text">Clean white with green brand accents — high contrast for SOC operators in bright environments.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 3. Wiz ── -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-left">
+        <div class="product-logo logo-wz">WZ</div>
+        <div>
+          <div class="card-header h2" style="font-size:13px;font-weight:700;color:#0f172a;">Wiz — Ask Mika AI</div>
+          <div class="product-sub">Issues Agent · Remediation Intelligence</div>
+        </div>
+      </div>
+      <a class="source-link" href="https://www.wiz.io/blog/wiz-ai-agents" target="_blank">↗ Source</a>
+    </div>
+    <div class="mock-ui">
+      <div class="wiz-shell">
+        <div class="wiz-header">
+          <span class="wiz-badge-critical">Critical</span>
+          <span class="wiz-title">Publicly exposed VM/serverless with initial access</span>
+        </div>
+        <div class="wiz-body">
+          <!-- Left: Issue detail -->
+          <div class="wiz-left">
+            <div class="wiz-actions">
+              <button class="wiz-action-btn">⚡ Investigate</button>
+              <button class="wiz-action-btn">💬 Comment</button>
+              <button class="wiz-action-btn">▶ Run Action</button>
+              <button class="wiz-action-btn">🎫 Ticket</button>
+            </div>
+            <div class="wiz-tabs">
+              <span class="wiz-tab active">Overview</span>
+              <span class="wiz-tab">Investigation</span>
+              <span class="wiz-tab">Code→Cloud</span>
+              <span class="wiz-tab">Remediation</span>
+            </div>
+            <div class="wiz-meta-row">
+              <div class="wiz-meta-item">
+                <div class="wiz-meta-key">Subscription</div>
+                <div class="wiz-meta-val"><span class="wiz-env-badge">☁ ACME-PROD</span></div>
+              </div>
+              <div class="wiz-meta-item">
+                <div class="wiz-meta-key">Severity</div>
+                <div class="wiz-meta-val" style="color:#b91c1c;font-weight:700;">Critical ●</div>
+              </div>
+            </div>
+            <div class="wiz-attack-label">Attack Path Visualization</div>
+            <div class="wiz-graph-placeholder">Internet → VM → Sensitive Data</div>
+          </div>
+          <!-- Right: AI Panel -->
+          <div class="wiz-right">
+            <div class="wiz-ai-panel">
+              <div class="wiz-ai-topbar">
+                <div class="wiz-ai-icon">✦</div>
+                <div>
+                  <div class="wiz-ai-name">Ask Mika AI</div>
+                  <div class="wiz-ai-sub">Security Intelligence Agent</div>
+                </div>
+              </div>
+              <div class="wiz-ai-bubble">
+                <div class="wiz-ai-status">Issues Expert · Investigation Complete</div>
+                <div class="wiz-risk-title">Risk Assessment</div>
+                <div class="wiz-risk-intro">CRITICAL toxic combination — publicly exposed VM with:</div>
+                <ul class="wiz-risk-bullets">
+                  <li>CVE-2025-59420 with known exploits</li>
+                  <li>Service account → sensitive data access</li>
+                  <li>Multiple PII files exposed</li>
+                </ul>
+                <div class="wiz-remediation-title">Immediate Remediation Plan</div>
+                <div class="wiz-step">
+                  <div class="wiz-step-num">1</div>
+                  <div class="wiz-step-text">Restrict Network Access (Priority 1)</div>
+                </div>
+                <div class="wiz-code-block">gcloud compute firewall-rules delete EXISTING_RULE --quiet</div>
+                <div class="wiz-step">
+                  <div class="wiz-step-num">2</div>
+                  <div class="wiz-step-text">Patch Critical Vulnerability (Priority 1)</div>
+                </div>
+              </div>
+              <div class="wiz-input">
+                <span>Ask anything...</span>
+                <button class="wiz-send-btn">↑</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="annotations">
+      <h3>Design Patterns</h3>
+      <div class="annotation-list">
+        <div class="annotation-item">
+          <span class="ann-tag" style="background:var(--chip-blue);color:var(--chip-blue-text);">Split Panel</span>
+          <span class="ann-text">Issue context on the left, AI analysis on the right — always visible together without context switching.</span>
+        </div>
+        <div class="annotation-item">
+          <span class="ann-tag" style="background:var(--chip-red);color:var(--chip-red-text);">Structured AI</span>
+          <span class="ann-text">AI output has explicit sections: Risk Assessment → Remediation Plan → Code blocks. Scannable at speed.</span>
+        </div>
+        <div class="annotation-item">
+          <span class="ann-tag" style="background:var(--chip-purple);color:var(--chip-purple-text);">Conversational</span>
+          <span class="ann-text">Persistent "Ask anything" input lets analysts drill deeper without leaving the issue context.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 4. Datadog ── -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-left">
+        <div class="product-logo logo-dd">DD</div>
+        <div>
+          <div class="card-header h2" style="font-size:13px;font-weight:700;color:#0f172a;">Datadog Bits AI SRE</div>
+          <div class="product-sub">Autonomous Alert Investigation · Root Cause</div>
+        </div>
+      </div>
+      <a class="source-link" href="https://www.datadoghq.com/product/ai/bits-ai-sre/" target="_blank">↗ Source</a>
+    </div>
+    <div class="mock-ui">
+      <div class="dd-shell">
+        <div class="dd-topbar">
+          <span class="dd-status-badge">Conclusive</span>
+          <span class="dd-title">High latency on flight-query-api for post_/api/v1/search</span>
+          <span class="dd-timing">Finished in 3 min</span>
+        </div>
+        <div class="dd-body">
+          <div class="dd-sidebar-icons">
+            <div class="dd-icon">⊞</div>
+            <div class="dd-icon">◎</div>
+            <div class="dd-icon active">✦</div>
+            <div class="dd-icon">⋮</div>
+          </div>
+          <div class="dd-chat">
+            <div class="dd-user-bubble">What can I do to remediate?</div>
+            <div class="dd-ai-bubble">
+              <div class="dd-ai-brand">✦ Bits AI</div>
+              <div class="dd-ai-text">Based on investigation — remediation steps for downstream slowness in flight-query-engine's execute_search:</div>
+              <div class="dd-action-title">Immediate actions:</div>
+              <div class="dd-action-step">
+                <div class="dd-action-num">1</div>
+                <div class="dd-action-text">Scale flight-query-engine</div>
+              </div>
+              <div class="dd-action-sub">Traffic to /api/v1/search spiked 0→4.5 hits/sec</div>
+              <div class="dd-action-step">
+                <div class="dd-action-num">2</div>
+                <div class="dd-action-text">Add more instances of flight-query-engine</div>
+              </div>
+              <div class="dd-action-sub">DB CPU Saturation is root cause</div>
+            </div>
+            <div class="dd-btn-row">
+              <button class="dd-btn">▶ Run Action</button>
+              <button class="dd-btn">⚙ Run Workflow</button>
+            </div>
+          </div>
+          <div class="dd-graph" style="position:relative;overflow:hidden;">
+            <div class="dd-graph-node dd-node-red" style="top:8px;left:8px;">DB CPU Exhaustion</div>
+            <div class="dd-graph-node dd-node-yellow" style="top:8px;right:8px;">Query Engine Slow</div>
+            <div class="dd-graph-node dd-node-yellow" style="top:52px;left:8px;">DB CPU Saturation</div>
+            <div class="dd-graph-node dd-node-blue" style="top:52px;right:8px;">Complex Queries</div>
+            <div style="position:absolute;top:96px;left:8px;right:8px;height:1px;background:#3a3a5a;"></div>
+            <div class="dd-conclusion">
+              <strong>Investigation Conclusion</strong><br/>
+              High latency traced to slow execute_search in flight-query-engine.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="annotations">
+      <h3>Design Patterns</h3>
+      <div class="annotation-list">
+        <div class="annotation-item">
+          <span class="ann-tag" style="background:var(--chip-purple);color:var(--chip-purple-text);">Auto-Investigate</span>
+          <span class="ann-text">AI fires automatically when the alert triggers — analyst opens to a <em>completed</em> investigation, not a loading state.</span>
+        </div>
+        <div class="annotation-item">
+          <span class="ann-tag" style="background:var(--chip-red);color:var(--chip-red-text);">Graph + Chat</span>
+          <span class="ann-text">Chat panel left, dependency graph right — evidence visualization always paired with the recommendation.</span>
+        </div>
+        <div class="annotation-item">
+          <span class="ann-tag" style="background:var(--chip-blue);color:var(--chip-blue-text);">1-Click Action</span>
+          <span class="ann-text">"Run Action / Run Workflow" directly from the AI panel — zero navigation to execute the remediation.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /grid -->
+
+<!-- ── SAMI Pattern Extraction ── -->
+<div class="sami-ref">
+  <div class="sami-ref-header">
+    <h2>Key Patterns for SAMI Insights Phase 2</h2>
+    <span>Extracted from the 4 products above</span>
+  </div>
+  <div class="sami-ref-body">
+    <div class="sami-pattern">
+      <div class="sami-pattern-title">Structured AI Output</div>
+      <div class="sami-pattern-desc">Label sections explicitly: Risk Assessment → SAMI Recommends → Remediation Steps. Analysts scan at 3 AM — headers matter more than prose.</div>
+      <div class="sami-pattern-source">Wiz, Datadog</div>
+    </div>
+    <div class="sami-pattern">
+      <div class="sami-pattern-title">Split Panel Evidence</div>
+      <div class="sami-pattern-desc">Show the alert/scope context (what, how many devices, tenants) alongside the AI analysis — never force the user to navigate away to see evidence.</div>
+      <div class="sami-pattern-source">Wiz, Datadog</div>
+    </div>
+    <div class="sami-pattern">
+      <div class="sami-pattern-title">1-Click Primary Action</div>
+      <div class="sami-pattern-desc">The top recommended action ("Patch 8 firewalls") must be a direct CTA — not buried in a detail drawer. Secondary actions (Snooze, Dismiss) visually de-emphasized.</div>
+      <div class="sami-pattern-source">Wiz, Datadog, PagerDuty</div>
+    </div>
+    <div class="sami-pattern">
+      <div class="sami-pattern-title">Category-Scoped Sidebar</div>
+      <div class="sami-pattern-desc">Left nav grouping by category (CVE / Policy / Behavioral / Renewals) mirrors how real MSP operators triage — keep this pattern, consider adding count badges with severity dots.</div>
+      <div class="sami-pattern-source">SAMI current · CrowdStrike</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Design Takeaways ── -->
+<div class="takeaways">
+  <h2>Design Takeaways vs. SAMI Insights Current State</h2>
+  <div class="takeaways-grid">
+    <div class="takeaway-col">
+      <h3>What SAMI Does Well</h3>
+      <div class="takeaway-item"><div class="takeaway-dot"></div><div class="takeaway-text">3-panel layout (sidebar → list → detail) matches industry standard for alert triage.</div></div>
+      <div class="takeaway-item"><div class="takeaway-dot"></div><div class="takeaway-text">Category-based grouping with count badges is the right mental model for MSP operators.</div></div>
+      <div class="takeaway-item"><div class="takeaway-dot"></div><div class="takeaway-text">"SAMI Recommends" callout box is well-positioned — consistent with CrowdStrike's Charlotte AI strip.</div></div>
+      <div class="takeaway-item"><div class="takeaway-dot"></div><div class="takeaway-text">Severity tags (Critical) + category tags (CVE) on cards match PagerDuty's priority badge pattern.</div></div>
+    </div>
+    <div class="takeaway-col">
+      <h3>Opportunities to Explore</h3>
+      <div class="takeaway-item"><div class="takeaway-dot" style="background:#f59e0b;"></div><div class="takeaway-text"><strong>Structured sections in AI callout</strong> — add explicit "Risk Assessment" and "Remediation Steps" subheadings inside the SAMI Recommends box (Wiz pattern).</div></div>
+      <div class="takeaway-item"><div class="takeaway-dot" style="background:#f59e0b;"></div><div class="takeaway-text"><strong>Evidence panel</strong> — show scope (tenant list, device count) alongside AI summary in the detail panel, not below it.</div></div>
+      <div class="takeaway-item"><div class="takeaway-dot" style="background:#f59e0b;"></div><div class="takeaway-text"><strong>Inline action chips</strong> — surface 2–3 AI-suggested next steps as chips in the list cards, not just in the detail panel (PagerDuty pattern).</div></div>
+    </div>
+    <div class="takeaway-col">
+      <h3>Questions to Test</h3>
+      <div class="takeaway-item"><div class="takeaway-dot" style="background:#8b5cf6;"></div><div class="takeaway-text">Does the MSP operator need a conversational "Ask anything" input in the detail panel, or is the structured recommendation sufficient?</div></div>
+      <div class="takeaway-item"><div class="takeaway-dot" style="background:#8b5cf6;"></div><div class="takeaway-text">Should the "Patch 8 firewalls" CTA button launch a workflow in NSM, or link to a step-by-step remediation guide?</div></div>
+      <div class="takeaway-item"><div class="takeaway-dot" style="background:#8b5cf6;"></div><div class="takeaway-text">Is a dependency / attack-path graph (Datadog / Wiz pattern) useful for SAMI Renewals and Policy Gap categories, or primarily for CVE Vulnerabilities?</div></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

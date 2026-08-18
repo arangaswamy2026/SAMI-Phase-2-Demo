@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<!--
+  Tab View Variant · SonicWall Unified Dashboard
+  Design System: UUIF 9.2
+  Layout: Persistent product strip + top-level tab navigation per product section
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tab View · SonicWall Unified Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════════════
+   DESIGN TOKENS — UUIF 9.2
+══════════════════════════════════════════════════════ */
+:root {
+  --uuif-brand-navy:#001b50;
+  --uuif-brand-orange:#ff5d00;
+  --uuif-brand-green:#59a02e;
+  --uuif-brand-red:#c70f0f;
+  --uuif-brand-yellow:#f3ac3d;
+  --uuif-brand-blue:#1f3c73;
+  --uuif-text-primary:#191c25;
+  --uuif-text-secondary:#4a618f;
+  --uuif-text-tertiary:#888;
+  --uuif-text-highlight:#0c2b67;
+  --uuif-text-contrast:#fff;
+  --uuif-text-hover:#ff5d00;
+  --uuif-surface-container:#fff;
+  --uuif-surface-bg:#fafafa;
+  --uuif-surface-primary:#5b74a7;
+  --uuif-surface-tertiary:#f6f8fe;
+  --uuif-surface-model:#f0f2f5;
+  --uuif-border-primary:#ff5d00;
+  --uuif-border-secondary:#78a3e5;
+  --uuif-border-tertiary:#ccc;
+  --uuif-border-transparent:rgba(17,17,17,.09);
+  --uuif-border-new:#d4e3f9;
+  --uuif-icon-primary:#5885cc;
+  --uuif-icon-secondary:#9dafd3;
+  --uuif-status-normal:#99CC00;
+  --uuif-status-major:#FF9900;
+  --uuif-status-failed:#CC0000;
+  --uuif-fill-blue-lightest:#f6f8fe;
+  --uuif-fill-green-xxx-lighter:#e3efdc;
+  --uuif-fill-yellow-xxx-lighter:#ffe9be;
+  --uuif-fill-red-lightest:#fff0f0;
+  --uuif-shadow-sm:0px 1px 6px 2px rgba(0,0,0,.12);
+  --uuif-radius-4:4px;
+  --uuif-radius-6:6px;
+  --uuif-radius-8:8px;
+  --uuif-radius-12:12px;
+  --uuif-radius-pill:88px;
+  --nav-w:60px;
+  --sub-w:200px;
+  --bar-h:48px;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Nunito Sans',sans-serif;
+  font-size:13px;
+  background:var(--uuif-surface-bg);
+  color:var(--uuif-text-primary);
+}
+
+/* ══════════════════════════════════════════════════════
+   PRIMARY NAV RAIL
+══════════════════════════════════════════════════════ */
+.nav-rail{
+  position:fixed;top:0;left:0;bottom:0;
+  width:var(--nav-w);
+  background:var(--uuif-brand-navy);
+  display:flex;flex-direction:column;align-items:center;
+  z-index:400;
+}
+.nav-logo{width:var(--nav-w);height:52px;display:flex;align-items:center;justify-content:center;padding:12px 14px}
+.nav-item{
+  position:relative;width:var(--nav-w);height:52px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;border:none;background:transparent;cursor:pointer;
+  color:var(--uuif-icon-secondary);
+  font-family:'Nunito Sans',sans-serif;font-size:9px;line-height:1;
+  transition:background 120ms;
+}
+.nav-item:hover{background:rgba(255,255,255,.07)}
+.nav-item.active{background:rgba(0,0,0,.3);color:var(--uuif-brand-orange)}
+.nav-item.active::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;
+  width:2px;background:var(--uuif-brand-orange);border-radius:0 2px 2px 0;
+}
+.nav-item svg{width:22px;height:22px;flex-shrink:0}
+.nav-divider{width:36px;height:1px;background:rgba(255,255,255,.12);margin:2px 0}
+.nav-spacer{flex:1}
+
+/* ══════════════════════════════════════════════════════
+   SUBNAV PANEL
+══════════════════════════════════════════════════════ */
+.subnav{
+  position:fixed;top:0;left:var(--nav-w);bottom:0;
+  width:var(--sub-w);
+  background:var(--uuif-surface-container);
+  border-right:1px solid var(--uuif-border-transparent);
+  z-index:300;display:flex;flex-direction:column;overflow-y:auto;
+}
+.subnav-header{padding:14px 16px 10px;border-bottom:1px solid var(--uuif-border-transparent)}
+.subnav-wordmark{display:flex;align-items:center;gap:7px;margin-bottom:3px}
+.subnav-wordmark-text{font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;letter-spacing:.06em;color:var(--uuif-brand-orange)}
+.subnav-slash{color:rgba(0,27,80,.3);font-size:13px;margin:0 2px}
+.subnav-app{font-family:'Nunito Sans',sans-serif;font-size:12px;font-weight:600;color:var(--uuif-text-secondary)}
+.subnav-section-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--uuif-brand-navy);padding:14px 16px 4px}
+.subnav-accordion{display:flex;align-items:center;justify-content:space-between;padding:6px 16px;cursor:pointer;font-size:13px;font-weight:600;color:var(--uuif-text-primary)}
+.subnav-accordion svg{width:14px;height:14px;stroke:var(--uuif-text-tertiary);transition:transform 200ms}
+.subnav-accordion.open svg{transform:rotate(90deg)}
+.subnav-item{display:block;padding:5px 16px 5px 28px;font-size:12px;font-weight:400;color:var(--uuif-text-secondary);cursor:pointer;border-left:2px solid transparent;text-decoration:none;transition:color 120ms}
+.subnav-item:hover{color:var(--uuif-text-hover)}
+.subnav-item.active{font-weight:700;color:var(--uuif-brand-orange);border-left-color:var(--uuif-brand-orange);background:rgba(255,93,0,.06)}
+
+/* ══════════════════════════════════════════════════════
+   TITLE BAR
+══════════════════════════════════════════════════════ */
+.title-bar{
+  position:fixed;top:0;left:calc(var(--nav-w) + var(--sub-w));right:0;
+  height:var(--bar-h);background:var(--uuif-surface-container);
+  border-bottom:1px solid var(--uuif-border-transparent);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;z-index:200;
+}
+.title-bar-left{display:flex;align-items:center;gap:8px}
+.breadcrumb{font-size:13px;color:var(--uuif-text-secondary)}
+.breadcrumb .sep{margin:0 5px;opacity:.4;font-size:11px}
+.breadcrumb .cur{color:var(--uuif-text-primary);font-weight:600}
+.scope-selector{
+  position:absolute;left:50%;transform:translateX(-50%);
+  width:291px;height:29px;border-radius:var(--uuif-radius-4);
+  border:1px solid var(--uuif-border-tertiary);
+  background:var(--uuif-surface-container);
+  display:flex;align-items:center;gap:6px;padding:0 8px;cursor:pointer;
+}
+.scope-selector-text{font-size:13px;color:var(--uuif-text-primary);flex:1}
+.scope-divider{width:1px;height:16px;background:var(--uuif-border-transparent)}
+.title-bar-right{display:flex;align-items:center}
+.tbi{width:48px;height:48px;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:.6;border:none;background:transparent;position:relative}
+.tbi:hover{opacity:1}
+.notif-dot{position:absolute;top:9px;right:9px;width:7px;height:7px;border-radius:50%;background:var(--uuif-brand-orange);border:1.5px solid #fff}
+.avatar-btn{display:flex;align-items:center;gap:4px;cursor:pointer;border:none;background:transparent;padding:0 8px}
+.avatar{width:29px;height:29px;border-radius:50%;background:linear-gradient(135deg,var(--uuif-brand-orange),var(--uuif-brand-navy));display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:800}
+
+/* ══════════════════════════════════════════════════════
+   LAYOUT BODY
+══════════════════════════════════════════════════════ */
+.body-wrap{margin-left:calc(var(--nav-w) + var(--sub-w));padding-top:var(--bar-h);min-height:100vh}
+.content{padding:16px;display:flex;flex-direction:column;gap:12px}
+
+/* ══════════════════════════════════════════════════════
+   CARD BASE
+══════════════════════════════════════════════════════ */
+.card{background:var(--uuif-surface-container);border:1px solid var(--uuif-border-tertiary);border-radius:var(--uuif-radius-6);overflow:hidden;box-shadow:var(--uuif-shadow-sm)}
+.card-title-pane{background:var(--uuif-surface-model);border-bottom:1px solid var(--uuif-border-transparent);min-height:35px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:14px;font-weight:700;text-transform:uppercase;color:var(--uuif-text-highlight)}
+.card-title-pane .sub{font-size:11px;font-weight:400;color:var(--uuif-text-tertiary);text-transform:none;margin-left:8px}
+.card-body{padding:12px}
+
+/* ══════════════════════════════════════════════════════
+   PRODUCT STRIP
+══════════════════════════════════════════════════════ */
+.strip-wrap{display:flex;align-items:stretch;gap:8px;padding:12px;position:relative}
+.strip-nav-btn{flex-shrink:0;width:28px;display:flex;align-items:center;justify-content:center;border:1px solid var(--uuif-border-new);border-radius:var(--uuif-radius-6);background:var(--uuif-surface-container);cursor:pointer;color:var(--uuif-icon-secondary);transition:border-color 120ms,color 120ms}
+.strip-nav-btn:hover{border-color:var(--uuif-border-secondary);color:var(--uuif-icon-primary)}
+.strip-tiles{flex:1;display:grid;grid-template-columns:repeat(6,1fr) 180px;gap:8px;min-width:0}
+.pct{background:var(--uuif-surface-container);border:1px solid var(--uuif-border-new);border-radius:var(--uuif-radius-8);padding:12px;display:flex;flex-direction:column;gap:0;min-width:0;cursor:pointer;transition:border-color 150ms,box-shadow 150ms}
+.pct:hover{border-color:var(--uuif-border-secondary);box-shadow:0 2px 8px rgba(88,133,204,.18)}
+.pct.selected{border-color:var(--uuif-brand-orange);box-shadow:0 0 0 2px rgba(255,93,0,.12)}
+.pct-header{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.pct-icon{width:24px;height:24px;flex-shrink:0;color:var(--uuif-brand-orange)}
+.pct-name{font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#171717;line-height:1.2}
+.pct-label{font-family:'Nunito Sans',sans-serif;font-size:13px;font-weight:600;color:#777;margin-bottom:2px}
+.pct-value{font-family:'Nunito',sans-serif;font-size:22px;font-weight:700;color:#16325d;line-height:1.1;margin-bottom:7px}
+.pct-divider{height:0.5px;background:var(--uuif-border-new);margin:0 -12px;margin-bottom:7px}
+.pct-attn-label{font-family:'Nunito Sans',sans-serif;font-size:12px;font-weight:600;color:#777;margin-bottom:2px}
+.pct-attn-value{font-family:'Nunito',sans-serif;font-size:22px;font-weight:700;color:var(--uuif-icon-primary);line-height:1.1}
+.org-tile{background:#122e5a;border:1px solid rgba(250,250,250,.3);border-radius:var(--uuif-radius-8);padding:12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.org-tile-title{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.45)}
+.org-stat{display:flex;flex-direction:column;gap:1px}
+.org-stat-label{font-size:11px;color:rgba(255,255,255,.45);letter-spacing:.04em;text-transform:uppercase}
+.org-stat-value{font-size:22px;font-weight:700;color:#fff;line-height:1.1}
+.org-stat-attn{font-size:18px;font-weight:700;color:var(--uuif-status-major);line-height:1.1}
+.org-divider{height:0.5px;background:rgba(255,255,255,.12)}
+.org-btn{background:var(--uuif-surface-primary);color:#fff;border:none;border-radius:var(--uuif-radius-pill);font-size:12px;font-weight:600;padding:5px 16px;cursor:pointer;font-family:'Nunito Sans',sans-serif;margin-top:auto;transition:background 120ms}
+.org-btn:hover{background:var(--uuif-brand-orange)}
+
+/* ══════════════════════════════════════════════════════
+   MAIN TAB BAR (Top-level sections)
+══════════════════════════════════════════════════════ */
+.main-tab-shell{
+  background:var(--uuif-surface-container);
+  border:1px solid var(--uuif-border-tertiary);
+  border-radius:var(--uuif-radius-6);
+  overflow:hidden;
+  box-shadow:var(--uuif-shadow-sm);
+}
+.tabs-main{
+  display:flex;align-items:flex-end;
+  background:var(--uuif-surface-container);
+  border-bottom:2px solid var(--uuif-border-primary);
+  padding:0 16px;gap:2px;
+}
+.tab-main{
+  height:40px;padding:0 16px;
+  font-size:13px;cursor:pointer;
+  display:flex;align-items:center;gap:7px;
+  border:none;background:transparent;
+  font-family:'Nunito Sans',sans-serif;
+  color:var(--uuif-text-secondary);font-weight:400;
+  white-space:nowrap;
+  border-radius:var(--uuif-radius-6) var(--uuif-radius-6) 0 0;
+  transition:color 120ms;
+}
+.tab-main:hover:not(.active){color:var(--uuif-text-primary)}
+.tab-main.active{
+  font-weight:700;color:var(--uuif-brand-orange);
+  border:1px solid var(--uuif-border-primary);
+  border-bottom:none;
+  background:var(--uuif-surface-container);
+  margin-bottom:-2px;
+}
+.tab-main-badge{
+  min-width:18px;height:18px;border-radius:var(--uuif-radius-pill);
+  background:var(--uuif-brand-orange);color:#fff;font-size:10px;font-weight:700;
+  display:inline-flex;align-items:center;justify-content:center;padding:0 5px;
+}
+.tab-main:not(.active) .tab-main-badge{background:var(--uuif-icon-secondary)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* ══════════════════════════════════════════════════════
+   TAB CONTENT INNER COMPONENTS
+══════════════════════════════════════════════════════ */
+.panel-body{padding:16px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+
+/* Stat summary bar inside a tab */
+.stat-bar{
+  display:flex;gap:0;
+  border:1px solid var(--uuif-border-new);
+  border-radius:var(--uuif-radius-6);
+  overflow:hidden;
+  margin-bottom:16px;
+}
+.stat-bar-item{
+  flex:1;padding:12px 16px;
+  border-right:1px solid var(--uuif-border-new);
+  display:flex;flex-direction:column;gap:2px;
+}
+.stat-bar-item:last-child{border-right:none}
+.stat-bar-label{font-size:11px;font-weight:600;color:var(--uuif-text-tertiary);text-transform:uppercase;letter-spacing:.04em}
+.stat-bar-value{font-size:22px;font-weight:700;color:var(--uuif-text-primary);line-height:1.1}
+.stat-bar-value.v-err{color:var(--uuif-brand-red)}
+.stat-bar-value.v-warn{color:var(--uuif-status-major)}
+.stat-bar-value.v-ok{color:var(--uuif-brand-green)}
+.stat-bar-value.v-blue{color:var(--uuif-icon-primary)}
+
+/* Inner cards */
+.inner-card{background:var(--uuif-surface-container);border:1px solid var(--uuif-border-tertiary);border-radius:var(--uuif-radius-6);overflow:hidden}
+.inner-card-header{background:var(--uuif-surface-model);border-bottom:1px solid var(--uuif-border-transparent);padding:8px 14px;display:flex;align-items:center;gap:8px;min-height:34px}
+.inner-card-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--uuif-text-highlight)}
+.inner-card-body{padding:14px}
+
+/* Donut */
+.donut-wrap{display:flex;align-items:center;gap:12px}
+.donut-legend{display:flex;flex-direction:column;gap:5px;flex:1}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.legend-label{color:var(--uuif-text-secondary);flex:1}
+.legend-val{font-weight:700;color:var(--uuif-text-primary)}
+
+/* 2nd-level tabs inside panel */
+.tabs2{display:flex;align-items:flex-end;border-bottom:1px solid var(--uuif-border-tertiary);gap:0;padding:0 14px}
+.tab2{height:38px;padding:0 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;border:none;background:transparent;font-family:'Nunito Sans',sans-serif;color:var(--uuif-text-secondary);font-weight:400;white-space:nowrap}
+.tab2.active{font-weight:700;color:var(--uuif-brand-orange);border-bottom:2px solid var(--uuif-border-primary);margin-bottom:-1px}
+
+/* Buttons */
+.btn-primary{background:var(--uuif-surface-primary);color:#fff;border:none;border-radius:var(--uuif-radius-pill);font-size:13px;font-weight:400;font-family:'Nunito Sans',sans-serif;padding:5.5px 20px;cursor:pointer;transition:background 120ms}
+.btn-primary:hover{background:var(--uuif-brand-orange)}
+.btn-secondary{background:var(--uuif-surface-container);color:var(--uuif-text-secondary);border:1px solid var(--uuif-border-secondary);border-radius:var(--uuif-radius-pill);font-size:13px;font-weight:400;font-family:'Nunito Sans',sans-serif;padding:5.5px 20px;cursor:pointer;transition:border-color 120ms,color 120ms}
+.btn-secondary:hover{border-color:var(--uuif-brand-orange);color:var(--uuif-brand-orange)}
+.btn-group{display:inline-flex;border:1px solid var(--uuif-border-tertiary);border-radius:var(--uuif-radius-4);overflow:hidden}
+.btn-group-item{padding:4px 10px;border:none;background:var(--uuif-surface-container);font-size:12px;cursor:pointer;color:var(--uuif-text-secondary);font-family:'Nunito Sans',sans-serif;border-right:1px solid var(--uuif-border-tertiary)}
+.btn-group-item:last-child{border-right:none}
+.btn-group-item.active{background:var(--uuif-fill-blue-lightest);color:var(--uuif-icon-primary);font-weight:600}
+
+/* Chips */
+.chip{display:inline-flex;align-items:center;height:20px;border-radius:var(--uuif-radius-4);padding:0 7px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border:1px solid;white-space:nowrap}
+.chip-error{background:var(--uuif-fill-red-lightest);border-color:var(--uuif-brand-red);color:var(--uuif-brand-red)}
+.chip-warn{background:var(--uuif-fill-yellow-xxx-lighter);border-color:var(--uuif-brand-yellow);color:#b57a0e}
+.chip-ok{background:var(--uuif-fill-green-xxx-lighter);border-color:var(--uuif-brand-green);color:#3d7020}
+.chip-info{background:var(--uuif-fill-blue-lightest);border-color:var(--uuif-border-secondary);color:var(--uuif-icon-primary)}
+.chip-neutral{background:var(--uuif-surface-model);border-color:var(--uuif-border-tertiary);color:var(--uuif-text-tertiary)}
+
+/* Toolbar */
+.toolbar{background:var(--uuif-surface-container);border-top:1px solid var(--uuif-border-primary);display:flex;align-items:center;gap:12px;padding:7px 14px}
+.toolbar-left{flex:1;display:flex;align-items:center;gap:10px}
+.toolbar-right{flex-shrink:0;display:flex;align-items:center;gap:10px}
+.tb-search{width:193px;height:29px;border-radius:var(--uuif-radius-4);border:1px solid var(--uuif-border-tertiary);display:flex;align-items:center;gap:6px;padding:0 8px;background:var(--uuif-surface-container)}
+.tb-search input{border:none;outline:none;font-size:12px;font-family:'Nunito Sans',sans-serif;color:var(--uuif-text-primary);background:transparent;flex:1}
+.tb-search input::placeholder{color:rgba(17,17,17,.3)}
+.tb-filter{height:29px;border-radius:var(--uuif-radius-4);border:1px solid var(--uuif-border-tertiary);display:inline-flex;align-items:center;padding:0 8px;gap:5px;cursor:pointer;background:var(--uuif-surface-container);font-size:12px;color:var(--uuif-text-primary);font-family:'Nunito Sans',sans-serif;white-space:nowrap}
+.tb-action{display:flex;align-items:center;gap:5px;cursor:pointer;background:transparent;border:none;font-size:12px;color:var(--uuif-text-secondary);font-family:'Nunito Sans',sans-serif;height:29px}
+.tb-action:hover{color:var(--uuif-brand-orange)}
+.tb-divider{width:1px;height:16px;background:var(--uuif-border-transparent)}
+
+/* Table */
+.data-table{width:100%;border-collapse:collapse}
+.data-table thead tr{background:#e8eff9}
+.data-table thead th{padding:7px 10px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--uuif-brand-navy);border-bottom:1px solid var(--uuif-border-transparent);white-space:nowrap;font-family:'Nunito Sans',sans-serif}
+.data-table tbody tr{border-bottom:1px solid var(--uuif-border-transparent)}
+.data-table tbody tr:hover{background:var(--uuif-surface-tertiary)}
+.data-table tbody td{padding:8px 10px;height:40px;font-size:12px;color:var(--uuif-text-primary);vertical-align:middle;font-family:'Nunito Sans',sans-serif}
+.data-table tbody td.muted{color:var(--uuif-text-tertiary);font-size:11px}
+.td-mono{font-family:'Courier New',monospace;font-size:11px}
+.checkbox-cell{width:32px;padding-left:12px!important;padding-right:0!important}
+.cb{width:14px;height:14px;accent-color:var(--uuif-icon-primary);cursor:pointer}
+.sev-badge{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:var(--uuif-radius-4);font-size:8px;font-weight:800;color:#fff;flex-shrink:0}
+.sev-crit{background:var(--uuif-status-failed)}
+.sev-warn{background:var(--uuif-status-major)}
+.sev-info{background:var(--uuif-icon-primary)}
+
+/* Pagination */
+.pagination{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-top:1px solid var(--uuif-border-transparent)}
+.pg-info{font-size:12px;color:var(--uuif-text-secondary)}
+.pg-btns{display:flex;gap:3px}
+.pg-btn{min-width:26px;height:26px;border-radius:var(--uuif-radius-4);border:1px solid var(--uuif-border-tertiary);background:var(--uuif-surface-container);font-size:11px;color:var(--uuif-text-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Nunito Sans',sans-serif}
+.pg-btn.active{background:var(--uuif-brand-navy);color:#fff;border-color:var(--uuif-brand-navy)}
+.pg-btn:hover:not(.active){border-color:var(--uuif-border-secondary)}
+
+/* Notifications header pane */
+.notif-title-pane{background:var(--uuif-surface-model);border-bottom:1px solid var(--uuif-border-transparent);min-height:35px;display:flex;align-items:center;padding:0 16px;gap:12px;flex-wrap:wrap}
+.notif-title-text{font-size:14px;font-weight:700;text-transform:uppercase;color:var(--uuif-text-highlight)}
+.notif-count-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--uuif-text-tertiary)}
+.notif-count-val{font-size:13px;font-weight:700;color:var(--uuif-text-primary)}
+.notif-count-sep{color:var(--uuif-border-tertiary)}
+
+/* View more */
+.mp-view-more{margin-left:auto;font-size:11px;font-weight:600;color:var(--uuif-icon-primary);text-decoration:none;display:flex;align-items:center;gap:3px;white-space:nowrap;opacity:.85}
+.mp-view-more:hover{color:var(--uuif-brand-orange);opacity:1}
+
+/* Map */
+.map-container{position:relative;background:#d0e8f5;min-height:280px;overflow:hidden}
+.map-legend{position:absolute;bottom:12px;right:12px;background:rgba(255,255,255,.92);border:1px solid var(--uuif-border-tertiary);border-radius:var(--uuif-radius-6);padding:8px 12px;display:flex;flex-direction:column;gap:5px}
+.map-legend-item{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--uuif-text-secondary)}
+.map-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* Count block grid */
+.count-2x2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.count-block{background:var(--uuif-surface-tertiary);border:1px solid var(--uuif-border-new);border-radius:var(--uuif-radius-6);padding:10px;display:flex;flex-direction:column;gap:2px}
+.count-block-label{font-size:10px;color:var(--uuif-text-tertiary);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.count-block-value{font-size:22px;font-weight:700;color:var(--uuif-text-primary);line-height:1.1}
+.count-block-value.v-err{color:var(--uuif-brand-red)}
+.count-block-value.v-warn{color:var(--uuif-status-major)}
+.count-block-value.v-ok{color:var(--uuif-brand-green)}
+.count-block-value.v-blue{color:var(--uuif-icon-primary)}
+
+/* SAMI styles */
+.sami-header{background:linear-gradient(135deg,#001b50 60%,#1f3c73);padding:14px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.sami-ring{width:36px;height:36px;border-radius:50%;border:2.5px solid var(--uuif-brand-orange);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sami-title{font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;color:#fff;line-height:1}
+.sami-subtitle{font-size:11px;color:rgba(255,255,255,.55);margin-top:2px}
+.sami-pill{padding:5px 14px;border-radius:var(--uuif-radius-pill);border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.65);font-size:12px;cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:background 120ms,color 120ms}
+.sami-pill.active{background:var(--uuif-brand-orange);border-color:var(--uuif-brand-orange);color:#fff;font-weight:600}
+.sami-pill:hover:not(.active){background:rgba(255,255,255,.1);color:#fff}
+.sami-body{display:grid;grid-template-columns:200px 280px 1fr;min-height:340px}
+.sami-sidebar{border-right:1px solid var(--uuif-border-transparent);padding:12px 0}
+.sami-sidebar-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--uuif-text-tertiary);padding:0 14px 8px}
+.sami-filter-tab{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;cursor:pointer;font-size:12px;color:var(--uuif-text-secondary);border-left:2px solid transparent;transition:background 120ms}
+.sami-filter-tab:hover{background:var(--uuif-surface-tertiary)}
+.sami-filter-tab.active{font-weight:700;color:var(--uuif-text-primary);background:var(--uuif-fill-blue-lightest);border-left-color:var(--uuif-icon-primary)}
+.sami-filter-count{font-size:11px;font-weight:700;padding:1px 7px;border-radius:var(--uuif-radius-pill)}
+.sami-fc-red{background:var(--uuif-fill-red-lightest);color:var(--uuif-brand-red)}
+.sami-fc-blue{background:var(--uuif-fill-blue-lightest);color:var(--uuif-icon-primary)}
+.sami-fc-warn{background:var(--uuif-fill-yellow-xxx-lighter);color:#b57a0e}
+.sami-fc-green{background:var(--uuif-fill-green-xxx-lighter);color:#3d7020}
+.sami-fc-neutral{background:var(--uuif-surface-model);color:var(--uuif-text-secondary)}
+.sami-list{border-right:1px solid var(--uuif-border-transparent);overflow-y:auto}
+.sami-insight{padding:12px 14px;border-bottom:1px solid var(--uuif-border-transparent);cursor:pointer;border-left:3px solid transparent;transition:background 120ms}
+.sami-insight:hover{background:var(--uuif-surface-tertiary)}
+.sami-insight.active{border-left-color:var(--uuif-brand-orange);background:var(--uuif-fill-blue-lightest)}
+.insight-meta{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.insight-type-chip{font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:1px 6px;border-radius:var(--uuif-radius-4)}
+.itc-cve{background:var(--uuif-fill-red-lightest);color:var(--uuif-brand-red);border:1px solid var(--uuif-brand-red)}
+.itc-anomaly{background:var(--uuif-fill-yellow-xxx-lighter);color:#b57a0e;border:1px solid var(--uuif-brand-yellow)}
+.itc-policy{background:var(--uuif-fill-blue-lightest);color:var(--uuif-icon-primary);border:1px solid var(--uuif-border-secondary)}
+.insight-time{font-size:10px;color:var(--uuif-text-tertiary)}
+.insight-title{font-size:12px;font-weight:700;color:var(--uuif-text-primary);margin-bottom:3px;line-height:1.3}
+.insight-excerpt{font-size:11px;color:var(--uuif-text-secondary);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sami-detail{padding:16px 18px;overflow-y:auto}
+.sami-detail-title{font-size:15px;font-weight:700;color:var(--uuif-text-highlight);margin-bottom:8px;line-height:1.3}
+.sami-detail-desc{font-size:12px;color:var(--uuif-text-secondary);line-height:1.6;margin-bottom:14px}
+.sami-detail-section{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--uuif-text-tertiary);margin-bottom:6px}
+.sami-rec-list{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.sami-rec-item{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--uuif-text-secondary);line-height:1.4}
+.sami-rec-num{width:18px;height:18px;border-radius:50%;background:var(--uuif-icon-primary);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.sami-action-bar{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:10px 16px;border-top:1px solid var(--uuif-border-transparent);background:var(--uuif-surface-model)}
+
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--uuif-icon-secondary);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--uuif-icon-primary)}
+</style>
+</head>
+<body>
+
+<!-- NAV RAIL -->
+<nav class="nav-rail" aria-label="Primary navigation">
+  <div class="nav-logo">
+    <svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-label="SonicWall logo">
+      <circle cx="17" cy="17" r="16" fill="rgba(255,93,0,.12)"/>
+      <path d="M8 17c0-4.97 4.03-9 9-9 2.49 0 4.74 1.01 6.36 2.64L9 22.36A8.96 8.96 0 018 17z" fill="#FF5D00"/>
+      <path d="M26 17c0 4.97-4.03 9-9 9-2.49 0-4.74-1.01-6.36-2.64L25 11.64A8.96 8.96 0 0126 17z" fill="#FF5D00" opacity=".45"/>
+    </svg>
+  </div>
+  <button class="nav-item active"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg><span>Home</span></button>
+  <button class="nav-item"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg><span>Tenants</span></button>
+  <div class="nav-divider"></div>
+  <button class="nav-item"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5h18v2H3zM3 9h18v2H3zM3 13h18v2H3zM2 3h2v18H2zM20 3h2v18h-2z"/></svg><span>NSM</span></button>
+  <button class="nav-item"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="18" r="2"/><path d="M8.5 13.5a5 5 0 017 0M4 9a11 11 0 0116 0" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg><span>Wireless</span></button>
+  <button class="nav-item"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L3 7v7c0 4.75 3.83 8.74 9 9.9 5.17-1.16 9-5.15 9-9.9V7L12 2z"/></svg><span>Capture</span></button>
+  <button class="nav-item"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 10a5 5 0 00-9.16-2.5A4 4 0 105 16h13a3 3 0 000-6z"/></svg><span>CSE</span></button>
+  <div class="nav-divider"></div>
+  <button class="nav-item"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M7 11h3l2 4 3-7 2 3h3" stroke="#001b50" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span>SAMI</span></button>
+  <div class="nav-spacer"></div>
+  <div class="nav-divider"></div>
+  <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 4v12M6 11l6 5 6-5M4 20h16"/></svg><span>Downloads</span></button>
+  <button class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg><span>Help</span></button>
+</nav>
+
+<!-- SUBNAV -->
+<aside class="subnav" aria-label="Section navigation">
+  <div class="subnav-header">
+    <div class="subnav-wordmark">
+      <svg width="18" height="18" viewBox="0 0 34 34" fill="none"><path d="M8 17c0-4.97 4.03-9 9-9 2.49 0 4.74 1.01 6.36 2.64L9 22.36A8.96 8.96 0 018 17z" fill="#FF5D00"/><path d="M26 17c0 4.97-4.03 9-9 9-2.49 0-4.74-1.01-6.36-2.64L25 11.64A8.96 8.96 0 0126 17z" fill="#FF5D00" opacity=".45"/></svg>
+      <span class="subnav-wordmark-text">SONICWALL</span>
+      <span class="subnav-slash">/</span>
+      <span class="subnav-app">Unified Management</span>
+    </div>
+  </div>
+  <div class="subnav-section-label">Dashboard</div>
+  <div class="subnav-accordion open" tabindex="0">
+    <span>Dashboard</span>
+    <svg viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+  </div>
+  <a class="subnav-item active" href="#">Unified Dashboard</a>
+  <div class="subnav-section-label" style="margin-top:8px">SAMI</div>
+  <div class="subnav-accordion open" tabindex="0">
+    <span>SAMI</span>
+    <svg viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+  </div>
+  <a class="subnav-item" href="#">Overview</a>
+  <a class="subnav-item" href="#">CVE Vulnerabilities</a>
+  <a class="subnav-item" href="#">Behavioral Anomalies</a>
+  <a class="subnav-item" href="#">Policy Gaps</a>
+</aside>
+
+<!-- TITLE BAR -->
+<header class="title-bar" role="banner">
+  <div class="title-bar-left">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      Home<span class="sep">\</span>Dashboard<span class="sep">\</span><span class="cur">Unified Dashboard</span>
+    </nav>
+  </div>
+  <div class="scope-selector" role="combobox" aria-label="Tenant scope selector">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="var(--uuif-icon-secondary)" stroke-width="1.5"/><ellipse cx="8" cy="8" rx="3" ry="6.5" stroke="var(--uuif-icon-secondary)" stroke-width="1.5"/><path d="M1.5 8h13" stroke="var(--uuif-icon-secondary)" stroke-width="1.5"/></svg>
+    <div class="scope-divider"></div>
+    <span class="scope-selector-text">All Tenants (Global)</span>
+    <svg width="10" height="10" viewBox="0 0 16 16" fill="var(--uuif-text-tertiary)"><path d="M4 6l4 4 4-4"/></svg>
+  </div>
+  <div class="title-bar-right">
+    <button class="tbi" aria-label="Announcements"><svg width="18" height="18" viewBox="0 0 24 24" fill="var(--uuif-text-primary)"><path d="M3 5a2 2 0 012-2h14a2 2 0 012 2v14l-5-3H5a2 2 0 01-2-2V5z"/></svg></button>
+    <button class="tbi" aria-label="Notifications"><svg width="18" height="18" viewBox="0 0 24 24" fill="var(--uuif-text-primary)"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg><span class="notif-dot"></span></button>
+    <button class="tbi" aria-label="Service Status"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--uuif-text-primary)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></button>
+    <button class="tbi" aria-label="Help"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--uuif-text-primary)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg></button>
+    <button class="avatar-btn" aria-label="User account menu">
+      <div class="avatar">HN</div>
+      <svg width="9" height="9" viewBox="0 0 16 16" fill="var(--uuif-text-tertiary)"><path d="M4 6l4 4 4-4"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- MAIN CONTENT -->
+<main class="body-wrap">
+<div class="content">
+
+<!-- ── PRODUCT STRIP (always visible) ── -->
+<section aria-labelledby="strip-title">
+  <div class="card">
+    <div class="card-title-pane" id="strip-title">
+      Product Overview
+      <span class="sub">Active Products · All Tenants</span>
+      <span style="margin-left:auto;font-size:11px;font-weight:400;color:var(--uuif-text-tertiary);text-transform:none">Last updated: 2 min ago</span>
+    </div>
+    <div class="strip-wrap">
+      <button class="strip-nav-btn" aria-label="Scroll left">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 4l-4 4 4 4"/></svg>
+      </button>
+      <div class="strip-tiles">
+        <!-- Firewalls -->
+        <div class="pct selected" onclick="switchTab('nsm')" role="button" tabindex="0" aria-label="NSM Firewalls tab">
+          <div class="pct-header">
+            <svg class="pct-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M3 5h18v2H3zM3 9h18v2H3zM3 13h18v2H3zM2 3h2v18H2zM20 3h2v18h-2z"/></svg>
+            <span class="pct-name">Firewalls</span>
+          </div>
+          <div class="pct-label">Total Devices</div>
+          <div class="pct-value">112</div>
+          <div class="pct-divider"></div>
+          <div class="pct-attn-label">Need Attention</div>
+          <div class="pct-attn-value">8</div>
+        </div>
+        <!-- Capture Client -->
+        <div class="pct" onclick="switchTab('capture')" role="button" tabindex="0">
+          <div class="pct-header">
+            <svg class="pct-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L3 7v7c0 4.75 3.83 8.74 9 9.9 5.17-1.16 9-5.15 9-9.9V7L12 2z"/></svg>
+            <span class="pct-name">Capture Client</span>
+          </div>
+          <div class="pct-label">Total Devices</div>
+          <div class="pct-value">1</div>
+          <div class="pct-divider"></div>
+          <div class="pct-attn-label">Need Attention</div>
+          <div class="pct-attn-value">1</div>
+        </div>
+        <!-- CC MDR -->
+        <div class="pct" onclick="switchTab('capture')" role="button" tabindex="0">
+          <div class="pct-header">
+            <svg class="pct-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L3 7v7c0 4.75 3.83 8.74 9 9.9 5.17-1.16 9-5.15 9-9.9V7L12 2z" opacity=".6"/><circle cx="12" cy="12" r="3"/></svg>
+            <span class="pct-name">CC MDR</span>
+          </div>
+          <div class="pct-label">Total Devices</div>
+          <div class="pct-value">2</div>
+          <div class="pct-divider"></div>
+          <div class="pct-attn-label">Need Attention</div>
+          <div class="pct-attn-value">1</div>
+        </div>
+        <!-- Access Points -->
+        <div class="pct" onclick="switchTab('wireless')" role="button" tabindex="0">
+          <div class="pct-header">
+            <svg class="pct-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="18" r="2"/><path d="M8.5 13.5a5 5 0 017 0M4 9a11 11 0 0116 0" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+            <span class="pct-name">Access Points</span>
+          </div>
+          <div class="pct-label">Total Devices</div>
+          <div class="pct-value">10</div>
+          <div class="pct-divider"></div>
+          <div class="pct-attn-label">Need Attention</div>
+          <div class="pct-attn-value">1</div>
+        </div>
+        <!-- Switches -->
+        <div class="pct" onclick="switchTab('wireless')" role="button" tabindex="0">
+          <div class="pct-header">
+            <svg class="pct-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="7" width="20" height="10" rx="2"/><path d="M8 12h2M14 12h2" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span class="pct-name">Switches</span>
+          </div>
+          <div class="pct-label">Total Devices</div>
+          <div class="pct-value">9</div>
+          <div class="pct-divider"></div>
+          <div class="pct-attn-label">Need Attention</div>
+          <div class="pct-attn-value">0</div>
+        </div>
+        <!-- Cloud Secure Edge -->
+        <div class="pct" onclick="switchTab('cse')" role="button" tabindex="0">
+          <div class="pct-header">
+            <svg class="pct-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M18 10a5 5 0 00-9.16-2.5A4 4 0 105 16h13a3 3 0 000-6z"/></svg>
+            <span class="pct-name">Cloud Secure Edge</span>
+          </div>
+          <div class="pct-label">Total Licenses</div>
+          <div class="pct-value">2</div>
+          <div class="pct-divider"></div>
+          <div class="pct-attn-label">Need Attention</div>
+          <div class="pct-attn-value">0</div>
+        </div>
+        <!-- Org Summary dark tile -->
+        <div class="org-tile">
+          <div class="org-tile-title">Org Summary</div>
+          <div class="org-stat"><div class="org-stat-label">Tenants</div><div class="org-stat-value">98</div></div>
+          <div class="org-divider"></div>
+          <div class="org-stat"><div class="org-stat-label">Need Attention</div><div class="org-stat-attn">5</div></div>
+          <button class="org-btn">Create Tenant</button>
+        </div>
+      </div>
+      <button class="strip-nav-btn" aria-label="Scroll right">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ── MAIN TAB SHELL ── -->
+<section class="main-tab-shell" aria-label="Product detail sections">
+
+  <!-- Tab bar -->
+  <div class="tabs-main" role="tablist" aria-label="Product sections">
+    <button class="tab-main active" id="tab-btn-nsm" role="tab" aria-selected="true" aria-controls="tab-nsm" onclick="switchTab('nsm')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M3 5h18v2H3zM3 9h18v2H3zM3 13h18v2H3zM2 3h2v18H2zM20 3h2v18h-2z"/></svg>
+      NSM · Firewalls
+      <span class="tab-main-badge">8</span>
+    </button>
+    <button class="tab-main" id="tab-btn-wireless" role="tab" aria-selected="false" aria-controls="tab-wireless" onclick="switchTab('wireless')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="18" r="2"/><path d="M8.5 13.5a5 5 0 017 0M4 9a11 11 0 0116 0" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+      Access Points &amp; Switches
+    </button>
+    <button class="tab-main" id="tab-btn-capture" role="tab" aria-selected="false" aria-controls="tab-capture" onclick="switchTab('capture')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L3 7v7c0 4.75 3.83 8.74 9 9.9 5.17-1.16 9-5.15 9-9.9V7L12 2z"/></svg>
+      Capture Client
+    </button>
+    <button class="tab-main" id="tab-btn-cse" role="tab" aria-selected="false" aria-controls="tab-cse" onclick="switchTab('cse')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18 10a5 5 0 00-9.16-2.5A4 4 0 105 16h13a3 3 0 000-6z"/></svg>
+      CSE · Zero Trust
+    </button>
+    <button class="tab-main" id="tab-btn-notifications" role="tab" aria-selected="false" aria-controls="tab-notifications" onclick="switchTab('notifications')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+      Notifications
+      <span class="tab-main-badge">237</span>
+    </button>
+    <button class="tab-main" id="tab-btn-sami" role="tab" aria-selected="false" aria-controls="tab-sami" onclick="switchTab('sami')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M7 11h3l2 4 3-7 2 3h3" stroke="#001b50" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      SAMI AI
+      <span class="tab-main-badge">12</span>
+    </button>
+  </div>
+
+  <!-- ═══ TAB: NSM Firewalls ═══ -->
+  <div class="tab-panel active" id="tab-nsm" role="tabpanel" aria-labelledby="tab-btn-nsm">
+    <div class="panel-body">
+      <!-- Stat bar -->
+      <div class="stat-bar">
+        <div class="stat-bar-item">
+          <div class="stat-bar-label">Total</div>
+          <div class="stat-bar-value">22</div>
+        </div>
+        <div class="stat-bar-item">
+          <div class="stat-bar-label">Online</div>
+          <div class="stat-bar-value v-ok">5</div>
+        </div>
+        <div class="stat-bar-item">
+          <div class="stat-bar-label">Offline</div>
+          <div class="stat-bar-value v-err">10</div>
+        </div>
+        <div class="stat-bar-item">
+          <div class="stat-bar-label">Out of Sync</div>
+          <div class="stat-bar-value v-warn">3</div>
+        </div>
+        <div class="stat-bar-item">
+          <div class="stat-bar-label">Exp. License</div>
+          <div class="stat-bar-value v-warn">4</div>
+        </div>
+        <div class="stat-bar-item">
+          <div class="stat-bar-label">Groups</div>
+          <div class="stat-bar-value">44</div>
+        </div>
+      </div>
+
+      <!-- Two-col: donut + table -->
+      <div class="two-col" style="grid-template-columns:260px 1fr">
+        <div class="inner-card">
+          <div class="inner-card-header">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="var(--uuif-brand-orange)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>
+            <span class="inner-card-title">Status Breakdown</span>
+          </div>
+          <div class="inner-card-body">
+            <div class="donut-wrap">
+              <svg width="100" height="100" viewBox="0 0 96 96" style="flex-shrink:0">
+                <circle cx="48" cy="48" r="36" fill="none" stroke="#e8eff9" stroke-width="12"/>
+                <circle cx="48" cy="48" r="36" fill="none" stroke="#59a02e" stroke-width="12" stroke-dasharray="34 192" stroke-dashoffset="0" transform="rotate(-90 48 48)"/>
+                <circle cx="48" cy="48" r="36" fill="none" stroke="#cc0000" stroke-width="12" stroke-dasharray="89 192" stroke-dashoffset="-34" transform="rotate(-90 48 48)"/>
+                <circle cx="48" cy="48" r="36" fill="none" stroke="#FF9900" stroke-width="12" stroke-dasharray="23 192" stroke-dashoffset="-123" transform="rotate(-90 48 48)"/>
+                <circle cx="48" cy="48" r="36" fill="none" stroke="#f3ac3d" stroke-width="12" stroke-dasharray="23 192" stroke-dashoffset="-146" transform="rotate(-90 48 48)"/>
+                <circle cx="48" cy="48" r="36" fill="none" stroke="#ccc" stroke-width="12" stroke-dasharray="23 192" stroke-dashoffset="-169" transform="rotate(-90 48 48)"/>
+                <text x="48" y="44" text-anchor="middle" font-size="16" font-weight="700" fill="#16325d" font-family="Nunito Sans,sans-serif">22</text>
+                <text x="48" y="57" text-anchor="middle" font-size="9" fill="#888" font-family="Nunito Sans,sans-serif">Total</text>
+              </svg>
+              <div class="donut-legend">
+                <div class="legend-item"><div class="legend-dot" style="background:#59a02e"></div><span class="legend-label">Online</span><span class="legend-val">5</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background:#cc0000"></div><span class="legend-label">Offline</span><span class="legend-val">10</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background:#FF9900"></div><span class="legend-label">Out of Sync</span><span class="legend-val">3</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background:#f3ac3d"></div><span class="legend-label">Expired</span><span class="legend-val">3</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background:#ccc"></div><span class="legend-label">Unassigned</span><span class="legend-val">1</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="inner-card">
+          <div class="inner-card-header">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="var(--uuif-brand-orange)"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9" stroke="#fff" stroke-width="1.5"/></svg>
+            <span class="inner-card-title">Device List</span>
+            <a href="#" class="mp-view-more" style="margin-left:auto">View all <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg></a>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="data-table" aria-label="Firewall device list">
+              <thead>
+                <tr>
+                  <th class="checkbox-cell"><input class="cb" type="checkbox" aria-label="Select all"></th>
+                  <th>Device Name</th>
+                  <th>Tenant</th>
+                  <th>Model</th>
+                  <th>Status</th>
+                  <th>License</th>
+                  <th>Firmware</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td class="checkbox-cell"><input class="cb" type="checkbox"></td><td>FW-MAIN-01</td><td>Acme Corp</td><td>TZ670</td><td><span class="chip chip-ok">Online</span></td><td><span class="chip chip-ok">Active</span></td><td class="muted">7.1.3-4010</td></tr>
+                <tr><td class="checkbox-cell"><input class="cb" type="checkbox"></td><td>FW-BRANCH-02</td><td>Acme Corp</td><td>TZ470</td><td><span class="chip chip-error">Offline</span></td><td><span class="chip chip-ok">Active</span></td><td class="muted">7.1.2-3950</td></tr>
+                <tr><td class="checkbox-cell"><input class="cb" type="checkbox"></td><td>FW-DC-CORE-01</td><td>Beta LLC</td><td>NSa 4700</td><td><span class="chip chip-warn">Out of Sync</span></td><td><span class="chip chip-warn">Expiring</span></td><td class="muted">7.1.3-4010</td></tr>
+                <tr><td class="checkbox-cell"><input class="cb" type="checkbox"></td><td>FW-REMOTE-05</td><td>Beta LLC</td><td>TZ370</td><td><span class="chip chip-error">Offline</span></td><td><span class="chip chip-error">Expired</span></td><td class="muted">7.0.1-3002</td></tr>
+                <tr><td class="checkbox-cell"><input class="cb" type="checkbox"></td><td>FW-CLOUD-01</td><td>Gamma Inc</td><td>NSv 470</td><td><span class="chip chip-ok">Online</span></td><td><span class="chip chip-ok">Active</span></td><td class="muted">7.1.3-4010</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <div class="pg-info">Showing 1–5 of 22 devices</div>
+            <div class="pg-btns"><button class="pg-btn">&#8249;</button><button class="pg-btn active">1</button><button class="pg-btn">2</button><button class="pg-btn">3</button><button class="pg-btn">&#8250;</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TAB: Access Points & Switches ═══ -->
+  <div class="tab-panel" id="tab-wireless" role="tabpanel" aria-labelledby="tab-btn-wireless">
+    <div class="panel-body">
+      <div class="stat-bar">
+        <div class="stat-bar-item"><div class="stat-bar-label">APs</div><div class="stat-bar-value">3</div></div>
+        <div class="stat-bar-item"><div class="stat-bar-label">Connected APs</div><div class="stat-bar-value v-ok">2</div></div>
+        <div class="stat-bar-item"><div class="stat-bar-label">Offline APs</div><div class="stat-bar-value v-err">1</div></div>
+        <div class="stat-bar-item"><div class="stat-bar-label">Switches</div><div class="stat-bar-value">2</div></div>
+        <div class="stat-bar-item"><div class="stat-bar-label">Clients</div><div class="stat-bar-value v-blue">13</div></div>
+        <div class="stat-bar-item"><div class="stat-bar-label">Locations</div><div class="stat-bar-value">2</div></div>
+      </div>
+
+      <div class="two-col">
+        <div class="inner-card">
+          <div class="inner-card-header">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="var(--uuif-brand-orange)"><circle cx="12" cy="18" r="2"/><path d="M8.5 13.5a5 5 0 017 0M4 9a11 11 0 0116 0" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+            <span class="inner-card-title">Access Point Status</span>
+          </div>
+          <div class="inner-card-body">
+            <div class="donut-wrap">
+              <svg width="100" height="100" viewBox="0 0 96 96" style="flex-shrink:0">
+                <circle cx="48" cy="48" r="36" fill="none" stroke="#e8eff9" stroke-width="12"/>
+                <circle cx="48" cy="48" r="36" fill="none" stroke="#59a02e" stroke-width="12" stroke-dasharray="136 192" stroke-dashoffset="0" transform="rotate(-90 48 48)"/>
+                <circle cx="48" cy="48" r="36" fill="none" stroke="#cc0000" stroke-width="12" stroke-dasharray="28 192" stroke-dashoffset="-136" transform="rotate(-90 48 48)"/>
+                <circle cx="48" cy="48" r="36" fill="none" stroke="#f3ac3d" stroke-width="12" stroke-dasharray="28 192" stroke-dashoffset="-164" transform="rotate(-90 48 48)"/>
+                <text x="48" y="44" text-anchor="middle" font-size="16" font-weight="700" fill="#16325d" font-family="Nunito Sans,sans-serif">3</text>
+                <text x="48" y="57" text-anchor="middle" font-size="9" fill="#888" font-family="Nunito Sans,sans-serif">APs</text>
+              </svg>
+              <div class="donut-legend">
+                <div class="legend-item"><div class="legend-dot" style="background:#59a02e"></div><span class="legend-label">Connected</span><span class="legend-val">2</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background:#cc0000"></div><span class="legend-label">Offline</span><span class="legend-val">1</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background:#f3ac3d"></div><span class="legend-label">Warning</span><span class="legend-val">0</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="inner-card">
+          <div class="inner-card-header">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="var(--uuif-brand-orange)"><rect x="2" y="7" width="20" height="10" rx="2"/></svg>
+            <span class="inner-card-title">Device List</span>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="data-table">
+              <thead><tr><th>Device</th><th>Type</th><th>Tenant</th><th>Status</th><th>Clients</th></tr></thead>
+              <tbody>
+                <tr><td>SW641-OFFICE-01</td><td>SonicWave 641</td><td>Acme Corp</td><td><span class="chip chip-ok">Connected</span></td><td>8</td></tr>
+                <tr><td>SW641-LOBBY-02</td><td>SonicWave 641</td><td>Acme Corp</td><td><span class="chip chip-ok">Connected</span></td><td>5</td></tr>
+                <tr><td>SW641-CONF-03</td><td>SonicWave 641</td><td>Beta LLC</td><td><span class="chip chip-error">Offline</span></td><td>0</td></tr>
+                <tr><td>SWS-24-CORE</td><td>Switch 24p</td><td>Acme Corp</td><td><span class="chip chip-ok">Online</span></td><td>—</td></tr>
+                <tr><td>SWS-8-BRANCH</td><td>Switch 8p</td><td>Beta LLC</td><td><span class="chip chip-ok">Online</span></td><td>—</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <div class="pg-info">Showing 1–5 of 5 devices</div>
+            <div class="pg-btns"><button class="pg-btn active">1</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TAB: Capture Client ═══ -->
+  <div class="tab-panel" id="tab-capture" role="tabpanel" aria-labelledby="tab-btn-capture">
+    <div class="panel-body">
+      <div class="stat-bar">
+        <div class="stat-bar-item"><div class="stat-bar-label">Affected</div><div class="stat-bar-value v-ok">0</div></div>
+        <div class="stat-bar-item"><div class="stat-bar-label">Threats</div><div class="stat-bar-value v-ok">0</div></div>
+        <div class="stat-bar-item"><div class="stat-bar-label">Vulnerable</div><div class="stat-bar-value v-ok">0</div></div>
+        <div class="stat-bar-item"><div class="stat-bar-label">Total Licenses</div><div class="stat-bar-value">0/0</div></div>
+        <div class="stat-bar-item"><div class="stat-bar-label">MDR Devices</div><div class="stat-bar-value">2</div></div>
+        <div class="stat-bar-item"><div class="stat-bar-label">MDR Alerts</div><div class="stat-bar-value v-warn">1</div></div>
+      </div>
+
+      <div class="two-col">
+        <div class="inner-card">
+          <div class="inner-card-header">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="var(--uuif-brand-orange)"><path d="M12 2L3 7v7c0 4.75 3.83 8.74 9 9.9 5.17-1.16 9-5.15 9-9.9V7L12 2z"/></svg>
+            <span class="inner-card-title">Threat History — 7 Days</span>
+          </div>
+          <div class="inner-card-body">
+            <svg width="100%" height="80" viewBox="0 0 280 80" preserveAspectRatio="none" style="display:block">
+              <line x1="0" y1="20" x2="280" y2="20" stroke="#e8eff9" stroke-width="1"/>
+              <line x1="0" y1="40" x2="280" y2="40" stroke="#e8eff9" stroke-width="1"/>
+              <line x1="0" y1="60" x2="280" y2="60" stroke="#e8eff9" stroke-width="1"/>
+              <polyline points="0,62 40,62 80,62 120,62 160,62 200,62 240,62 280,62" fill="none" stroke="var(--uuif-icon-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <text x="0" y="75" font-size="8" fill="#aaa" font-family="Nunito Sans,sans-serif">Mon</text>
+              <text x="36" y="75" font-size="8" fill="#aaa" font-family="Nunito Sans,sans-serif">Tue</text>
+              <text x="76" y="75" font-size="8" fill="#aaa" font-family="Nunito Sans,sans-serif">Wed</text>
+              <text x="116" y="75" font-size="8" fill="#aaa" font-family="Nunito Sans,sans-serif">Thu</text>
+              <text x="156" y="75" font-size="8" fill="#aaa" font-family="Nunito Sans,sans-serif">Fri</text>
+              <text x="196" y="75" font-size="8" fill="#aaa" font-family="Nunito Sans,sans-serif">Sat</text>
+              <text x="236" y="75" font-size="8" fill="#aaa" font-family="Nunito Sans,sans-serif">Sun</text>
+            </svg>
+            <div style="font-size:12px;color:var(--uuif-brand-green);font-weight:600;margin-top:8px;display:flex;align-items:center;gap:5px">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--uuif-brand-green)"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm3.3 5.7l-4 4-.7.7-.7-.7-2-2 1.4-1.4L6.3 9l3.3-3.3L11.3 7z"/></svg>
+              No threats detected in the last 7 days
+            </div>
+          </div>
+        </div>
+
+        <div class="inner-card">
+          <div class="inner-card-header">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="var(--uuif-brand-orange)"><path d="M12 2L3 7v7c0 4.75 3.83 8.74 9 9.9 5.17-1.16 9-5.15 9-9.9V7L12 2z" opacity=".6"/><circle cx="12" cy="12" r="3"/></svg>
+            <span class="inner-card-title">MDR Devices</span>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="data-table">
+              <thead><tr><th>Device</th><th>Tenant</th><th>Status</th><th>License</th><th>Threats</th></tr></thead>
+              <tbody>
+                <tr><td>CC-MDR-GAMMA-01</td><td>Gamma Inc</td><td><span class="chip chip-ok">Protected</span></td><td><span class="chip chip-warn">Expiring</span></td><td>0</td></tr>
+                <tr><td>CC-MDR-DELTA-01</td><td>Delta SA</td><td><span class="chip chip-ok">Protected</span></td><td><span class="chip chip-ok">Active</span></td><td>0</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="padding:10px 12px;font-size:11px;color:var(--uuif-text-tertiary)">2 devices enrolled in MDR</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TAB: CSE Zero Trust ═══ -->
+  <div class="tab-panel" id="tab-cse" role="tabpanel" aria-labelledby="tab-btn-cse">
+    <div class="panel-body">
+      <div class="stat-bar">
+        <div class="stat-bar-item"><div class="stat-bar-label">Devices</div><div class="stat-bar-value">8</div></div>
+        <div class="stat-bar-item"><div class="stat-bar-label">Users</div><div class="stat-bar-value v-blue">6</div></div>
+        <div class="stat-bar-item"><div class="stat-bar-label">Policies</div><div class="stat-bar-value">7</div></div>
+        <div class="stat-bar-item"><div class="stat-bar-label">Connectors</div><div class="stat-bar-value">1</div></div>
+        <div class="stat-bar-item"><div class="stat-bar-label">Blocked</div><div class="stat-bar-value v-err">0</div></div>
+        <div class="stat-bar-item"><div class="stat-bar-label">Trusted</div><div class="stat-bar-value v-ok">8</div></div>
+      </div>
+
+      <div class="two-col">
+        <div class="inner-card">
+          <div class="inner-card-header">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="var(--uuif-brand-orange)"><path d="M18 10a5 5 0 00-9.16-2.5A4 4 0 105 16h13a3 3 0 000-6z"/></svg>
+            <span class="inner-card-title">Device OS Breakdown</span>
+          </div>
+          <div class="inner-card-body">
+            <div class="donut-wrap">
+              <svg width="100" height="100" viewBox="0 0 96 96" style="flex-shrink:0">
+                <circle cx="48" cy="48" r="36" fill="none" stroke="#e8eff9" stroke-width="12"/>
+                <circle cx="48" cy="48" r="36" fill="none" stroke="#5885cc" stroke-width="12" stroke-dasharray="72 192" stroke-dashoffset="0" transform="rotate(-90 48 48)"/>
+                <circle cx="48" cy="48" r="36" fill="none" stroke="#59a02e" stroke-width="12" stroke-dasharray="72 192" stroke-dashoffset="-72" transform="rotate(-90 48 48)"/>
+                <circle cx="48" cy="48" r="36" fill="none" stroke="#f3ac3d" stroke-width="12" stroke-dasharray="24 192" stroke-dashoffset="-144" transform="rotate(-90 48 48)"/>
+                <circle cx="48" cy="48" r="36" fill="none" stroke="#ccc" stroke-width="12" stroke-dasharray="24 192" stroke-dashoffset="-168" transform="rotate(-90 48 48)"/>
+                <text x="48" y="44" text-anchor="middle" font-size="16" font-weight="700" fill="#16325d" font-family="Nunito Sans,sans-serif">8</text>
+                <text x="48" y="57" text-anchor="middle" font-size="9" fill="#888" font-family="Nunito Sans,sans-serif">Devices</text>
+              </svg>
+              <div class="donut-legend">
+                <div class="legend-item"><div class="legend-dot" style="background:#5885cc"></div><span class="legend-label">Windows</span><span class="legend-val">3</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background:#59a02e"></div><span class="legend-label">macOS</span><span class="legend-val">3</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background:#f3ac3d"></div><span class="legend-label">Android</span><span class="legend-val">1</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background:#ccc"></div><span class="legend-label">iOS</span><span class="legend-val">1</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="inner-card">
+          <div class="inner-card-header">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="var(--uuif-brand-orange)"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+            <span class="inner-card-title">Active Users</span>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="data-table">
+              <thead><tr><th>User</th><th>Device</th><th>OS</th><th>Trust Score</th><th>Last Seen</th></tr></thead>
+              <tbody>
+                <tr><td>j.smith@acme.com</td><td>LAPTOP-JS-01</td><td>Windows 11</td><td><span class="chip chip-ok">High</span></td><td class="muted">2 min ago</td></tr>
+                <tr><td>a.patel@acme.com</td><td>MBP-AP-02</td><td>macOS 14</td><td><span class="chip chip-ok">High</span></td><td class="muted">5 min ago</td></tr>
+                <tr><td>r.jones@beta.com</td><td>WIN-RJ-03</td><td>Windows 10</td><td><span class="chip chip-warn">Med</span></td><td class="muted">18 min ago</td></tr>
+                <tr><td>k.liu@gamma.com</td><td>IPHONE-KL-04</td><td>iOS 17</td><td><span class="chip chip-ok">High</span></td><td class="muted">1 hr ago</td></tr>
+                <tr><td>m.chen@delta.com</td><td>PIXEL-MC-05</td><td>Android 14</td><td><span class="chip chip-ok">High</span></td><td class="muted">3 hr ago</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <div class="pg-info">Showing 1–5 of 6 users</div>
+            <div class="pg-btns"><button class="pg-btn active">1</button><button class="pg-btn">2</button><button class="pg-btn">&#8250;</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TAB: Notifications ═══ -->
+  <div class="tab-panel" id="tab-notifications" role="tabpanel" aria-labelledby="tab-btn-notifications">
+    <!-- Sub-header with counts and map/list toggle -->
+    <div class="notif-title-pane">
+      <span class="notif-count-item"><span class="notif-count-val">237</span> Total</span>
+      <span class="notif-count-sep">|</span>
+      <span class="notif-count-item"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--uuif-brand-red)"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 3v4M8 11h.01"/></svg><span class="notif-count-val" style="color:var(--uuif-brand-red)">7</span> Security</span>
+      <span class="notif-count-sep">|</span>
+      <span class="notif-count-item"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--uuif-icon-primary)"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 3v4M8 11h.01"/></svg><span class="notif-count-val" style="color:var(--uuif-icon-primary)">229</span> System</span>
+      <span class="notif-count-sep">|</span>
+      <span class="notif-count-item"><svg width="10" height="10" viewBox="0 0 16 16" fill="var(--uuif-brand-yellow)"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 3v4M8 11h.01"/></svg><span class="notif-count-val" style="color:var(--uuif-brand-yellow)">1</span> License</span>
+      <span style="margin-left:auto">
+        <div class="btn-group" role="tablist" aria-label="View toggle">
+          <button class="btn-group-item" id="tab-map-btn" role="tab" aria-selected="false" aria-controls="notif-map" onclick="switchNotifView('map')" title="Map view">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" style="margin-right:4px"><path d="M1 4l5 2V14L1 12V4zM6 6l4-2v8L6 14V6zM10 4l5 2V14l-5-2V4z"/></svg>Map
+          </button>
+          <button class="btn-group-item active" id="tab-list-btn" role="tab" aria-selected="true" aria-controls="notif-list" onclick="switchNotifView('list')" title="List view">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" style="margin-right:4px"><rect x="2" y="3" width="12" height="1.5"/><rect x="2" y="7" width="12" height="1.5"/><rect x="2" y="11" width="12" height="1.5"/></svg>List
+          </button>
+        </div>
+      </span>
+    </div>
+
+    <!-- MAP VIEW -->
+    <div id="notif-map" style="display:none" role="tabpanel">
+      <div class="map-container">
+        <svg width="100%" height="280" viewBox="0 0 1000 480" preserveAspectRatio="xMidYMid slice" style="display:block;background:#c8e6f5">
+          <path d="M95 60 L190 55 L235 75 L260 120 L255 180 L240 220 L210 250 L185 270 L165 265 L140 245 L115 200 L95 165 L80 125 Z" fill="#9db8a0" stroke="#7a9b7d" stroke-width="0.5"/>
+          <path d="M195 315 L255 310 L290 350 L300 410 L275 450 L235 460 L200 440 L175 400 L165 360 L175 330 Z" fill="#9db8a0" stroke="#7a9b7d" stroke-width="0.5"/>
+          <path d="M440 155 L510 150 L545 170 L550 220 L540 290 L520 350 L490 380 L455 375 L430 350 L415 290 L410 220 L420 175 Z" fill="#9db8a0" stroke="#7a9b7d" stroke-width="0.5"/>
+          <path d="M510 30 L620 20 L750 25 L820 40 L840 70 L800 90 L750 85 L680 95 L620 90 L570 85 L530 75 Z" fill="#9db8a0" stroke="#7a9b7d" stroke-width="0.5"/>
+          <path d="M600 90 L700 85 L770 100 L790 140 L775 185 L740 200 L700 210 L660 200 L620 175 L590 145 Z" fill="#9db8a0" stroke="#7a9b7d" stroke-width="0.5"/>
+          <path d="M700 100 L800 90 L840 120 L840 160 L800 190 L755 195 L720 175 L700 145 Z" fill="#9db8a0" stroke="#7a9b7d" stroke-width="0.5"/>
+          <path d="M760 310 L850 300 L900 320 L910 370 L880 410 L820 420 L760 390 L740 350 Z" fill="#9db8a0" stroke="#7a9b7d" stroke-width="0.5"/>
+          <g transform="translate(170,165)"><circle cx="0" cy="0" r="12" fill="#cc0000" stroke="#fff" stroke-width="2" opacity=".9"/><text x="0" y="4" text-anchor="middle" font-size="10" fill="#fff" font-weight="700" font-family="Nunito Sans,sans-serif">22</text><polygon points="0,14 -5,26 5,26" fill="#cc0000" opacity=".9"/></g>
+          <rect x="183" y="140" width="56" height="15" rx="3" fill="rgba(0,27,80,.75)"/>
+          <text x="211" y="151" text-anchor="middle" font-size="9" fill="#fff" font-family="Nunito Sans,sans-serif">FW Offline</text>
+          <g transform="translate(660,245)"><circle cx="0" cy="0" r="10" fill="#1f3c73" stroke="#fff" stroke-width="2" opacity=".9"/><text x="0" y="4" text-anchor="middle" font-size="9" fill="#fff" font-weight="700" font-family="Nunito Sans,sans-serif">AP</text><polygon points="0,12 -4,22 4,22" fill="#1f3c73" opacity=".9"/></g>
+          <rect x="665" y="220" width="50" height="15" rx="3" fill="rgba(31,60,115,.8)"/>
+          <text x="690" y="231" text-anchor="middle" font-size="9" fill="#fff" font-family="Nunito Sans,sans-serif">Bangalore</text>
+          <g transform="translate(470,95)"><circle cx="0" cy="0" r="10" fill="#FF9900" stroke="#fff" stroke-width="2" opacity=".9"/><text x="0" y="4" text-anchor="middle" font-size="9" fill="#fff" font-weight="700" font-family="Nunito Sans,sans-serif">!</text><polygon points="0,12 -4,22 4,22" fill="#FF9900" opacity=".9"/></g>
+          <rect x="458" y="70" width="56" height="15" rx="3" fill="rgba(200,120,0,.85)"/>
+          <text x="486" y="81" text-anchor="middle" font-size="9" fill="#fff" font-family="Nunito Sans,sans-serif">EU Warning</text>
+        </svg>
+        <div class="map-legend">
+          <div style="font-size:10px;font-weight:700;color:var(--uuif-text-tertiary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Legend</div>
+          <div class="map-legend-item"><div class="map-legend-dot" style="background:#cc0000"></div>Offline / Critical</div>
+          <div class="map-legend-item"><div class="map-legend-dot" style="background:#FF9900"></div>Warning / Attention</div>
+          <div class="map-legend-item"><div class="map-legend-dot" style="background:#1f3c73"></div>Access Point / Online</div>
+          <div class="map-legend-item"><div class="map-legend-dot" style="background:#59a02e"></div>All Healthy</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIST VIEW -->
+    <div id="notif-list" role="tabpanel">
+      <div class="tabs2" role="tablist" style="padding:0 14px">
+        <button class="tab2 active">Firewalls</button>
+        <button class="tab2">Access Points</button>
+        <button class="tab2">Switches</button>
+        <button class="tab2">Capture Client</button>
+        <button class="tab2">Capture Client MDR</button>
+      </div>
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <div class="tb-search"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="var(--uuif-text-tertiary)" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="5"/><path d="M11 11l3.5 3.5"/></svg><input type="text" placeholder="Search notifications..." aria-label="Search notifications"></div>
+          <div class="tb-filter">Priority <svg width="9" height="9" viewBox="0 0 16 16" fill="var(--uuif-text-tertiary)"><path d="M4 6l4 4 4-4"/></svg></div>
+          <div class="tb-filter">Alert State <svg width="9" height="9" viewBox="0 0 16 16" fill="var(--uuif-text-tertiary)"><path d="M4 6l4 4 4-4"/></svg></div>
+          <div class="tb-filter">Category <svg width="9" height="9" viewBox="0 0 16 16" fill="var(--uuif-text-tertiary)"><path d="M4 6l4 4 4-4"/></svg></div>
+        </div>
+        <div class="tb-divider"></div>
+        <div class="toolbar-right">
+          <button class="tb-action"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 3v8M4 9l4 4 4-4M3 13h10"/></svg> Export</button>
+          <button class="tb-action"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M14 8A6 6 0 113 4.5M3 2v3h3"/></svg> Refresh</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table" aria-label="Notification events">
+          <thead><tr><th class="checkbox-cell"><input class="cb" type="checkbox"></th><th>Local Time</th><th style="min-width:240px">Message</th><th>Priority</th><th>Tenant</th><th>Alert State</th><th>Source IP</th><th>Type</th><th>Friendly Name</th><th>Category</th></tr></thead>
+          <tbody>
+            <tr><td class="checkbox-cell"><input class="cb" type="checkbox"></td><td class="muted">05/29/2026 09:14:22</td><td>Admin login from 10.10.1.45 — NSM portal access, 2-step auth passed</td><td><span class="chip chip-info">Low</span></td><td>Acme Corp</td><td><span class="chip chip-ok">Acknowledged</span></td><td class="td-mono">10.10.1.45</td><td>User Auth</td><td>FW-MAIN-01</td><td>User</td></tr>
+            <tr><td class="checkbox-cell"><input class="cb" type="checkbox"></td><td class="muted">05/29/2026 08:58:41</td><td>Interface X1 down on FW-BRANCH-02 — link loss detected</td><td><span class="chip chip-warn">Med</span></td><td>Acme Corp</td><td><span class="chip chip-neutral">Open</span></td><td class="td-mono">—</td><td>Interface</td><td>FW-BRANCH-02</td><td>Device</td></tr>
+            <tr><td class="checkbox-cell"><input class="cb" type="checkbox"></td><td class="muted">05/29/2026 08:32:07</td><td>AP SonicWave 641-001 PoE budget exceeded on port 3 — device may reboot</td><td><span class="chip chip-warn">Med</span></td><td>Beta LLC</td><td><span class="chip chip-neutral">Open</span></td><td class="td-mono">10.0.0.22</td><td>PoE</td><td>SW641-001</td><td>Device</td></tr>
+            <tr><td class="checkbox-cell"><input class="cb" type="checkbox"></td><td class="muted">05/29/2026 08:05:44</td><td>Capture Client MDR license expiring in 7 days — renew to avoid service gap</td><td><span class="chip chip-error">High</span></td><td>Gamma Inc</td><td><span class="chip chip-neutral">Open</span></td><td class="td-mono">—</td><td>License</td><td>CC-MDR-GAMMA</td><td>License</td></tr>
+            <tr><td class="checkbox-cell"><input class="cb" type="checkbox"></td><td class="muted">05/29/2026 07:45:00</td><td>NSM read-only analyst login from 172.16.5.9 — MFA verified, session active</td><td><span class="chip chip-info">Low</span></td><td>Delta SA</td><td><span class="chip chip-ok">Acknowledged</span></td><td class="td-mono">172.16.5.9</td><td>User Auth</td><td>NSM-PORTAL</td><td>User</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <div class="pg-info">Showing 1–5 of 237 notifications</div>
+        <div class="pg-btns"><button class="pg-btn">&#8249;</button><button class="pg-btn active">1</button><button class="pg-btn">2</button><button class="pg-btn">3</button><button class="pg-btn">…</button><button class="pg-btn">48</button><button class="pg-btn">&#8250;</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TAB: SAMI AI ═══ -->
+  <div class="tab-panel" id="tab-sami" role="tabpanel" aria-labelledby="tab-btn-sami">
+    <div class="sami-header">
+      <div class="sami-ring">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#FF5D00" stroke-width="1.5"/><path d="M7 11h3l2 4 3-7 2 3h3" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div>
+        <div class="sami-title">SAMI AI Insights</div>
+        <div class="sami-subtitle">Proactive threat intelligence across all products</div>
+      </div>
+      <div style="display:flex;gap:6px;margin-left:auto">
+        <button class="sami-pill active">All</button>
+        <button class="sami-pill">CVE</button>
+        <button class="sami-pill">Anomalies</button>
+        <button class="sami-pill">Policy</button>
+      </div>
+    </div>
+    <div class="sami-body">
+      <!-- Sidebar filter -->
+      <div class="sami-sidebar">
+        <div class="sami-sidebar-title">Categories</div>
+        <div class="sami-filter-tab active">All Insights <span class="sami-filter-count sami-fc-blue">12</span></div>
+        <div class="sami-filter-tab">CVE Vulnerabilities <span class="sami-filter-count sami-fc-red">4</span></div>
+        <div class="sami-filter-tab">Behavioral Anomalies <span class="sami-filter-count sami-fc-warn">5</span></div>
+        <div class="sami-filter-tab">Policy Gaps <span class="sami-filter-count sami-fc-neutral">3</span></div>
+        <div class="sami-filter-tab">Auto-Remediated <span class="sami-filter-count sami-fc-green">2</span></div>
+      </div>
+      <!-- Insight list -->
+      <div class="sami-list">
+        <div class="sami-insight active">
+          <div class="insight-meta"><span class="insight-type-chip itc-cve">CVE</span><span class="insight-time">09:02 today</span></div>
+          <div class="insight-title">Critical CVE-2024-53704 affects 10 TZ-series firewalls</div>
+          <div class="insight-excerpt">Auth-bypass in SSL-VPN. Affected firmware: 7.0.x &lt; 7.0.1-3005. Patch to 7.1.3-4010 recommended immediately.</div>
+        </div>
+        <div class="sami-insight">
+          <div class="insight-meta"><span class="insight-type-chip itc-anomaly">Anomaly</span><span class="insight-time">08:44 today</span></div>
+          <div class="insight-title">Unusual admin login burst from 185.220.101.x (Tor exit node)</div>
+          <div class="insight-excerpt">6 failed attempts in 3 minutes on FW-BRANCH-02. Geo: Netherlands. MFA held, account not locked.</div>
+        </div>
+        <div class="sami-insight">
+          <div class="insight-meta"><span class="insight-type-chip itc-policy">Policy</span><span class="insight-time">07:30 today</span></div>
+          <div class="insight-title">3 tenants have unrestricted outbound on port 445</div>
+          <div class="insight-excerpt">SMB open to all outbound destinations increases ransomware lateral-movement risk. Policy templates available.</div>
+        </div>
+        <div class="sami-insight">
+          <div class="insight-meta"><span class="insight-type-chip itc-anomaly">Anomaly</span><span class="insight-time">06:15 today</span></div>
+          <div class="insight-title">Data transfer spike: 2.4 GB in 8 min from FW-DC-CORE-01</div>
+          <div class="insight-excerpt">Destination 104.21.78.3 (Cloudflare CDN). Spike correlated with scheduled backup — flagged for review.</div>
+        </div>
+        <div class="sami-insight">
+          <div class="insight-meta"><span class="insight-type-chip itc-cve">CVE</span><span class="insight-time">Yesterday</span></div>
+          <div class="insight-title">CVE-2024-40766 management-access bypass — 2 devices at risk</div>
+          <div class="insight-excerpt">Unauthenticated remote code execution via HTTPS management port. Disable remote management or patch immediately.</div>
+        </div>
+      </div>
+      <!-- Detail pane -->
+      <div class="sami-detail">
+        <div class="sami-detail-title">Critical CVE-2024-53704 affects 10 TZ-series firewalls</div>
+        <div class="sami-detail-desc">An authentication bypass vulnerability in the SSL-VPN component allows remote unauthenticated attackers to establish a VPN session. Affected firmware versions are 7.0.x prior to 7.0.1-3005 and 7.1.x prior to 7.1.1-7058. CVSS Score: 9.3 (Critical). Active exploitation observed in the wild.</div>
+        <div class="sami-detail-section">Recommended Actions</div>
+        <ul class="sami-rec-list">
+          <li class="sami-rec-item"><span class="sami-rec-num">1</span>Immediately patch all affected firewalls to firmware 7.1.3-4010 via NSM bulk update.</li>
+          <li class="sami-rec-item"><span class="sami-rec-num">2</span>Disable SSL-VPN on devices that cannot be patched within 24 hours.</li>
+          <li class="sami-rec-item"><span class="sami-rec-num">3</span>Review VPN session logs from the last 7 days for unauthorized access indicators.</li>
+          <li class="sami-rec-item"><span class="sami-rec-num">4</span>Enable geo-blocking on management interfaces for non-business regions.</li>
+        </ul>
+        <div class="sami-detail-section">Affected Devices</div>
+        <table class="data-table" style="font-size:11px">
+          <thead><tr><th>Device</th><th>Tenant</th><th>Firmware</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>FW-BRANCH-02</td><td>Acme Corp</td><td class="muted">7.1.2-3950</td><td><span class="chip chip-error">Vulnerable</span></td></tr>
+            <tr><td>FW-REMOTE-05</td><td>Beta LLC</td><td class="muted">7.0.1-3002</td><td><span class="chip chip-error">Vulnerable</span></td></tr>
+          </tbody>
+        </table>
+        <div class="sami-action-bar">
+          <button class="btn-secondary" style="font-size:12px;padding:4px 16px">Dismiss</button>
+          <button class="btn-primary" style="font-size:12px;padding:4px 16px">Patch All via NSM</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<footer style="text-align:center;font-size:11px;color:var(--uuif-text-tertiary);padding:16px;border-top:1px solid var(--uuif-border-transparent);margin-top:4px">
+  SonicWall Unified Management &middot; UUIF 9.2 &middot; Tab View Variant &middot; &copy; 2026 SonicWall Inc.
+</footer>
+
+</div><!-- /content -->
+</main>
+
+<script>
+// ─── Main tab switcher ───────────────────────────────────
+const TABS = ['nsm','wireless','capture','cse','notifications','sami'];
+const STRIP_MAP = {nsm:'nsm',wireless:'wireless',capture:'capture',cse:'cse'};
+
+function switchTab(id) {
+  TABS.forEach(t => {
+    const btn = document.getElementById('tab-btn-' + t);
+    const panel = document.getElementById('tab-' + t);
+    if (btn) { btn.classList.toggle('active', t === id); btn.setAttribute('aria-selected', t === id); }
+    if (panel) { panel.classList.toggle('active', t === id); }
+  });
+  // Update strip tile selection
+  document.querySelectorAll('.pct').forEach(el => el.classList.remove('selected'));
+  if (STRIP_MAP[id]) {
+    const stripId = STRIP_MAP[id];
+    document.querySelectorAll('.pct').forEach(el => {
+      if (el.getAttribute('onclick') && el.getAttribute('onclick').includes("'" + stripId + "'")) {
+        el.classList.add('selected');
+      }
+    });
+  }
+}
+
+// ─── Notifications view toggle ───────────────────────────
+function switchNotifView(view) {
+  var mapPanel = document.getElementById('notif-map');
+  var listPanel = document.getElementById('notif-list');
+  var mapBtn = document.getElementById('tab-map-btn');
+  var listBtn = document.getElementById('tab-list-btn');
+  if (view === 'map') {
+    mapPanel.style.display = '';
+    listPanel.style.display = 'none';
+    mapBtn.classList.add('active'); mapBtn.setAttribute('aria-selected','true');
+    listBtn.classList.remove('active'); listBtn.setAttribute('aria-selected','false');
+  } else {
+    listPanel.style.display = '';
+    mapPanel.style.display = 'none';
+    listBtn.classList.add('active'); listBtn.setAttribute('aria-selected','true');
+    mapBtn.classList.remove('active'); mapBtn.setAttribute('aria-selected','false');
+  }
+}
+</script>
+</body>
+</html>

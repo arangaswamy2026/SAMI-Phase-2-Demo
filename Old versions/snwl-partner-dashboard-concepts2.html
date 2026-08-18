@@ -1,0 +1,2045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+  Design System Version: UUIF 9.2
+  Component Tokens Used: --uuif-surface-bg, --uuif-surface-container, --uuif-surface-model,
+    --uuif-surface-primary, --uuif-surface-tertiary, --uuif-text-primary, --uuif-text-secondary,
+    --uuif-text-highlight, --uuif-text-tertiary, --uuif-border-tertiary, --uuif-border-transparent,
+    --uuif-brand-orange, --uuif-brand-green, --uuif-brand-red, --uuif-brand-yellow,
+    --uuif-status-normal, --uuif-status-minor, --uuif-status-major, --uuif-status-high,
+    --uuif-fill-blue-lightest, --uuif-fill-green-xxx-lighter, --uuif-fill-yellow-xxx-lighter,
+    --uuif-fill-red-lightest, --uuif-radius-6, --uuif-radius-8, --uuif-radius-pill
+  Design Reference: inspo-nexroute-logistics-dashboard.png (layout), inspo-kealthy-hospital-dashboard.png (metric tiles)
+  Gaps Flagged: None
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SonicWall Partner Dashboard — 4 Concepts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --uuif-text-primary: #191c25;
+    --uuif-text-secondary: #4a618f;
+    --uuif-text-tertiary: #888888;
+    --uuif-text-contrast: #ffffff;
+    --uuif-text-highlight: #0c2b67;
+    --uuif-text-hover: #ff5d00;
+    --uuif-surface-container: #ffffff;
+    --uuif-surface-bg: #fafafa;
+    --uuif-surface-primary: #5b74a7;
+    --uuif-surface-secondary: #d2dff2;
+    --uuif-surface-tertiary: #f6f8fe;
+    --uuif-surface-highlight: #ff5d00;
+    --uuif-surface-model: #f0f2f5;
+    --uuif-border-primary: #ff5d00;
+    --uuif-border-secondary: #78a3e5;
+    --uuif-border-tertiary: #cccccc;
+    --uuif-border-transparent: rgba(17,17,17,0.09);
+    --uuif-brand-navy: #001b50;
+    --uuif-brand-blue: #1f3c73;
+    --uuif-brand-orange: #ff5d00;
+    --uuif-brand-green: #59a02e;
+    --uuif-brand-red: #c70f0f;
+    --uuif-brand-yellow: #f3ac3d;
+    --uuif-status-normal: #99CC00;
+    --uuif-status-minor: #FFCC00;
+    --uuif-status-major: #FF9900;
+    --uuif-status-high: #FF0000;
+    --uuif-status-failed: #CC0000;
+    --uuif-fill-blue-lightest: #f6f8fe;
+    --uuif-fill-green-xxx-lighter: #e3efdc;
+    --uuif-fill-yellow-xxx-lighter: #ffe9be;
+    --uuif-fill-red-lightest: #fff0f0;
+    --uuif-radius-4: 4px;
+    --uuif-radius-6: 6px;
+    --uuif-radius-8: 8px;
+    --uuif-radius-pill: 100px;
+    --uuif-shadow-sm: 0 1px 4px rgba(0,0,0,0.08);
+    --uuif-shadow-md: 0 4px 12px rgba(0,0,0,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito Sans', sans-serif;
+    background: #e8edf5;
+    color: var(--uuif-text-primary);
+    min-height: 100vh;
+  }
+
+  /* ============================================================
+     CONCEPT SELECTOR NAV
+  ============================================================ */
+  .concept-nav {
+    background: var(--uuif-brand-navy);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 52px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+
+  .concept-nav-label {
+    color: rgba(255,255,255,0.5);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-right: 8px;
+  }
+
+  .concept-btn {
+    padding: 6px 16px;
+    border-radius: var(--uuif-radius-pill);
+    border: 1.5px solid rgba(255,255,255,0.2);
+    background: transparent;
+    color: rgba(255,255,255,0.7);
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .concept-btn:hover {
+    border-color: var(--uuif-brand-orange);
+    color: #fff;
+  }
+
+  .concept-btn.active {
+    background: var(--uuif-brand-orange);
+    border-color: var(--uuif-brand-orange);
+    color: #fff;
+  }
+
+  /* ============================================================
+     DASHBOARD PANELS (hidden/shown)
+  ============================================================ */
+  .concept-panel {
+    display: none;
+  }
+
+  .concept-panel.active {
+    display: block;
+  }
+
+  /* ============================================================
+     SHARED NAV SHELL
+  ============================================================ */
+  .shell {
+    display: flex;
+    height: calc(100vh - 52px);
+    overflow: hidden;
+  }
+
+  .primary-nav {
+    width: 60px;
+    background: var(--uuif-brand-navy);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 0;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .nav-logo {
+    width: 36px;
+    height: 36px;
+    margin-bottom: 12px;
+  }
+
+  .nav-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--uuif-radius-6);
+    cursor: pointer;
+    transition: background 0.15s;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .nav-icon:hover { background: rgba(255,255,255,0.1); color: #fff; }
+  .nav-icon.active { background: var(--uuif-brand-orange); color: #fff; }
+
+  .nav-icon svg { width: 20px; height: 20px; fill: currentColor; }
+
+  .subnav {
+    width: 220px;
+    background: var(--uuif-surface-container);
+    border-right: 1px solid var(--uuif-border-tertiary);
+    flex-shrink: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .subnav-header {
+    padding: 16px 16px 12px;
+    border-bottom: 1px solid var(--uuif-border-transparent);
+  }
+
+  .subnav-logo-text {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--uuif-text-secondary);
+  }
+
+  .subnav-product {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--uuif-text-highlight);
+    margin-top: 2px;
+  }
+
+  .subnav-section {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--uuif-border-transparent);
+  }
+
+  .subnav-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--uuif-text-tertiary);
+    padding: 0 16px;
+    margin-bottom: 4px;
+  }
+
+  .subnav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    font-size: 13px;
+    color: var(--uuif-text-secondary);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .subnav-item:hover { background: var(--uuif-surface-tertiary); color: var(--uuif-text-hover); }
+  .subnav-item.active {
+    background: rgba(255,72,26,0.09);
+    color: var(--uuif-text-hover);
+    font-weight: 700;
+    border-left: 3px solid var(--uuif-brand-orange);
+    padding-left: 13px;
+  }
+
+  .subnav-badge {
+    margin-left: auto;
+    background: var(--uuif-brand-red);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 5px;
+    border-radius: var(--uuif-radius-pill);
+    min-width: 18px;
+    text-align: center;
+  }
+
+  .subnav-badge.warn { background: var(--uuif-brand-yellow); color: #fff; }
+  .subnav-badge.info { background: var(--uuif-surface-primary); color: #fff; }
+
+  /* ============================================================
+     MAIN CONTENT AREA
+  ============================================================ */
+  .main-content {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--uuif-surface-bg);
+  }
+
+  /* Top bar */
+  .topbar {
+    height: 52px;
+    background: var(--uuif-surface-container);
+    border-bottom: 1px solid var(--uuif-border-transparent);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .breadcrumb {
+    font-size: 13px;
+    color: var(--uuif-text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .breadcrumb span { color: var(--uuif-text-tertiary); }
+
+  .topbar-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .topbar-select {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 12px;
+    padding: 5px 10px;
+    border: 1px solid var(--uuif-border-tertiary);
+    border-radius: var(--uuif-radius-6);
+    color: var(--uuif-text-secondary);
+    background: var(--uuif-surface-container);
+    cursor: pointer;
+  }
+
+  .page-body {
+    padding: 20px 24px;
+  }
+
+  /* ============================================================
+     SHARED COMPONENTS
+  ============================================================ */
+  .count-block-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .count-block {
+    background: var(--uuif-surface-container);
+    border: 1px solid var(--uuif-border-secondary);
+    border-radius: var(--uuif-radius-8);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 140px;
+    box-shadow: var(--uuif-shadow-sm);
+  }
+
+  .count-block-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--uuif-radius-6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--uuif-fill-blue-lightest);
+    flex-shrink: 0;
+  }
+
+  .count-block-icon svg { width: 18px; height: 18px; fill: var(--uuif-brand-orange); }
+
+  .count-block-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--uuif-text-secondary);
+    margin-bottom: 2px;
+  }
+
+  .count-block-value {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--uuif-text-primary);
+    line-height: 1;
+  }
+
+  .count-block-value.red { color: var(--uuif-brand-red); }
+  .count-block-value.orange { color: var(--uuif-brand-orange); }
+  .count-block-value.green { color: var(--uuif-brand-green); }
+
+  .dashboard-card {
+    background: var(--uuif-surface-container);
+    border: 1px solid var(--uuif-border-tertiary);
+    border-radius: var(--uuif-radius-6);
+    box-shadow: var(--uuif-shadow-sm);
+    overflow: hidden;
+  }
+
+  .card-header {
+    background: var(--uuif-surface-model);
+    border-bottom: 1px solid var(--uuif-border-transparent);
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--uuif-text-highlight);
+  }
+
+  .card-action {
+    font-size: 11px;
+    color: var(--uuif-text-hover);
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .card-body {
+    padding: 12px;
+  }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+  /* Status chip */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    border-radius: var(--uuif-radius-4);
+    padding: 0 7px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border: 1px solid;
+    white-space: nowrap;
+  }
+
+  .chip.success { background: var(--uuif-fill-green-xxx-lighter); border-color: var(--uuif-brand-green); color: var(--uuif-brand-green); }
+  .chip.warning { background: var(--uuif-fill-yellow-xxx-lighter); border-color: var(--uuif-brand-yellow); color: var(--uuif-brand-yellow); }
+  .chip.error { background: var(--uuif-fill-red-lightest); border-color: var(--uuif-brand-red); color: var(--uuif-brand-red); }
+  .chip.info { background: var(--uuif-fill-blue-lightest); border-color: var(--uuif-border-secondary); color: var(--uuif-text-secondary); }
+
+  /* Severity dot */
+  .sev-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .sev-dot.critical { background: var(--uuif-status-failed); }
+  .sev-dot.high { background: var(--uuif-status-high); }
+  .sev-dot.major { background: var(--uuif-status-major); }
+  .sev-dot.minor { background: var(--uuif-status-minor); }
+  .sev-dot.normal { background: var(--uuif-status-normal); }
+
+  /* Data table */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+
+  .data-table th {
+    background: var(--uuif-surface-model);
+    border-bottom: 2px solid var(--uuif-brand-orange);
+    padding: 8px 10px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--uuif-text-secondary);
+    white-space: nowrap;
+  }
+
+  .data-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--uuif-border-transparent);
+    color: var(--uuif-text-primary);
+    vertical-align: middle;
+  }
+
+  .data-table tr:nth-child(even) td { background: var(--uuif-fill-blue-lightest); }
+  .data-table tr:hover td { background: var(--uuif-surface-tertiary); }
+
+  /* Progress bar */
+  .pbar-track {
+    height: 6px;
+    background: var(--uuif-border-secondary);
+    border-radius: var(--uuif-radius-pill);
+    overflow: hidden;
+  }
+
+  .pbar-fill {
+    height: 100%;
+    border-radius: var(--uuif-radius-pill);
+    background: var(--uuif-brand-orange);
+  }
+
+  .pbar-fill.green { background: var(--uuif-brand-green); }
+  .pbar-fill.red { background: var(--uuif-brand-red); }
+  .pbar-fill.yellow { background: var(--uuif-brand-yellow); }
+
+  /* Mini donut placeholder */
+  .donut-wrap {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .donut-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--uuif-text-secondary);
+  }
+
+  .donut-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .donut-swatch {
+    width: 10px; height: 10px; border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  /* Alert insight banner */
+  .ai-banner {
+    background: var(--uuif-fill-blue-lightest);
+    border: 1px solid var(--uuif-border-secondary);
+    border-radius: var(--uuif-radius-8);
+    padding: 10px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .ai-banner-icon {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--uuif-brand-orange);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .ai-banner-icon svg { width: 14px; height: 14px; fill: white; }
+
+  .ai-banner-text {
+    font-size: 13px;
+    color: var(--uuif-text-secondary);
+    line-height: 1.5;
+  }
+
+  .ai-banner-text strong { color: var(--uuif-text-highlight); font-weight: 700; }
+  .ai-banner-text .hl-orange { color: var(--uuif-brand-orange); font-weight: 700; }
+  .ai-banner-text .hl-red { color: var(--uuif-brand-red); font-weight: 700; }
+
+  /* Tenant list row */
+  .tenant-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: var(--uuif-radius-6);
+    transition: background 0.15s;
+    cursor: pointer;
+  }
+
+  .tenant-row:hover { background: var(--uuif-surface-tertiary); }
+
+  .tenant-avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--uuif-surface-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--uuif-brand-blue);
+    flex-shrink: 0;
+    text-transform: uppercase;
+  }
+
+  .tenant-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--uuif-text-primary);
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .tenant-devices {
+    font-size: 11px;
+    color: var(--uuif-text-tertiary);
+  }
+
+  /* Concept label tag */
+  .concept-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--uuif-fill-blue-lightest);
+    border: 1px solid var(--uuif-border-secondary);
+    border-radius: var(--uuif-radius-pill);
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--uuif-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+  }
+
+  /* Sparkline placeholder */
+  .sparkline {
+    height: 36px;
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    padding: 0 2px;
+  }
+
+  .spark-bar {
+    flex: 1;
+    border-radius: 2px 2px 0 0;
+    background: var(--uuif-surface-secondary);
+  }
+
+  .spark-bar.active { background: var(--uuif-brand-orange); }
+  .spark-bar.red { background: var(--uuif-brand-red); opacity: 0.6; }
+
+  /* Product pill tabs */
+  .product-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .product-tab {
+    padding: 5px 12px;
+    border-radius: var(--uuif-radius-pill);
+    border: 1.5px solid var(--uuif-border-tertiary);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--uuif-text-secondary);
+    cursor: pointer;
+    background: var(--uuif-surface-container);
+    transition: all 0.15s;
+  }
+
+  .product-tab:hover { border-color: var(--uuif-brand-orange); color: var(--uuif-text-hover); }
+  .product-tab.active { background: var(--uuif-brand-orange); border-color: var(--uuif-brand-orange); color: #fff; }
+
+  /* Metric with trend */
+  .metric-card {
+    background: var(--uuif-surface-container);
+    border: 1px solid var(--uuif-border-tertiary);
+    border-radius: var(--uuif-radius-8);
+    padding: 14px;
+    box-shadow: var(--uuif-shadow-sm);
+  }
+
+  .metric-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--uuif-text-secondary);
+    margin-bottom: 6px;
+  }
+
+  .metric-value {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--uuif-text-primary);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .metric-value.orange { color: var(--uuif-brand-orange); }
+  .metric-value.red { color: var(--uuif-brand-red); }
+
+  .metric-sub {
+    font-size: 11px;
+    color: var(--uuif-text-tertiary);
+  }
+
+  .metric-trend {
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    margin-top: 4px;
+  }
+
+  .metric-trend.up { color: var(--uuif-brand-red); }
+  .metric-trend.down { color: var(--uuif-brand-green); }
+
+  /* ============================================================
+     SVG CHART HELPERS
+  ============================================================ */
+  .chart-svg {
+    width: 100%;
+    height: 120px;
+  }
+
+  /* ============================================================
+     PAGE HEADER (concept label)
+  ============================================================ */
+  .page-header {
+    padding: 16px 24px 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .page-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--uuif-text-highlight);
+    margin-bottom: 2px;
+  }
+
+  .page-subtitle {
+    font-size: 12px;
+    color: var(--uuif-text-tertiary);
+  }
+
+  /* Concept rationale panel */
+  .rationale-strip {
+    background: var(--uuif-brand-navy);
+    color: rgba(255,255,255,0.85);
+    padding: 10px 24px;
+    font-size: 12px;
+    line-height: 1.6;
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .rationale-strip strong {
+    color: var(--uuif-brand-orange);
+    font-weight: 700;
+  }
+
+  .rationale-item {
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+  }
+
+  .rationale-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+  /* Timeline for concept 3 */
+  .timeline-event {
+    display: flex;
+    gap: 10px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--uuif-border-transparent);
+    font-size: 12px;
+  }
+
+  .tl-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-top: 4px;
+    flex-shrink: 0;
+  }
+
+  .tl-body { flex: 1; }
+  .tl-title { font-weight: 700; color: var(--uuif-text-primary); }
+  .tl-meta { color: var(--uuif-text-tertiary); font-size: 11px; margin-top: 1px; }
+
+  /* Action button */
+  .btn-primary {
+    padding: 7px 16px;
+    border-radius: var(--uuif-radius-pill);
+    background: var(--uuif-brand-orange);
+    border: none;
+    color: #fff;
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .btn-primary:hover { opacity: 0.88; }
+
+  .btn-secondary {
+    padding: 7px 16px;
+    border-radius: var(--uuif-radius-pill);
+    background: transparent;
+    border: 1.5px solid var(--uuif-border-secondary);
+    color: var(--uuif-text-secondary);
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-secondary:hover { border-color: var(--uuif-brand-orange); color: var(--uuif-text-hover); }
+
+  /* Health ring */
+  .health-ring-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .health-score {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--uuif-text-primary);
+  }
+
+  .health-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--uuif-text-secondary);
+    font-weight: 700;
+  }
+
+  /* Section divider */
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--uuif-text-tertiary);
+    padding: 0 0 6px 0;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--uuif-border-transparent);
+  }
+
+  /* Flag */
+  .flag-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--uuif-border-transparent);
+  }
+
+  .flag-icon {
+    width: 28px; height: 28px;
+    border-radius: var(--uuif-radius-6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .flag-icon.red { background: var(--uuif-fill-red-lightest); }
+  .flag-icon.yellow { background: var(--uuif-fill-yellow-xxx-lighter); }
+  .flag-icon.green { background: var(--uuif-fill-green-xxx-lighter); }
+
+  .flag-text {
+    font-size: 12px;
+    color: var(--uuif-text-primary);
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .flag-meta {
+    font-size: 11px;
+    color: var(--uuif-text-tertiary);
+    margin-top: 2px;
+  }
+
+  /* ============================================================
+     CONCEPT 4 — Map placeholder
+  ============================================================ */
+  .geo-map-placeholder {
+    background: linear-gradient(145deg, var(--uuif-surface-secondary) 0%, var(--uuif-fill-blue-lightest) 100%);
+    border-radius: var(--uuif-radius-6);
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--uuif-text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .geo-pin {
+    position: absolute;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--uuif-brand-orange);
+    box-shadow: 0 0 0 3px rgba(255,93,0,0.3);
+  }
+
+  /* ============================================================
+     Scrollable sidebar list
+  ============================================================ */
+  .sidebar-list {
+    overflow-y: auto;
+    max-height: calc(100vh - 300px);
+  }
+
+  .divider { height: 1px; background: var(--uuif-border-transparent); margin: 8px 0; }
+
+  .text-orange { color: var(--uuif-brand-orange); }
+  .text-red { color: var(--uuif-brand-red); }
+  .text-green { color: var(--uuif-brand-green); }
+  .text-muted { color: var(--uuif-text-tertiary); font-size: 11px; }
+  .fw-700 { font-weight: 700; }
+  .mt-8 { margin-top: 8px; }
+  .mt-12 { margin-top: 12px; }
+  .mt-16 { margin-top: 16px; }
+  .mb-12 { margin-bottom: 12px; }
+  .flex-between { display: flex; justify-content: space-between; align-items: center; }
+  .gap-8 { gap: 8px; }
+  .d-flex { display: flex; align-items: center; }
+</style>
+</head>
+<body>
+
+<!-- CONCEPT SWITCHER NAV -->
+<nav class="concept-nav">
+  <span class="concept-nav-label">Concept</span>
+  <button class="concept-btn active" onclick="showConcept(1)">1 — Risk Triage</button>
+  <button class="concept-btn" onclick="showConcept(2)">2 — Product Health Matrix</button>
+  <button class="concept-btn" onclick="showConcept(3)">3 — Tenant Scorecard</button>
+  <button class="concept-btn" onclick="showConcept(4)">4 — Action Queue</button>
+</nav>
+
+
+<!-- ============================================================
+     CONCEPT 1 — RISK TRIAGE VIEW
+     Mental model: "Show me what's on fire right now across all my tenants"
+============================================================ -->
+<div class="concept-panel active" id="concept-1">
+
+  <div class="rationale-strip">
+    <div class="rationale-item"><span class="rationale-icon">🎯</span><span><strong>Concept 1 — Risk Triage:</strong> Partners managing 50 tenants need to know "who needs attention NOW." Organizes the entire dashboard around severity signal. Cross-product alerts (NSM + CC + CSE + WNM) are deduplicated and surfaced as a single risk feed. Partners scan one screen, not four apps.</span></div>
+    <div class="rationale-item"><span class="rationale-icon">📐</span><span><strong>Layout:</strong> Left rail = tenant risk ranking. Center = unified alert feed with cross-product origin tags. Right rail = count blocks + health snapshot. Inspired by NexRoute logistics split layout.</span></div>
+  </div>
+
+  <div class="shell">
+    <!-- Primary nav -->
+    <nav class="primary-nav">
+      <svg class="nav-logo" viewBox="0 0 36 36" fill="none">
+        <circle cx="18" cy="18" r="18" fill="#FF5D00"/>
+        <path d="M10 22 Q18 8 26 22 Q18 28 10 22Z" fill="white" opacity="0.9"/>
+      </svg>
+      <div class="nav-icon active">
+        <svg viewBox="0 0 24 24"><path d="M3 3h18v4H3zM3 9h18v4H3zM3 15h18v4H3z"/></svg>
+      </div>
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+      </div>
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+      </div>
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      </div>
+      <div class="nav-icon" style="margin-top:auto">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+      </div>
+    </nav>
+
+    <!-- Subnav -->
+    <nav class="subnav">
+      <div class="subnav-header">
+        <div class="subnav-logo-text">SonicWall</div>
+        <div class="subnav-product">Partner Portal</div>
+      </div>
+      <div class="subnav-section">
+        <div class="subnav-section-label">Overview</div>
+        <div class="subnav-item active">🛡 Risk Triage</div>
+        <div class="subnav-item">📊 All Dashboards</div>
+        <div class="subnav-item">🏢 Tenants <span class="subnav-badge info">50</span></div>
+      </div>
+      <div class="subnav-section">
+        <div class="subnav-section-label">Products</div>
+        <div class="subnav-item">🔥 NSM Firewalls <span class="subnav-badge">22</span></div>
+        <div class="subnav-item">📡 WNM Access Points</div>
+        <div class="subnav-item">💻 Capture Client <span class="subnav-badge warn">4</span></div>
+        <div class="subnav-item">☁ CSE Cloud Edge</div>
+      </div>
+      <div class="subnav-section">
+        <div class="subnav-section-label">Reports</div>
+        <div class="subnav-item">📈 Weekly Summary</div>
+        <div class="subnav-item">📋 Compliance</div>
+      </div>
+    </nav>
+
+    <!-- Main content -->
+    <div class="main-content">
+      <div class="topbar">
+        <div class="breadcrumb">Partner Portal <span>›</span> Risk Triage</div>
+        <div class="topbar-actions">
+          <select class="topbar-select"><option>All Tenants (50)</option></select>
+          <select class="topbar-select"><option>Last 24 Hours</option></select>
+          <button class="btn-primary">Export Report</button>
+        </div>
+      </div>
+
+      <div style="display:flex; height:calc(100% - 52px);">
+
+        <!-- Left: Tenant risk ranking -->
+        <div style="width:240px; background:var(--uuif-surface-container); border-right:1px solid var(--uuif-border-transparent); overflow-y:auto; flex-shrink:0;">
+          <div style="padding:12px 14px; border-bottom:1px solid var(--uuif-border-transparent);">
+            <div class="section-label" style="margin:0">Tenants by Risk</div>
+          </div>
+          <div style="padding:8px;">
+            <!-- High risk tenants -->
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--uuif-brand-red);padding:8px 4px 4px;">🔴 Critical (3)</div>
+            <div class="tenant-row">
+              <div class="tenant-avatar" style="background:#fff0f0;color:var(--uuif-brand-red)">AC</div>
+              <div>
+                <div class="tenant-name">Acme Corp</div>
+                <div style="font-size:11px;color:var(--uuif-brand-red);font-weight:600">12 open alerts</div>
+              </div>
+            </div>
+            <div class="tenant-row">
+              <div class="tenant-avatar" style="background:#fff0f0;color:var(--uuif-brand-red)">GX</div>
+              <div>
+                <div class="tenant-name">GlobalTech Intl</div>
+                <div style="font-size:11px;color:var(--uuif-brand-red);font-weight:600">8 open alerts</div>
+              </div>
+            </div>
+            <div class="tenant-row">
+              <div class="tenant-avatar" style="background:#fff0f0;color:var(--uuif-brand-red)">NX</div>
+              <div>
+                <div class="tenant-name">NexaCorp</div>
+                <div style="font-size:11px;color:var(--uuif-brand-red);font-weight:600">6 open alerts</div>
+              </div>
+            </div>
+
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--uuif-brand-yellow);padding:8px 4px 4px;">🟡 Warning (9)</div>
+            <div class="tenant-row">
+              <div class="tenant-avatar">BL</div>
+              <div>
+                <div class="tenant-name">BlueLine Mfg</div>
+                <div style="font-size:11px;color:var(--uuif-brand-yellow);font-weight:600">3 warnings</div>
+              </div>
+            </div>
+            <div class="tenant-row">
+              <div class="tenant-avatar">RC</div>
+              <div>
+                <div class="tenant-name">Redcliff Systems</div>
+                <div style="font-size:11px;color:var(--uuif-brand-yellow);font-weight:600">2 warnings</div>
+              </div>
+            </div>
+            <div class="tenant-row">
+              <div class="tenant-avatar">PT</div>
+              <div>
+                <div class="tenant-name">PeakTech Ltd</div>
+                <div style="font-size:11px;color:var(--uuif-brand-yellow);font-weight:600">2 warnings</div>
+              </div>
+            </div>
+            <div style="padding:4px 8px;font-size:11px;color:var(--uuif-text-hover);cursor:pointer;font-weight:600">+ 6 more ›</div>
+
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--uuif-brand-green);padding:8px 4px 4px;">🟢 Healthy (38)</div>
+            <div class="tenant-row">
+              <div class="tenant-avatar" style="background:#e3efdc;color:var(--uuif-brand-green)">SW</div>
+              <div>
+                <div class="tenant-name">SkyWave Networks</div>
+                <div style="font-size:11px;color:var(--uuif-brand-green);font-weight:600">All clear</div>
+              </div>
+            </div>
+            <div style="padding:4px 8px;font-size:11px;color:var(--uuif-text-hover);cursor:pointer;font-weight:600">+ 37 more ›</div>
+          </div>
+        </div>
+
+        <!-- Center: Unified alert feed -->
+        <div style="flex:1; padding:20px; overflow-y:auto;">
+          <!-- AI banner -->
+          <div class="ai-banner">
+            <div class="ai-banner-icon">
+              <svg viewBox="0 0 24 24"><path d="M12 2L13.5 8.5L20 10L13.5 11.5L12 18L10.5 11.5L4 10L10.5 8.5L12 2Z"/></svg>
+            </div>
+            <div class="ai-banner-text">
+              <strong>SAMI Insight:</strong> <span class="hl-red">3 critical alerts</span> across Acme Corp, GlobalTech, and NexaCorp share the same source IP pattern — <span class="hl-orange">possible coordinated scan</span>. Recommend grouping into a single incident review before escalating.
+            </div>
+          </div>
+
+          <!-- Count blocks -->
+          <div class="count-block-row">
+            <div class="count-block">
+              <div class="count-block-icon"><svg viewBox="0 0 24 24"><path d="M12 2L3 7l9 5 9-5-9-5zM3 17l9 5 9-5M3 12l9 5 9-5"/></svg></div>
+              <div>
+                <div class="count-block-label">Total Tenants</div>
+                <div class="count-block-value">50</div>
+              </div>
+            </div>
+            <div class="count-block">
+              <div class="count-block-icon"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8zM12 9a3 3 0 100 6 3 3 0 000-6z"/></svg></div>
+              <div>
+                <div class="count-block-label">Total Devices</div>
+                <div class="count-block-value">1,247</div>
+              </div>
+            </div>
+            <div class="count-block">
+              <div class="count-block-icon"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg></div>
+              <div>
+                <div class="count-block-label">Open Alerts</div>
+                <div class="count-block-value red">68</div>
+              </div>
+            </div>
+            <div class="count-block">
+              <div class="count-block-icon"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+              <div>
+                <div class="count-block-label">Offline Devices</div>
+                <div class="count-block-value orange">22</div>
+              </div>
+            </div>
+            <div class="count-block">
+              <div class="count-block-icon"><svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/></svg></div>
+              <div>
+                <div class="count-block-label">Expired Licenses</div>
+                <div class="count-block-value orange">7</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Unified alert table -->
+          <div class="dashboard-card">
+            <div class="card-header">
+              <div class="card-title">Unified Alert Feed — All Products</div>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <div class="product-tab active" style="font-size:11px;padding:3px 8px">All</div>
+                <div class="product-tab" style="font-size:11px;padding:3px 8px">NSM</div>
+                <div class="product-tab" style="font-size:11px;padding:3px 8px">WNM</div>
+                <div class="product-tab" style="font-size:11px;padding:3px 8px">CC</div>
+                <div class="product-tab" style="font-size:11px;padding:3px 8px">CSE</div>
+                <a class="card-action">View All</a>
+              </div>
+            </div>
+            <div class="card-body" style="padding:0">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Severity</th>
+                    <th>Tenant</th>
+                    <th>Product</th>
+                    <th>Message</th>
+                    <th>Device</th>
+                    <th>Time</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="sev-dot critical"></span></td>
+                    <td class="fw-700">Acme Corp</td>
+                    <td><span class="chip error">NSM</span></td>
+                    <td>Firewall offline — reregister_fw_may7</td>
+                    <td>fw-acme-01</td>
+                    <td class="text-muted">2 min ago</td>
+                    <td><a class="card-action">Remediate</a></td>
+                  </tr>
+                  <tr>
+                    <td><span class="sev-dot critical"></span></td>
+                    <td class="fw-700">GlobalTech Intl</td>
+                    <td><span class="chip error">CC</span></td>
+                    <td>5 infected devices — pending action</td>
+                    <td>Multiple</td>
+                    <td class="text-muted">14 min ago</td>
+                    <td><a class="card-action">Remediate</a></td>
+                  </tr>
+                  <tr>
+                    <td><span class="sev-dot high"></span></td>
+                    <td class="fw-700">NexaCorp</td>
+                    <td><span class="chip error">NSM</span></td>
+                    <td>License expired — 4 devices impacted</td>
+                    <td>fw-nexacorp-02</td>
+                    <td class="text-muted">38 min ago</td>
+                    <td><a class="card-action">Renew</a></td>
+                  </tr>
+                  <tr>
+                    <td><span class="sev-dot major"></span></td>
+                    <td class="fw-700">BlueLine Mfg</td>
+                    <td><span class="chip warning">WNM</span></td>
+                    <td>3 access points offline — Building B</td>
+                    <td>ap-bl-14, ap-bl-15</td>
+                    <td class="text-muted">1 hr ago</td>
+                    <td><a class="card-action">Review</a></td>
+                  </tr>
+                  <tr>
+                    <td><span class="sev-dot major"></span></td>
+                    <td class="fw-700">Redcliff Systems</td>
+                    <td><span class="chip info">CSE</span></td>
+                    <td>Unregistered device accessing service</td>
+                    <td>User: j.sharma</td>
+                    <td class="text-muted">2 hr ago</td>
+                    <td><a class="card-action">Review</a></td>
+                  </tr>
+                  <tr>
+                    <td><span class="sev-dot minor"></span></td>
+                    <td class="fw-700">PeakTech Ltd</td>
+                    <td><span class="chip warning">NSM</span></td>
+                    <td>Config out of sync — 2 firewalls</td>
+                    <td>fw-peak-01, 02</td>
+                    <td class="text-muted">4 hr ago</td>
+                    <td><a class="card-action">Sync</a></td>
+                  </tr>
+                  <tr>
+                    <td><span class="sev-dot normal"></span></td>
+                    <td class="fw-700">SkyWave Networks</td>
+                    <td><span class="chip success">NSM</span></td>
+                    <td>New license applied — 365 days</td>
+                    <td>fw-sky-01</td>
+                    <td class="text-muted">6 hr ago</td>
+                    <td><a class="card-action">Confirm</a></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: health summary -->
+        <div style="width:220px; border-left:1px solid var(--uuif-border-transparent); background:var(--uuif-surface-container); padding:16px; overflow-y:auto; flex-shrink:0;">
+          <div class="section-label">Tenant Health</div>
+          <div style="display:flex;gap:8px;margin-bottom:16px;">
+            <div style="flex:1;text-align:center;padding:10px;background:var(--uuif-fill-red-lightest);border-radius:var(--uuif-radius-6)">
+              <div style="font-size:22px;font-weight:800;color:var(--uuif-brand-red)">3</div>
+              <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.05em;color:var(--uuif-brand-red);font-weight:700">Critical</div>
+            </div>
+            <div style="flex:1;text-align:center;padding:10px;background:var(--uuif-fill-yellow-xxx-lighter);border-radius:var(--uuif-radius-6)">
+              <div style="font-size:22px;font-weight:800;color:var(--uuif-brand-yellow)">9</div>
+              <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.05em;color:var(--uuif-brand-yellow);font-weight:700">Warning</div>
+            </div>
+          </div>
+          <div style="text-align:center;padding:10px;background:var(--uuif-fill-green-xxx-lighter);border-radius:var(--uuif-radius-6);margin-bottom:16px">
+            <div style="font-size:22px;font-weight:800;color:var(--uuif-brand-green)">38</div>
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.05em;color:var(--uuif-brand-green);font-weight:700">Healthy Tenants</div>
+          </div>
+
+          <div class="section-label">Product Status</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div>
+              <div class="flex-between mb-12"><span style="font-size:12px;font-weight:700">NSM Firewalls</span><span class="chip error">22 offline</span></div>
+              <div class="pbar-track"><div class="pbar-fill red" style="width:100%"></div></div>
+            </div>
+            <div>
+              <div class="flex-between mb-12" style="margin-bottom:4px"><span style="font-size:12px;font-weight:700">Capture Client</span><span class="chip warning">4 infected</span></div>
+              <div class="pbar-track"><div class="pbar-fill yellow" style="width:18%"></div></div>
+            </div>
+            <div>
+              <div class="flex-between mb-12" style="margin-bottom:4px"><span style="font-size:12px;font-weight:700">WNM APs</span><span class="chip success">Healthy</span></div>
+              <div class="pbar-track"><div class="pbar-fill green" style="width:90%"></div></div>
+            </div>
+            <div>
+              <div class="flex-between mb-12" style="margin-bottom:4px"><span style="font-size:12px;font-weight:700">CSE Edge</span><span class="chip info">1 flag</span></div>
+              <div class="pbar-track"><div class="pbar-fill" style="width:75%"></div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     CONCEPT 2 — PRODUCT HEALTH MATRIX
+     Mental model: "Show me how each product is performing across ALL my tenants in one grid"
+============================================================ -->
+<div class="concept-panel" id="concept-2">
+
+  <div class="rationale-strip">
+    <div class="rationale-item"><span class="rationale-icon">🎯</span><span><strong>Concept 2 — Product Health Matrix:</strong> Partners often ask "which product is causing the most issues?" This design treats each product (NSM, WNM, CC, CSE) as a column, tenants as rows — creating a visual heat map of status. Single glance reveals which product-tenant intersection is broken.</span></div>
+    <div class="rationale-item"><span class="rationale-icon">📐</span><span><strong>Layout:</strong> Top KPI rail. Full-width product-vs-tenant matrix table with status cells. Right side sparklines per product. Inspired by Omn.io finance split-table reference for clean data density.</span></div>
+  </div>
+
+  <div class="shell">
+    <nav class="primary-nav">
+      <svg class="nav-logo" viewBox="0 0 36 36" fill="none">
+        <circle cx="18" cy="18" r="18" fill="#FF5D00"/>
+        <path d="M10 22 Q18 8 26 22 Q18 28 10 22Z" fill="white" opacity="0.9"/>
+      </svg>
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 3h18v4H3zM3 9h18v4H3zM3 15h18v4H3z"/></svg></div>
+      <div class="nav-icon active"><svg viewBox="0 0 24 24"><path d="M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z"/></svg></div>
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg></div>
+    </nav>
+
+    <nav class="subnav">
+      <div class="subnav-header">
+        <div class="subnav-logo-text">SonicWall</div>
+        <div class="subnav-product">Partner Portal</div>
+      </div>
+      <div class="subnav-section">
+        <div class="subnav-section-label">Overview</div>
+        <div class="subnav-item">🛡 Risk Triage</div>
+        <div class="subnav-item active">📊 Product Matrix</div>
+        <div class="subnav-item">🏢 Tenants <span class="subnav-badge info">50</span></div>
+      </div>
+      <div class="subnav-section">
+        <div class="subnav-section-label">Products</div>
+        <div class="subnav-item">🔥 NSM Firewalls <span class="subnav-badge">22</span></div>
+        <div class="subnav-item">📡 WNM Access Points</div>
+        <div class="subnav-item">💻 Capture Client <span class="subnav-badge warn">4</span></div>
+        <div class="subnav-item">☁ CSE Cloud Edge</div>
+      </div>
+    </nav>
+
+    <div class="main-content">
+      <div class="topbar">
+        <div class="breadcrumb">Partner Portal <span>›</span> Product Health Matrix</div>
+        <div class="topbar-actions">
+          <select class="topbar-select"><option>All Tenants (50)</option></select>
+          <select class="topbar-select"><option>Last 7 Days</option></select>
+          <button class="btn-primary">Export</button>
+        </div>
+      </div>
+
+      <div class="page-body">
+
+        <!-- Product KPI rail -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px">
+          <!-- NSM -->
+          <div class="metric-card">
+            <div class="metric-label" style="color:var(--uuif-brand-red)">🔥 NSM Firewalls</div>
+            <div class="metric-value red">22 / 847</div>
+            <div class="metric-sub">Offline / Total devices</div>
+            <div class="metric-trend up" style="margin-top:6px">↑ 4 more than yesterday</div>
+            <div class="sparkline mt-8">
+              <div class="spark-bar" style="height:40%"></div>
+              <div class="spark-bar" style="height:55%"></div>
+              <div class="spark-bar" style="height:45%"></div>
+              <div class="spark-bar" style="height:70%"></div>
+              <div class="spark-bar" style="height:60%"></div>
+              <div class="spark-bar red" style="height:100%"></div>
+              <div class="spark-bar red active" style="height:92%"></div>
+            </div>
+          </div>
+          <!-- WNM -->
+          <div class="metric-card">
+            <div class="metric-label" style="color:var(--uuif-brand-green)">📡 WNM Access Points</div>
+            <div class="metric-value green">247</div>
+            <div class="metric-sub">Online APs across tenants</div>
+            <div class="metric-trend down" style="margin-top:6px">↓ All healthy today</div>
+            <div class="sparkline mt-8">
+              <div class="spark-bar green" style="height:70%;background:var(--uuif-brand-green);opacity:0.4"></div>
+              <div class="spark-bar green" style="height:75%;background:var(--uuif-brand-green);opacity:0.4"></div>
+              <div class="spark-bar green" style="height:80%;background:var(--uuif-brand-green);opacity:0.4"></div>
+              <div class="spark-bar green" style="height:72%;background:var(--uuif-brand-green);opacity:0.4"></div>
+              <div class="spark-bar green" style="height:90%;background:var(--uuif-brand-green);opacity:0.6"></div>
+              <div class="spark-bar green" style="height:85%;background:var(--uuif-brand-green);opacity:0.6"></div>
+              <div class="spark-bar" style="height:95%;background:var(--uuif-brand-green)"></div>
+            </div>
+          </div>
+          <!-- Capture Client -->
+          <div class="metric-card">
+            <div class="metric-label" style="color:var(--uuif-brand-yellow)">💻 Capture Client</div>
+            <div class="metric-value orange">4</div>
+            <div class="metric-sub">Infected devices pending action</div>
+            <div class="metric-trend up" style="margin-top:6px">↑ 2 new infections today</div>
+            <div class="sparkline mt-8">
+              <div class="spark-bar" style="height:10%"></div>
+              <div class="spark-bar" style="height:5%"></div>
+              <div class="spark-bar" style="height:15%"></div>
+              <div class="spark-bar" style="height:20%"></div>
+              <div class="spark-bar red" style="height:40%"></div>
+              <div class="spark-bar red" style="height:60%"></div>
+              <div class="spark-bar red active" style="height:100%"></div>
+            </div>
+          </div>
+          <!-- CSE -->
+          <div class="metric-card">
+            <div class="metric-label" style="color:var(--uuif-surface-primary)">☁ CSE Cloud Edge</div>
+            <div class="metric-value">99.8%</div>
+            <div class="metric-sub">Connector uptime</div>
+            <div class="metric-trend down" style="margin-top:6px">↓ 1 flag: unregistered device</div>
+            <div class="sparkline mt-8">
+              <div class="spark-bar" style="height:90%;background:var(--uuif-surface-primary);opacity:0.5"></div>
+              <div class="spark-bar" style="height:95%;background:var(--uuif-surface-primary);opacity:0.5"></div>
+              <div class="spark-bar" style="height:88%;background:var(--uuif-surface-primary);opacity:0.5"></div>
+              <div class="spark-bar" style="height:92%;background:var(--uuif-surface-primary);opacity:0.5"></div>
+              <div class="spark-bar" style="height:97%;background:var(--uuif-surface-primary);opacity:0.7"></div>
+              <div class="spark-bar" style="height:100%;background:var(--uuif-surface-primary)"></div>
+              <div class="spark-bar" style="height:98%;background:var(--uuif-surface-primary)"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product × Tenant Matrix -->
+        <div class="dashboard-card">
+          <div class="card-header">
+            <div class="card-title">Product × Tenant Status Matrix</div>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <span style="font-size:11px;color:var(--uuif-text-tertiary)">Showing top 12 tenants by risk ·</span>
+              <a class="card-action">View All 50</a>
+            </div>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="min-width:160px">Tenant</th>
+                  <th style="text-align:center">NSM<br><span style="font-weight:400;text-transform:none;font-size:10px">Firewalls</span></th>
+                  <th style="text-align:center">WNM<br><span style="font-weight:400;text-transform:none;font-size:10px">Access Points</span></th>
+                  <th style="text-align:center">Capture Client<br><span style="font-weight:400;text-transform:none;font-size:10px">Endpoints</span></th>
+                  <th style="text-align:center">CSE<br><span style="font-weight:400;text-transform:none;font-size:10px">Cloud Edge</span></th>
+                  <th style="text-align:center">Overall</th>
+                  <th>Devices</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="fw-700">Acme Corp</td>
+                  <td style="text-align:center"><span class="chip error">Offline</span></td>
+                  <td style="text-align:center"><span class="chip success">OK</span></td>
+                  <td style="text-align:center"><span class="chip error">4 infected</span></td>
+                  <td style="text-align:center"><span class="chip success">OK</span></td>
+                  <td style="text-align:center"><span class="sev-dot critical"></span></td>
+                  <td>142</td>
+                </tr>
+                <tr>
+                  <td class="fw-700">GlobalTech Intl</td>
+                  <td style="text-align:center"><span class="chip warning">Out of sync</span></td>
+                  <td style="text-align:center"><span class="chip success">OK</span></td>
+                  <td style="text-align:center"><span class="chip error">Threat</span></td>
+                  <td style="text-align:center"><span class="chip info">1 flag</span></td>
+                  <td style="text-align:center"><span class="sev-dot critical"></span></td>
+                  <td>287</td>
+                </tr>
+                <tr>
+                  <td class="fw-700">NexaCorp</td>
+                  <td style="text-align:center"><span class="chip error">Expired lic.</span></td>
+                  <td style="text-align:center"><span class="chip success">OK</span></td>
+                  <td style="text-align:center"><span class="chip success">OK</span></td>
+                  <td style="text-align:center"><span class="chip success">OK</span></td>
+                  <td style="text-align:center"><span class="sev-dot high"></span></td>
+                  <td>94</td>
+                </tr>
+                <tr>
+                  <td class="fw-700">BlueLine Mfg</td>
+                  <td style="text-align:center"><span class="chip success">OK</span></td>
+                  <td style="text-align:center"><span class="chip warning">3 offline</span></td>
+                  <td style="text-align:center"><span class="chip success">OK</span></td>
+                  <td style="text-align:center"><span class="chip success">OK</span></td>
+                  <td style="text-align:center"><span class="sev-dot major"></span></td>
+                  <td>68</td>
+                </tr>
+                <tr>
+                  <td class="fw-700">Redcliff Systems</td>
+                  <td style="text-align:center"><span class="chip success">OK</span></td>
+                  <td style="text-align:center"><span class="chip success">OK</span></td>
+                  <td style="text-align:center"><span class="chip success">OK</span></td>
+                  <td style="text-align:center"><span class="chip warning">Unreg. device</span></td>
+                  <td style="text-align:center"><span class="sev-dot major"></span></td>
+                  <td>51</td>
+                </tr>
+                <tr>
+                  <td class="fw-700">PeakTech Ltd</td>
+                  <td style="text-align:center"><span class="chip warning">Out of sync</span></td>
+                  <td style="text-align:center"><span class="chip success">OK</span></td>
+                  <td style="text-align:center"><span class="chip success">OK</span></td>
+                  <td style="text-align:center"><span class="chip success">OK</span></td>
+                  <td style="text-align:center"><span class="sev-dot minor"></span></td>
+                  <td>44</td>
+                </tr>
+                <tr>
+                  <td class="fw-700">SkyWave Networks</td>
+                  <td style="text-align:center"><span class="chip success">OK</span></td>
+                  <td style="text-align:center"><span class="chip success">OK</span></td>
+                  <td style="text-align:center"><span class="chip success">OK</span></td>
+                  <td style="text-align:center"><span class="chip success">OK</span></td>
+                  <td style="text-align:center"><span class="sev-dot normal"></span></td>
+                  <td>189</td>
+                </tr>
+                <tr>
+                  <td class="fw-700">Meridian Partners</td>
+                  <td style="text-align:center"><span class="chip success">OK</span></td>
+                  <td style="text-align:center">—</td>
+                  <td style="text-align:center"><span class="chip success">OK</span></td>
+                  <td style="text-align:center"><span class="chip success">OK</span></td>
+                  <td style="text-align:center"><span class="sev-dot normal"></span></td>
+                  <td>77</td>
+                </tr>
+                <tr>
+                  <td class="fw-700">Orion Dynamics</td>
+                  <td style="text-align:center"><span class="chip success">OK</span></td>
+                  <td style="text-align:center"><span class="chip success">OK</span></td>
+                  <td style="text-align:center"><span class="chip success">OK</span></td>
+                  <td style="text-align:center">—</td>
+                  <td style="text-align:center"><span class="sev-dot normal"></span></td>
+                  <td>102</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     CONCEPT 3 — TENANT SCORECARD VIEW
+     Mental model: "I want a card for each tenant with a health score I can quickly scan"
+============================================================ -->
+<div class="concept-panel" id="concept-3">
+
+  <div class="rationale-strip">
+    <div class="rationale-item"><span class="rationale-icon">🎯</span><span><strong>Concept 3 — Tenant Scorecard:</strong> Partners think in tenants, not products. Each tenant gets a card with a composite health score (aggregated from NSM + WNM + CC + CSE). Cards are sortable by health score, revenue tier, or alert count. Ideal for monthly review prep and partner QBRs.</span></div>
+    <div class="rationale-item"><span class="rationale-icon">📐</span><span><strong>Layout:</strong> Filter bar + search. Grid of tenant cards (4-col) with health score ring, product status pills, device count, and top alert. Click-through to tenant detail. Inspired by Quantix LLM dashboard 4-col metric grid.</span></div>
+  </div>
+
+  <div class="shell">
+    <nav class="primary-nav">
+      <svg class="nav-logo" viewBox="0 0 36 36" fill="none">
+        <circle cx="18" cy="18" r="18" fill="#FF5D00"/>
+        <path d="M10 22 Q18 8 26 22 Q18 28 10 22Z" fill="white" opacity="0.9"/>
+      </svg>
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 3h18v4H3zM3 9h18v4H3zM3 15h18v4H3z"/></svg></div>
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z"/></svg></div>
+      <div class="nav-icon active"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+    </nav>
+
+    <nav class="subnav">
+      <div class="subnav-header">
+        <div class="subnav-logo-text">SonicWall</div>
+        <div class="subnav-product">Partner Portal</div>
+      </div>
+      <div class="subnav-section">
+        <div class="subnav-section-label">Overview</div>
+        <div class="subnav-item">🛡 Risk Triage</div>
+        <div class="subnav-item">📊 Product Matrix</div>
+        <div class="subnav-item active">🏢 Tenant Scorecards <span class="subnav-badge info">50</span></div>
+      </div>
+      <div class="subnav-section">
+        <div class="subnav-section-label">Filter</div>
+        <div class="subnav-item">🔴 Critical (3)</div>
+        <div class="subnav-item">🟡 Warning (9)</div>
+        <div class="subnav-item">🟢 Healthy (38)</div>
+      </div>
+    </nav>
+
+    <div class="main-content">
+      <div class="topbar">
+        <div class="breadcrumb">Partner Portal <span>›</span> Tenant Scorecards</div>
+        <div class="topbar-actions">
+          <input type="text" placeholder="Search tenants..." style="font-family:'Nunito Sans',sans-serif;font-size:12px;padding:5px 10px;border:1px solid var(--uuif-border-tertiary);border-radius:var(--uuif-radius-6);color:var(--uuif-text-secondary);width:180px;">
+          <select class="topbar-select"><option>Sort: Risk Score</option></select>
+          <button class="btn-primary">Export</button>
+        </div>
+      </div>
+
+      <div class="page-body">
+        <!-- Summary KPIs -->
+        <div class="count-block-row mb-12" style="margin-bottom:20px">
+          <div class="count-block">
+            <div class="count-block-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+            <div><div class="count-block-label">Active Tenants</div><div class="count-block-value">50</div></div>
+          </div>
+          <div class="count-block">
+            <div class="count-block-icon"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg></div>
+            <div><div class="count-block-label">Needs Attention</div><div class="count-block-value red">12</div></div>
+          </div>
+          <div class="count-block">
+            <div class="count-block-icon"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+            <div><div class="count-block-label">Avg Health Score</div><div class="count-block-value green">82<span style="font-size:14px;font-weight:400">/100</span></div></div>
+          </div>
+          <div class="count-block">
+            <div class="count-block-icon"><svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/></svg></div>
+            <div><div class="count-block-label">Total Devices</div><div class="count-block-value">1,247</div></div>
+          </div>
+          <div class="count-block">
+            <div class="count-block-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+            <div><div class="count-block-label">Expired Licenses</div><div class="count-block-value orange">7</div></div>
+          </div>
+        </div>
+
+        <!-- Tenant card grid -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
+
+          <!-- Card: Critical -->
+          <div class="dashboard-card" style="border-top:3px solid var(--uuif-brand-red)">
+            <div class="card-body">
+              <div class="flex-between" style="margin-bottom:10px">
+                <div>
+                  <div style="font-size:14px;font-weight:800;color:var(--uuif-text-primary)">Acme Corp</div>
+                  <div class="text-muted">142 devices · NSM, CC</div>
+                </div>
+                <div style="text-align:center">
+                  <div style="font-size:24px;font-weight:800;color:var(--uuif-brand-red);line-height:1">31</div>
+                  <div style="font-size:9px;text-transform:uppercase;font-weight:700;color:var(--uuif-brand-red)">Score</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">
+                <span class="chip error">NSM: Offline</span>
+                <span class="chip error">CC: 4 infected</span>
+                <span class="chip success">WNM: OK</span>
+              </div>
+              <div style="background:var(--uuif-fill-red-lightest);border-radius:var(--uuif-radius-4);padding:6px 8px;font-size:11px;color:var(--uuif-brand-red);font-weight:600;margin-bottom:8px">
+                ⚠ 12 open alerts — immediate action needed
+              </div>
+              <div class="flex-between">
+                <span class="text-muted">Last seen: 2 min ago</span>
+                <button class="btn-primary" style="font-size:11px;padding:4px 10px">Remediate</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card: Critical 2 -->
+          <div class="dashboard-card" style="border-top:3px solid var(--uuif-brand-red)">
+            <div class="card-body">
+              <div class="flex-between" style="margin-bottom:10px">
+                <div>
+                  <div style="font-size:14px;font-weight:800;color:var(--uuif-text-primary)">GlobalTech Intl</div>
+                  <div class="text-muted">287 devices · All products</div>
+                </div>
+                <div style="text-align:center">
+                  <div style="font-size:24px;font-weight:800;color:var(--uuif-brand-red);line-height:1">44</div>
+                  <div style="font-size:9px;text-transform:uppercase;font-weight:700;color:var(--uuif-brand-red)">Score</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">
+                <span class="chip warning">NSM: Sync</span>
+                <span class="chip error">CC: Threat</span>
+                <span class="chip info">CSE: Flag</span>
+              </div>
+              <div style="background:var(--uuif-fill-red-lightest);border-radius:var(--uuif-radius-4);padding:6px 8px;font-size:11px;color:var(--uuif-brand-red);font-weight:600;margin-bottom:8px">
+                ⚠ 8 open alerts
+              </div>
+              <div class="flex-between">
+                <span class="text-muted">Last seen: 14 min ago</span>
+                <button class="btn-primary" style="font-size:11px;padding:4px 10px">Review</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card: Warning -->
+          <div class="dashboard-card" style="border-top:3px solid var(--uuif-brand-yellow)">
+            <div class="card-body">
+              <div class="flex-between" style="margin-bottom:10px">
+                <div>
+                  <div style="font-size:14px;font-weight:800;color:var(--uuif-text-primary)">BlueLine Mfg</div>
+                  <div class="text-muted">68 devices · NSM, WNM</div>
+                </div>
+                <div style="text-align:center">
+                  <div style="font-size:24px;font-weight:800;color:var(--uuif-brand-yellow);line-height:1">72</div>
+                  <div style="font-size:9px;text-transform:uppercase;font-weight:700;color:var(--uuif-brand-yellow)">Score</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">
+                <span class="chip success">NSM: OK</span>
+                <span class="chip warning">WNM: 3 offline</span>
+                <span class="chip success">CC: OK</span>
+              </div>
+              <div style="background:var(--uuif-fill-yellow-xxx-lighter);border-radius:var(--uuif-radius-4);padding:6px 8px;font-size:11px;color:var(--uuif-brand-yellow);font-weight:600;margin-bottom:8px">
+                ⚡ 3 warnings — monitor
+              </div>
+              <div class="flex-between">
+                <span class="text-muted">Last seen: 1 hr ago</span>
+                <button class="btn-secondary" style="font-size:11px;padding:4px 10px">Monitor</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card: Healthy -->
+          <div class="dashboard-card" style="border-top:3px solid var(--uuif-brand-green)">
+            <div class="card-body">
+              <div class="flex-between" style="margin-bottom:10px">
+                <div>
+                  <div style="font-size:14px;font-weight:800;color:var(--uuif-text-primary)">SkyWave Networks</div>
+                  <div class="text-muted">189 devices · NSM, WNM, CSE</div>
+                </div>
+                <div style="text-align:center">
+                  <div style="font-size:24px;font-weight:800;color:var(--uuif-brand-green);line-height:1">96</div>
+                  <div style="font-size:9px;text-transform:uppercase;font-weight:700;color:var(--uuif-brand-green)">Score</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">
+                <span class="chip success">NSM: OK</span>
+                <span class="chip success">WNM: OK</span>
+                <span class="chip success">CSE: OK</span>
+              </div>
+              <div style="background:var(--uuif-fill-green-xxx-lighter);border-radius:var(--uuif-radius-4);padding:6px 8px;font-size:11px;color:var(--uuif-brand-green);font-weight:600;margin-bottom:8px">
+                ✓ All systems healthy
+              </div>
+              <div class="flex-between">
+                <span class="text-muted">Last seen: 5 min ago</span>
+                <button class="btn-secondary" style="font-size:11px;padding:4px 10px">View</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- More cards placeholder -->
+          <div class="dashboard-card" style="border-top:3px solid var(--uuif-brand-green)">
+            <div class="card-body">
+              <div class="flex-between" style="margin-bottom:10px">
+                <div><div style="font-size:14px;font-weight:800">Meridian Partners</div><div class="text-muted">77 devices · NSM, CC, CSE</div></div>
+                <div style="text-align:center"><div style="font-size:24px;font-weight:800;color:var(--uuif-brand-green)">91</div><div style="font-size:9px;text-transform:uppercase;font-weight:700;color:var(--uuif-brand-green)">Score</div></div>
+              </div>
+              <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">
+                <span class="chip success">NSM: OK</span><span class="chip success">CC: OK</span><span class="chip success">CSE: OK</span>
+              </div>
+              <div style="background:var(--uuif-fill-green-xxx-lighter);border-radius:var(--uuif-radius-4);padding:6px 8px;font-size:11px;color:var(--uuif-brand-green);font-weight:600;margin-bottom:8px">✓ All systems healthy</div>
+              <div class="flex-between"><span class="text-muted">Last seen: 8 min ago</span><button class="btn-secondary" style="font-size:11px;padding:4px 10px">View</button></div>
+            </div>
+          </div>
+
+          <div class="dashboard-card" style="border-top:3px solid var(--uuif-status-major)">
+            <div class="card-body">
+              <div class="flex-between" style="margin-bottom:10px">
+                <div><div style="font-size:14px;font-weight:800">Redcliff Systems</div><div class="text-muted">51 devices · NSM, CSE</div></div>
+                <div style="text-align:center"><div style="font-size:24px;font-weight:800;color:var(--uuif-status-major)">68</div><div style="font-size:9px;text-transform:uppercase;font-weight:700;color:var(--uuif-status-major)">Score</div></div>
+              </div>
+              <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">
+                <span class="chip success">NSM: OK</span><span class="chip info">CSE: 1 flag</span>
+              </div>
+              <div style="background:var(--uuif-fill-yellow-xxx-lighter);border-radius:var(--uuif-radius-4);padding:6px 8px;font-size:11px;color:var(--uuif-brand-yellow);font-weight:600;margin-bottom:8px">⚡ Unregistered device flagged</div>
+              <div class="flex-between"><span class="text-muted">Last seen: 2 hr ago</span><button class="btn-secondary" style="font-size:11px;padding:4px 10px">Monitor</button></div>
+            </div>
+          </div>
+
+          <div class="dashboard-card" style="border-top:3px solid var(--uuif-brand-green)">
+            <div class="card-body">
+              <div class="flex-between" style="margin-bottom:10px">
+                <div><div style="font-size:14px;font-weight:800">Orion Dynamics</div><div class="text-muted">102 devices · NSM, WNM, CC</div></div>
+                <div style="text-align:center"><div style="font-size:24px;font-weight:800;color:var(--uuif-brand-green)">88</div><div style="font-size:9px;text-transform:uppercase;font-weight:700;color:var(--uuif-brand-green)">Score</div></div>
+              </div>
+              <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">
+                <span class="chip success">NSM: OK</span><span class="chip success">WNM: OK</span><span class="chip success">CC: OK</span>
+              </div>
+              <div style="background:var(--uuif-fill-green-xxx-lighter);border-radius:var(--uuif-radius-4);padding:6px 8px;font-size:11px;color:var(--uuif-brand-green);font-weight:600;margin-bottom:8px">✓ All systems healthy</div>
+              <div class="flex-between"><span class="text-muted">Last seen: 22 min ago</span><button class="btn-secondary" style="font-size:11px;padding:4px 10px">View</button></div>
+            </div>
+          </div>
+
+          <!-- +43 more placeholder -->
+          <div class="dashboard-card" style="display:flex;align-items:center;justify-content:center;min-height:160px;border:2px dashed var(--uuif-border-tertiary);background:transparent;box-shadow:none;">
+            <div style="text-align:center">
+              <div style="font-size:28px;font-weight:800;color:var(--uuif-text-tertiary)">+43</div>
+              <div style="font-size:12px;color:var(--uuif-text-tertiary);margin-bottom:8px">more tenants</div>
+              <a class="card-action" style="font-size:12px">View All 50 →</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     CONCEPT 4 — ACTION QUEUE VIEW
+     Mental model: "What do I actually need to DO today across all tenants?"
+============================================================ -->
+<div class="concept-panel" id="concept-4">
+
+  <div class="rationale-strip">
+    <div class="rationale-item"><span class="rationale-icon">🎯</span><span><strong>Concept 4 — Action Queue:</strong> Partners are operations managers. They do not just want to see status — they need a prioritized work queue. Every alert is transformed into an action item with estimated effort, affected tenant, and 1-click resolve. Removes the "so what?" gap of status-only dashboards.</span></div>
+    <div class="rationale-item"><span class="rationale-icon">📐</span><span><strong>Layout:</strong> Left = daily action queue with priority lanes. Center-top = 6 KPI count blocks. Center-bottom = event timeline. Right = license renewal tracker. Kealthy Hospital two-panel reference for the sidebar + main split.</span></div>
+  </div>
+
+  <div class="shell">
+    <nav class="primary-nav">
+      <svg class="nav-logo" viewBox="0 0 36 36" fill="none">
+        <circle cx="18" cy="18" r="18" fill="#FF5D00"/>
+        <path d="M10 22 Q18 8 26 22 Q18 28 10 22Z" fill="white" opacity="0.9"/>
+      </svg>
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 3h18v4H3zM3 9h18v4H3zM3 15h18v4H3z"/></svg></div>
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z"/></svg></div>
+      <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+      <div class="nav-icon active"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg></div>
+    </nav>
+
+    <nav class="subnav">
+      <div class="subnav-header">
+        <div class="subnav-logo-text">SonicWall</div>
+        <div class="subnav-product">Partner Portal</div>
+      </div>
+      <div class="subnav-section">
+        <div class="subnav-section-label">Today's Queue</div>
+        <div class="subnav-item active">⚡ Action Queue <span class="subnav-badge">18</span></div>
+        <div class="subnav-item">✓ Completed Today <span class="subnav-badge info">6</span></div>
+      </div>
+      <div class="subnav-section">
+        <div class="subnav-section-label">Upcoming</div>
+        <div class="subnav-item">📅 License Renewals <span class="subnav-badge warn">7</span></div>
+        <div class="subnav-item">🔄 Scheduled Deploys</div>
+        <div class="subnav-item">📊 Reports Due</div>
+      </div>
+      <div class="subnav-section">
+        <div class="subnav-section-label">Portfolio</div>
+        <div class="subnav-item">🏢 All Tenants <span class="subnav-badge info">50</span></div>
+        <div class="subnav-item">📡 Devices</div>
+      </div>
+    </nav>
+
+    <div class="main-content">
+      <div class="topbar">
+        <div class="breadcrumb">Partner Portal <span>›</span> Action Queue</div>
+        <div class="topbar-actions">
+          <select class="topbar-select"><option>All Tenants (50)</option></select>
+          <select class="topbar-select"><option>All Products</option></select>
+          <button class="btn-primary">Mark All Done</button>
+        </div>
+      </div>
+
+      <div style="display:flex;height:calc(100% - 52px);">
+
+        <!-- Left: Action queue -->
+        <div style="width:320px;border-right:1px solid var(--uuif-border-transparent);overflow-y:auto;flex-shrink:0;background:var(--uuif-surface-container);">
+          <div style="padding:12px 14px;border-bottom:1px solid var(--uuif-border-transparent)">
+            <div class="section-label" style="margin:0">Today's Action Queue</div>
+            <div style="font-size:11px;color:var(--uuif-text-tertiary);margin-top:2px">18 items · Est. 2.4h total</div>
+          </div>
+
+          <!-- Critical lane -->
+          <div style="padding:8px 12px 4px">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--uuif-brand-red);margin-bottom:6px">🔴 Critical — Act Immediately</div>
+
+            <div class="flag-item">
+              <div class="flag-icon red">🔥</div>
+              <div style="flex:1">
+                <div class="flag-text">Restore offline firewalls</div>
+                <div class="flag-meta">Acme Corp · NSM · 22 devices · ~45 min</div>
+              </div>
+              <button class="btn-primary" style="font-size:10px;padding:3px 8px;flex-shrink:0">Start</button>
+            </div>
+
+            <div class="flag-item">
+              <div class="flag-icon red">💻</div>
+              <div style="flex:1">
+                <div class="flag-text">Isolate infected endpoints</div>
+                <div class="flag-meta">GlobalTech Intl · Capture Client · 4 devices · ~20 min</div>
+              </div>
+              <button class="btn-primary" style="font-size:10px;padding:3px 8px;flex-shrink:0">Start</button>
+            </div>
+
+            <div class="flag-item" style="border-bottom:none">
+              <div class="flag-icon red">📋</div>
+              <div style="flex:1">
+                <div class="flag-text">Renew expired licenses</div>
+                <div class="flag-meta">NexaCorp · NSM · 4 devices blocked · ~10 min</div>
+              </div>
+              <button class="btn-primary" style="font-size:10px;padding:3px 8px;flex-shrink:0">Renew</button>
+            </div>
+          </div>
+
+          <div class="divider" style="margin:0"></div>
+
+          <!-- Warning lane -->
+          <div style="padding:8px 12px 4px">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--uuif-brand-yellow);margin-bottom:6px">🟡 Warning — Address Today</div>
+
+            <div class="flag-item">
+              <div class="flag-icon yellow">📡</div>
+              <div style="flex:1">
+                <div class="flag-text">Diagnose offline APs</div>
+                <div class="flag-meta">BlueLine Mfg · WNM · 3 APs · ~15 min</div>
+              </div>
+              <button class="btn-secondary" style="font-size:10px;padding:3px 8px;flex-shrink:0">View</button>
+            </div>
+
+            <div class="flag-item">
+              <div class="flag-icon yellow">🔄</div>
+              <div style="flex:1">
+                <div class="flag-text">Sync out-of-sync configs</div>
+                <div class="flag-meta">PeakTech Ltd · NSM · 2 firewalls · ~10 min</div>
+              </div>
+              <button class="btn-secondary" style="font-size:10px;padding:3px 8px;flex-shrink:0">Sync</button>
+            </div>
+
+            <div class="flag-item">
+              <div class="flag-icon yellow">👤</div>
+              <div style="flex:1">
+                <div class="flag-text">Review unregistered device</div>
+                <div class="flag-meta">Redcliff Systems · CSE · j.sharma · ~5 min</div>
+              </div>
+              <button class="btn-secondary" style="font-size:10px;padding:3px 8px;flex-shrink:0">Review</button>
+            </div>
+
+            <div style="padding:6px 0;font-size:11px;color:var(--uuif-text-hover);font-weight:600;cursor:pointer">+ 6 more warnings →</div>
+          </div>
+
+          <div class="divider" style="margin:0"></div>
+
+          <!-- Routine lane -->
+          <div style="padding:8px 12px 4px">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--uuif-text-tertiary);margin-bottom:6px">🔵 Routine — This Week</div>
+
+            <div class="flag-item">
+              <div class="flag-icon green">📋</div>
+              <div style="flex:1">
+                <div class="flag-text">Run monthly compliance report</div>
+                <div class="flag-meta">All tenants · Due Fri · ~30 min</div>
+              </div>
+              <button class="btn-secondary" style="font-size:10px;padding:3px 8px;flex-shrink:0">Queue</button>
+            </div>
+
+            <div class="flag-item">
+              <div class="flag-icon green">📦</div>
+              <div style="flex:1">
+                <div class="flag-text">Review 5 pending ZTP deployments</div>
+                <div class="flag-meta">3 tenants · ~20 min</div>
+              </div>
+              <button class="btn-secondary" style="font-size:10px;padding:3px 8px;flex-shrink:0">Queue</button>
+            </div>
+
+            <div style="padding:6px 0;font-size:11px;color:var(--uuif-text-hover);font-weight:600;cursor:pointer">+ 6 more routine items →</div>
+          </div>
+        </div>
+
+        <!-- Center + Right -->
+        <div style="flex:1;overflow-y:auto;padding:20px;display:flex;gap:16px;">
+
+          <!-- Center column -->
+          <div style="flex:1;min-width:0">
+            <!-- KPI row -->
+            <div class="count-block-row" style="margin-bottom:20px">
+              <div class="count-block"><div class="count-block-icon"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div><div><div class="count-block-label">Queue Items</div><div class="count-block-value red">18</div></div></div>
+              <div class="count-block"><div class="count-block-icon"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div><div class="count-block-label">Completed</div><div class="count-block-value green">6</div></div></div>
+              <div class="count-block"><div class="count-block-icon"><svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/></svg></div><div><div class="count-block-label">Expiring Licenses</div><div class="count-block-value orange">7</div></div></div>
+              <div class="count-block"><div class="count-block-icon"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/></svg></div><div><div class="count-block-label">Offline Devices</div><div class="count-block-value orange">22</div></div></div>
+            </div>
+
+            <!-- Event timeline -->
+            <div class="dashboard-card">
+              <div class="card-header"><div class="card-title">Event Timeline — Today</div><a class="card-action">Full Log</a></div>
+              <div class="card-body">
+                <div class="timeline-event">
+                  <div class="tl-dot" style="background:var(--uuif-brand-red)"></div>
+                  <div class="tl-body">
+                    <div class="tl-title">Firewall offline detected — Acme Corp / fw-acme-01</div>
+                    <div class="tl-meta">NSM · 2026-05-27 23:40 · Auto-alert triggered</div>
+                  </div>
+                  <span class="chip error">NSM</span>
+                </div>
+                <div class="timeline-event">
+                  <div class="tl-dot" style="background:var(--uuif-brand-red)"></div>
+                  <div class="tl-body">
+                    <div class="tl-title">4 infected endpoints detected — GlobalTech Intl</div>
+                    <div class="tl-meta">Capture Client · 23:26 · SentinelOne flag</div>
+                  </div>
+                  <span class="chip error">CC</span>
+                </div>
+                <div class="timeline-event">
+                  <div class="tl-dot" style="background:var(--uuif-brand-yellow)"></div>
+                  <div class="tl-body">
+                    <div class="tl-title">3 APs offline — BlueLine Mfg / Building B</div>
+                    <div class="tl-meta">WNM · 22:59 · No connectivity signal</div>
+                  </div>
+                  <span class="chip warning">WNM</span>
+                </div>
+                <div class="timeline-event">
+                  <div class="tl-dot" style="background:var(--uuif-surface-primary)"></div>
+                  <div class="tl-body">
+                    <div class="tl-title">Unregistered device accessing services — Redcliff / j.sharma</div>
+                    <div class="tl-meta">CSE · 21:02 · Policy mismatch</div>
+                  </div>
+                  <span class="chip info">CSE</span>
+                </div>
+                <div class="timeline-event">
+                  <div class="tl-dot" style="background:var(--uuif-brand-green)"></div>
+                  <div class="tl-body">
+                    <div class="tl-title">License renewed — SkyWave Networks / 365 days applied</div>
+                    <div class="tl-meta">NSM · 18:55 · Admin: nsmadmin</div>
+                  </div>
+                  <span class="chip success">NSM</span>
+                </div>
+                <div class="timeline-event" style="border-bottom:none">
+                  <div class="tl-dot" style="background:var(--uuif-brand-green)"></div>
+                  <div class="tl-body">
+                    <div class="tl-title">Config sync completed — Meridian Partners</div>
+                    <div class="tl-meta">NSM · 17:30 · Triggered by deploy job</div>
+                  </div>
+                  <span class="chip success">NSM</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right rail: License renewals -->
+          <div style="width:200px;flex-shrink:0;">
+            <div class="dashboard-card">
+              <div class="card-header"><div class="card-title">License Renewals</div></div>
+              <div class="card-body">
+                <div style="font-size:11px;color:var(--uuif-text-tertiary);margin-bottom:8px">Expiring within 30 days</div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <div style="background:var(--uuif-fill-red-lightest);border-radius:var(--uuif-radius-6);padding:8px">
+                    <div style="font-size:12px;font-weight:700;color:var(--uuif-brand-red)">NexaCorp</div>
+                    <div style="font-size:11px;color:var(--uuif-text-tertiary)">NSM · Expired now</div>
+                    <button class="btn-primary" style="font-size:10px;padding:3px 8px;margin-top:4px;width:100%">Renew</button>
+                  </div>
+                  <div style="background:var(--uuif-fill-yellow-xxx-lighter);border-radius:var(--uuif-radius-6);padding:8px">
+                    <div style="font-size:12px;font-weight:700;color:var(--uuif-brand-yellow)">PeakTech Ltd</div>
+                    <div style="font-size:11px;color:var(--uuif-text-tertiary)">NSM · Expires in 7d</div>
+                    <button class="btn-secondary" style="font-size:10px;padding:3px 8px;margin-top:4px;width:100%">Schedule</button>
+                  </div>
+                  <div style="background:var(--uuif-fill-yellow-xxx-lighter);border-radius:var(--uuif-radius-6);padding:8px">
+                    <div style="font-size:12px;font-weight:700;color:var(--uuif-brand-yellow)">Orion Dynamics</div>
+                    <div style="font-size:11px;color:var(--uuif-text-tertiary)">CC · Expires in 14d</div>
+                    <button class="btn-secondary" style="font-size:10px;padding:3px 8px;margin-top:4px;width:100%">Schedule</button>
+                  </div>
+                  <div style="padding:4px;text-align:center;font-size:11px;color:var(--uuif-text-hover);cursor:pointer;font-weight:600">+ 4 more →</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="dashboard-card mt-16" style="margin-top:16px">
+              <div class="card-header"><div class="card-title">Today's Progress</div></div>
+              <div class="card-body">
+                <div style="text-align:center;margin-bottom:10px">
+                  <div style="font-size:28px;font-weight:800;color:var(--uuif-brand-green)">6</div>
+                  <div style="font-size:10px;text-transform:uppercase;font-weight:700;color:var(--uuif-text-tertiary);letter-spacing:0.05em">of 24 resolved</div>
+                </div>
+                <div class="pbar-track" style="height:10px;margin-bottom:6px">
+                  <div class="pbar-fill green" style="width:25%"></div>
+                </div>
+                <div style="font-size:11px;color:var(--uuif-text-tertiary);text-align:center">25% complete today</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  function showConcept(n) {
+    document.querySelectorAll('.concept-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.concept-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('concept-' + n).classList.add('active');
+    document.querySelectorAll('.concept-btn')[n - 1].classList.add('active');
+  }
+</script>
+
+</body>
+</html>

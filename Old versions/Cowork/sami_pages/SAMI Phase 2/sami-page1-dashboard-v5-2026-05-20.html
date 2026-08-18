@@ -1,0 +1,1610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NSM Dashboard — SAMI + Notifications Inline v5</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; color: #1a2332; font-size: 13px; }
+
+  .sidebar {
+    position: fixed; left: 0; top: 0; width: 48px; height: 100vh;
+    background: #0d1526; display: flex; flex-direction: column;
+    align-items: center; padding: 0; z-index: 100;
+  }
+  .sidebar-logo {
+    width: 48px; height: 48px; background: #E85D1A;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .sidebar-logo svg { width: 26px; height: 26px; fill: white; }
+  .sidebar-icon {
+    width: 48px; height: 44px; display: flex; align-items: center; justify-content: center;
+    color: #7a8ba0; cursor: pointer; position: relative; transition: color 0.2s;
+  }
+  .sidebar-icon:hover { color: #fff; }
+  .sidebar-icon.active { color: #fff; border-left: 2px solid #E85D1A; }
+  .sidebar-icon .badge {
+    position: absolute; top: 7px; right: 7px;
+    background: #E85D1A; color: white; font-size: 9px; font-weight: 700;
+    border-radius: 8px; min-width: 16px; height: 16px;
+    display: flex; align-items: center; justify-content: center; padding: 0 3px;
+  }
+  .sidebar-spacer { flex: 1; }
+
+  .topbar {
+    position: fixed; left: 48px; right: 0; top: 0; height: 44px;
+    background: #fff; border-bottom: 1px solid #e2e6ea;
+    display: flex; align-items: center; padding: 0 16px; z-index: 99; gap: 8px;
+  }
+  .breadcrumb { display: flex; align-items: center; gap: 4px; font-size: 12.5px; color: #555; flex: 1; }
+  .breadcrumb a { color: #3b7dd8; text-decoration: none; }
+  .breadcrumb a:hover { text-decoration: underline; }
+  .breadcrumb span { color: #999; }
+  .tenant-selector {
+    display: flex; align-items: center; gap: 6px;
+    border: 1px solid #d0d7de; border-radius: 20px;
+    padding: 4px 12px; font-size: 12.5px; cursor: pointer;
+    background: #fff; color: #333;
+  }
+  .tenant-selector .dot { width: 8px; height: 8px; background: #E85D1A; border-radius: 50%; }
+  .topbar-icons { display: flex; align-items: center; gap: 10px; }
+  .topbar-icons .icon-btn {
+    width: 30px; height: 30px; border-radius: 50%; display: flex;
+    align-items: center; justify-content: center; cursor: pointer;
+    color: #555; transition: background 0.2s; position: relative;
+  }
+  .topbar-icons .icon-btn:hover { background: #f0f2f5; }
+  .topbar-icons .notif-badge {
+    position: absolute; top: 2px; right: 2px;
+    width: 8px; height: 8px; background: #E85D1A; border-radius: 50%;
+  }
+  .avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: #1a3a5c; color: #fff; font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+
+  .page { margin-left: 48px; padding-top: 44px; min-height: 100vh; }
+  .p1-content { padding: 16px; }
+
+  .product-row-wrap { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+  .product-row { display: flex; gap: 10px; flex: 1; overflow: hidden; }
+  .product-card {
+    background: #fff; border-radius: 6px; border: 1px solid #e2e6ea;
+    padding: 12px 14px; min-width: 148px; flex-shrink: 0;
+  }
+  .product-card .pc-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    color: #555; letter-spacing: 0.5px; margin-bottom: 6px;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .product-card .pc-count { font-size: 26px; font-weight: 700; color: #1a2332; line-height: 1; margin-bottom: 4px; }
+  .product-card .pc-sublabel { font-size: 11px; color: #888; margin-bottom: 6px; }
+  .product-card .pc-attention { font-size: 11px; color: #666; }
+  .product-card .pc-attention .warn { color: #E85D1A; }
+  .product-card .pc-attention .eol { color: #888; }
+  .product-card .learn-btn {
+    display: inline-block; border: 1px solid #d0d7de; border-radius: 4px;
+    padding: 4px 10px; font-size: 11px; color: #333; cursor: pointer;
+    background: #fff; margin-top: 4px;
+  }
+  .product-card .coming-soon { color: #E85D1A; font-size: 11px; font-weight: 600; }
+  .arrow-btn {
+    width: 26px; height: 26px; border: 1px solid #d0d7de; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; background: #fff; color: #555; flex-shrink: 0;
+  }
+  .org-summary {
+    background: #1a2f4e; color: #fff; border-radius: 6px;
+    padding: 14px 16px; min-width: 180px;
+  }
+  .org-summary .os-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #8ba3be; margin-bottom: 12px; }
+  .org-summary .os-stat-label { font-size: 10px; color: #8ba3be; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 2px; }
+  .org-summary .os-stat-val { font-size: 28px; font-weight: 700; line-height: 1; margin-bottom: 10px; }
+  .org-summary .os-btn {
+    background: #2a4a6e; border: none; color: #fff; font-size: 12px;
+    padding: 7px 14px; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 4px;
+  }
+  .dashboard-row { display: flex; gap: 12px; margin-bottom: 16px; align-items: flex-start; }
+  .dashboard-row .product-section { flex: 1; background: #fff; border-radius: 6px; border: 1px solid #e2e6ea; padding: 12px 14px; }
+  .product-section .ps-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #888; margin-bottom: 2px; letter-spacing: 0.5px; }
+  .product-section .ps-sub { font-size: 11px; color: #aaa; margin-bottom: 10px; }
+
+  .sami-tabs { display: flex; gap: 0; border-bottom: 1px solid #e2e6ea; margin-bottom: 14px; }
+  .sami-tab {
+    padding: 9px 16px; font-size: 13px; cursor: pointer; color: #666;
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+  }
+  .sami-tab.active { color: #E85D1A; border-bottom-color: #E85D1A; font-weight: 600; }
+
+  .ask-sami-wrap { display: flex; justify-content: center; margin-bottom: 18px; }
+  .ask-sami {
+    display: flex; align-items: center; gap: 8px;
+    border: 1.5px solid #3b7dd8; border-radius: 24px;
+    padding: 9px 16px; width: 560px; background: #fff;
+    box-shadow: 0 0 0 3px rgba(59,125,216,0.08);
+  }
+  .ask-sami .sami-spark { color: #E85D1A; font-size: 15px; }
+  .ask-sami input {
+    border: none; outline: none; flex: 1; font-size: 13px; color: #555; background: transparent;
+  }
+  .ask-sami .kbd {
+    font-size: 10px; color: #999; background: #f0f2f5;
+    border-radius: 3px; padding: 2px 5px; font-family: monospace;
+  }
+
+  .alert-grid { display: flex; gap: 12px; }
+  .alert-col { flex: 1; }
+  .rec-col { flex: 1; }
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .section-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: #1a2332; }
+  .view-all { font-size: 12px; color: #3b7dd8; text-decoration: none; }
+  .view-all:hover { text-decoration: underline; }
+
+  .alert-card {
+    background: #fff; border-radius: 6px; border: 1px solid #e2e6ea;
+    padding: 12px 14px; margin-bottom: 10px;
+  }
+  .alert-card .ac-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .alert-card .ac-type {
+    font-size: 10.5px; color: #E85D1A; font-weight: 600;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .alert-card .ac-type::before { content: ''; width: 6px; height: 6px; background: #E85D1A; border-radius: 50%; display: inline-block; }
+  .alert-card .ac-time { font-size: 11px; color: #999; }
+  .alert-card .ac-title { font-size: 13px; font-weight: 700; color: #1a2332; margin-bottom: 8px; }
+  .sami-badge {
+    display: inline-flex; align-items: flex-start; gap: 4px;
+    background: #FFF3ED; border-radius: 4px; padding: 5px 8px;
+    font-size: 11.5px; color: #555; margin-bottom: 8px; line-height: 1.4; width: 100%;
+  }
+  .sami-badge .sb-tag {
+    background: #E85D1A; color: #fff; font-size: 9px; font-weight: 700;
+    border-radius: 3px; padding: 1px 5px; letter-spacing: 0.3px; flex-shrink: 0; margin-top: 1px;
+  }
+  .sami-badge .sb-icon { color: #E85D1A; font-size: 11px; flex-shrink: 0; }
+  .alert-card .ac-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+  .alert-card .ac-scope { display: flex; gap: 12px; font-size: 11px; color: #666; align-items: center; }
+  .alert-card .ac-scope span { display: flex; align-items: center; gap: 4px; }
+  .alert-card .ac-actions { display: flex; gap: 6px; }
+  .btn-primary {
+    background: #E85D1A; color: #fff; border: none; border-radius: 4px;
+    padding: 5px 11px; font-size: 11.5px; cursor: pointer; font-weight: 600;
+  }
+  .btn-secondary {
+    background: #fff; color: #555; border: 1px solid #d0d7de; border-radius: 4px;
+    padding: 5px 11px; font-size: 11.5px; cursor: pointer;
+  }
+
+  .rec-stats { display: flex; gap: 8px; margin-bottom: 12px; }
+  .rec-stat {
+    flex: 1; background: #fff; border-radius: 6px; border: 1px solid #e2e6ea;
+    padding: 10px 12px;
+  }
+  .rec-stat .rs-val { font-size: 22px; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+  .rec-stat .rs-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; color: #888; }
+  .rec-stat.cve .rs-val { color: #E85D1A; }
+  .rec-stat.behavioral .rs-val { color: #3b7dd8; }
+  .rec-stat.policy .rs-val { color: #1a2332; }
+  .rec-stat.arr .rs-val { color: #1a6b3c; font-size: 18px; }
+
+  .rec-card {
+    background: #fff; border-radius: 6px; border: 1px solid #e2e6ea;
+    padding: 12px 14px; margin-bottom: 10px;
+  }
+  .rec-card .rc-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .rc-type { font-size: 10.5px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+  .rc-type.behavioral { color: #3b7dd8; }
+  .rc-type.behavioral::before { content: ''; width: 6px; height: 6px; background: #3b7dd8; border-radius: 50%; }
+  .rc-type.policy { color: #6b3bcc; }
+  .rc-type.policy::before { content: ''; width: 6px; height: 6px; background: #6b3bcc; border-radius: 50%; }
+  .rec-card .rc-title { font-size: 13px; font-weight: 700; color: #1a2332; margin-bottom: 8px; }
+  .rec-card .rc-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+  .rec-card .rc-scope { display: flex; gap: 12px; font-size: 11px; color: #666; align-items: center; }
+
+  /* ══════════════════════════════════════
+     ACTIVATION ANIMATION SYSTEM
+  ══════════════════════════════════════ */
+
+  /* Illustration panel needs relative positioning for overlay */
+  .day0-illus { position: relative; overflow: hidden; }
+
+  /* ── Scan overlay (sits on top of SVG during activation) ── */
+  .scan-overlay {
+    position: absolute; inset: 0;
+    background: rgba(10, 18, 32, 0.72);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 10px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease;
+    border-radius: 0;
+  }
+  .scan-overlay.visible { opacity: 1; pointer-events: auto; }
+
+  /* The horizontal sweep line */
+  .scan-line {
+    position: absolute; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent 0%, #E85D1A 20%, #ff8c50 50%, #E85D1A 80%, transparent 100%);
+    box-shadow: 0 0 10px 3px rgba(232,93,26,0.5);
+    top: 0;
+    animation: none;
+  }
+  .scan-line.sweeping {
+    animation: scanSweep 1.6s ease-in-out infinite;
+  }
+  @keyframes scanSweep {
+    0%   { top: 0%; opacity: 0; }
+    5%   { opacity: 1; }
+    95%  { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+  }
+
+  /* Center content of overlay */
+  .scan-center {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    z-index: 2;
+  }
+  .scan-shield-icon {
+    width: 40px; height: 40px;
+    animation: shieldPulse 0.8s ease-in-out infinite alternate;
+  }
+  @keyframes shieldPulse {
+    from { filter: drop-shadow(0 0 4px rgba(232,93,26,0.4)); }
+    to   { filter: drop-shadow(0 0 12px rgba(232,93,26,0.9)); }
+  }
+  .scan-label {
+    font-size: 11px; font-weight: 700; color: #E85D1A; letter-spacing: 0.5px;
+    text-transform: uppercase; font-family: system-ui;
+  }
+  .scan-counter {
+    font-size: 22px; font-weight: 800; color: #fff; font-family: system-ui;
+    line-height: 1; letter-spacing: -0.5px;
+  }
+  .scan-counter span { font-size: 11px; font-weight: 400; color: #8ba3be; margin-left: 2px; }
+  .scan-sub-text {
+    font-size: 10px; color: #7a9ab8; font-family: system-ui;
+  }
+
+  /* Progress bar at bottom of overlay */
+  .scan-progress-wrap {
+    position: absolute; bottom: 12px; left: 16px; right: 16px;
+    background: rgba(255,255,255,0.1); border-radius: 3px; height: 3px; overflow: hidden;
+  }
+  .scan-progress-bar {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, #E85D1A, #ff8c50);
+    border-radius: 3px;
+    transition: width linear;
+  }
+
+  /* ── Success flash overlay ── */
+  .success-overlay {
+    position: absolute; inset: 0;
+    background: rgba(10,18,32,0.85);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+  .success-overlay.visible { opacity: 1; }
+  .success-check {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: #1a8a4a;
+    display: flex; align-items: center; justify-content: center;
+    animation: checkPop 0.4s cubic-bezier(0.17,0.89,0.32,1.28);
+  }
+  @keyframes checkPop {
+    0%   { transform: scale(0); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .success-text {
+    font-size: 11px; font-weight: 700; color: #4ade80; font-family: system-ui;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .success-subtext {
+    font-size: 9.5px; color: #7a9ab8; font-family: system-ui;
+  }
+
+  /* ── Button states ── */
+  .btn-activate-sm.scanning {
+    background: #1a2f4e; cursor: not-allowed;
+    box-shadow: none; transform: none;
+  }
+  .btn-activate-sm.scanning:hover { box-shadow: none; transform: none; }
+  .btn-activate-sm.done {
+    background: #1a8a4a;
+    box-shadow: 0 2px 8px rgba(26,138,74,0.3);
+  }
+  .btn-activate-sm.done:hover { box-shadow: 0 4px 14px rgba(26,138,74,0.4); }
+
+  /* Spinner */
+  .spin-icon { animation: spinAnim 0.8s linear infinite; }
+  @keyframes spinAnim { to { transform: rotate(360deg); } }
+
+  /* ── Wrapper and exit animation ── */
+  #sami-container { position: relative; }
+
+  .day0-empty {
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .day0-empty.exiting {
+    opacity: 0; transform: translateY(-8px); pointer-events: none;
+  }
+
+  /* ── Active state wrapper — column so banner sits above the two-col grid ── */
+  #sami-active {
+    display: none; opacity: 0; transform: translateY(10px);
+    flex-direction: column;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  #sami-active.entering {
+    display: flex; opacity: 0; transform: translateY(10px);
+  }
+  #sami-active.visible {
+    opacity: 1; transform: translateY(0);
+  }
+  /* Inner two-column row */
+  .sami-alert-grid {
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+
+  /* ── SAMI active banner (light theme, full-width, transient) ── */
+  .sami-active-banner {
+    display: flex; align-items: center; gap: 10px;
+    background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px;
+    padding: 9px 14px; margin-bottom: 12px; width: 100%;
+    opacity: 0; transform: translateY(-6px);
+    transition: opacity 0.4s ease 0.3s, transform 0.4s ease 0.3s;
+    overflow: hidden;
+  }
+  .sami-active-banner.visible  { opacity: 1; transform: translateY(0); }
+  .sami-active-banner.dimissing {
+    opacity: 0; transform: translateY(-6px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    pointer-events: none;
+  }
+  .sab-check {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: #dcfce7; border: 1.5px solid #86efac;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .sab-dot {
+    width: 7px; height: 7px; border-radius: 50%; background: #22c55e;
+    animation: sabPulse 2s ease-in-out infinite; flex-shrink: 0;
+  }
+  @keyframes sabPulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.3); }
+    50%     { box-shadow: 0 0 0 4px rgba(34,197,94,0); }
+  }
+  .sab-text { font-size: 12px; font-weight: 700; color: #166534; }
+  .sab-sub  { font-size: 11px; color: #4b7a5c; }
+  .sab-stat {
+    margin-left: auto; display: flex; align-items: center; gap: 12px;
+    flex-shrink: 0;
+  }
+  .sab-stat-item {
+    font-size: 11px; color: #166534; display: flex; align-items: center; gap: 4px;
+  }
+  .sab-stat-item strong { font-weight: 700; }
+  .sab-dismiss {
+    width: 18px; height: 18px; border-radius: 3px; border: none;
+    background: transparent; cursor: pointer; color: #6ba880; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+  .sab-dismiss:hover { background: #dcfce7; color: #166534; }
+  /* Auto-dismiss progress line */
+  .sab-timer {
+    position: absolute; bottom: 0; left: 0;
+    height: 2px; background: #22c55e; border-radius: 0 0 0 6px;
+    width: 100%; animation: none;
+  }
+  .sab-timer.running {
+    animation: timerDrain 4s linear forwards;
+  }
+  @keyframes timerDrain { from { width: 100%; } to { width: 0%; } }
+
+  /* ── Day-0 empty state ── */
+  .day0-empty {
+    background: #fff; border-radius: 6px; border: 1px solid #e2e6ea;
+    display: flex; align-items: center; gap: 0; overflow: hidden;
+  }
+  .day0-illus {
+    flex: 0 0 280px; padding: 24px 16px 24px 24px;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #f8fafc 0%, #f0f4f8 100%);
+    border-right: 1px solid #e8ecf1;
+  }
+  .day0-body {
+    flex: 1; padding: 24px 24px 22px 24px;
+  }
+  .day0-eyebrow {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: #fff3ed; border: 1px solid #fbd2b9;
+    border-radius: 12px; padding: 3px 10px; margin-bottom: 10px;
+    font-size: 10px; font-weight: 700; color: #E85D1A; letter-spacing: 0.3px;
+  }
+  .day0-eyebrow .e-dot {
+    width: 5px; height: 5px; border-radius: 50%; background: #E85D1A;
+    animation: edot-pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes edot-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
+  .day0-headline { font-size: 15px; font-weight: 800; color: #1a2332; line-height: 1.3; margin-bottom: 5px; }
+  .day0-headline span { color: #E85D1A; }
+  .day0-sub { font-size: 11.5px; color: #777; line-height: 1.55; margin-bottom: 14px; max-width: 440px; }
+  .day0-benefits { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .benefit-pill {
+    display: flex; align-items: center; gap: 5px;
+    background: #f4f6f9; border: 1px solid #e2e6ea;
+    border-radius: 20px; padding: 4px 10px 4px 6px;
+    font-size: 11px; color: #444; white-space: nowrap;
+  }
+  .benefit-pill .bp-icon {
+    width: 18px; height: 18px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .day0-ctas { display: flex; align-items: center; gap: 10px; }
+  .btn-activate-sm {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #E85D1A; color: #fff; border: none; border-radius: 4px;
+    padding: 7px 14px; font-size: 12px; font-weight: 700; cursor: pointer;
+    box-shadow: 0 2px 8px rgba(232,93,26,0.28); letter-spacing: 0.1px;
+    transition: box-shadow 0.2s, transform 0.15s;
+  }
+  .btn-activate-sm:hover { box-shadow: 0 4px 14px rgba(232,93,26,0.38); transform: translateY(-1px); }
+  .btn-learn-sm {
+    font-size: 11.5px; color: #3b7dd8; background: none; border: none;
+    cursor: pointer; text-decoration: underline; text-underline-offset: 2px;
+  }
+  /* SVG animation classes */
+  .flow-dash { stroke-dasharray: 5 4; animation: dash-flow 2s linear infinite; }
+  .flow-dash-r { stroke-dasharray: 5 4; animation: dash-flow 2.6s linear infinite reverse; }
+  @keyframes dash-flow { to { stroke-dashoffset: -36; } }
+  .pulse-ring { animation: ring-out 2.2s ease-out infinite; }
+  .pulse-ring-2 { animation: ring-out 2.2s ease-out 0.75s infinite; }
+  .pulse-ring-3 { animation: ring-out 2.2s ease-out 1.5s infinite; }
+  @keyframes ring-out { 0%{r:30;opacity:0.5} 100%{r:72;opacity:0} }
+  .node-bob { animation: bob 3s ease-in-out infinite; }
+  .node-bob-2 { animation: bob 3.6s ease-in-out 0.5s infinite; }
+  @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+  .spark-blink { animation: sblink 1.6s ease-in-out infinite; }
+  @keyframes sblink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <svg viewBox="0 0 24 24"><path d="M12 2 C8 2 4 6 4 10 C4 14 6 17 9 19 L9 22 L15 22 L15 19 C18 17 20 14 20 10 C20 6 16 2 12 2Z"/></svg>
+  </div>
+  <div class="sidebar-icon active">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    <span class="badge">8</span>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 2v4M22 12h-4"/></svg>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+  </div>
+  <div class="sidebar-spacer"></div>
+  <div class="sidebar-icon">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <span class="badge">3</span>
+  </div>
+</nav>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="breadcrumb">
+    <a href="#">Home</a><span>›</span>
+    <a href="#">Dashboard</a><span>›</span>
+    <span style="color:#333; font-weight:600">Overview</span>
+  </div>
+  <div class="tenant-selector">
+    <div class="dot"></div>
+    All Tenants (Global)
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+  </div>
+  <div class="topbar-icons">
+    <div class="icon-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <div class="notif-badge"></div>
+    </div>
+    <div class="icon-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </div>
+    <div class="avatar">HN</div>
+  </div>
+</header>
+
+<!-- PAGE 1 MAIN -->
+<main class="page">
+  <div class="p1-content">
+
+    <!-- Product Cards + Org Summary -->
+    <div class="dashboard-row">
+      <div class="product-section">
+        <div class="ps-title">Overview</div>
+        <div class="ps-sub">Active Product</div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div class="arrow-btn">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          </div>
+          <div class="product-row">
+            <div class="product-card">
+              <div class="pc-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Firewall
+              </div>
+              <div class="pc-count">110</div>
+              <div class="pc-sublabel">Total Devices</div>
+              <div class="pc-attention">Need Attention</div>
+              <div class="pc-attention"><span class="warn">⚠ 2</span> &nbsp;<span class="eol">EOL 6</span></div>
+            </div>
+            <div class="product-card">
+              <div class="pc-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+                Cloud Secure Edge
+              </div>
+              <div class="pc-count">2</div>
+              <div class="pc-sublabel">Total Active Licenses</div>
+              <button class="learn-btn">Learn More</button>
+            </div>
+            <div class="product-card">
+              <div class="pc-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+                Access Point
+              </div>
+              <div class="pc-count">10</div>
+              <div class="pc-sublabel">Total Devices</div>
+              <div class="pc-attention">Need Attention</div>
+              <div class="pc-attention">0</div>
+            </div>
+            <div class="product-card">
+              <div class="pc-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                Switch
+              </div>
+              <div class="pc-count">9</div>
+              <div class="pc-sublabel">Total Devices</div>
+              <div class="pc-attention">Need Attention</div>
+              <div class="pc-attention">0</div>
+            </div>
+            <div class="product-card">
+              <div class="pc-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Capture Client
+              </div>
+              <div class="pc-count">2</div>
+              <div class="pc-sublabel">Total Endpoints</div>
+              <div class="pc-attention">Need Attention</div>
+              <div class="pc-attention">0</div>
+            </div>
+            <div class="product-card">
+              <div class="pc-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Capture Client MDR
+              </div>
+              <div class="pc-count">2</div>
+              <div class="pc-sublabel">Total Endpoints</div>
+              <div class="pc-attention">Need Attention</div>
+              <div class="pc-attention">0</div>
+            </div>
+            <div class="product-card">
+              <div class="pc-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                SMA 1000
+              </div>
+              <div class="pc-count">6</div>
+              <div class="pc-sublabel">Total Devices</div>
+              <div class="pc-attention">Need Attention</div>
+              <div class="pc-attention"><span class="coming-soon">Coming Soon ⊙</span></div>
+            </div>
+          </div>
+          <div class="arrow-btn">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+      </div>
+      <div class="org-summary">
+        <div class="os-title">Org Summary</div>
+        <div class="os-stat-label">Tenants</div>
+        <div class="os-stat-val">98</div>
+        <div class="os-stat-label">Need Attention</div>
+        <div class="os-stat-val" style="font-size:22px;">2</div>
+        <button class="os-btn">Create Tenant</button>
+      </div>
+    </div>
+
+    <!-- SAMI Tabs — Notifications now shown inline below -->
+    <div class="sami-tabs">
+      <div class="sami-tab active">SAMI Alerts</div>
+    </div>
+
+    <!-- Ask SAMI -->
+    <div class="ask-sami-wrap">
+      <div class="ask-sami">
+        <span class="sami-spark">✦</span>
+        <input type="text" placeholder='Ask SAMI anything — e.g. "Show renewals at risk this month"'>
+        <span class="kbd">⌘</span>
+        <span class="kbd">K</span>
+      </div>
+    </div>
+
+    <!-- Day 0 — SAMI Empty State + Activated State wrapper -->
+    <div id="sami-container">
+    <div class="day0-empty" id="day0-empty">
+
+      <!-- Left: compact illustration -->
+      <div class="day0-illus">
+        <svg width="232" height="180" viewBox="0 0 232 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="d0bg" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#E85D1A" stop-opacity="0.07"/>
+              <stop offset="100%" stop-color="#E85D1A" stop-opacity="0"/>
+            </radialGradient>
+            <linearGradient id="d0shield" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#1a3a5c"/>
+              <stop offset="100%" stop-color="#0d1526"/>
+            </linearGradient>
+            <linearGradient id="d0node" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#1e3554"/>
+              <stop offset="100%" stop-color="#0d1a2e"/>
+            </linearGradient>
+            <style>
+              .d0-flow  { stroke-dasharray:5 4; animation:d0dash  2s  linear infinite; }
+              .d0-flowr { stroke-dasharray:5 4; animation:d0dash  2.6s linear infinite reverse; }
+              .d0-flowd { stroke-dasharray:5 4; animation:d0dash  3.2s linear infinite; }
+              @keyframes d0dash { to { stroke-dashoffset:-36; } }
+              .d0-pr1 { animation:d0ring 2.2s ease-out        infinite; }
+              .d0-pr2 { animation:d0ring 2.2s ease-out 0.74s  infinite; }
+              .d0-pr3 { animation:d0ring 2.2s ease-out 1.48s  infinite; }
+              @keyframes d0ring { 0%{r:24;opacity:0.5} 100%{r:68;opacity:0} }
+              .d0-bob  { animation:d0b 3s   ease-in-out         infinite; }
+              .d0-bob2 { animation:d0b 3.6s ease-in-out 0.5s   infinite; }
+              .d0-bob3 { animation:d0b 2.9s ease-in-out 1.1s   infinite; }
+              @keyframes d0b { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+              .d0-blink { animation:d0bl 1.7s ease-in-out infinite; }
+              @keyframes d0bl { 0%,100%{opacity:1} 50%{opacity:0.25} }
+              .d0-pkt1 { animation:d0p1 2s linear infinite; }
+              .d0-pkt2 { animation:d0p2 2.4s linear infinite; }
+              .d0-pkt3 { animation:d0p3 1.9s linear infinite; }
+              @keyframes d0p1 { 0%{offset-distance:0%} 100%{offset-distance:100%} }
+              @keyframes d0p2 { 0%{offset-distance:0%} 100%{offset-distance:100%} }
+              @keyframes d0p3 { 0%{offset-distance:0%} 100%{offset-distance:100%} }
+            </style>
+          </defs>
+
+          <!-- Background glow -->
+          <ellipse cx="116" cy="90" rx="100" ry="80" fill="url(#d0bg)"/>
+
+          <!-- Orbit rings -->
+          <circle cx="116" cy="90" r="52" stroke="#dde3ec" stroke-width="1" stroke-dasharray="3 6" fill="none" opacity="0.7"/>
+          <circle cx="116" cy="90" r="76" stroke="#dde3ec" stroke-width="1" stroke-dasharray="2 8" fill="none" opacity="0.4"/>
+
+          <!-- Pulse rings -->
+          <circle cx="116" cy="90" r="24" fill="none" stroke="#E85D1A" stroke-width="1.5" class="d0-pr1" opacity="0.5"/>
+          <circle cx="116" cy="90" r="24" fill="none" stroke="#E85D1A" stroke-width="1.5" class="d0-pr2" opacity="0.5"/>
+          <circle cx="116" cy="90" r="24" fill="none" stroke="#E85D1A" stroke-width="1.5" class="d0-pr3" opacity="0.5"/>
+
+          <!-- Connection lines (device → shield) -->
+          <line x1="42" y1="38"  x2="96"  y2="72"  stroke="#3b7dd8" stroke-width="1" class="d0-flow"  opacity="0.45"/>
+          <line x1="190" y1="36" x2="138" y2="70"  stroke="#3b7dd8" stroke-width="1" class="d0-flowr" opacity="0.45"/>
+          <line x1="18"  y1="96" x2="88"  y2="90"  stroke="#E85D1A" stroke-width="1.2" class="d0-flow" opacity="0.6"/>
+          <line x1="214" y1="94" x2="144" y2="90"  stroke="#3b7dd8" stroke-width="1" class="d0-flowr" opacity="0.45"/>
+          <line x1="50"  y1="152" x2="96" y2="112" stroke="#E85D1A" stroke-width="1.2" class="d0-flowd" opacity="0.6"/>
+          <line x1="182" y1="150" x2="138" y2="112" stroke="#3b7dd8" stroke-width="1" class="d0-flow"  opacity="0.45"/>
+
+          <!-- Animated data packets -->
+          <circle r="2.5" fill="#E85D1A" opacity="0.9">
+            <animateMotion dur="2s" repeatCount="indefinite"><mpath href="#dp1"/></animateMotion>
+          </circle>
+          <path id="dp1" d="M18,96 L88,90" fill="none"/>
+
+          <circle r="2" fill="#3b7dd8" opacity="0.85">
+            <animateMotion dur="2.4s" repeatCount="indefinite"><mpath href="#dp2"/></animateMotion>
+          </circle>
+          <path id="dp2" d="M42,38 L96,72" fill="none"/>
+
+          <circle r="2" fill="#E85D1A" opacity="0.9">
+            <animateMotion dur="1.9s" repeatCount="indefinite"><mpath href="#dp3"/></animateMotion>
+          </circle>
+          <path id="dp3" d="M50,152 L96,112" fill="none"/>
+
+          <!-- ── PERIPHERAL NODES ── -->
+
+          <!-- Top-left: Firewall -->
+          <g transform="translate(16,18)" class="d0-bob">
+            <rect x="0" y="0" width="52" height="38" rx="6" fill="url(#d0node)" stroke="#243a56" stroke-width="1"/>
+            <rect x="8" y="10" width="36" height="2.5" rx="1.2" fill="#3b7dd8" opacity="0.7"/>
+            <rect x="8" y="16" width="36" height="2.5" rx="1.2" fill="#E85D1A" opacity="0.6"/>
+            <rect x="8" y="22" width="24" height="2.5" rx="1.2" fill="#3b7dd8" opacity="0.4"/>
+            <text x="26" y="34" text-anchor="middle" font-size="7" fill="#7a9ab8" font-family="system-ui">FW ×12</text>
+          </g>
+
+          <!-- Top-right: Cloud/NSv -->
+          <g transform="translate(164,14)" class="d0-bob2">
+            <rect x="0" y="0" width="52" height="40" rx="6" fill="url(#d0node)" stroke="#243a56" stroke-width="1"/>
+            <path d="M12 24 Q14 16 22 16 Q24 10 32 10 Q40 10 40 18 Q46 18 46 24 Z" fill="none" stroke="#3b7dd8" stroke-width="1.2" opacity="0.7"/>
+            <text x="26" y="36" text-anchor="middle" font-size="7" fill="#7a9ab8" font-family="system-ui">NSv Cloud</text>
+          </g>
+
+          <!-- Left: NSM pill -->
+          <g transform="translate(0,78)" class="d0-bob3">
+            <rect x="0" y="0" width="44" height="28" rx="6" fill="#1a2f4e" stroke="#E85D1A" stroke-width="1.2"/>
+            <text x="22" y="12" text-anchor="middle" font-size="7" font-weight="700" fill="#E85D1A" font-family="system-ui">NSM</text>
+            <rect x="5" y="16" width="34" height="2" rx="1" fill="#E85D1A" opacity="0.2"/>
+            <rect x="5" y="16" width="22" height="2" rx="1" fill="#E85D1A" opacity="0.7"/>
+            <text x="22" y="25" text-anchor="middle" font-size="6" fill="#8ba3be" font-family="system-ui">98 tenants</text>
+          </g>
+
+          <!-- Right: Switch -->
+          <g transform="translate(188,76)" class="d0-bob">
+            <rect x="0" y="0" width="44" height="30" rx="6" fill="url(#d0node)" stroke="#243a56" stroke-width="1"/>
+            <g fill="#3b7dd8" opacity="0.65">
+              <rect x="5"  y="8" width="6" height="4" rx="1"/>
+              <rect x="14" y="8" width="6" height="4" rx="1"/>
+              <rect x="23" y="8" width="6" height="4" rx="1"/>
+              <rect x="32" y="8" width="6" height="4" rx="1"/>
+            </g>
+            <rect x="14" y="8" width="6" height="4" rx="1" fill="#E85D1A" opacity="0.85"/>
+            <text x="22" y="24" text-anchor="middle" font-size="7" fill="#7a9ab8" font-family="system-ui">SW ×48</text>
+          </g>
+
+          <!-- Bottom-left: CVE alert node -->
+          <g transform="translate(12,138)" class="d0-bob2">
+            <rect x="0" y="0" width="66" height="36" rx="6" fill="#1a0a04" stroke="#E85D1A" stroke-width="1.2"/>
+            <text x="33" y="13" text-anchor="middle" font-size="7" font-weight="700" fill="#E85D1A" font-family="system-ui">CVE DETECTED</text>
+            <circle cx="10" cy="24" r="3" fill="#E85D1A"/>
+            <text x="18" y="28" font-size="6.5" fill="#cc8060" font-family="system-ui">CVSS 9.1 Critical</text>
+          </g>
+
+          <!-- Bottom-right: Anomaly node -->
+          <g transform="translate(154,136)" class="d0-bob3">
+            <rect x="0" y="0" width="66" height="36" rx="6" fill="#020d1e" stroke="#3b7dd8" stroke-width="1.2"/>
+            <text x="33" y="12" text-anchor="middle" font-size="7" font-weight="700" fill="#3b7dd8" font-family="system-ui">ANOMALY SCAN</text>
+            <rect x="6"  y="18" width="4" height="10" rx="1" fill="#3b7dd8" opacity="0.4"/>
+            <rect x="13" y="14" width="4" height="14" rx="1" fill="#3b7dd8" opacity="0.6"/>
+            <rect x="20" y="16" width="4" height="12" rx="1" fill="#E85D1A" opacity="0.9"/>
+            <rect x="27" y="20" width="4" height="8"  rx="1" fill="#3b7dd8" opacity="0.5"/>
+            <rect x="34" y="18" width="4" height="10" rx="1" fill="#3b7dd8" opacity="0.4"/>
+            <rect x="41" y="15" width="4" height="13" rx="1" fill="#3b7dd8" opacity="0.55"/>
+            <rect x="48" y="19" width="4" height="9"  rx="1" fill="#3b7dd8" opacity="0.4"/>
+            <text x="33" y="33" text-anchor="middle" font-size="6" fill="#5a88c8" font-family="system-ui">24/7 continuous</text>
+          </g>
+
+          <!-- ── CENTER SHIELD ── -->
+          <!-- Outer glow -->
+          <circle cx="116" cy="90" r="34" fill="#E85D1A" opacity="0.06"/>
+          <!-- Shield -->
+          <path d="M116 62 C116 62 96 70 96 84 L96 100 C96 110 106 118 116 122 C126 118 136 110 136 100 L136 84 C136 70 116 62 116 62Z" fill="url(#d0shield)" stroke="#253f60" stroke-width="1"/>
+          <!-- Inner detail -->
+          <path d="M116 68 C116 68 100 75 100 87 L100 100 C100 108 109 115 116 118 C123 115 132 108 132 100 L132 87 C132 75 116 68 116 68Z" fill="none" stroke="#3b5a82" stroke-width="0.7" opacity="0.5"/>
+          <!-- Neural nodes inside shield -->
+          <g transform="translate(104,80)">
+            <circle cx="3"  cy="6"  r="2" fill="#E85D1A" opacity="0.9"/>
+            <circle cx="12" cy="3"  r="2" fill="#E85D1A" opacity="0.9"/>
+            <circle cx="21" cy="7"  r="2" fill="#E85D1A" opacity="0.9"/>
+            <circle cx="6"  cy="17" r="2" fill="#3b7dd8" opacity="0.9"/>
+            <circle cx="15" cy="14" r="2.5" fill="#E85D1A"/>
+            <circle cx="21" cy="20" r="2" fill="#3b7dd8" opacity="0.9"/>
+            <circle cx="10" cy="27" r="2" fill="#E85D1A" opacity="0.6"/>
+            <line x1="3"  y1="6"  x2="12" y2="3"  stroke="#E85D1A" stroke-width="0.7" opacity="0.6"/>
+            <line x1="12" y1="3"  x2="21" y2="7"  stroke="#E85D1A" stroke-width="0.7" opacity="0.6"/>
+            <line x1="12" y1="3"  x2="15" y2="14" stroke="#E85D1A" stroke-width="0.7" opacity="0.6"/>
+            <line x1="21" y1="7"  x2="15" y2="14" stroke="#E85D1A" stroke-width="0.7" opacity="0.6"/>
+            <line x1="3"  y1="6"  x2="6"  y2="17" stroke="#5a8ac0" stroke-width="0.7" opacity="0.5"/>
+            <line x1="15" y1="14" x2="21" y2="20" stroke="#E85D1A" stroke-width="0.7" opacity="0.6"/>
+            <line x1="6"  y1="17" x2="15" y2="14" stroke="#5a8ac0" stroke-width="0.7" opacity="0.5"/>
+            <line x1="6"  y1="17" x2="10" y2="27" stroke="#5a8ac0" stroke-width="0.7" opacity="0.5"/>
+          </g>
+          <!-- Spark on shield -->
+          <text x="116" y="76" text-anchor="middle" font-size="9" fill="#E85D1A" class="d0-blink">✦</text>
+          <!-- SAMI label -->
+          <text x="116" y="122" text-anchor="middle" font-size="7" font-weight="800" fill="#E85D1A" letter-spacing="1.2" font-family="system-ui">SAMI</text>
+
+          <!-- Floating chip: Risk -34% -->
+          <g transform="translate(68,50)" opacity="0.85">
+            <rect x="0" y="0" width="60" height="17" rx="8.5" fill="#fff" stroke="#e2e6ea" stroke-width="1"/>
+            <circle cx="10" cy="8.5" r="4" fill="#1a8a4a"/>
+            <text x="9.5" y="12" text-anchor="middle" font-size="7" fill="#fff" font-family="system-ui">↓</text>
+            <text x="36" y="12" text-anchor="middle" font-size="7.5" fill="#1a2332" font-weight="600" font-family="system-ui">Risk −34%</text>
+          </g>
+
+          <!-- Floating chip: Auto-Fix -->
+          <g transform="translate(108,150)" opacity="0.85">
+            <rect x="0" y="0" width="64" height="17" rx="8.5" fill="#fff" stroke="#e2e6ea" stroke-width="1"/>
+            <circle cx="10" cy="8.5" r="4" fill="#3b7dd8"/>
+            <text x="9.5" y="12" text-anchor="middle" font-size="7" fill="#fff" font-family="system-ui">⚙</text>
+            <text x="38" y="12" text-anchor="middle" font-size="7.5" fill="#1a2332" font-weight="600" font-family="system-ui">Auto-Fix Ready</text>
+          </g>
+
+        </svg>
+
+        <!-- ── Scan overlay (shown during activation) ── -->
+        <div class="scan-overlay" id="scan-overlay">
+          <div class="scan-line" id="scan-line"></div>
+          <div class="scan-center">
+            <svg class="scan-shield-icon" viewBox="0 0 40 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 2 C20 2 4 8 4 18 L4 32 C4 40 12 46 20 46 C28 46 36 40 36 32 L36 18 C36 8 20 2 20 2Z" fill="#1a3a5c" stroke="#E85D1A" stroke-width="1.5"/>
+              <path d="M14 22l4 4 8-8" stroke="#E85D1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0" id="shield-check"/>
+              <text x="20" y="28" text-anchor="middle" font-size="10" fill="#E85D1A" font-weight="800" font-family="system-ui" id="shield-spark">✦</text>
+            </svg>
+            <div class="scan-label" id="scan-label">Activating SAMI</div>
+            <div class="scan-counter"><span id="tenant-count">0</span><span>/ 98 tenants</span></div>
+            <div class="scan-sub-text" id="scan-sub">Connecting to devices…</div>
+          </div>
+          <div class="scan-progress-wrap">
+            <div class="scan-progress-bar" id="scan-progress"></div>
+          </div>
+        </div>
+
+        <!-- ── Success overlay ── -->
+        <div class="success-overlay" id="success-overlay">
+          <div class="success-check">
+            <svg width="22" height="22" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="success-text">SAMI Active</div>
+          <div class="success-subtext">98 tenants · 3 alerts found</div>
+        </div>
+
+      </div>
+
+      <!-- Right: content -->
+      <div class="day0-body">
+        <div class="day0-eyebrow">
+          <span class="e-dot"></span>
+          SAMI IS READY — ACTIVATION REQUIRED
+        </div>
+
+        <div class="day0-headline">
+          <span>SAMI</span> starts protecting the moment you activate
+        </div>
+        <p class="day0-sub">
+          SAMI correlates CVE intelligence, device telemetry, and behavioral signals across all 98 tenants — surfacing critical alerts before they become incidents, with one-click fixes built in.
+        </p>
+
+        <!-- Benefit pills -->
+        <div class="day0-benefits">
+          <div class="benefit-pill">
+            <div class="bp-icon" style="background:#fff3ed;">
+              <svg width="11" height="11" fill="none" stroke="#E85D1A" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+            </div>
+            CVE Alerts
+          </div>
+          <div class="benefit-pill">
+            <div class="bp-icon" style="background:#eef4ff;">
+              <svg width="11" height="11" fill="none" stroke="#3b7dd8" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            </div>
+            Behavioral Anomalies
+          </div>
+          <div class="benefit-pill">
+            <div class="bp-icon" style="background:#edfcf3;">
+              <svg width="11" height="11" fill="none" stroke="#1a8a4a" stroke-width="2" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </div>
+            One-Click Remediation
+          </div>
+          <div class="benefit-pill">
+            <div class="bp-icon" style="background:#fff3ed;">
+              <svg width="11" height="11" fill="none" stroke="#E85D1A" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            </div>
+            Tenant Risk Scoring
+          </div>
+          <div class="benefit-pill">
+            <div class="bp-icon" style="background:#f3f0ff;">
+              <svg width="11" height="11" fill="none" stroke="#7c5df0" stroke-width="2" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+            </div>
+            Ask SAMI — NL Queries
+          </div>
+        </div>
+
+        <!-- CTA row -->
+        <div class="day0-ctas">
+          <button class="btn-activate-sm" id="activate-btn" onclick="activateSAMI()">
+            <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24" id="btn-icon"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            <span id="btn-label">Activate SAMI</span>
+          </button>
+          <button class="btn-learn-sm">How SAMI works →</button>
+          <span style="margin-left:auto;font-size:10.5px;color:#aaa;display:flex;align-items:center;gap:5px;">
+            <svg width="11" height="11" fill="#1a8a4a" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Avg. 34% risk reduction in 30 days
+          </span>
+        </div>
+      </div>
+
+    </div><!-- /day0-empty -->
+
+    <!-- ══════════════════════════════════════
+         ACTIVATED STATE — hidden until SAMI activated
+    ══════════════════════════════════════ -->
+    <div id="sami-active">
+
+      <!-- Transient banner — full width, above both columns -->
+      <div class="sami-active-banner" id="active-banner" style="position:relative;">
+        <div class="sab-check">
+          <svg width="11" height="11" fill="none" stroke="#16a34a" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <span class="sab-dot"></span>
+        <span class="sab-text">SAMI is now active</span>
+        <span class="sab-sub">— monitoring 98 tenants · 110 firewalls · first scan complete</span>
+        <div class="sab-stat">
+          <div class="sab-stat-item">
+            <svg width="11" height="11" fill="none" stroke="#16a34a" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+            <strong>3</strong> alerts found
+          </div>
+          <div class="sab-stat-item">
+            <svg width="11" height="11" fill="none" stroke="#16a34a" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <strong>8</strong> CVEs detected
+          </div>
+        </div>
+        <button class="sab-dismiss" onclick="dismissBanner()" title="Dismiss">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <div class="sab-timer" id="sab-timer"></div>
+      </div>
+
+      <!-- Two-column alert grid -->
+      <div class="sami-alert-grid">
+      <!-- Left: Alerts -->
+      <div class="alert-col">
+        <div class="section-header">
+          <div class="section-title">Need Attention</div>
+        </div>
+
+        <div class="alert-card" style="animation: cardSlideIn 0.4s ease 0.05s both;">
+          <div class="ac-meta">
+            <div class="ac-type">CVE Vulnerability</div>
+            <div class="ac-time">Just now</div>
+          </div>
+          <div class="ac-title">SSL VPN Auth Bypass (CVE-2026-1142) — 12 Firewalls Across 4 Tenants</div>
+          <div class="sami-badge">
+            <span class="sb-tag">SAMI</span>
+            <span class="sb-icon">▲</span>
+            <span>CVSS 9.8 critical. Unauthenticated RCE possible on SonicOS &lt; 7.1.2-1023. Active PoC exploit observed in the wild. Acme Corp, Beta Networks, Westfield IT, and Crown Logistics are exposed. Patch pre-staged and compatibility-verified across all 12 devices.</span>
+          </div>
+          <div class="ac-footer">
+            <div class="ac-scope">
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> 4 Tenants</span>
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> 12 Firewalls</span>
+            </div>
+            <div class="ac-actions">
+              <button class="btn-primary">Deploy patch</button>
+              <button class="btn-secondary">Schedule</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert-card" style="animation: cardSlideIn 0.4s ease 0.15s both;">
+          <div class="ac-meta">
+            <div class="ac-type">Device Alert</div>
+            <div class="ac-time">Just now</div>
+          </div>
+          <div class="ac-title">3 Gateways Unreachable — Northgate Health &amp; Delta Logistics</div>
+          <div class="sami-badge">
+            <span class="sb-tag">SAMI</span>
+            <span class="sb-icon">▲</span>
+            <span>FW-NH-02, FW-NH-03 (Northgate Health) and FW-DL-01 (Delta Logistics) unreachable for 3+ hours. Last heartbeat lost after a BGP route change. Branch sites currently without perimeter inspection.</span>
+          </div>
+          <div class="ac-footer">
+            <div class="ac-scope">
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> 2 Tenants</span>
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> 3 Firewalls offline</span>
+            </div>
+            <div class="ac-actions">
+              <button class="btn-primary">Diagnose</button>
+              <button class="btn-secondary">Notify tenant</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert-card" style="animation: cardSlideIn 0.4s ease 0.25s both;">
+          <div class="ac-meta">
+            <div class="ac-type">Subscription Risk</div>
+            <div class="ac-time">Just now</div>
+          </div>
+          <div class="ac-title">ATP &amp; TZ Subscriptions Expiring &lt;9 Days — 3 Tenants, 21 Firewalls</div>
+          <div class="sami-badge">
+            <span class="sb-tag">SAMI</span>
+            <span class="sb-icon">▲</span>
+            <span>Acme Corp (8 FW), Beta Networks (7 FW), and Delta Logistics (6 FW) ATP subscriptions lapse before the next QBR. $87K ARR at risk. Renewal quotes are ready.</span>
+          </div>
+          <div class="ac-footer">
+            <div class="ac-scope">
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> 3 Tenants</span>
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> 21 Firewalls at risk</span>
+            </div>
+            <div class="ac-actions">
+              <button class="btn-primary">Initiate renewal</button>
+              <button class="btn-secondary">Snooze</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Recommendations -->
+      <div class="rec-col" style="animation: cardSlideIn 0.4s ease 0.1s both;">
+        <div class="section-header">
+          <div class="section-title">SAMI Recommendations</div>
+          <a class="view-all" href="sami-page2-recommendation-v2-2026-05-20.html">View all</a>
+        </div>
+        <div class="rec-stats">
+          <div class="rec-stat cve"><div class="rs-val">8</div><div class="rs-label">CVE Vulnerabilities</div></div>
+          <div class="rec-stat behavioral"><div class="rs-val">5</div><div class="rs-label">Behavioral Anomalies</div></div>
+          <div class="rec-stat policy"><div class="rs-val">5</div><div class="rs-label">Policy Gaps Found</div></div>
+          <div class="rec-stat arr"><div class="rs-val">$287K</div><div class="rs-label">ARR at Renewal Risk</div></div>
+        </div>
+        <div class="rec-card" style="animation: cardSlideIn 0.4s ease 0.2s both;">
+          <div class="rc-meta">
+            <div class="rc-type behavioral">Behavioral Anomaly</div>
+            <div class="ac-time">Just now</div>
+          </div>
+          <div class="rc-title">Credential Stuffing Against Super-Admin Accounts — Beta Networks &amp; Crown Logistics</div>
+          <div class="sami-badge">
+            <span class="sb-tag">SAMI</span>
+            <span class="sb-icon">▲</span>
+            <span>18 failed login attempts from 3 new geographies against admin@beta.local and sysadmin@crown.local in the last 60 minutes. Both accounts lack MFA.</span>
+          </div>
+          <div class="rc-footer">
+            <div class="rc-scope">
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> 2 Tenants</span>
+            </div>
+            <div class="ac-actions">
+              <button class="btn-primary">Force MFA now</button>
+              <button class="btn-secondary">Snooze</button>
+            </div>
+          </div>
+        </div>
+        <div class="rec-card" style="animation: cardSlideIn 0.4s ease 0.3s both;">
+          <div class="rc-meta">
+            <div class="rc-type policy">Policy Gap</div>
+            <div class="ac-time" style="color:#f5a623;">Drift &gt; 45d</div>
+          </div>
+          <div class="rc-title">Permit-Any Outbound on WAN Edge — Defeats DPI-SSL Across 3 Tenants</div>
+          <div class="sami-badge">
+            <span class="sb-tag">SAMI</span>
+            <span class="sb-icon">▲</span>
+            <span>Acme Corp, Beta Networks, and Westfield IT have default-allow outbound rules bypassing DPI-SSL inspection. Policy last reviewed 45+ days ago.</span>
+          </div>
+          <div class="rc-footer">
+            <div class="rc-scope">
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> 3 Tenants</span>
+            </div>
+            <div class="ac-actions">
+              <button class="btn-primary">Apply baseline</button>
+              <button class="btn-secondary">Review rules</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      </div><!-- /sami-alert-grid -->
+    </div><!-- /sami-active -->
+    </div><!-- /sami-container -->
+
+    <!-- ══════════════════════════════════════
+         NOTIFICATIONS PANEL — inline below SAMI
+    ══════════════════════════════════════ -->
+    <div class="notif-section">
+
+      <!-- Header -->
+      <div class="notif-header">
+        <div class="notif-title">NOTIFICATIONS</div>
+        <div class="notif-subtitle">Notifications for Product Alerts</div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="notif-toolbar">
+        <!-- Filter icon + Search -->
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+          <div style="cursor:pointer;color:#aaa;display:flex;align-items:center;">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          </div>
+          <div class="notif-search-wrap">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="Search friendly name / issue type / priority / tenant etc."/>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="notif-stats">
+          <div class="notif-stat total">
+            <span class="ns-label">Total</span>
+            <span class="ns-val">141</span>
+          </div>
+          <div class="notif-stat security">
+            <span class="ns-label">Security</span>
+            <span class="ns-val">1</span>
+          </div>
+          <div class="notif-stat system">
+            <span class="ns-label">System</span>
+            <span class="ns-val">140</span>
+          </div>
+          <div class="notif-stat license">
+            <span class="ns-label">License</span>
+            <span class="ns-val" style="color:#1a2332;">0</span>
+          </div>
+        </div>
+
+        <div class="notif-divider"></div>
+
+        <!-- Time filters -->
+        <div class="notif-time-filter">
+          <div class="time-radio-wrap">
+            <div class="time-radio selected"></div>
+            <select class="time-select">
+              <option>24 Hours</option>
+              <option>48 Hours</option>
+              <option>7 Days</option>
+              <option>30 Days</option>
+            </select>
+          </div>
+          <div class="time-radio-wrap">
+            <div class="time-radio"></div>
+            <span class="time-label">Custom</span>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="notif-actions">
+          <button class="notif-action-btn">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            Export
+          </button>
+          <button class="notif-action-btn">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+            Refresh
+          </button>
+          <button class="notif-action-btn">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Map
+          </button>
+          <button class="notif-action-btn active">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            List
+          </button>
+        </div>
+      </div>
+
+      <!-- Product sub-tabs -->
+      <div class="notif-product-tabs">
+        <div class="notif-ptab active">Firewalls</div>
+        <div class="notif-ptab">Access Points</div>
+        <div class="notif-ptab">Switches</div>
+        <div class="notif-ptab">Capture Client</div>
+        <div class="notif-ptab">Capture Client MDR</div>
+      </div>
+
+      <!-- Table -->
+      <div class="notif-table-wrap">
+        <table class="notif-table">
+          <thead>
+            <tr>
+              <th>Local Time</th>
+              <th>Friendly Name</th>
+              <th>Use Type</th>
+              <th>Priority</th>
+              <th>Source IP</th>
+              <th>Tenant</th>
+              <th>Message</th>
+              <th>User</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Row template — 8 rows matching screenshot -->
+            <tr>
+              <td>2023-08-24 4:04:58</td>
+              <td><span class="notif-fn">LD NSa 4700</span></td>
+              <td><div class="notif-use-type"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Device Management</div></td>
+              <td><span class="notif-priority-em">Emergency</span></td>
+              <td style="font-size:11.5px;color:#555;font-family:monospace;">172.110.34.234</td>
+              <td><div class="notif-tenant">Xorent<br>Technologies</div></td>
+              <td><div class="notif-message">Down, Heartbeats not received and device status check failed</div></td>
+              <td><span class="notif-user">jsmith</span></td>
+              <td><div class="notif-action-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></div></td>
+            </tr>
+            <tr>
+              <td>2023-08-24 4:04:58</td>
+              <td><span class="notif-fn">LD NSa 4700</span></td>
+              <td><div class="notif-use-type"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Device Management</div></td>
+              <td><span class="notif-priority-em">Emergency</span></td>
+              <td style="font-size:11.5px;color:#555;font-family:monospace;">172.110.34.234</td>
+              <td><div class="notif-tenant">Xorent<br>Technologies</div></td>
+              <td><div class="notif-message">Down, Heartbeats not received and device status check failed</div></td>
+              <td><span class="notif-user">jsmith</span></td>
+              <td><div class="notif-action-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></div></td>
+            </tr>
+            <tr>
+              <td>2023-08-24 4:04:58</td>
+              <td><span class="notif-fn">LD NSa 4700</span></td>
+              <td><div class="notif-use-type"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Device Management</div></td>
+              <td><span class="notif-priority-em">Emergency</span></td>
+              <td style="font-size:11.5px;color:#555;font-family:monospace;">172.110.34.234</td>
+              <td><div class="notif-tenant">Xorent<br>Technologies</div></td>
+              <td><div class="notif-message">Down, Heartbeats not received and device status check failed</div></td>
+              <td><span class="notif-user">jsmith</span></td>
+              <td><div class="notif-action-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></div></td>
+            </tr>
+            <tr>
+              <td>2023-08-24 4:04:58</td>
+              <td><span class="notif-fn">LD NSa 4700</span></td>
+              <td><div class="notif-use-type"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Device Management</div></td>
+              <td><span class="notif-priority-em">Emergency</span></td>
+              <td style="font-size:11.5px;color:#555;font-family:monospace;">172.110.34.234</td>
+              <td><div class="notif-tenant">Xorent<br>Technologies</div></td>
+              <td><div class="notif-message">Down, Heartbeats not received and device status check failed</div></td>
+              <td><span class="notif-user">jsmith</span></td>
+              <td><div class="notif-action-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></div></td>
+            </tr>
+            <tr>
+              <td>2023-08-24 4:04:58</td>
+              <td><span class="notif-fn">LD NSa 4700</span></td>
+              <td><div class="notif-use-type"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Device Management</div></td>
+              <td><span class="notif-priority-em">Emergency</span></td>
+              <td style="font-size:11.5px;color:#555;font-family:monospace;">172.110.34.234</td>
+              <td><div class="notif-tenant">Xorent<br>Technologies</div></td>
+              <td><div class="notif-message">Down, Heartbeats not received and device status check failed</div></td>
+              <td><span class="notif-user">jsmith</span></td>
+              <td><div class="notif-action-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></div></td>
+            </tr>
+            <tr>
+              <td>2023-08-24 4:04:58</td>
+              <td><span class="notif-fn">TZ 370</span></td>
+              <td><div class="notif-use-type"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Device Management</div></td>
+              <td><span class="notif-priority-em">Emergency</span></td>
+              <td style="font-size:11.5px;color:#555;font-family:monospace;">10.0.0.214</td>
+              <td><div class="notif-tenant">Acme Corp</div></td>
+              <td><div class="notif-message">Down, Heartbeats not received and device status check failed</div></td>
+              <td><span class="notif-user">admin</span></td>
+              <td><div class="notif-action-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></div></td>
+            </tr>
+            <tr>
+              <td>2023-08-24 4:03:21</td>
+              <td><span class="notif-fn">NSa 2700</span></td>
+              <td><div class="notif-use-type"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Security</div></td>
+              <td><span style="font-size:11.5px;color:#E85D1A;font-weight:600;">Alert</span></td>
+              <td style="font-size:11.5px;color:#555;font-family:monospace;">192.168.1.1</td>
+              <td><div class="notif-tenant">Beta<br>Networks</div></td>
+              <td><div class="notif-message">IPS signature match: Exploit.CVE-2026-1142 detected from external source</div></td>
+              <td><span class="notif-user">nsm-sys</span></td>
+              <td><div class="notif-action-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></div></td>
+            </tr>
+            <tr>
+              <td>2023-08-24 4:01:44</td>
+              <td><span class="notif-fn">LD NSa 4700</span></td>
+              <td><div class="notif-use-type"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Device Management</div></td>
+              <td><span class="notif-priority-em">Emergency</span></td>
+              <td style="font-size:11.5px;color:#555;font-family:monospace;">172.110.34.234</td>
+              <td><div class="notif-tenant">Xorent<br>Technologies</div></td>
+              <td><div class="notif-message">Down, Heartbeats not received and device status check failed</div></td>
+              <td><span class="notif-user">jsmith</span></td>
+              <td><div class="notif-action-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Footer / Pagination -->
+      <div class="notif-footer">
+        <span class="notif-footer-info">Showing 1–8 of 141 notifications</span>
+        <div class="notif-footer-pages">
+          <button class="notif-page-btn">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <button class="notif-page-btn active">1</button>
+          <button class="notif-page-btn">2</button>
+          <button class="notif-page-btn">3</button>
+          <span style="font-size:11px;color:#aaa;padding:0 4px;">…</span>
+          <button class="notif-page-btn">18</button>
+          <button class="notif-page-btn">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /notif-section -->
+
+  </div>
+</main>
+
+<style>
+  @keyframes cardSlideIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ══════════════════════════════════════
+     NOTIFICATIONS PANEL
+  ══════════════════════════════════════ */
+  .notif-section {
+    background: #fff; border-radius: 6px; border: 1px solid #e2e6ea;
+    margin-top: 12px; overflow: hidden;
+  }
+
+  /* Header */
+  .notif-header {
+    padding: 12px 16px 10px;
+    border-bottom: 1px solid #edf0f3;
+  }
+  .notif-title { font-size: 13px; font-weight: 800; color: #1a2332; letter-spacing: 0.2px; margin-bottom: 1px; }
+  .notif-subtitle { font-size: 11px; color: #999; }
+
+  /* Toolbar */
+  .notif-toolbar {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 16px; border-bottom: 1px solid #edf0f3;
+    background: #fafbfc;
+  }
+  .notif-search-wrap {
+    display: flex; align-items: center; gap: 6px;
+    border: 1px solid #d0d7de; border-radius: 4px;
+    padding: 5px 10px; background: #fff; flex: 0 0 280px;
+  }
+  .notif-search-wrap svg { color: #aaa; flex-shrink: 0; }
+  .notif-search-wrap input {
+    border: none; outline: none; font-size: 11.5px; color: #555;
+    background: transparent; width: 100%;
+  }
+  .notif-search-wrap input::placeholder { color: #bbb; }
+  .notif-stats { display: flex; gap: 20px; align-items: baseline; }
+  .notif-stat { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+  .notif-stat .ns-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #999; }
+  .notif-stat .ns-val { font-size: 18px; font-weight: 800; line-height: 1; }
+  .notif-stat.total .ns-val { color: #E85D1A; }
+  .notif-stat.security .ns-val { color: #E85D1A; }
+  .notif-stat.system .ns-val  { color: #E85D1A; }
+  .notif-stat.license .ns-val { color: #1a2332; }
+  .notif-divider { width: 1px; height: 28px; background: #e2e6ea; }
+  .notif-time-filter { display: flex; align-items: center; gap: 8px; }
+  .time-radio-wrap { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+  .time-radio { width: 13px; height: 13px; border-radius: 50%; border: 1.5px solid #d0d7de; background: #fff; flex-shrink: 0; }
+  .time-radio.selected { border-color: #E85D1A; background: #E85D1A; }
+  .time-select {
+    border: 1px solid #d0d7de; border-radius: 4px; padding: 4px 8px;
+    font-size: 11.5px; color: #333; background: #fff; cursor: pointer; outline: none;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .time-label { font-size: 11.5px; color: #555; }
+  .notif-actions { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+  .notif-action-btn {
+    display: flex; align-items: center; gap: 4px;
+    border: 1px solid #d0d7de; border-radius: 4px;
+    padding: 4px 10px; font-size: 11.5px; color: #555;
+    background: #fff; cursor: pointer; transition: background 0.15s;
+  }
+  .notif-action-btn:hover { background: #f4f6f9; }
+  .notif-action-btn.active { background: #1a2332; color: #fff; border-color: #1a2332; }
+
+  /* Product sub-tabs */
+  .notif-product-tabs {
+    display: flex; gap: 0; border-bottom: 1px solid #e2e6ea;
+    padding: 0 16px;
+  }
+  .notif-ptab {
+    padding: 9px 14px; font-size: 11.5px; font-weight: 600;
+    color: #999; cursor: pointer; letter-spacing: 0.3px;
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+    text-transform: uppercase; white-space: nowrap;
+    transition: color 0.15s;
+  }
+  .notif-ptab:hover { color: #555; }
+  .notif-ptab.active { color: #E85D1A; border-bottom-color: #E85D1A; }
+
+  /* Table */
+  .notif-table-wrap { overflow-x: auto; }
+  .notif-table {
+    width: 100%; border-collapse: collapse; font-size: 12px;
+  }
+  .notif-table thead tr {
+    background: #f4f6f9;
+  }
+  .notif-table thead th {
+    padding: 9px 14px; text-align: left;
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.5px; color: #666; white-space: nowrap;
+    border-bottom: 1px solid #e2e6ea; user-select: none;
+  }
+  .notif-table thead th:first-child { padding-left: 16px; }
+  .notif-table thead th:last-child  { padding-right: 16px; }
+  .notif-table tbody tr {
+    border-bottom: 1px solid #f0f2f5;
+    transition: background 0.12s;
+  }
+  .notif-table tbody tr:hover { background: #fafbfc; }
+  .notif-table tbody tr:last-child { border-bottom: none; }
+  .notif-table td {
+    padding: 9px 14px; color: #333; vertical-align: middle;
+  }
+  .notif-table td:first-child { padding-left: 16px; color: #666; font-size: 11.5px; white-space: nowrap; }
+  .notif-table td:last-child  { padding-right: 16px; }
+  .notif-fn { font-weight: 700; color: #1a2332; }
+  .notif-use-type {
+    display: flex; align-items: center; gap: 5px; color: #555; font-size: 11.5px;
+  }
+  .notif-use-type svg { color: #bbb; flex-shrink: 0; }
+  .notif-priority-em {
+    font-size: 11.5px; color: #1a2332; font-weight: 500;
+  }
+  .notif-tenant { font-size: 11.5px; color: #444; line-height: 1.35; }
+  .notif-message { font-size: 11.5px; color: #555; max-width: 340px; }
+  .notif-user { font-size: 11.5px; color: #555; }
+  .notif-action-icon {
+    color: #bbb; cursor: pointer; transition: color 0.15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .notif-action-icon:hover { color: #E85D1A; }
+
+  /* Pagination bar */
+  .notif-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px; border-top: 1px solid #edf0f3;
+    background: #fafbfc;
+  }
+  .notif-footer-info { font-size: 11px; color: #999; }
+  .notif-footer-pages { display: flex; gap: 4px; align-items: center; }
+  .notif-page-btn {
+    min-width: 26px; height: 26px; border: 1px solid #d0d7de; border-radius: 4px;
+    background: #fff; font-size: 11.5px; color: #555; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.12s;
+  }
+  .notif-page-btn:hover { background: #f4f6f9; }
+  .notif-page-btn.active { background: #E85D1A; color: #fff; border-color: #E85D1A; font-weight: 700; }
+</style>
+
+<script>
+// Notifications product tabs
+document.querySelectorAll('.notif-ptab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.notif-ptab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+  });
+});
+
+// Time filter radio toggle
+document.querySelectorAll('.time-radio-wrap').forEach(wrap => {
+  wrap.addEventListener('click', () => {
+    document.querySelectorAll('.time-radio').forEach(r => r.classList.remove('selected'));
+    wrap.querySelector('.time-radio').classList.add('selected');
+  });
+});
+
+function dismissBanner() {
+  const banner = document.getElementById('active-banner');
+  if (!banner || banner.classList.contains('dimissing')) return;
+  banner.classList.add('dimissing');
+  setTimeout(() => {
+    banner.style.display = 'none';
+  }, 450);
+}
+
+function activateSAMI() {
+  const btn       = document.getElementById('activate-btn');
+  const btnIcon   = document.getElementById('btn-icon');
+  const btnLabel  = document.getElementById('btn-label');
+  const overlay   = document.getElementById('scan-overlay');
+  const scanLine  = document.getElementById('scan-line');
+  const progress  = document.getElementById('scan-progress');
+  const counter   = document.getElementById('tenant-count');
+  const scanLabel = document.getElementById('scan-label');
+  const scanSub   = document.getElementById('scan-sub');
+  const successOv = document.getElementById('success-overlay');
+  const day0      = document.getElementById('day0-empty');
+  const active    = document.getElementById('sami-active');
+  const banner    = document.getElementById('active-banner');
+
+  if (btn.classList.contains('scanning') || btn.classList.contains('done')) return;
+
+  // ── Phase 1: Button → scanning state ──
+  btn.classList.add('scanning');
+  btnIcon.innerHTML = `<circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="24" stroke-dashoffset="8" class="spin-icon"/>`;
+  btnLabel.textContent = 'Activating…';
+
+  // Show scan overlay
+  setTimeout(() => {
+    overlay.classList.add('visible');
+    scanLine.classList.add('sweeping');
+  }, 200);
+
+  // ── Phase 2: Tenant counter + progress bar (2.4s total) ──
+  const totalTenants = 98;
+  const duration     = 2400; // ms
+  const startTime    = performance.now();
+
+  const scanMessages = [
+    { at: 0,    label: 'Activating SAMI',       sub: 'Connecting to devices…' },
+    { at: 0.20, label: 'Scanning tenants',       sub: 'Analyzing firewall configs…' },
+    { at: 0.45, label: 'Scanning tenants',       sub: 'Checking CVE exposure…' },
+    { at: 0.65, label: 'Detecting anomalies',    sub: 'Running behavioral analysis…' },
+    { at: 0.82, label: 'Correlating signals',    sub: 'Cross-referencing threat intel…' },
+    { at: 0.94, label: 'Building alerts',        sub: 'Prioritizing by risk score…' },
+  ];
+  let msgIndex = 0;
+
+  function tick(now) {
+    const elapsed  = now - startTime;
+    const progress_pct = Math.min(elapsed / duration, 1);
+
+    // Update counter
+    const count = Math.round(progress_pct * totalTenants);
+    counter.textContent = count;
+
+    // Update progress bar
+    progress.style.width = (progress_pct * 100) + '%';
+    progress.style.transition = 'width 0.08s linear';
+
+    // Update labels at milestones
+    while (msgIndex < scanMessages.length && progress_pct >= scanMessages[msgIndex].at) {
+      scanLabel.textContent = scanMessages[msgIndex].label;
+      scanSub.textContent   = scanMessages[msgIndex].sub;
+      msgIndex++;
+    }
+
+    if (progress_pct < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      // ── Phase 3: scan complete ──
+      counter.textContent = totalTenants;
+      progress.style.width = '100%';
+      scanLine.classList.remove('sweeping');
+      scanLabel.textContent = 'Scan complete';
+      scanSub.textContent   = '3 alerts found across 98 tenants';
+
+      setTimeout(() => {
+        overlay.classList.remove('visible');
+        successOv.classList.add('visible');
+      }, 300);
+
+      // ── Phase 4: transition to active state ──
+      setTimeout(() => {
+        successOv.classList.remove('visible');
+        day0.classList.add('exiting');
+
+        setTimeout(() => {
+          day0.style.display = 'none';
+
+          // Show activated grid
+          active.classList.add('entering');
+          active.style.display = 'flex';
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              active.classList.add('visible');
+              banner.classList.add('visible');
+              // Start auto-dismiss timer bar
+              const timerBar = document.getElementById('sab-timer');
+              if (timerBar) {
+                setTimeout(() => timerBar.classList.add('running'), 350);
+              }
+              // Auto-dismiss after 4.5s
+              setTimeout(() => dismissBanner(), 4500);
+            });
+          });
+
+        }, 500);
+      }, 1200);
+    }
+  }
+
+  requestAnimationFrame(tick);
+}
+</script>
+
+</body>
+</html>

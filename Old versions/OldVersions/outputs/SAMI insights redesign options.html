@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAMI Recommendation — Design Options</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#001b50; --orange:#ff5d00; --red:#c70f0f;
+  --yellow:#f3ac3d; --green:#59a02e; --blue:#2563eb;
+  --teal:#059669; --purple:#6b46c1;
+  --bg:#f4f6f9; --white:#fff; --border:#e4e7ec;
+  --text-1:#191c25; --text-2:#4a618f; --text-3:#888;
+  --font:'Nunito Sans',sans-serif;
+  --radius:6px; --radius-lg:10px;
+  --shadow:0 1px 6px rgba(0,0,0,.10);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text-1);font-size:13px;-webkit-font-smoothing:antialiased;}
+button{font-family:var(--font);cursor:pointer;}
+
+/* ── OPTION SWITCHER BAR ── */
+.switcher-bar{
+  position:sticky;top:0;z-index:100;
+  background:var(--navy);
+  display:flex;align-items:center;gap:0;
+  padding:0 20px;
+  border-bottom:2px solid rgba(255,255,255,.1);
+  box-shadow:0 2px 12px rgba(0,0,0,.25);
+}
+.switcher-label{
+  font-size:11px;font-weight:800;letter-spacing:0.8px;
+  color:rgba(255,255,255,.5);text-transform:uppercase;
+  margin-right:16px;white-space:nowrap;
+}
+.switcher-btn{
+  padding:13px 20px;font-size:12px;font-weight:700;
+  color:rgba(255,255,255,.55);background:none;border:none;
+  border-bottom:3px solid transparent;margin-bottom:-2px;
+  transition:all .15s;white-space:nowrap;
+  letter-spacing:.02em;
+}
+.switcher-btn:hover{color:rgba(255,255,255,.85);}
+.switcher-btn.active{color:#fff;border-bottom-color:var(--orange);}
+.switcher-tag{
+  font-size:9px;font-weight:800;letter-spacing:.5px;
+  padding:2px 6px;border-radius:3px;margin-left:6px;
+  background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);
+  text-transform:uppercase;vertical-align:middle;
+}
+
+/* ── OPTION PANES ── */
+.option-pane{display:none;}
+.option-pane.active{display:block;}
+
+/* ══════════════════════════════════════
+   SHARED COMPONENTS
+══════════════════════════════════════ */
+.sev-badge{
+  display:inline-flex;align-items:center;
+  font-size:9px;font-weight:800;letter-spacing:.5px;
+  padding:2px 7px;border-radius:3px;text-transform:uppercase;
+}
+.sev-critical{background:#c70f0f;color:#fff;}
+.sev-high{background:#d97706;color:#fff;}
+.sev-medium{background:#2563eb;color:#fff;}
+.cat-tag{
+  display:inline-flex;align-items:center;
+  font-size:9px;font-weight:800;letter-spacing:.5px;
+  padding:2px 7px;border-radius:3px;text-transform:uppercase;
+  border:1px solid currentColor;
+}
+.cat-cve{color:#c70f0f;}
+.cat-policy{color:#059669;}
+.cat-behaviour{color:#2563eb;}
+.cat-renewal{color:#d97706;}
+.count-pill{
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:800;
+  min-width:18px;height:18px;padding:0 5px;
+  border-radius:9px;background:#c70f0f;color:#fff;
+}
+.count-pill.other{background:#e4e7ec;color:#4a618f;}
+
+/* action buttons */
+.btn-primary{
+  font-size:11.5px;font-weight:700;
+  background:var(--navy);color:#fff;border:none;
+  border-radius:4px;padding:5px 12px;cursor:pointer;
+  font-family:var(--font);
+}
+.btn-ghost{
+  font-size:11.5px;font-weight:500;
+  background:none;color:var(--text-2);
+  border:1px solid var(--border);border-radius:4px;
+  padding:5px 12px;cursor:pointer;font-family:var(--font);
+}
+
+/* ══════════════════════════════════════
+   SHARED DATA — alert items
+══════════════════════════════════════ */
+
+/* ══════════════════════════════════════
+   OPTION A — Sidebar + List + Detail
+══════════════════════════════════════ */
+.oa-shell{display:flex;height:calc(100vh - 47px);overflow:hidden;}
+
+/* sidebar */
+.oa-sidebar{
+  width:220px;flex-shrink:0;
+  background:var(--white);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  overflow-y:auto;
+}
+.oa-sidebar-head{
+  padding:16px 16px 10px;
+  font-size:10px;font-weight:800;letter-spacing:.7px;
+  color:var(--text-3);text-transform:uppercase;
+  border-bottom:1px solid var(--border);
+}
+.oa-nav-item{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 16px;
+  cursor:pointer;border-left:3px solid transparent;
+  transition:all .12s;
+  font-size:13px;font-weight:600;color:var(--text-2);
+}
+.oa-nav-item:hover{background:#fafbfd;color:var(--text-1);}
+.oa-nav-item.active{
+  border-left-color:var(--orange);
+  background:#fff8f5;color:var(--navy);font-weight:700;
+}
+.oa-nav-dot{
+  width:8px;height:8px;border-radius:50%;flex-shrink:0;
+}
+.oa-nav-count{margin-left:auto;}
+.oa-nav-sep{
+  padding:10px 16px 4px;
+  font-size:9.5px;font-weight:800;letter-spacing:.6px;
+  color:var(--text-3);text-transform:uppercase;
+}
+
+/* list panel */
+.oa-list{
+  flex:1;overflow-y:auto;
+  background:var(--bg);
+  border-right:1px solid var(--border);
+  min-width:0;
+}
+.oa-list-head{
+  position:sticky;top:0;background:var(--white);
+  border-bottom:1px solid var(--border);
+  padding:12px 16px;display:flex;align-items:center;gap:8px;
+  z-index:10;
+}
+.oa-list-title{font-size:14px;font-weight:800;color:var(--navy);}
+.oa-list-sub{font-size:11px;color:var(--text-3);margin-left:4px;}
+.oa-group-label{
+  padding:8px 16px;
+  font-size:9.5px;font-weight:800;letter-spacing:.6px;
+  color:var(--text-3);text-transform:uppercase;
+  background:var(--bg);border-bottom:1px solid var(--border);
+  border-top:1px solid var(--border);
+  margin-top:4px;
+}
+.oa-alert-row{
+  background:var(--white);
+  border-bottom:1px solid var(--border);
+  padding:12px 16px;cursor:pointer;
+  transition:background .1s;
+  border-left:3px solid transparent;
+}
+.oa-alert-row:hover{background:#fafbfd;}
+.oa-alert-row.active{background:#fff8f5;border-left-color:var(--orange);}
+.oa-alert-row.needs{border-left-color:var(--red);}
+.oa-row-header{display:flex;align-items:center;gap:6px;margin-bottom:5px;flex-wrap:wrap;}
+.oa-row-title{font-size:13px;font-weight:700;color:var(--text-1);line-height:1.4;margin-bottom:4px;}
+.oa-row-sub{font-size:11.5px;color:var(--text-2);line-height:1.5;}
+.oa-row-time{font-size:10.5px;color:var(--text-3);margin-left:auto;}
+.oa-row-other{opacity:.65;}
+
+/* detail panel */
+.oa-detail{
+  width:380px;flex-shrink:0;
+  background:var(--white);overflow-y:auto;
+}
+.oa-detail-empty{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:100%;color:var(--text-3);gap:8px;
+}
+.oa-detail-head{
+  padding:16px;border-bottom:1px solid var(--border);
+}
+.oa-detail-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.oa-detail-title{font-size:15px;font-weight:800;color:var(--navy);line-height:1.4;margin-bottom:6px;}
+.oa-detail-time{font-size:11px;color:var(--text-3);}
+.oa-detail-section{padding:14px 16px;border-bottom:1px solid var(--border);}
+.oa-detail-section-label{font-size:9.5px;font-weight:800;letter-spacing:.6px;color:var(--text-3);text-transform:uppercase;margin-bottom:8px;}
+.oa-detail-sami{
+  background:#f6f8fe;border-radius:6px;padding:12px;
+  font-size:12.5px;color:var(--text-2);line-height:1.6;
+}
+.oa-detail-sami strong{color:var(--navy);}
+.oa-detail-actions{display:flex;gap:8px;flex-wrap:wrap;padding:14px 16px;}
+
+/* ══════════════════════════════════════
+   OPTION B — Swimlane Columns
+══════════════════════════════════════ */
+.ob-shell{height:calc(100vh - 47px);overflow:hidden;display:flex;flex-direction:column;}
+.ob-header{
+  padding:14px 20px;background:var(--white);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;
+}
+.ob-title{font-size:16px;font-weight:800;color:var(--navy);}
+.ob-sub{font-size:12px;color:var(--text-3);}
+.ob-filter{margin-left:auto;display:flex;gap:6px;}
+.ob-filter-chip{
+  font-size:11px;font-weight:600;padding:4px 10px;border-radius:12px;
+  background:var(--bg);border:1px solid var(--border);color:var(--text-2);
+  cursor:pointer;
+}
+.ob-filter-chip.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.ob-cols{display:flex;flex:1;overflow:hidden;gap:0;}
+.ob-col{
+  flex:1;display:flex;flex-direction:column;
+  border-right:1px solid var(--border);overflow:hidden;
+}
+.ob-col:last-child{border-right:none;}
+.ob-col-head{
+  padding:12px 14px 10px;background:var(--white);
+  border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.ob-col-title{font-size:12px;font-weight:800;color:var(--navy);margin-bottom:2px;}
+.ob-col-meta{font-size:11px;color:var(--text-3);}
+.ob-col-body{overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:6px;}
+.ob-sep-label{
+  font-size:9px;font-weight:800;letter-spacing:.6px;
+  color:var(--text-3);text-transform:uppercase;
+  padding:4px 6px;
+}
+.ob-card{
+  background:var(--white);border-radius:var(--radius);
+  border:1px solid var(--border);padding:10px 12px;
+  cursor:pointer;transition:box-shadow .1s;
+}
+.ob-card:hover{box-shadow:var(--shadow);}
+.ob-card.needs{border-left:3px solid var(--red);}
+.ob-card.other{opacity:.72;}
+.ob-card-header{display:flex;align-items:center;gap:5px;margin-bottom:6px;flex-wrap:wrap;}
+.ob-card-title{font-size:12px;font-weight:700;color:var(--text-1);line-height:1.4;}
+.ob-card-body{font-size:11.5px;color:var(--text-2);line-height:1.5;margin-bottom:8px;}
+.ob-card-time{font-size:10px;color:var(--text-3);}
+.ob-card-actions{display:flex;gap:6px;}
+.ob-act-btn{
+  font-size:10.5px;font-weight:700;
+  background:var(--navy);color:#fff;border:none;
+  border-radius:3px;padding:3px 9px;cursor:pointer;font-family:var(--font);
+}
+.ob-act-ghost{
+  font-size:10.5px;font-weight:500;
+  background:none;color:var(--text-2);
+  border:1px solid var(--border);border-radius:3px;
+  padding:3px 9px;cursor:pointer;font-family:var(--font);
+}
+
+/* ══════════════════════════════════════
+   OPTION C — Smart Feed + Filters
+══════════════════════════════════════ */
+.oc-shell{height:calc(100vh - 47px);overflow:hidden;display:flex;flex-direction:column;}
+.oc-filter-bar{
+  background:var(--white);border-bottom:1px solid var(--border);
+  padding:10px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  flex-shrink:0;
+}
+.oc-filter-label{font-size:11px;font-weight:700;color:var(--text-3);white-space:nowrap;}
+.oc-chip{
+  font-size:11.5px;font-weight:600;padding:5px 14px;border-radius:12px;
+  background:var(--bg);border:1px solid var(--border);color:var(--text-2);
+  cursor:pointer;transition:all .12s;
+}
+.oc-chip:hover{border-color:var(--navy);}
+.oc-chip.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.oc-toggle{
+  margin-left:auto;display:flex;align-items:center;gap:6px;
+  font-size:11.5px;color:var(--text-2);font-weight:600;
+}
+.oc-toggle input[type=checkbox]{accent-color:var(--orange);cursor:pointer;}
+.oc-body{flex:1;overflow:hidden;display:flex;}
+.oc-feed{flex:1;overflow-y:auto;padding:0;}
+.oc-section-sep{
+  padding:8px 20px;font-size:9.5px;font-weight:800;letter-spacing:.6px;
+  color:var(--text-3);text-transform:uppercase;
+  background:var(--bg);border-bottom:1px solid var(--border);
+  border-top:1px solid var(--border);
+  position:sticky;top:0;z-index:5;
+}
+.oc-row{
+  background:var(--white);border-bottom:1px solid var(--border);
+  padding:12px 20px;cursor:pointer;display:flex;gap:14px;
+  border-left:4px solid transparent;transition:background .1s;
+}
+.oc-row:hover{background:#fafbfd;}
+.oc-row.active{background:#fff8f5;border-left-color:var(--orange);}
+.oc-row-left{flex:1;min-width:0;}
+.oc-row-header{display:flex;align-items:center;gap:6px;margin-bottom:5px;flex-wrap:wrap;}
+.oc-row-title{font-size:13px;font-weight:700;color:var(--text-1);line-height:1.4;margin-bottom:3px;}
+.oc-row-body{font-size:12px;color:var(--text-2);line-height:1.5;}
+.oc-row-right{flex-shrink:0;text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
+.oc-row-time{font-size:10.5px;color:var(--text-3);}
+.oc-row-act{
+  font-size:11px;font-weight:700;
+  background:var(--navy);color:#fff;border:none;
+  border-radius:4px;padding:4px 10px;cursor:pointer;font-family:var(--font);
+}
+.oc-row.dimmed{opacity:.6;}
+.oc-detail{
+  width:380px;flex-shrink:0;background:var(--white);
+  border-left:1px solid var(--border);overflow-y:auto;
+}
+/* border colors per cat */
+.oc-row[data-cat=cve]{border-left-color:#c70f0f;}
+.oc-row[data-cat=policy]{border-left-color:#059669;}
+.oc-row[data-cat=behaviour]{border-left-color:#2563eb;}
+.oc-row[data-cat=renewal]{border-left-color:#d97706;}
+
+/* ══════════════════════════════════════
+   OPTION D — Critical Strip + Tab List
+══════════════════════════════════════ */
+.od-shell{height:calc(100vh - 47px);overflow:hidden;display:flex;flex-direction:column;}
+.od-strip{
+  background:var(--white);border-bottom:1px solid var(--border);
+  padding:12px 20px;flex-shrink:0;
+}
+.od-strip-head{
+  display:flex;align-items:center;gap:8px;margin-bottom:10px;
+}
+.od-strip-title{font-size:11px;font-weight:800;letter-spacing:.6px;color:var(--red);text-transform:uppercase;}
+.od-strip-count{
+  background:var(--red);color:#fff;font-size:10px;font-weight:800;
+  border-radius:9px;padding:1px 7px;
+}
+.od-strip-scroll{
+  display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;
+}
+.od-strip-scroll::-webkit-scrollbar{height:3px;}
+.od-strip-scroll::-webkit-scrollbar-thumb{background:var(--border);}
+.od-crit-card{
+  flex-shrink:0;width:260px;
+  background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);
+  border-top:3px solid var(--red);
+  padding:10px 12px;cursor:pointer;transition:box-shadow .1s;
+}
+.od-crit-card:hover{box-shadow:var(--shadow);}
+.od-crit-card.active{border-color:var(--orange);border-top-color:var(--orange);}
+.od-crit-card-header{display:flex;gap:5px;margin-bottom:6px;flex-wrap:wrap;}
+.od-crit-title{font-size:12px;font-weight:700;color:var(--text-1);line-height:1.4;margin-bottom:4px;}
+.od-crit-action{font-size:10.5px;font-weight:700;background:var(--navy);color:#fff;border:none;border-radius:3px;padding:3px 9px;cursor:pointer;font-family:var(--font);}
+
+.od-bottom{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+.od-tabs{
+  display:flex;gap:0;background:var(--white);border-bottom:1px solid var(--border);
+  flex-shrink:0;padding:0 20px;
+}
+.od-tab{
+  padding:10px 16px;font-size:12.5px;font-weight:600;color:var(--text-3);
+  background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;
+  cursor:pointer;font-family:var(--font);transition:all .12s;
+}
+.od-tab:hover{color:var(--text-1);}
+.od-tab.active{color:var(--orange);border-bottom-color:var(--orange);font-weight:700;}
+.od-tab-count{
+  font-size:9.5px;font-weight:800;background:var(--bg);
+  color:var(--text-2);border-radius:8px;padding:1px 6px;margin-left:5px;
+}
+.od-tab.active .od-tab-count{background:var(--orange);color:#fff;}
+.od-content{flex:1;overflow:hidden;display:flex;}
+.od-list{flex:1;overflow-y:auto;}
+.od-row{
+  background:var(--white);border-bottom:1px solid var(--border);
+  padding:12px 20px;cursor:pointer;border-left:3px solid transparent;
+  transition:background .1s;
+}
+.od-row:hover{background:#fafbfd;}
+.od-row.active{background:#fff8f5;border-left-color:var(--orange);}
+.od-row.needs{border-left-color:var(--red);}
+.od-row-header{display:flex;align-items:center;gap:6px;margin-bottom:5px;flex-wrap:wrap;}
+.od-row-title{font-size:13px;font-weight:700;color:var(--text-1);line-height:1.4;margin-bottom:3px;}
+.od-row-body{font-size:12px;color:var(--text-2);line-height:1.5;margin-bottom:6px;}
+.od-row-footer{display:flex;align-items:center;gap:8px;}
+.od-row-time{font-size:10.5px;color:var(--text-3);margin-left:auto;}
+.od-detail{
+  width:380px;flex-shrink:0;background:var(--white);
+  border-left:1px solid var(--border);overflow-y:auto;
+}
+
+/* shared detail panel styles */
+.detail-empty{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:100%;gap:8px;color:var(--text-3);text-align:center;padding:40px;
+}
+.detail-empty svg{opacity:.3;}
+.detail-head{padding:16px;border-bottom:1px solid var(--border);}
+.detail-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.detail-title{font-size:15px;font-weight:800;color:var(--navy);line-height:1.4;margin-bottom:6px;}
+.detail-time{font-size:11px;color:var(--text-3);margin-bottom:4px;}
+.detail-section{padding:14px 16px;border-bottom:1px solid var(--border);}
+.detail-sec-label{font-size:9.5px;font-weight:800;letter-spacing:.6px;color:var(--text-3);text-transform:uppercase;margin-bottom:8px;}
+.detail-sami{background:#f6f8fe;border-radius:6px;padding:12px;font-size:12.5px;color:var(--text-2);line-height:1.65;}
+.detail-sami strong{color:var(--navy);}
+.detail-meta{font-size:12px;color:var(--text-2);line-height:1.7;}
+.detail-actions{display:flex;gap:8px;flex-wrap:wrap;padding:14px 16px;}
+</style>
+</head>
+<body>
+
+<!-- ── SWITCHER BAR ── -->
+<div class="switcher-bar">
+  <span class="switcher-label">Design Options</span>
+  <button class="switcher-btn active" onclick="showOption('a',this)">
+    A — Sidebar + Detail <span class="switcher-tag">Specified</span>
+  </button>
+  <button class="switcher-btn" onclick="showOption('b',this)">
+    B — Swimlane Columns
+  </button>
+  <button class="switcher-btn" onclick="showOption('c',this)">
+    C — Smart Feed + Filters
+  </button>
+  <button class="switcher-btn" onclick="showOption('d',this)">
+    D — Critical Strip + Tabs
+  </button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     DATA
+══════════════════════════════════════════════════════════ -->
+<script>
+const ALERTS = [
+  // CVE — needs attention
+  { id:'cve1', cat:'cve', sev:'critical', needs:true,
+    title:'SSL VPN auth bypass exposed on 8 firewalls across 2 high-value tenants',
+    body:'CVE-2025-44892 (CVSS 9.8) allows unauthenticated access through SonicOS SSL VPN. Acme Corp and Beta Networks have public-facing affected appliances. Patch is stable; proof-of-concept code is public but no exploitation observed in your fleet yet.',
+    sami:'CVSS 9.8 with public PoC — highest exploitation risk in queue. Recommend patching Acme Corp and Beta Networks before weekend. 8 internet-facing firewalls confirmed vulnerable.',
+    action:'Patch 8 firewalls', time:'2d ago',
+    tenants:'Acme Corp, Beta Networks', devices:'8 firewalls' },
+  // CVE — other
+  { id:'cve2', cat:'cve', sev:'medium', needs:false,
+    title:'Firmware Memory Corruption — 4 Devices',
+    body:'CVE-2024-5678 (CVSS 7.8) affects 4 devices. No active exploit confirmed. Upgrade available.',
+    sami:'Low urgency. No public exploit. Safe to defer to next maintenance cycle.',
+    action:'Schedule patch', time:'5d ago',
+    tenants:'Westfield IT', devices:'4 firewalls' },
+  { id:'cve3', cat:'cve', sev:'medium', needs:false,
+    title:'Low-Risk CVE — No Active Exploit Confirmed',
+    body:'CVE-2024-9012 (CVSS 3.1) affects 3 devices. SAMI is monitoring threat intel feeds.',
+    sami:'Monitoring only. No action required at this time.',
+    action:'Monitor', time:'7d ago',
+    tenants:'Riverside Mfg', devices:'3 firewalls' },
+  // POLICY — needs attention
+  { id:'pol1', cat:'policy', sev:'critical', needs:true,
+    title:'Super-admin MFA not enforced on 2 tenants — single password from full takeover',
+    body:'Beta Networks and Delta Logistics allow super-admin login with password only. Behaviour Anomalies already shows credential stuffing attempts against these accounts.',
+    sami:'This gap is being actively probed. Enforce MFA immediately across both tenants before a credential is compromised.',
+    action:'Enforce MFA now', time:'Linked to behav alert',
+    tenants:'Beta Networks, Delta Logistics', devices:'All admin accounts' },
+  { id:'pol2', cat:'policy', sev:'critical', needs:true,
+    title:'Default-allow outbound on 3 perimeter firewalls — defeats DPI-SSL coverage',
+    body:'Acme, Beta, and Crown have permit-any outbound rules at the WAN edge. Malicious egress goes uninspected even with DPI-SSL and IPS enabled.',
+    sami:'Contradicts org baseline policy set in 2024. Drift >60 days. Recommend applying baseline policy across all 3 tenants now.',
+    action:'Apply baseline policy', time:'Drift > 60d',
+    tenants:'Acme Corp, Beta Networks, Crown', devices:'3 perimeter FWs' },
+  // POLICY — other
+  { id:'pol3', cat:'policy', sev:'medium', needs:false,
+    title:'Guest VLAN Lacks Isolation — Riverside Mfg',
+    body:'Guest VLAN has no inter-VLAN routing restrictions and can reach production segments.',
+    sami:'Low-urgency gap. No active exploit observed. Recommend scheduling a rule review.',
+    action:'Review', time:'4d ago',
+    tenants:'Riverside Mfg', devices:'1 firewall' },
+  { id:'pol4', cat:'policy', sev:'medium', needs:false,
+    title:'Conflicting Firewall Rules — 3 Policy Overlaps',
+    body:'Overlapping rules across Westfield IT and Brighton Labs inadvertently allow SMB and RDP inbound.',
+    sami:'Elevated risk due to RDP/SMB exposure. Recommend rule audit in next cycle.',
+    action:'Audit rules', time:'3d ago',
+    tenants:'Westfield IT, Brighton Labs', devices:'2 firewalls' },
+  // BEHAVIOUR — needs attention
+  { id:'beh1', cat:'behaviour', sev:'critical', needs:true,
+    title:'Active credential stuffing against super-admin jsmith@beta.local — MFA absent',
+    body:'5 failed login attempts from a new geography and ASN in the past hour, while the same account has 4 active sessions from its usual location. Concurrent-session abuse pattern.',
+    sami:'Active attack in progress. Combined with no MFA on this tenant, a single guessed password compromises the entire estate. Force re-auth immediately.',
+    action:'Force re-auth + lock account', time:'1h ago',
+    tenants:'Beta Networks', devices:'jsmith@beta.local' },
+  // BEHAVIOUR — other
+  { id:'beh2', cat:'behaviour', sev:'medium', needs:false,
+    title:'Unusual Admin Login Pattern — TZ-400',
+    body:'17 failed admin login attempts followed by a successful login from IP 185.220.x.x — a geolocation inconsistent with historical patterns.',
+    sami:'Possible brute-force compromise. Review access logs and verify with the admin who owns this credential.',
+    action:'Review logs', time:'2d ago',
+    tenants:'Acme Tenant 1', devices:'TZ-400' },
+  { id:'beh3', cat:'behaviour', sev:'medium', needs:false,
+    title:'Lateral Movement Detected — FW-PROD-07',
+    body:'Anomalous east-west traffic across 4 internal segments over 2 hours. Credential reuse patterns consistent with MITRE T1550.',
+    sami:'Containment is recommended before further propagation. No isolation has occurred yet.',
+    action:'Investigate', time:'3d ago',
+    tenants:'Acme Corp', devices:'FW-PROD-07' },
+  // RENEWALS — needs attention
+  { id:'ren1', cat:'renewal', sev:'critical', needs:true,
+    title:'Acme Corp ATP lapses in 9 days — $42K ARR plus 8 firewalls lose protection',
+    body:'Subscription expires before next QBR. 8 firewalls rely on ATP for Capture sandboxing — lapse removes real-time malware analysis.',
+    sami:'Highest revenue risk in queue. Start renewal quote before end of week. Linked to open CVE findings that depend on ATP coverage.',
+    action:'Start renewal quote', time:'Expires in 9d',
+    tenants:'Acme Corp', devices:'8 firewalls' },
+  // RENEWALS — other
+  { id:'ren2', cat:'renewal', sev:'medium', needs:false,
+    title:'License Renewal Approaching — Beta Inc ($50K ARR)',
+    body:"Beta Inc's $50K ARR renewal is due in 45 days. Early outreach improves renewal probability.",
+    sami:'No immediate risk. SAMI has drafted talking points for the renewal conversation.',
+    action:'Schedule call', time:'45d remaining',
+    tenants:'Beta Inc', devices:'All licensed devices' },
+  { id:'ren3', cat:'renewal', sev:'medium', needs:false,
+    title:'4 Gen6 Devices Approaching EOL — Westfield IT',
+    body:'14 Gen6 devices approaching EOL in 90 days. Budget freeze announced.',
+    sami:'Low urgency. Recommend positioning TZ680 migration proposal as cost savings.',
+    action:'Send proposal', time:'90d remaining',
+    tenants:'Westfield IT', devices:'14 Gen6 devices' },
+];
+
+const CAT_META = {
+  cve:       { label:'CVE Vulnerabilities', color:'#c70f0f', dot:'#c70f0f' },
+  policy:    { label:'Policy Gaps',         color:'#059669', dot:'#059669' },
+  behaviour: { label:'Behavioral',          color:'#2563eb', dot:'#2563eb' },
+  renewal:   { label:'Renewals',            color:'#d97706', dot:'#d97706' },
+};
+
+function needsCount(cat){ return ALERTS.filter(a=>(!cat||a.cat===cat)&&a.needs).length; }
+function allCount(cat){ return ALERTS.filter(a=>!cat||a.cat===cat).length; }
+
+function renderDetailPanel(alertId, container){
+  const a = ALERTS.find(x=>x.id===alertId);
+  if(!a){ container.innerHTML=`<div class="detail-empty"><svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg><div>Select an alert to view details</div></div>`; return; }
+  const cm = CAT_META[a.cat];
+  container.innerHTML=`
+    <div class="detail-head">
+      <div class="detail-tags">
+        <span class="cat-tag cat-${a.cat}">${cm.label}</span>
+        <span class="sev-badge sev-${a.sev}">${a.sev}</span>
+        ${a.needs?'<span class="sev-badge" style="background:#fff;color:#c70f0f;border:1px solid #c70f0f;">Needs Attention</span>':''}
+      </div>
+      <div class="detail-title">${a.title}</div>
+      <div class="detail-time">${a.time}</div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-sec-label">Alert Summary</div>
+      <div class="detail-meta">${a.body}</div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-sec-label">✦ SAMI Analysis</div>
+      <div class="detail-sami"><strong>SAMI recommends:</strong> ${a.sami}</div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-sec-label">Scope</div>
+      <div class="detail-meta">
+        <div><strong>Tenants:</strong> ${a.tenants}</div>
+        <div><strong>Devices:</strong> ${a.devices}</div>
+      </div>
+    </div>
+    <div class="detail-actions">
+      <button class="btn-primary">${a.action}</button>
+      <button class="btn-ghost">Snooze</button>
+      <button class="btn-ghost">Dismiss</button>
+    </div>`;
+}
+</script>
+
+<!-- ══════════════════════════════════════════════════════════
+     OPTION A — Sidebar + List + Detail
+══════════════════════════════════════════════════════════ -->
+<div class="option-pane active" id="opt-a">
+<div class="oa-shell">
+  <!-- Sidebar -->
+  <div class="oa-sidebar">
+    <div class="oa-sidebar-head">SAMI Recommendation</div>
+    <div class="oa-nav-item active" data-cat="all" onclick="oaSetCat('all',this)">
+      <div class="oa-nav-dot" style="background:#c70f0f;box-shadow:0 0 0 2px #fde8e8;"></div>
+      Needs Attention
+      <span class="oa-nav-count"><span class="count-pill" id="oa-count-all">4</span></span>
+    </div>
+    <div class="oa-nav-sep">By Category</div>
+    <div class="oa-nav-item" data-cat="cve" onclick="oaSetCat('cve',this)">
+      <div class="oa-nav-dot" style="background:#c70f0f;"></div>
+      CVE Vulnerabilities
+      <span class="oa-nav-count"><span class="count-pill other">3</span></span>
+    </div>
+    <div class="oa-nav-item" data-cat="policy" onclick="oaSetCat('policy',this)">
+      <div class="oa-nav-dot" style="background:#059669;"></div>
+      Policy Gaps
+      <span class="oa-nav-count"><span class="count-pill other">4</span></span>
+    </div>
+    <div class="oa-nav-item" data-cat="behaviour" onclick="oaSetCat('behaviour',this)">
+      <div class="oa-nav-dot" style="background:#2563eb;"></div>
+      Behavioral
+      <span class="oa-nav-count"><span class="count-pill other">3</span></span>
+    </div>
+    <div class="oa-nav-item" data-cat="renewal" onclick="oaSetCat('renewal',this)">
+      <div class="oa-nav-dot" style="background:#d97706;"></div>
+      Renewals
+      <span class="oa-nav-count"><span class="count-pill other">3</span></span>
+    </div>
+  </div>
+
+  <!-- Alert List -->
+  <div class="oa-list" id="oa-list">
+    <div class="oa-list-head">
+      <span class="oa-list-title" id="oa-list-title">Needs Attention</span>
+      <span class="oa-list-sub" id="oa-list-sub">4 critical across all categories</span>
+    </div>
+    <div id="oa-list-body"></div>
+  </div>
+
+  <!-- Detail Panel -->
+  <div class="oa-detail" id="oa-detail"></div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     OPTION B — Swimlane Columns
+══════════════════════════════════════════════════════════ -->
+<div class="option-pane" id="opt-b">
+<div class="ob-shell">
+  <div class="ob-header">
+    <div>
+      <div class="ob-title">SAMI Recommendation</div>
+      <div class="ob-sub">4 categories · 5 need attention · 8 informational</div>
+    </div>
+    <div class="ob-filter">
+      <span class="ob-filter-chip active" onclick="obFilter('all',this)">All</span>
+      <span class="ob-filter-chip" onclick="obFilter('needs',this)">Needs Attention only</span>
+    </div>
+  </div>
+  <div class="ob-cols" id="ob-cols"></div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     OPTION C — Smart Feed + Filters
+══════════════════════════════════════════════════════════ -->
+<div class="option-pane" id="opt-c">
+<div class="oc-shell">
+  <div class="oc-filter-bar">
+    <span class="oc-filter-label">Show:</span>
+    <button class="oc-chip active" onclick="ocFilter('all',this)">All</button>
+    <button class="oc-chip" onclick="ocFilter('cve',this)">CVE</button>
+    <button class="oc-chip" onclick="ocFilter('policy',this)">Policy</button>
+    <button class="oc-chip" onclick="ocFilter('behaviour',this)">Behavioral</button>
+    <button class="oc-chip" onclick="ocFilter('renewal',this)">Renewals</button>
+    <label class="oc-toggle">
+      <input type="checkbox" id="oc-attn-only" onchange="ocRender()">
+      Needs Attention only
+    </label>
+  </div>
+  <div class="oc-body">
+    <div class="oc-feed" id="oc-feed"></div>
+    <div class="oc-detail" id="oc-detail"></div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     OPTION D — Critical Strip + Tabs
+══════════════════════════════════════════════════════════ -->
+<div class="option-pane" id="opt-d">
+<div class="od-shell">
+  <!-- Critical strip -->
+  <div class="od-strip">
+    <div class="od-strip-head">
+      <span class="od-strip-title">Needs Attention</span>
+      <span class="od-strip-count" id="od-strip-count">5</span>
+      <span style="font-size:11px;color:var(--text-3);margin-left:8px;">Act on these now ↓</span>
+    </div>
+    <div class="od-strip-scroll" id="od-strip-scroll"></div>
+  </div>
+  <!-- Tabbed full list -->
+  <div class="od-bottom">
+    <div class="od-tabs">
+      <button class="od-tab active" onclick="odSetTab('cve',this)">CVE <span class="od-tab-count">3</span></button>
+      <button class="od-tab" onclick="odSetTab('policy',this)">Policy <span class="od-tab-count">4</span></button>
+      <button class="od-tab" onclick="odSetTab('behaviour',this)">Behavioral <span class="od-tab-count">3</span></button>
+      <button class="od-tab" onclick="odSetTab('renewal',this)">Renewals <span class="od-tab-count">3</span></button>
+    </div>
+    <div class="od-content">
+      <div class="od-list" id="od-list"></div>
+      <div class="od-detail" id="od-detail"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+/* ── OPTION SWITCHER ── */
+function showOption(key,btn){
+  document.querySelectorAll('.switcher-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.option-pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById('opt-'+key).classList.add('active');
+}
+
+/* ══ OPTION A ══ */
+let oaCat='all', oaSelected=null;
+
+function oaSetCat(cat,el){
+  oaCat=cat;
+  document.querySelectorAll('.oa-nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+  const items = cat==='all' ? ALERTS.filter(a=>a.needs) : ALERTS.filter(a=>a.cat===cat);
+  const title = cat==='all' ? 'Needs Attention' : CAT_META[cat].label;
+  const sub = cat==='all'
+    ? `${needsCount()} critical across all categories`
+    : `${needsCount(cat)} need attention · ${allCount(cat)-needsCount(cat)} other`;
+  document.getElementById('oa-list-title').textContent=title;
+  document.getElementById('oa-list-sub').textContent=sub;
+  oaRenderList(items, cat);
+  oaSelected=null;
+  renderDetailPanel(null, document.getElementById('oa-detail'));
+}
+
+function oaRenderList(items, cat){
+  const body=document.getElementById('oa-list-body');
+  let html='';
+  if(cat==='all'){
+    html = items.map(a=>`<div class="oa-alert-row needs" onclick="oaSelect('${a.id}',this)">
+      <div class="oa-row-header"><span class="cat-tag cat-${a.cat}">${CAT_META[a.cat].label}</span><span class="sev-badge sev-${a.sev}">${a.sev}</span><span class="oa-row-time">${a.time}</span></div>
+      <div class="oa-row-title">${a.title}</div>
+      <div class="oa-row-sub">${a.body.substring(0,100)}…</div>
+    </div>`).join('');
+  } else {
+    const needs=items.filter(a=>a.needs), other=items.filter(a=>!a.needs);
+    if(needs.length){ html+=`<div class="oa-group-label">Needs Attention — ${needs.length}</div>`; }
+    html+=needs.map(a=>`<div class="oa-alert-row needs" onclick="oaSelect('${a.id}',this)">
+      <div class="oa-row-header"><span class="sev-badge sev-${a.sev}">${a.sev}</span><span class="oa-row-time">${a.time}</span></div>
+      <div class="oa-row-title">${a.title}</div>
+      <div class="oa-row-sub">${a.body.substring(0,100)}…</div>
+    </div>`).join('');
+    if(other.length){ html+=`<div class="oa-group-label">Other — ${other.length}</div>`; }
+    html+=other.map(a=>`<div class="oa-alert-row oa-row-other" onclick="oaSelect('${a.id}',this)">
+      <div class="oa-row-header"><span class="sev-badge" style="background:#e4e7ec;color:#4a618f;">${a.sev}</span><span class="oa-row-time">${a.time}</span></div>
+      <div class="oa-row-title">${a.title}</div>
+      <div class="oa-row-sub">${a.body.substring(0,100)}…</div>
+    </div>`).join('');
+  }
+  body.innerHTML=html;
+}
+
+function oaSelect(id,el){
+  document.querySelectorAll('.oa-alert-row').forEach(r=>r.classList.remove('active'));
+  el.classList.add('active');
+  oaSelected=id;
+  renderDetailPanel(id, document.getElementById('oa-detail'));
+}
+
+/* ══ OPTION B ══ */
+let obShowAll=true;
+function obFilter(mode,el){
+  document.querySelectorAll('.ob-filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  obShowAll=(mode==='all');
+  obRender();
+}
+
+function obRender(){
+  const cats=['cve','policy','behaviour','renewal'];
+  const cols=document.getElementById('ob-cols');
+  cols.innerHTML=cats.map(cat=>{
+    const items = obShowAll ? ALERTS.filter(a=>a.cat===cat) : ALERTS.filter(a=>a.cat===cat&&a.needs);
+    const needs=items.filter(a=>a.needs), other=items.filter(a=>!a.needs);
+    const cm=CAT_META[cat];
+    return `<div class="ob-col">
+      <div class="ob-col-head" style="border-top:3px solid ${cm.color};">
+        <div class="ob-col-title">${cm.label}</div>
+        <div class="ob-col-meta">${needsCount(cat)} critical · ${allCount(cat)-needsCount(cat)} other</div>
+      </div>
+      <div class="ob-col-body">
+        ${needs.length?`<div class="ob-sep-label" style="color:${cm.color};">Needs Attention</div>`:''}
+        ${needs.map(a=>`<div class="ob-card needs" onclick="obSelect('${a.id}')">
+          <div class="ob-card-header"><span class="sev-badge sev-${a.sev}">${a.sev}</span><span class="ob-card-time">${a.time}</span></div>
+          <div class="ob-card-title">${a.title}</div>
+          <div class="ob-card-body">${a.body.substring(0,90)}…</div>
+          <div class="ob-card-actions"><button class="ob-act-btn">${a.action}</button><button class="ob-act-ghost">Snooze</button></div>
+        </div>`).join('')}
+        ${(!obShowAll||!other.length)?'':(`<div class="ob-sep-label">Other</div>`+
+        other.map(a=>`<div class="ob-card other" onclick="obSelect('${a.id}')">
+          <div class="ob-card-header"><span class="sev-badge" style="background:#e4e7ec;color:#4a618f;">${a.sev}</span><span class="ob-card-time">${a.time}</span></div>
+          <div class="ob-card-title">${a.title}</div>
+          <div class="ob-card-body">${a.body.substring(0,80)}…</div>
+        </div>`).join(''))}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function obSelect(id){
+  // In B, clicking shows an overlay/detail - simplified here as alert
+  const a=ALERTS.find(x=>x.id===id);
+  if(a) {
+    // Show in a simple lightbox overlay
+    let overlay=document.getElementById('b-overlay');
+    if(!overlay){ overlay=document.createElement('div'); overlay.id='b-overlay';
+      overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:flex;align-items:center;justify-content:center;';
+      overlay.onclick=function(e){if(e.target===overlay)overlay.remove();};
+      document.body.appendChild(overlay); }
+    overlay.innerHTML=`<div style="background:#fff;border-radius:10px;width:460px;max-height:80vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.2);">
+      <div class="detail-head"><div class="detail-tags"><span class="cat-tag cat-${a.cat}">${CAT_META[a.cat].label}</span><span class="sev-badge sev-${a.sev}">${a.sev}</span></div>
+      <div class="detail-title">${a.title}</div><div class="detail-time">${a.time}</div></div>
+      <div class="detail-section"><div class="detail-sec-label">Summary</div><div class="detail-meta">${a.body}</div></div>
+      <div class="detail-section"><div class="detail-sec-label">✦ SAMI Analysis</div><div class="detail-sami"><strong>SAMI recommends:</strong> ${a.sami}</div></div>
+      <div class="detail-section"><div class="detail-sec-label">Scope</div><div class="detail-meta"><div><strong>Tenants:</strong> ${a.tenants}</div><div><strong>Devices:</strong> ${a.devices}</div></div></div>
+      <div class="detail-actions"><button class="btn-primary">${a.action}</button><button class="btn-ghost" onclick="document.getElementById('b-overlay').remove()">Close</button></div>
+    </div>`;
+  }
+}
+
+/* ══ OPTION C ══ */
+let ocCat='all';
+function ocFilter(cat,el){
+  ocCat=cat;
+  document.querySelectorAll('.oc-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  ocRender();
+}
+function ocRender(){
+  const attnOnly=document.getElementById('oc-attn-only').checked;
+  let items=ALERTS.filter(a=>ocCat==='all'||a.cat===ocCat);
+  if(attnOnly) items=items.filter(a=>a.needs);
+  const feed=document.getElementById('oc-feed');
+  const needs=items.filter(a=>a.needs), other=items.filter(a=>!a.needs);
+  let html='';
+  if(needs.length){ html+=`<div class="oc-section-sep">Needs Attention — ${needs.length}</div>`; }
+  html+=needs.map(a=>`<div class="oc-row" data-cat="${a.cat}" data-id="${a.id}" onclick="ocSelect('${a.id}',this)">
+    <div class="oc-row-left">
+      <div class="oc-row-header"><span class="cat-tag cat-${a.cat}">${CAT_META[a.cat].label}</span><span class="sev-badge sev-${a.sev}">${a.sev}</span></div>
+      <div class="oc-row-title">${a.title}</div>
+      <div class="oc-row-body">${a.body.substring(0,110)}…</div>
+    </div>
+    <div class="oc-row-right"><span class="oc-row-time">${a.time}</span><button class="oc-row-act">${a.action}</button></div>
+  </div>`).join('');
+  if(!attnOnly && other.length){
+    html+=`<div class="oc-section-sep">Other — ${other.length}</div>`;
+    html+=other.map(a=>`<div class="oc-row dimmed" data-cat="${a.cat}" data-id="${a.id}" onclick="ocSelect('${a.id}',this)">
+      <div class="oc-row-left">
+        <div class="oc-row-header"><span class="cat-tag cat-${a.cat}">${CAT_META[a.cat].label}</span><span style="font-size:10px;color:#888;">${a.sev}</span></div>
+        <div class="oc-row-title">${a.title}</div>
+        <div class="oc-row-body">${a.body.substring(0,90)}…</div>
+      </div>
+      <div class="oc-row-right"><span class="oc-row-time">${a.time}</span></div>
+    </div>`).join('');
+  }
+  feed.innerHTML=html;
+  renderDetailPanel(null, document.getElementById('oc-detail'));
+}
+function ocSelect(id,el){
+  document.querySelectorAll('.oc-row').forEach(r=>r.classList.remove('active'));
+  el.classList.add('active');
+  renderDetailPanel(id, document.getElementById('oc-detail'));
+}
+
+/* ══ OPTION D ══ */
+let odCat='cve', odSelected=null;
+function odSetTab(cat,el){
+  odCat=cat;
+  document.querySelectorAll('.od-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  odRenderList();
+  renderDetailPanel(null, document.getElementById('od-detail'));
+}
+function odRenderList(){
+  const items=ALERTS.filter(a=>a.cat===odCat);
+  const needs=items.filter(a=>a.needs), other=items.filter(a=>!a.needs);
+  let html='';
+  if(needs.length) html+=`<div style="padding:6px 20px 2px;font-size:9.5px;font-weight:800;letter-spacing:.6px;color:#c70f0f;text-transform:uppercase;">Needs Attention — ${needs.length}</div>`;
+  html+=needs.map(a=>`<div class="od-row needs" onclick="odSelect('${a.id}',this)">
+    <div class="od-row-header"><span class="sev-badge sev-${a.sev}">${a.sev}</span><span class="od-row-time">${a.time}</span></div>
+    <div class="od-row-title">${a.title}</div>
+    <div class="od-row-body">${a.body.substring(0,110)}…</div>
+    <div class="od-row-footer"><button class="btn-primary" style="font-size:11px;padding:4px 10px;">${a.action}</button><button class="btn-ghost" style="font-size:11px;padding:4px 10px;">Snooze</button></div>
+  </div>`).join('');
+  if(other.length) html+=`<div style="padding:6px 20px 2px;margin-top:4px;font-size:9.5px;font-weight:800;letter-spacing:.6px;color:#888;text-transform:uppercase;border-top:1px solid #eef0f4;">Other — ${other.length}</div>`;
+  html+=other.map(a=>`<div class="od-row" style="opacity:.7;" onclick="odSelect('${a.id}',this)">
+    <div class="od-row-header"><span style="font-size:10px;color:#888;font-weight:600;">${a.sev}</span><span class="od-row-time">${a.time}</span></div>
+    <div class="od-row-title">${a.title}</div>
+    <div class="od-row-body">${a.body.substring(0,90)}…</div>
+  </div>`).join('');
+  document.getElementById('od-list').innerHTML=html;
+}
+function odSelect(id,el){
+  document.querySelectorAll('.od-row').forEach(r=>r.classList.remove('active'));
+  el.classList.add('active');
+  odSelected=id;
+  renderDetailPanel(id, document.getElementById('od-detail'));
+}
+
+/* ── INIT ── */
+window.onload = function(){
+  // Option A
+  const allNeeds=ALERTS.filter(a=>a.needs);
+  oaRenderList(allNeeds,'all');
+  renderDetailPanel(null,document.getElementById('oa-detail'));
+
+  // Option B
+  obRender();
+
+  // Option C
+  ocRender();
+
+  // Option D — critical strip
+  const critCards=ALERTS.filter(a=>a.needs);
+  document.getElementById('od-strip-count').textContent=critCards.length;
+  document.getElementById('od-strip-scroll').innerHTML=critCards.map(a=>`
+    <div class="od-crit-card" onclick="odCritClick('${a.id}',this)">
+      <div class="od-crit-card-header"><span class="cat-tag cat-${a.cat}">${CAT_META[a.cat].label}</span><span class="sev-badge sev-${a.sev}">${a.sev}</span></div>
+      <div class="od-crit-title">${a.title}</div>
+      <button class="od-crit-action">${a.action}</button>
+    </div>`).join('');
+  odRenderList();
+  renderDetailPanel(null,document.getElementById('od-detail'));
+};
+
+function odCritClick(id,el){
+  document.querySelectorAll('.od-crit-card').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  // switch tab to match cat
+  const a=ALERTS.find(x=>x.id===id);
+  document.querySelectorAll('.od-tab').forEach(t=>{
+    t.classList.remove('active');
+    if(t.textContent.toLowerCase().includes(a.cat.substring(0,3))) t.classList.add('active');
+  });
+  odCat=a.cat; odRenderList();
+  renderDetailPanel(id,document.getElementById('od-detail'));
+}
+</script>
+</body>
+</html>

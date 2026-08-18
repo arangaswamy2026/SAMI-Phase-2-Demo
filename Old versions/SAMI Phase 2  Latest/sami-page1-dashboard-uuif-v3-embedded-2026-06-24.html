@@ -1,0 +1,4120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NSM Dashboard — SAMI Activation · UUIF 9.2</title>
+<!--
+  Design System Version: UUIF 9.2
+  Component Tokens Used: --uuif-brand-navy, --uuif-brand-orange, --uuif-brand-blue,
+    --uuif-brand-green, --uuif-brand-red, --uuif-brand-yellow,
+    --uuif-surface-container, --uuif-surface-bg, --uuif-surface-primary,
+    --uuif-surface-model, --uuif-surface-tertiary, --uuif-surface-selected,
+    --uuif-text-primary, --uuif-text-secondary, --uuif-text-contrast,
+    --uuif-text-hover, --uuif-text-disabled, --uuif-text-highlight,
+    --uuif-border-primary, --uuif-border-secondary, --uuif-border-tertiary,
+    --uuif-border-transparent,
+    --uuif-fill-blue-lightest, --uuif-fill-green-xxx-lighter,
+    --uuif-fill-yellow-xxx-lighter, --uuif-fill-red-lightest,
+    --uuif-shadow-sm, --uuif-shadow-md,
+    --uuif-radius-4, --uuif-radius-6, --uuif-radius-8, --uuif-radius-pill
+  Components Used: uuif-btn-primary, uuif-btn-secondary, uuif-btn-ghost,
+    uuif-btn-icon, uuif-chip, uuif-tabs, uuif-count-block,
+    uuif-dashboard-card, uuif-action-bar, uuif-confirm-dialog-success
+  Gaps Flagged: None
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
+<style>
+/* ─── UUIF 9.2 Token Definitions ─── */
+:root {
+  --uuif-brand-navy:              #001b50;
+  --uuif-brand-blue:              #1f3c73;
+  --uuif-brand-orange:            #ff5d00;
+  --uuif-brand-green:             #59a02e;
+  --uuif-brand-red:               #c70f0f;
+  --uuif-brand-yellow:            #f3ac3d;
+  --uuif-surface-container:       #ffffff;
+  --uuif-surface-bg:              #fafafa;
+  --uuif-surface-primary:         #5b74a7;
+  --uuif-surface-secondary:       #d2dff2;
+  --uuif-surface-tertiary:        #f6f8fe;
+  --uuif-surface-highlight:       #ff5d00;
+  --uuif-surface-hover:           rgba(17,17,17,0.06);
+  --uuif-surface-selected:        rgba(255,72,26,0.09);
+  --uuif-surface-disabled:        #e8eff9;
+  --uuif-surface-contrast:        #111315;
+  --uuif-surface-model:           #f0f2f5;
+  --uuif-text-primary:            #191c25;
+  --uuif-text-secondary:          #4a618f;
+  --uuif-text-tertiary:           #888888;
+  --uuif-text-contrast:           #ffffff;
+  --uuif-text-disabled:           rgba(17,17,17,0.3);
+  --uuif-text-hover:              #ff5d00;
+  --uuif-text-selected:           #ffffff;
+  --uuif-text-highlight:          #0c2b67;
+  --uuif-border-primary:          #ff5d00;
+  --uuif-border-secondary:        #78a3e5;
+  --uuif-border-tertiary:         #cccccc;
+  --uuif-border-transparent:      rgba(17,17,17,0.09);
+  --uuif-border-disabled:         #d2dff2;
+  --uuif-border-hover:            #ff5d00;
+  --uuif-icon-primary:            #5885cc;
+  --uuif-icon-secondary:          #9dafd3;
+  --uuif-icon-tertiary:           #62686d;
+  --uuif-fill-blue-lightest:      #f6f8fe;
+  --uuif-fill-green-xxx-lighter:  #e3efdc;
+  --uuif-fill-yellow-xxx-lighter: #ffe9be;
+  --uuif-fill-red-lightest:       #fff0f0;
+  --uuif-fill-green-x-darker:     #478234;
+  --uuif-shadow-sm:               0px 1px 6px 2px rgba(0,0,0,0.12);
+  --uuif-shadow-md:               0px 4px 12px 0px rgba(0,0,0,0.16);
+  --uuif-radius-4:                4px;
+  --uuif-radius-6:                6px;
+  --uuif-radius-8:                8px;
+  --uuif-radius-12:               12px;
+  --uuif-radius-22:               22px;
+  --uuif-radius-pill:             88px;
+
+  /* ─── Variable aliases used by the Notifications section (UM landing page tokens) ─── */
+  --bg:                var(--uuif-surface-bg);
+  --white:             var(--uuif-surface-container);
+  --border:            var(--uuif-border-tertiary);
+  --font:              'Nunito Sans', sans-serif;
+  --radius:            var(--uuif-radius-6);
+  --radius-lg:         var(--uuif-radius-8);
+  --red:               var(--uuif-brand-red);
+  --orange:            var(--uuif-brand-orange);
+  --warning:           #f59e0b;
+  --link:              #1e6fe8;
+  --sami-purple:       #6b46c1;
+  --sami-purple-bg:    #f5f3ff;
+  --sami-purple-border:#e0d7fd;
+  --behavioral-blue:   #2563eb;
+  --behavioral-bg:     #e6efff;
+  --policy-green:      #10b981;
+  --policy-green-bg:   #e8f7f0;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  overflow-x: hidden;
+}
+
+body {
+  font-family: 'Nunito Sans', sans-serif;
+  background: var(--uuif-surface-bg);
+  color: var(--uuif-text-primary);
+  font-size: 13px;
+}
+
+/* ═══════════════════════════════════
+   PRIMARY NAV RAIL — 60px  (UUIF §6)
+═══════════════════════════════════ */
+.primary-nav {
+  position: fixed; left: 0; top: 0;
+  width: 60px; height: 100vh;
+  background: var(--uuif-brand-navy);
+  display: flex; flex-direction: column;
+  align-items: center;
+  z-index: 100;
+}
+
+/* Logo area: 32×32 swoosh, padding 12px 14px */
+.nav-logo {
+  width: 60px; height: 52px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 12px 14px; flex-shrink: 0;
+}
+
+.nav-item {
+  width: 60px; height: 52px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; position: relative; flex-shrink: 0;
+}
+.nav-item:hover { background: rgba(17,17,17,0.2); }
+.nav-item.active {
+  background: linear-gradient(90deg, rgba(17,17,17,1), rgba(17,17,17,1));
+}
+.nav-item.active::before {
+  content: '';
+  position: absolute; left: 1px; top: 0; bottom: 0;
+  width: 2px; background: var(--uuif-brand-orange);
+}
+/* Default icon fill: #D2DFF2 · Active: #FF5D00 */
+.nav-item svg { width: 28px; height: 28px; color: #D2DFF2; }
+.nav-item.active svg { color: #FF5D00; }
+.nav-item:hover svg { color: rgba(255,255,255,0.8); }
+
+/* Badge on nav item */
+.nav-badge {
+  position: absolute; top: 8px; right: 8px;
+  background: var(--uuif-brand-orange); color: #fff;
+  font-size: 9px; font-weight: 700; border-radius: 8px;
+  min-width: 16px; height: 16px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 3px; font-family: 'Nunito Sans', sans-serif;
+}
+
+.nav-divider {
+  width: 100%; height: 0;
+  border-top: 0.5px solid rgba(255,255,255,0.15);
+  margin: 2px 0; flex-shrink: 0;
+}
+
+.nav-spacer { flex: 1; }
+
+/* ═══════════════════════════════════
+   TITLE BAR — 48px  (UUIF §6 Title Bar)
+═══════════════════════════════════ */
+.title-bar {
+  position: fixed; left: 60px; right: 0; top: 0; height: 48px;
+  background: var(--uuif-surface-container);
+  border-bottom: 1px solid rgba(17,17,17,0.09);
+  display: flex; align-items: center; padding: 0 20px; z-index: 99; gap: 0;
+  overflow: hidden; width: calc(100vw - 60px); box-sizing: border-box;
+}
+
+/* Breadcrumb: Nunito Medium 14px #5b74a7 */
+.breadcrumb {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 14px; font-weight: 500;
+  color: var(--uuif-text-secondary);
+  flex: 1; min-width: 0; overflow: hidden;
+  padding: 0 8px 0 0;
+}
+.breadcrumb-current { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.breadcrumb a { color: var(--uuif-text-secondary); text-decoration: none; }
+.breadcrumb a:hover { color: var(--uuif-text-hover); }
+.breadcrumb-sep { color: var(--uuif-text-disabled); font-size: 12px; }
+.breadcrumb-current { color: var(--uuif-text-primary); font-weight: 700; font-size: 14px; }
+
+/* Scope Selector: centered in title bar via absolute position */
+.scope-selector {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 6px;
+  border: 1px solid var(--uuif-border-tertiary);
+  border-radius: var(--uuif-radius-4);
+  padding: 0 10px; width: 240px; height: 29px;
+  font-size: 13px; cursor: pointer;
+  background: var(--uuif-surface-container);
+  color: var(--uuif-text-primary);
+  pointer-events: auto;
+}
+.scope-selector:hover { border-color: var(--uuif-border-secondary); }
+.scope-selector .scope-dot {
+  width: 8px; height: 8px;
+  background: var(--uuif-brand-orange); border-radius: 50%; flex-shrink: 0;
+}
+.scope-selector svg { color: var(--uuif-text-tertiary); flex-shrink: 0; }
+
+/* Title bar icon buttons: 48×48px hit area, 20px icon, opacity 0.65 */
+.title-bar-icons { display: flex; align-items: center; gap: 0; flex-shrink: 0; }
+.title-bar-icon {
+  width: 48px; height: 48px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; opacity: 0.65; position: relative;
+  color: var(--uuif-text-secondary);
+}
+.title-bar-icon:hover { opacity: 1; }
+.title-bar-icon svg { width: 20px; height: 20px; }
+.notif-badge {
+  position: absolute; top: 11px; right: 11px;
+  width: 7px; height: 7px;
+  background: #ec682c; border-radius: 50%;
+}
+
+/* Avatar: 29×29px circle */
+.avatar-wrap { display: flex; align-items: center; gap: 6px; padding: 0 8px; }
+.avatar {
+  width: 29px; height: 29px; border-radius: 50%;
+  background: var(--uuif-surface-primary); color: var(--uuif-text-contrast);
+  font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.avatar-caret { font-size: 10px; color: #888; }
+
+/* ═══════════════════════════════════
+   PAGE SHELL
+═══════════════════════════════════ */
+.page {
+  margin-left: 60px; padding-top: 48px; min-height: 100vh; overflow-x: hidden;
+  transition: margin-right 0.28s cubic-bezier(0.4,0,0.2,1);
+}
+/* When the embedded SAMI pane is open, content reflows to make room for it */
+body.sami-pane-open .page { margin-right: 390px; }
+.page-content { padding: 16px 20px; max-width: 100%; overflow-x: hidden; }
+
+/* ═══════════════════════════════════
+   PRODUCT OVERVIEW ROW
+═══════════════════════════════════ */
+.overview-row {
+  display: flex; gap: 12px; margin-bottom: 16px; align-items: flex-start;
+}
+/* Left: product section panel */
+.product-section {
+  flex: 1;
+  min-width: 0;                    /* allow the section to shrink so the row reflows */
+  background: var(--uuif-surface-container);
+  border: 1px solid rgba(17,17,17,0.09);
+  border-radius: var(--uuif-radius-6);
+  padding: 12px 14px;
+}
+.ps-title {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  color: var(--uuif-text-tertiary); letter-spacing: 0.06em; margin-bottom: 2px;
+}
+.ps-sub {
+  font-size: 11px; color: var(--uuif-text-disabled); margin-bottom: 10px;
+}
+
+/* Product card carousel */
+.product-card-row { display: flex; align-items: center; gap: 8px; }
+.product-cards { display: flex; gap: 8px; flex: 1; min-width: 0; overflow: hidden; }
+
+/* uuif-btn-icon: 29×29px, radius 6px */
+.uuif-btn-icon {
+  width: 29px; height: 29px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--uuif-surface-container);
+  border: 1px solid var(--uuif-border-tertiary);
+  border-radius: var(--uuif-radius-6);
+  cursor: pointer; color: var(--uuif-text-secondary);
+}
+.uuif-btn-icon:hover {
+  border-color: var(--uuif-border-primary);
+  color: var(--uuif-text-hover);
+}
+.uuif-btn-icon svg { width: 14px; height: 14px; }
+
+/* Individual product card: UUIF dashboard-card style */
+.product-card {
+  background: var(--uuif-surface-container);
+  border: 1px solid rgba(17,17,17,0.09);
+  border-radius: var(--uuif-radius-6);
+  padding: 10px 12px; min-width: 144px; flex-shrink: 0;
+}
+.pc-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  color: var(--uuif-text-secondary); letter-spacing: 0.05em; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 5px;
+}
+.pc-label svg { color: var(--uuif-icon-secondary); }
+/* Count: Archivo Bold 20px style (using Nunito Bold 22px as closest) */
+.pc-count {
+  font-weight: 800; font-size: 22px; color: var(--uuif-text-primary);
+  line-height: 1; margin-bottom: 4px;
+}
+.pc-sublabel { font-size: 11px; color: var(--uuif-text-tertiary); margin-bottom: 5px; }
+.pc-attention {
+  font-size: 11px; color: var(--uuif-text-tertiary);
+}
+.pc-attention .warn {
+  color: var(--uuif-brand-orange); font-weight: 700;
+}
+.pc-attention .eol {
+  color: var(--uuif-text-tertiary); font-weight: 600;
+}
+.pc-learn-btn {
+  display: inline-flex; align-items: center;
+  border: 1px solid var(--uuif-border-tertiary);
+  border-radius: var(--uuif-radius-4);
+  padding: 3px 10px; font-size: 11px;
+  color: var(--uuif-text-secondary); cursor: pointer;
+  background: var(--uuif-surface-container); margin-top: 4px;
+  font-family: 'Nunito Sans', sans-serif;
+}
+.pc-learn-btn:hover { border-color: var(--uuif-border-primary); color: var(--uuif-text-hover); }
+.pc-coming-soon { color: var(--uuif-brand-orange); font-size: 11px; font-weight: 600; }
+
+/* Right: Org Summary dark card */
+.org-summary {
+  background: var(--uuif-brand-navy);
+  color: var(--uuif-text-contrast);
+  border-radius: var(--uuif-radius-8);
+  padding: 14px 16px; min-width: 184px;
+}
+.os-title {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--uuif-surface-secondary);
+  margin-bottom: 12px;
+}
+.os-stat-label {
+  font-size: 10px; color: var(--uuif-surface-secondary);
+  text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 2px;
+}
+.os-stat-val {
+  font-weight: 800; font-size: 28px; line-height: 1;
+  margin-bottom: 10px; color: var(--uuif-text-contrast);
+}
+/* Create Tenant button — secondary style on dark bg */
+.os-btn {
+  width: 100%; padding: 7px 0; margin-top: 4px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: var(--uuif-radius-pill);
+  color: var(--uuif-text-contrast);
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 12px; cursor: pointer;
+}
+.os-btn:hover {
+  background: rgba(255,255,255,0.18);
+  border-color: rgba(255,255,255,0.35);
+}
+
+/* ═══════════════════════════════════
+   SAMI TABS — 1st Level (UUIF §8)
+═══════════════════════════════════ */
+.uuif-tabs {
+  background: var(--uuif-surface-container);
+  border-bottom: 2px solid var(--uuif-border-primary);
+  padding: 0 20px;
+  display: flex; gap: 0; margin-bottom: 14px;
+}
+.uuif-tab {
+  height: 40px;
+  display: flex; align-items: center;
+  padding: 0 16px;
+  font-size: 14px; font-weight: 400;
+  color: var(--uuif-text-secondary);
+  cursor: pointer; white-space: nowrap;
+  border: 1px solid transparent; border-bottom: none;
+  border-radius: var(--uuif-radius-6) var(--uuif-radius-6) 0 0;
+  position: relative; margin-bottom: -2px;
+  user-select: none;
+}
+.uuif-tab:hover { color: var(--uuif-text-hover); }
+.uuif-tab.active {
+  font-weight: 700; color: var(--uuif-text-hover);
+  background: var(--uuif-surface-container);
+  border-color: var(--uuif-border-primary);
+}
+
+/* ═══════════════════════════════════
+   ASK SAMI INPUT BAR
+═══════════════════════════════════ */
+.ask-sami-wrap {
+  display: flex; justify-content: center; margin-bottom: 18px;
+}
+.ask-sami {
+  display: flex; align-items: center; gap: 8px;
+  border: 1.5px solid rgba(255,255,255,0.7);
+  border-radius: var(--uuif-radius-pill);
+  padding: 8px 16px; width: 560px;
+  background: rgba(255,255,255,0.78);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+.ask-sami:focus-within {
+  border-color: var(--uuif-border-primary);
+  box-shadow: 0 0 0 3px rgba(255,93,0,0.08);
+}
+.sami-spark {
+  color: var(--uuif-brand-orange); font-size: 15px; flex-shrink: 0;
+}
+.ask-sami input {
+  border: none; outline: none; flex: 1;
+  font-size: 13px; color: var(--uuif-text-primary);
+  background: transparent;
+  font-family: 'Nunito Sans', sans-serif;
+}
+.ask-sami input::placeholder { color: var(--uuif-text-disabled); }
+.kbd {
+  font-size: 10px; color: var(--uuif-text-tertiary);
+  background: var(--uuif-surface-model);
+  border: 1px solid var(--uuif-border-tertiary);
+  border-radius: var(--uuif-radius-4);
+  padding: 2px 5px; font-family: monospace;
+}
+
+/* ═══════════════════════════════════
+   DAY-0 EMPTY STATE
+═══════════════════════════════════ */
+.day0-empty {
+  background: rgba(255,255,255,0.82);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: var(--uuif-radius-8);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; gap: 0; overflow: hidden;
+  min-height: calc(100vh - 290px);
+  padding: 48px 24px;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.07);
+}
+.day0-empty.exiting {
+  opacity: 0; transform: translateY(-8px); pointer-events: none;
+}
+
+/* Top illustration panel */
+.day0-illus {
+  flex: none; width: 340px; height: 240px; padding: 24px;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--uuif-fill-blue-lightest) 0%, #eef2fb 100%);
+  border: 1px solid rgba(17,17,17,0.07);
+  border-radius: var(--uuif-radius-8);
+  margin-bottom: 28px;
+  position: relative; overflow: hidden;
+}
+
+/* Body */
+.day0-body { padding: 0; max-width: 600px; }
+
+/* Eyebrow badge */
+.day0-eyebrow {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--uuif-surface-selected);
+  border: 1px solid rgba(255,93,0,0.25);
+  border-radius: var(--uuif-radius-pill);
+  padding: 5px 14px; margin-bottom: 16px;
+  font-size: 11px; font-weight: 700;
+  color: var(--uuif-brand-orange); letter-spacing: 0.04em;
+}
+.e-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--uuif-brand-orange);
+  animation: edot-pulse 1.8s ease-in-out infinite;
+}
+@keyframes edot-pulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:0.4; transform:scale(0.7); }
+}
+
+.day0-headline {
+  font-size: 28px; font-weight: 800;
+  color: var(--uuif-text-primary); line-height: 1.25; margin-bottom: 12px;
+}
+.day0-headline span { color: var(--uuif-brand-orange); }
+
+.day0-sub {
+  font-size: 14px; color: var(--uuif-text-secondary);
+  line-height: 1.6; margin: 0 auto 24px; max-width: 520px;
+}
+
+/* Benefit pills — UUIF chip style */
+.day0-benefits { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+.benefit-pill {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--uuif-surface-container);
+  border: 1px solid rgba(17,17,17,0.09);
+  border-radius: var(--uuif-radius-pill);
+  padding: 4px 10px 4px 6px;
+  font-size: 11px; color: var(--uuif-text-secondary); white-space: nowrap;
+}
+.bp-icon {
+  width: 18px; height: 18px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+
+/* CTAs row */
+.day0-ctas { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; }
+
+/* Activate button — uuif-btn-primary but with orange (brand highlight) */
+.btn-activate {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--uuif-brand-orange);
+  border: 1px solid transparent;
+  color: var(--uuif-text-contrast);
+  border-radius: var(--uuif-radius-pill);
+  padding: 11px 28px;
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 15px; font-weight: 700; cursor: pointer;
+  box-shadow: 0 2px 8px rgba(255,93,0,0.28);
+  letter-spacing: 0.1px;
+  transition: box-shadow 0.2s, transform 0.15s;
+}
+.btn-activate:hover {
+  box-shadow: 0 4px 14px rgba(255,93,0,0.38); transform: translateY(-1px);
+}
+.btn-activate.scanning {
+  background: var(--uuif-brand-navy); cursor: not-allowed;
+  box-shadow: none; transform: none;
+}
+.btn-activate.done {
+  background: var(--uuif-brand-green);
+  box-shadow: 0 2px 8px rgba(89,160,46,0.3);
+}
+.btn-activate.done:hover {
+  box-shadow: 0 4px 14px rgba(89,160,46,0.4);
+}
+
+.btn-learn {
+  font-size: 11.5px; color: var(--uuif-text-secondary);
+  background: none; border: none; cursor: pointer;
+  text-decoration: underline; text-underline-offset: 2px;
+  font-family: 'Nunito Sans', sans-serif;
+}
+.btn-learn:hover { color: var(--uuif-text-hover); }
+
+/* ═══════════════════════════════════
+   SCAN OVERLAY  (kept from original, colors remapped)
+═══════════════════════════════════ */
+.scan-overlay {
+  position: absolute; inset: 0;
+  background: rgba(0,12,32,0.78);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 10px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.scan-overlay.visible { opacity: 1; pointer-events: auto; }
+
+.scan-line {
+  position: absolute; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--uuif-brand-orange) 20%, #ff8c50 50%, var(--uuif-brand-orange) 80%, transparent 100%);
+  box-shadow: 0 0 10px 3px rgba(255,93,0,0.5);
+  top: 0; animation: none;
+}
+.scan-line.sweeping { animation: scanSweep 1.6s ease-in-out infinite; }
+@keyframes scanSweep {
+  0%   { top: 0%; opacity: 0; }
+  5%   { opacity: 1; }
+  95%  { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+.scan-center {
+  display: flex; flex-direction: column; align-items: center; gap: 6px; z-index: 2;
+}
+.scan-shield-icon {
+  width: 40px; height: 40px;
+  animation: shieldPulse 0.8s ease-in-out infinite alternate;
+}
+@keyframes shieldPulse {
+  from { filter: drop-shadow(0 0 4px rgba(255,93,0,0.4)); }
+  to   { filter: drop-shadow(0 0 12px rgba(255,93,0,0.9)); }
+}
+
+.scan-label {
+  font-size: 11px; font-weight: 700; color: var(--uuif-brand-orange);
+  letter-spacing: 0.5px; text-transform: uppercase;
+  font-family: 'Nunito Sans', sans-serif;
+}
+.scan-counter {
+  font-size: 22px; font-weight: 800; color: var(--uuif-text-contrast);
+  font-family: 'Nunito Sans', sans-serif; line-height: 1; letter-spacing: -0.5px;
+}
+.scan-counter span { font-size: 11px; font-weight: 400; color: var(--uuif-surface-secondary); margin-left: 2px; }
+.scan-sub-text {
+  font-size: 10px; color: var(--uuif-icon-secondary);
+  font-family: 'Nunito Sans', sans-serif;
+}
+
+.scan-progress-wrap {
+  position: absolute; bottom: 12px; left: 16px; right: 16px;
+  background: rgba(255,255,255,0.1); border-radius: var(--uuif-radius-pill);
+  height: 3px; overflow: hidden;
+}
+.scan-progress-bar {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--uuif-brand-orange), #ff8c50);
+  border-radius: var(--uuif-radius-pill);
+  transition: width linear;
+}
+
+/* Success flash overlay */
+.success-overlay {
+  position: absolute; inset: 0;
+  background: rgba(0,12,32,0.85);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 8px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+.success-overlay.visible { opacity: 1; }
+
+.success-check {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: var(--uuif-brand-green);
+  display: flex; align-items: center; justify-content: center;
+  animation: checkPop 0.4s cubic-bezier(0.17,0.89,0.32,1.28);
+}
+@keyframes checkPop {
+  0%   { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.success-text {
+  font-size: 11px; font-weight: 700; color: #4ade80;
+  font-family: 'Nunito Sans', sans-serif;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.success-subtext {
+  font-size: 9.5px; color: var(--uuif-icon-secondary);
+  font-family: 'Nunito Sans', sans-serif;
+}
+
+/* Spinner */
+.spin-icon { animation: spinAnim 0.8s linear infinite; }
+@keyframes spinAnim { to { transform: rotate(360deg); } }
+
+/* ─── SAMI Section Wrap — North Star gradient background ─── */
+.sami-section-wrap {
+  background: #E6EEF6;
+  border: 1px solid rgba(17,17,17,0.09);
+  border-radius: var(--uuif-radius-6);
+  margin-bottom: 0; overflow: hidden;
+  margin-top: 12px;
+  padding: 16px 16px 0;
+  position: relative;
+}
+/* North Star ellipse blobs — blue (top-right) and orange (top-left) */
+.sami-section-wrap::before,
+.sami-section-wrap::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  z-index: 0;
+}
+/* Blue blob — top-right */
+.sami-section-wrap::before {
+  right: -180px; top: -220px;
+  width: 700px; height: 560px;
+  background: radial-gradient(ellipse at center, #B7E4FB 0%, #00AAFF 100%);
+  opacity: 0.18;
+  filter: blur(70px);
+}
+/* Orange/peach blob — top-left */
+.sami-section-wrap::after {
+  left: -180px; top: -210px;
+  width: 700px; height: 560px;
+  background: radial-gradient(ellipse at 30% 40%, #FF3700 0%, #FF7956 100%);
+  opacity: 0.14;
+  filter: blur(70px);
+}
+.sami-section-tabs {
+  margin: 0 !important;
+  padding: 0 !important;
+  border-bottom: 1px solid var(--uuif-border-primary) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  position: relative; z-index: 1;
+}
+/* Active tab blends into the gradient background */
+.sami-section-tabs .uuif-tab.active {
+  background: #E6EEF6;
+}
+.sami-section-body {
+  padding: 14px 0 16px;
+  position: relative; z-index: 1;
+}
+/* Notifications pane keeps a clean white card feel over the gradient */
+#pane-notifications {
+  background: rgba(255,255,255,0.7);
+  border-radius: var(--uuif-radius-6);
+  backdrop-filter: blur(4px);
+}
+
+/* ═══════════════════════════════════
+   ACTIVATED STATE
+═══════════════════════════════════ */
+#sami-container { position: relative; }
+.day0-empty { transition: opacity 0.5s ease, transform 0.5s ease; }
+
+#sami-active {
+  display: none; opacity: 0; transform: translateY(10px);
+  flex-direction: column;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+#sami-active.entering { display: flex; opacity: 0; transform: translateY(10px); }
+#sami-active.visible  { opacity: 1; transform: translateY(0); }
+
+/* ─── SAMI Active Hero Banner ─── */
+.sami-hero {
+  background: linear-gradient(135deg, #001b50 0%, #0d2d6b 40%, #1a3a7a 70%, #0a1f4a 100%);
+  border-radius: var(--uuif-radius-8);
+  padding: 20px 24px 18px;
+  margin-bottom: 14px;
+  position: relative;
+  overflow: hidden;
+}
+.sami-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 30% 50%, rgba(255,93,0,0.12) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 20%, rgba(88,133,204,0.15) 0%, transparent 50%);
+  pointer-events: none;
+}
+.sami-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 20px;
+  position: relative; z-index: 1;
+}
+.sami-hero-left {}
+.sami-hero-greeting {
+  font-size: 22px; font-weight: 800;
+  color: #ffffff; margin-bottom: 5px; line-height: 1.2;
+}
+.sami-hero-greeting span { color: var(--uuif-brand-orange); }
+.sami-hero-sub {
+  font-size: 12px; color: rgba(210,223,242,0.85);
+  display: flex; align-items: center; gap: 6px;
+}
+.sami-hero-live-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 0 0 rgba(74,222,128,0.4);
+  animation: heroPulse 2s ease-in-out infinite; flex-shrink: 0;
+}
+@keyframes heroPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(74,222,128,0.4); }
+  50%      { box-shadow: 0 0 0 5px rgba(74,222,128,0); }
+}
+.sami-hero-count {
+  font-weight: 800; color: #ffffff;
+}
+.sami-hero-ask {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: var(--uuif-radius-pill);
+  padding: 7px 14px; margin-top: 14px;
+  width: 480px; max-width: 100%;
+  backdrop-filter: blur(4px);
+}
+.sami-hero-ask:focus-within {
+  border-color: var(--uuif-brand-orange);
+  background: rgba(255,255,255,0.12);
+}
+.sami-hero-ask input {
+  border: none; outline: none; flex: 1;
+  font-size: 12.5px; color: rgba(255,255,255,0.9);
+  background: transparent;
+  font-family: 'Nunito Sans', sans-serif;
+}
+.sami-hero-ask input::placeholder { color: rgba(210,223,242,0.5); }
+.sami-hero-ask-spark { color: var(--uuif-brand-orange); font-size: 14px; flex-shrink: 0; }
+.sami-hero-ask-kbd {
+  font-size: 9.5px; color: rgba(210,223,242,0.5);
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 3px;
+  padding: 1px 4px; font-family: monospace; flex-shrink: 0;
+}
+
+/* Hero right: KPI stat pills */
+.sami-hero-kpis {
+  display: flex; flex-direction: column; gap: 8px; flex-shrink: 0;
+}
+.sami-hero-kpi-row { display: flex; gap: 8px; }
+.sami-hero-kpi {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--uuif-radius-6);
+  padding: 8px 14px; min-width: 110px;
+  text-align: center;
+}
+.sami-hero-kpi-val {
+  font-size: 20px; font-weight: 800; line-height: 1; margin-bottom: 2px;
+}
+.sami-hero-kpi-label {
+  font-size: 9.5px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; color: rgba(210,223,242,0.7);
+}
+.kpi-orange { color: var(--uuif-brand-orange); }
+.kpi-red    { color: #f87171; }
+.kpi-blue   { color: #60a5fa; }
+.kpi-green  { color: #4ade80; }
+
+.sami-alert-grid {
+  display: flex; gap: 12px; align-items: flex-start;
+}
+
+/* ─── Alert card severity left rail ─── */
+.alert-card.sev-critical { border-left: 3px solid var(--uuif-brand-red); }
+.alert-card.sev-high     { border-left: 3px solid var(--uuif-brand-yellow); }
+.alert-card.sev-medium   { border-left: 3px solid var(--uuif-icon-primary); }
+
+/* ─── Mini bar chart in rec stats ─── */
+.rec-stat-card {
+  flex: 1;
+  background: rgba(255,255,255,0.82);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: var(--uuif-radius-12);
+  padding: 10px 12px;
+  display: flex; flex-direction: column; gap: 6px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+}
+.rec-stat-top {
+  display: flex; align-items: flex-start; justify-content: space-between;
+}
+.rec-stat-val {
+  font-weight: 800; font-size: 22px; line-height: 1;
+}
+.rec-stat-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--uuif-text-secondary);
+  margin-top: 2px;
+}
+.rec-mini-chart { display: flex; align-items: flex-end; gap: 2px; height: 30px; }
+.rec-mini-bar {
+  flex: 1; border-radius: 2px 2px 0 0; min-width: 4px;
+  opacity: 0.75; transition: opacity 0.2s;
+}
+.rec-mini-bar:hover { opacity: 1; }
+.rec-trend {
+  font-size: 10px; font-weight: 600;
+  display: flex; align-items: center; gap: 3px;
+}
+.rec-trend.up   { color: var(--uuif-brand-red); }
+.rec-trend.down { color: var(--uuif-brand-green); }
+
+/* ─── Active Banner — Status Info Banner (Success variant) ─── */
+.sami-active-banner {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--uuif-fill-green-xxx-lighter);
+  border: 1px solid var(--uuif-brand-green);
+  border-radius: var(--uuif-radius-6);
+  padding: 9px 14px; margin-bottom: 12px; width: 100%;
+  opacity: 0; transform: translateY(-6px);
+  transition: opacity 0.4s ease 0.3s, transform 0.4s ease 0.3s;
+  overflow: hidden; position: relative;
+}
+.sami-active-banner.visible   { opacity: 1; transform: translateY(0); }
+.sami-active-banner.dimissing {
+  opacity: 0; transform: translateY(-6px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  pointer-events: none;
+}
+
+/* 24×24px icon circle (UUIF Status Info Banner spec) */
+.sab-check {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--uuif-brand-green);
+  border: none;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.sab-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--uuif-brand-green);
+  animation: sabPulse 2s ease-in-out infinite; flex-shrink: 0;
+}
+@keyframes sabPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(89,160,46,0.3); }
+  50%      { box-shadow: 0 0 0 4px rgba(89,160,46,0); }
+}
+
+/* Title: 16px bold --uuif-text-secondary (UUIF banner spec) */
+.sab-text {
+  font-size: 13px; font-weight: 700;
+  color: var(--uuif-fill-green-x-darker);
+}
+.sab-sub {
+  font-size: 12px; color: var(--uuif-fill-green-x-darker); opacity: 0.8;
+}
+
+.sab-stat { margin-left: auto; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.sab-stat-item {
+  font-size: 11px; color: var(--uuif-fill-green-x-darker);
+  display: flex; align-items: center; gap: 4px;
+}
+.sab-stat-item strong { font-weight: 700; }
+
+.sab-dismiss {
+  width: 20px; height: 20px; border-radius: var(--uuif-radius-4); border: none;
+  background: transparent; cursor: pointer; color: var(--uuif-brand-green);
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.sab-dismiss:hover { background: rgba(89,160,46,0.2); }
+
+.sab-timer {
+  position: absolute; bottom: 0; left: 0;
+  height: 2px; background: var(--uuif-brand-green);
+  border-radius: 0 0 0 var(--uuif-radius-6);
+  width: 100%; animation: none;
+}
+.sab-timer.running { animation: timerDrain 4s linear forwards; }
+@keyframes timerDrain { from { width: 100%; } to { width: 0%; } }
+
+/* ─── Section header ─── */
+.section-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
+}
+/* Section title: Bold 16px UPPERCASE --uuif-text-primary (UUIF Title Pane spec) */
+.section-title {
+  font-size: 13px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--uuif-text-highlight);
+}
+.view-all {
+  font-size: 12px; color: var(--uuif-text-secondary); text-decoration: none;
+}
+.view-all:hover { color: var(--uuif-text-hover); text-decoration: underline; }
+
+/* ─── Alert / Rec columns ─── */
+.alert-col { flex: 1; }
+.rec-col   { flex: 1; }
+
+/* ─── Alert / Rec card — UUIF Dashboard Card spec ─── */
+/* Background: --uuif-surface-container · Border: --uuif-border-tertiary · Radius: --uuif-radius-6 */
+/* Header: --uuif-surface-model bg, --uuif-border-transparent bottom, 14px bold UPPERCASE title */
+/* Body: 10px padding · Footer: --uuif-border-transparent top, right-aligned actions */
+.alert-card, .rec-card {
+  background: rgba(255,255,255,0.82);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: var(--uuif-radius-6);
+  margin-bottom: 10px; overflow: hidden;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+}
+
+/* Card header bar — clean, no background */
+.card-header {
+  background: transparent;
+  border-bottom: 1px solid rgba(17,17,17,0.06);
+  padding: 9px 12px 8px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+/* Header title: 14px bold --uuif-text-highlight UPPERCASE */
+.card-header-title {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--uuif-text-highlight);
+  display: flex; align-items: center; gap: 6px;
+}
+/* Card body: 10px padding */
+.card-body { padding: 10px 12px; }
+/* Card footer: border-transparent top, right-aligned actions */
+.card-footer {
+  border-top: 1px solid var(--uuif-border-transparent);
+  padding: 8px 12px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+/* Alert / rec category — pill chip matching Recommendations page */
+.ac-type {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: rgba(17,17,17,0.05);
+  border-radius: var(--uuif-radius-pill);
+  padding: 2px 8px 2px 6px;
+  font-size: 10px; font-weight: 600;
+  color: var(--uuif-text-secondary);
+}
+.ac-type svg { width: 11px; height: 11px; flex-shrink: 0; color: var(--uuif-text-tertiary); }
+
+/* Needs Attention badge */
+.ac-needs-attn {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: rgba(199,15,15,0.07);
+  border: 1px solid rgba(199,15,15,0.22);
+  color: var(--uuif-brand-red);
+  font-size: 10px; font-weight: 700;
+  border-radius: var(--uuif-radius-pill);
+  padding: 2px 8px 2px 6px;
+}
+.ac-needs-attn svg { width: 10px; height: 10px; flex-shrink: 0; }
+
+.ac-time { font-size: 11px; color: var(--uuif-text-tertiary); }
+.ac-time-warning { color: var(--uuif-brand-yellow); font-weight: 600; font-size: 11px; }
+
+/* Card body title: 13px bold */
+.ac-title, .rc-title {
+  font-size: 13px; font-weight: 700;
+  color: var(--uuif-text-primary); margin-bottom: 8px; line-height: 1.4;
+}
+
+/* ══════════════════════════════════════
+   SAMI AI INSIGHT HIGHLIGHT SYSTEM
+   Three options — Option A is active on cards.
+   All options use only UUIF 9.2 tokens.
+══════════════════════════════════════ */
+
+/* ── Option A: Gradient Badge + Tinted Box (ACTIVE) ──
+   Inspired by Microsoft Copilot / SentinelOne Purple AI.
+   Small AI pill badge with spark icon + orange-tinted insight box.
+   Pros: Instantly scannable, brand-native, low visual noise.
+   Cons: Badge fatigue if overused — limit to top-N insights.      */
+.sami-badge {
+  display: inline-flex; align-items: flex-start; gap: 6px;
+  background: var(--uuif-surface-selected);
+  border: 1px solid rgba(255,93,0,0.18);
+  border-radius: var(--uuif-radius-6);
+  padding: 8px 10px;
+  font-size: 11.5px; color: var(--uuif-text-secondary);
+  margin-bottom: 8px; line-height: 1.4; width: 100%;
+  position: relative; overflow: hidden;
+}
+/* Subtle shimmer sweep — fades in and out once every 6s */
+.sami-badge::after {
+  content: '';
+  position: absolute; top: 0; left: -60%;
+  width: 40%; height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,93,0,0.07) 50%, transparent 100%);
+  animation: badgeShimmer 6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes badgeShimmer {
+  0%,80%,100% { left: -60%; opacity: 0; }
+  40%         { left: 120%; opacity: 1; }
+}
+/* SAMI AI pill badge — gradient orange */
+.sb-tag {
+  display: inline-flex; align-items: center; gap: 3px;
+  background: linear-gradient(90deg, var(--uuif-brand-orange) 0%, #ff8330 100%);
+  color: var(--uuif-text-contrast);
+  font-size: 9px; font-weight: 800;
+  border-radius: var(--uuif-radius-pill); padding: 2px 6px;
+  letter-spacing: 0.4px; flex-shrink: 0; margin-top: 1px;
+  text-transform: uppercase;
+  box-shadow: 0 1px 4px rgba(255,93,0,0.3);
+}
+.sb-tag svg { width: 9px; height: 9px; flex-shrink: 0; }
+.sb-icon { color: var(--uuif-brand-orange); font-size: 11px; flex-shrink: 0; }
+
+/* ── Option B: Left Accent Rail + Tinted Card ──
+   Inspired by Splunk AI / IBM QRadar AI.
+   A 3px left border in orange, very subtle bg tint, no badge.
+   Pros: Works without icon, elegant in dense alert lists.
+   Cons: Can visually conflict with severity-color left rails.      */
+.sami-badge-b {
+  display: inline-flex; align-items: flex-start; gap: 8px;
+  background: rgba(255,93,0,0.04);
+  border: 1px solid rgba(255,93,0,0.12);
+  border-left: 3px solid var(--uuif-brand-orange);
+  border-radius: 0 var(--uuif-radius-6) var(--uuif-radius-6) 0;
+  padding: 8px 10px 8px 10px;
+  font-size: 11.5px; color: var(--uuif-text-secondary);
+  margin-bottom: 8px; line-height: 1.4; width: 100%;
+}
+.sb-tag-b {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 9px; font-weight: 800; color: var(--uuif-brand-orange);
+  letter-spacing: 0.4px; flex-shrink: 0; margin-top: 1px;
+  text-transform: uppercase; white-space: nowrap;
+}
+.sb-tag-b svg { width: 9px; height: 9px; flex-shrink: 0; }
+.sb-divider-b {
+  width: 1px; background: rgba(17,17,17,0.12); flex-shrink: 0; align-self: stretch;
+}
+
+/* ── Option C: Animated Glow Border + Footer Chip ──
+   Inspired by CrowdStrike Charlotte AI / Darktrace.
+   Pulsing glow ring on the entire card + "Generated by SAMI" footer chip.
+   Pros: Unmistakably AI, premium feel, high-priority signal.
+   Cons: Distracting in dense views — use only for P0/critical AI insights.
+   Applied via .alert-card--ai-glow modifier on the card container.          */
+.alert-card--ai-glow {
+  box-shadow: 0 0 0 1.5px rgba(255,93,0,0.35), 0 0 12px 2px rgba(255,93,0,0.1) !important;
+  animation: glowPulse 3s ease-in-out infinite;
+}
+@keyframes glowPulse {
+  0%,100% { box-shadow: 0 0 0 1.5px rgba(255,93,0,0.35), 0 0 8px 2px rgba(255,93,0,0.08); }
+  50%     { box-shadow: 0 0 0 1.5px rgba(255,93,0,0.55), 0 0 18px 4px rgba(255,93,0,0.16); }
+}
+.sami-badge-c {
+  display: inline-flex; align-items: flex-start; gap: 6px;
+  background: var(--uuif-surface-selected);
+  border: 1px solid rgba(255,93,0,0.15);
+  border-radius: var(--uuif-radius-6);
+  padding: 7px 10px;
+  font-size: 11.5px; color: var(--uuif-text-secondary);
+  margin-bottom: 8px; line-height: 1.4; width: 100%;
+}
+.sami-generated-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--uuif-surface-tertiary);
+  border: 1px solid rgba(255,93,0,0.2);
+  border-radius: var(--uuif-radius-pill);
+  padding: 2px 8px;
+  font-size: 10px; font-weight: 600; color: var(--uuif-brand-orange);
+  letter-spacing: 0.2px;
+}
+.sami-generated-chip svg { width: 9px; height: 9px; flex-shrink: 0; }
+
+/* UUIF Footer Action Order: secondary left · primary rightmost */
+.ac-actions { display: flex; gap: 8px; align-items: center; }
+
+/* Buttons — UUIF pill shape */
+.uuif-btn-primary {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--uuif-surface-primary);
+  border: 1px solid transparent;
+  color: var(--uuif-text-contrast);
+  border-radius: var(--uuif-radius-pill);
+  padding: 4.5px 14px;
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+}
+.uuif-btn-primary:hover { background: var(--uuif-brand-orange); }
+
+.uuif-btn-secondary {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--uuif-surface-container);
+  border: 1px solid var(--uuif-border-secondary);
+  color: var(--uuif-text-secondary);
+  border-radius: var(--uuif-radius-pill);
+  padding: 4.5px 14px;
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 12px; cursor: pointer;
+}
+.uuif-btn-secondary:hover { border-color: var(--uuif-border-primary); color: var(--uuif-text-hover); }
+
+/* Ghost / text-only button */
+.uuif-btn-ghost {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: none; border: 1px solid transparent;
+  color: var(--uuif-text-secondary);
+  border-radius: var(--uuif-radius-pill);
+  padding: 4.5px 8px;
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 12px; cursor: pointer;
+  text-decoration: underline; text-underline-offset: 2px;
+}
+.uuif-btn-ghost:hover { color: var(--uuif-text-hover); }
+
+/* ─── Rec stats — uuif-count-block style ─── */
+.rec-stats { display: flex; gap: 8px; margin-bottom: 12px; }
+.uuif-count-block {
+  flex: 1;
+  background: var(--uuif-surface-container);
+  border: 1px solid rgba(17,17,17,0.09);
+  border-radius: var(--uuif-radius-12);
+  padding: 10px 12px;
+}
+.cb-value {
+  font-weight: 800; font-size: 22px; line-height: 1; margin-bottom: 3px;
+}
+.cb-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--uuif-text-secondary);
+}
+.cb-cve        { color: var(--uuif-brand-orange); }
+.cb-behavioral { color: var(--uuif-icon-primary); }
+.cb-policy     { color: var(--uuif-text-primary); }
+.cb-arr        { color: var(--uuif-brand-green); font-size: 18px; }
+
+/* rc-scope / ac-scope — left side of card footer */
+.rc-scope, .ac-scope {
+  display: flex; gap: 10px; font-size: 11px;
+  color: var(--uuif-text-secondary); align-items: center;
+}
+.rc-scope span, .ac-scope span { display: flex; align-items: center; gap: 4px; }
+.rc-scope svg, .ac-scope svg { color: var(--uuif-icon-secondary); }
+
+/* ══════════════════════════════
+   SAMI AI — SCALABLE HIGHLIGHT TOKENS
+   Option A-F — all UUIF-compliant
+══════════════════════════════ */
+
+/* D: Inline prefix — works anywhere: table cells, list items, tooltips */
+.sami-inline-tag {
+  display: inline-flex; align-items: center; gap: 2px;
+  background: linear-gradient(90deg, var(--uuif-brand-orange) 0%, #ff8330 100%);
+  color: #fff; font-size: 8px; font-weight: 800;
+  border-radius: var(--uuif-radius-pill);
+  padding: 1px 5px; letter-spacing: 0.4px;
+  text-transform: uppercase; flex-shrink: 0; white-space: nowrap;
+  vertical-align: middle; line-height: 1.6;
+  box-shadow: 0 1px 3px rgba(255,93,0,0.25);
+}
+
+/* E: AI section header strip — replaces dashboard-card header bg */
+.sami-section-header {
+  background: linear-gradient(90deg, rgba(255,93,0,0.08) 0%, rgba(255,131,48,0.04) 100%);
+  border-bottom: 1px solid rgba(255,93,0,0.15);
+  padding: 7px 10px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+/* F: Floating "Generated by SAMI AI" chip — bottom-right of container */
+.sami-float-chip {
+  position: absolute; bottom: 6px; right: 6px;
+  display: inline-flex; align-items: center; gap: 3px;
+  background: var(--uuif-surface-container);
+  border: 1px solid rgba(255,93,0,0.2);
+  border-radius: var(--uuif-radius-pill);
+  padding: 2px 7px;
+  font-size: 9px; font-weight: 600; color: var(--uuif-brand-orange);
+  box-shadow: var(--uuif-shadow-sm);
+  z-index: 2;
+}
+
+/* ══════════════════════════════
+   SAMI AI — Insight block highlight (Microsoft Copilot-inspired)
+   Applied to the inner AI content section only — card stays normal UUIF card
+══════════════════════════════ */
+.sami-ai-insight {
+  position: relative;
+  background: linear-gradient(135deg, rgba(255,93,0,0.07) 0%, rgba(255,131,48,0.04) 100%);
+  border: 1px solid rgba(255,93,0,0.16);
+  border-left: none;
+  border-radius: var(--uuif-radius-4);
+  margin-top: 8px;
+  padding: 0;
+  overflow: hidden;
+}
+.sami-ai-insight::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: linear-gradient(to bottom, var(--uuif-brand-orange) 0%, #ff8330 55%, rgba(255,131,48,0.3) 100%);
+  border-radius: var(--uuif-radius-4) 0 0 var(--uuif-radius-4);
+}
+
+/* Header row inside the insight block */
+.sami-ai-insight-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 5px 10px 5px 12px;
+  border-bottom: 1px solid rgba(255,93,0,0.1);
+}
+.sami-ai-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: linear-gradient(90deg, var(--uuif-brand-orange) 0%, #ff8330 100%);
+  color: #fff; font-size: 9px; font-weight: 800; letter-spacing: 0.4px;
+  text-transform: uppercase;
+  border-radius: var(--uuif-radius-pill); padding: 2px 7px 2px 5px;
+  box-shadow: 0 1px 4px rgba(255,93,0,0.28);
+}
+.sami-ai-badge svg { flex-shrink: 0; }
+.sami-ai-powered {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 10px; font-weight: 600; color: var(--uuif-brand-orange);
+  opacity: 0.8; letter-spacing: 0.2px;
+}
+.sami-ai-powered svg { flex-shrink: 0; }
+
+/* Insight text body */
+.sami-ai-insight-body {
+  padding: 6px 10px 7px 12px;
+  font-size: 12px; color: var(--uuif-text-secondary); line-height: 1.5;
+}
+
+/* ─── Card enter animation ─── */
+@keyframes cardSlideIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Risk stat footnote ─── */
+.risk-stat {
+  font-size: 10.5px;
+  color: var(--uuif-text-tertiary);
+  display: flex; align-items: center; gap: 5px;
+}
+.risk-stat svg { color: var(--uuif-brand-green); flex-shrink: 0; }
+
+/* ─── NOTIFICATIONS SECTION (from UM landing page) ─── */
+.notif { padding: 16px 20px; }
+.notif-head { margin-bottom: 14px; }
+.notif-title { font-size: 12px; font-weight: 800; letter-spacing: 0.5px; color: var(--uuif-text-primary); }
+.notif-sub { font-size: 11px; color: var(--uuif-text-tertiary); margin-top: 2px; font-weight: 500; }
+.notif-toolbar {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 12px; padding-bottom: 12px;
+  border-bottom: 1px solid #e5e8ee;
+}
+.filter-icon { color: var(--uuif-text-secondary); cursor: pointer; display: flex; }
+.search-wrap { position: relative; display: flex; align-items: center; }
+.search-wrap svg { position: absolute; left: 9px; color: var(--uuif-text-tertiary); width: 14px; height: 14px; }
+.search-input {
+  border: 1px solid var(--border); border-radius: 4px;
+  padding: 6px 10px 6px 30px; font-size: 11px; width: 320px;
+  color: var(--uuif-text-primary); background: white; font-family: var(--font);
+}
+.totals-block { display: flex; align-items: center; gap: 22px; margin-left: 10px; }
+.total-item { text-align: center; }
+.total-label { font-size: 10px; font-weight: 800; color: var(--uuif-text-tertiary); letter-spacing: 0.4px; margin-bottom: 2px; }
+.total-value { font-size: 16px; font-weight: 800; color: var(--orange); }
+.time-range { display: flex; align-items: center; gap: 8px; margin-left: 10px; }
+.radio-circle { width: 12px; height: 12px; border: 1.5px solid var(--uuif-text-tertiary); border-radius: 50%; }
+.time-select {
+  border: 1px solid var(--border); border-radius: 4px;
+  padding: 5px 8px; font-size: 11px; color: var(--uuif-text-primary);
+  background: white; display: flex; align-items: center; gap: 6px; font-weight: 600;
+}
+.custom-label { font-size: 11px; color: var(--uuif-text-secondary); display: flex; align-items: center; gap: 6px; font-weight: 500; }
+.toolbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.toolbar-btn {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; color: var(--uuif-text-secondary);
+  background: white; border: none; padding: 4px 8px; font-weight: 600;
+}
+.toolbar-btn.active {
+  background: var(--uuif-text-primary); color: white;
+  border-radius: 4px; padding: 5px 10px;
+}
+.notif-tabs { display: flex; border-bottom: 1px solid #e5e8ee; }
+.notif-tab {
+  padding: 10px 20px; font-size: 12px; font-weight: 700;
+  color: var(--uuif-text-tertiary); cursor: pointer;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  letter-spacing: 0.3px;
+}
+.notif-tab.active { color: var(--orange); border-bottom-color: var(--orange); }
+.notif-table { width: 100%; border-collapse: collapse; }
+.notif-table th {
+  text-align: left; font-size: 10px; font-weight: 800;
+  letter-spacing: 0.4px; color: var(--uuif-text-secondary);
+  padding: 10px 8px; background: var(--bg);
+  border-bottom: 1px solid #e5e8ee;
+}
+.notif-table th.sortable::after { content: ' ↓'; color: var(--orange); }
+.notif-table td {
+  padding: 10px 8px; font-size: 11.5px;
+  color: var(--uuif-text-primary);
+  border-bottom: 1px solid #eef0f4; vertical-align: top;
+}
+.notif-table tbody tr:hover { background: #fafbfd; }
+.notif-check { width: 14px; height: 14px; border: 1px solid var(--uuif-text-tertiary); border-radius: 2px; background: white; }
+.notif-local-time { font-size: 11px; color: var(--uuif-text-primary); }
+.notif-local-time span { display: block; }
+.priority-info { color: var(--uuif-text-tertiary); font-size: 11px; }
+.priority-warning { color: var(--warning); font-size: 11px; font-weight: 600; }
+.notif-tenant-cell { display: flex; align-items: center; gap: 4px; color: var(--uuif-text-primary); }
+.notif-tenant-cell svg { color: var(--orange); width: 12px; height: 12px; }
+.state-dropdown {
+  border: 1px solid var(--border); border-radius: 4px;
+  padding: 4px 8px; font-size: 11px;
+  display: flex; align-items: center; justify-content: space-between;
+  width: 110px; color: var(--uuif-text-primary); background: white;
+}
+.notif-source-ip { font-size: 11px; color: var(--uuif-text-primary); }
+.notif-type-cell { display: flex; align-items: center; gap: 5px; color: var(--uuif-text-primary); }
+.notif-type-cell svg { color: var(--behavioral-blue); width: 14px; height: 14px; }
+.notif-category { font-size: 11px; color: var(--uuif-text-primary); font-weight: 600; }
+.sami-tab-pill { display: inline-flex; align-items: center; gap: 6px; }
+.sami-tab-pill::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--sami-purple); box-shadow: 0 0 0 2px var(--sami-purple-bg);
+}
+.sami-alerts-wrap { padding: 0; }
+.sami-alerts-row {
+  display: flex; align-items: flex-start;
+  padding: 14px 18px 14px 16px;
+  border-bottom: 1px solid #eef0f4;
+  border-left: 3px solid transparent;
+  position: relative; background: white; transition: background 0.12s;
+}
+.sami-alerts-row:hover { background: #fafbfd; }
+.sami-alerts-row.sev-critical { border-left-color: var(--red); }
+.sami-alerts-row.sev-high     { border-left-color: var(--warning); }
+.sami-alerts-row.sev-medium   { border-left-color: var(--behavioral-blue); }
+.sami-alerts-row.sev-resolved { border-left-color: var(--policy-green); }
+.sami-row-left { flex: 1; min-width: 0; display: flex; gap: 10px; }
+.sami-pill {
+  background: var(--uuif-brand-navy); color: white;
+  font-size: 9px; font-weight: 800; letter-spacing: 0.6px;
+  padding: 3px 7px; border-radius: 4px;
+  display: inline-flex; align-items: center;
+  flex-shrink: 0; margin-top: 2px; font-family: var(--font);
+}
+.sami-row-content { flex: 1; min-width: 0; }
+.sami-row-title { font-size: 13px; font-weight: 700; color: var(--uuif-text-primary); line-height: 1.4; margin-bottom: 4px; }
+.sami-row-meta {
+  font-size: 11.5px; color: var(--uuif-text-tertiary);
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px;
+}
+.sami-meta-time { color: var(--uuif-text-tertiary); font-weight: 500; }
+.sami-meta-tenants { color: var(--uuif-text-secondary); font-weight: 500; }
+.sami-root-cause {
+  font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+  font-size: 11px; background: transparent; padding: 1px 0;
+}
+.sami-root-cause.cause-red   { color: var(--red); }
+.sami-root-cause.cause-blue  { color: var(--behavioral-blue); }
+.sami-root-cause.cause-green { color: var(--policy-green); }
+.sami-root-cause.cause-orange{ color: var(--orange); }
+.sami-row-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; margin-left: 16px; }
+.raw-alerts-pill {
+  display: inline-flex; align-items: center;
+  background: white; border: 1px solid var(--border);
+  border-radius: 12px; font-size: 11px; font-weight: 600;
+  color: var(--uuif-text-secondary); padding: 3px 10px;
+}
+.cta-primary {
+  background: var(--uuif-brand-navy); color: white; border: none;
+  font-size: 11.5px; font-weight: 700;
+  padding: 6px 13px; border-radius: 5px; font-family: var(--font);
+}
+.cta-primary:hover { background: #001440; }
+.resolved-badge {
+  display: inline-flex; align-items: center;
+  font-size: 11px; font-weight: 800; letter-spacing: 0.5px;
+  color: var(--policy-green); padding: 4px 8px;
+}
+.why-group {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11.5px; color: var(--uuif-text-secondary);
+  background: transparent; border: none; cursor: pointer; font-weight: 500;
+}
+.why-group:hover { color: var(--link); }
+.why-group svg { color: var(--uuif-text-tertiary); }
+.sami-alerts-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 18px;
+  background: linear-gradient(180deg, #f9f7ff 0%, #ffffff 100%);
+  border-bottom: 1px solid #eef0f4;
+}
+.sami-alerts-header-left { display: flex; align-items: center; gap: 10px; }
+.sami-alerts-icon {
+  width: 24px; height: 24px; background: var(--orange);
+  border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;
+}
+.sami-alerts-header-title { font-size: 13px; font-weight: 800; color: var(--uuif-text-primary); }
+.sami-alerts-header-sub { font-size: 11px; color: var(--uuif-text-tertiary); font-weight: 500; margin-top: 1px; }
+.sami-summary-chips { display: flex; gap: 8px; }
+.sami-summary-chip {
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.3px;
+  padding: 3px 9px; border-radius: 10px;
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.sami-summary-chip::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
+.chip-critical { background: #fdecec; color: var(--red); }
+.chip-critical::before { background: var(--red); }
+.chip-high { background: #fff4e0; color: #b96e00; }
+.chip-high::before { background: var(--warning); }
+.chip-medium { background: var(--behavioral-bg); color: var(--behavioral-blue); }
+.chip-medium::before { background: var(--behavioral-blue); }
+.chip-resolved { background: var(--policy-green-bg); color: var(--policy-green); }
+.chip-resolved::before { background: var(--policy-green); }
+.notif-section-card {
+  background: rgba(255,255,255,0.82);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: var(--radius-lg);
+  margin-top: 12px;
+}
+
+/* ══════════════════════════════════════
+   SAMI ACTIVE STATE — Figma-matched layout
+   Node 1225-23168 replication
+══════════════════════════════════════ */
+
+/* Header: greeting + ask bar — NO container background */
+.sami-active-header {
+  padding: 18px 0 16px;
+  margin-bottom: 14px;
+  text-align: center;
+}
+.sami-active-top {
+  display: flex; flex-direction: column; align-items: center; gap: 5px; margin-bottom: 14px;
+}
+.sami-active-greeting {
+  font-size: 32px; font-weight: 800; color: var(--uuif-text-primary); letter-spacing: -0.3px;
+}
+.sami-active-greeting span { color: var(--uuif-brand-orange); }
+.sami-active-sub {
+  font-size: 14px; color: var(--uuif-text-secondary);
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+/* Hide the live dot in the greeting — not in Figma design */
+.sami-active-sub .sami-hero-live-dot { display: none; }
+.sami-active-ask-row {
+  display: flex; justify-content: center;
+}
+.sami-active-ask {
+  display: flex; align-items: center; gap: 10px;
+  width: 520px;
+  border: 1.5px solid #8b82f0;
+  border-radius: var(--uuif-radius-pill);
+  padding: 10px 18px;
+  background: rgba(255,255,255,0.96);
+  box-shadow: 0 2px 16px rgba(88,133,204,0.14);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.sami-active-ask:focus-within {
+  border-color: var(--uuif-brand-orange);
+  box-shadow: 0 0 0 3px rgba(255,93,0,0.1), 0 2px 16px rgba(88,133,204,0.14);
+}
+.sami-active-ask input {
+  flex: 1; border: none; outline: none; background: transparent;
+  font-size: 13px; color: var(--uuif-text-primary); font-family: 'Nunito Sans', sans-serif;
+}
+.sami-active-ask input::placeholder { color: var(--uuif-text-disabled); }
+.sami-ask-kbd {
+  font-size: 10px; color: var(--uuif-text-tertiary);
+  background: var(--uuif-surface-model);
+  border: 1px solid var(--uuif-border-tertiary);
+  border-radius: var(--uuif-radius-4);
+  padding: 2px 6px; font-family: monospace; flex-shrink: 0;
+}
+
+/* Two-column grid */
+.sami-figma-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+/* Column — NO background, just a transparent layout container */
+.sami-figma-col {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  overflow: visible;
+}
+
+/* Column header — no container, floats on gradient */
+.sami-figma-col-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2px 10px;
+}
+.sami-figma-col-title {
+  font-size: 12px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--uuif-text-primary);
+}
+.sami-figma-col-subtitle {
+  font-size: 11px; color: var(--uuif-text-secondary); margin-top: 2px;
+}
+.sami-figma-viewall {
+  font-size: 11.5px; color: var(--uuif-text-secondary); text-decoration: none; font-weight: 600;
+}
+.sami-figma-viewall:hover { color: var(--uuif-brand-orange); }
+
+/* Alert card — standalone frosted white card */
+.sami-figma-card {
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.75);
+  border-radius: 10px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+  padding: 14px 16px 12px;
+  margin-bottom: 10px;
+}
+.sami-figma-card:last-child { margin-bottom: 0; }
+.sami-figma-card-top {
+  display: flex; gap: 10px; align-items: flex-start;
+}
+/* Red dot severity indicator (like Figma) */
+.sami-figma-card-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: #c70f0f; flex-shrink: 0; margin-top: 4px;
+}
+.sami-figma-card-dot.dot-orange { background: var(--uuif-brand-orange); }
+.sami-figma-card-dot.dot-yellow { background: var(--uuif-brand-yellow); }
+.sami-figma-card-content { flex: 1; min-width: 0; }
+.sami-figma-card-title-row {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 5px;
+}
+.sami-figma-card-title {
+  font-size: 13px; font-weight: 700; color: var(--uuif-text-primary);
+  line-height: 1.4; flex: 1;
+}
+.sami-figma-card-time {
+  font-size: 11px; color: var(--uuif-text-tertiary); white-space: nowrap; flex-shrink: 0;
+  display: flex; align-items: center; gap: 5px;
+}
+.sami-figma-card-desc {
+  font-size: 12px; color: var(--uuif-text-secondary); line-height: 1.5; margin-bottom: 10px;
+}
+.sami-figma-card-footer {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;
+}
+.sami-figma-card-tags {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+}
+.sami-figma-card-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; color: var(--uuif-text-secondary);
+  background: rgba(88,133,204,0.08);
+  border: 1px solid rgba(88,133,204,0.18);
+  border-radius: var(--uuif-radius-4); padding: 2px 8px;
+}
+.sami-figma-card-actions {
+  display: flex; gap: 8px;
+}
+
+/* Severity pill (kept for compatibility) */
+.sami-figma-pill {
+  display: inline-flex; align-items: center;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.04em;
+  border-radius: var(--uuif-radius-4); padding: 3px 8px;
+  white-space: nowrap; flex-shrink: 0;
+}
+.pill-emergency {
+  background: rgba(255,93,0,0.1);
+  color: var(--uuif-brand-orange);
+  border: 1px solid rgba(255,93,0,0.25);
+}
+.pill-critical {
+  background: rgba(199,15,15,0.08);
+  color: var(--uuif-brand-red);
+  border: 1px solid rgba(199,15,15,0.22);
+}
+.pill-high {
+  background: rgba(243,172,61,0.1);
+  color: #b87a00;
+  border: 1px solid rgba(243,172,61,0.35);
+}
+
+/* Divider between cards (now unused but kept) */
+.sami-figma-divider { display: none; }
+
+/* Outline button (alert row actions) */
+.sami-figma-btn-outline {
+  display: inline-flex; align-items: center;
+  background: rgba(255,255,255,0.9);
+  border: 1px solid var(--uuif-border-secondary);
+  border-radius: var(--uuif-radius-pill);
+  padding: 5px 14px;
+  font-size: 11.5px; font-weight: 600;
+  color: var(--uuif-text-secondary);
+  font-family: 'Nunito Sans', sans-serif; cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.sami-figma-btn-outline:hover {
+  border-color: var(--uuif-brand-orange); color: var(--uuif-brand-orange);
+}
+
+/* Stat cards row */
+.sami-figma-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+  margin-bottom: 10px;
+}
+.sami-figma-stat-card {
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.75);
+  border-radius: 10px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+  padding: 14px 14px 12px;
+}
+.sami-figma-stat-top {
+  display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 4px;
+}
+.sami-figma-stat-val {
+  font-size: 28px; font-weight: 800; line-height: 1;
+}
+.sami-figma-stat-label {
+  font-size: 11px; font-weight: 700; color: var(--uuif-text-primary); margin-bottom: 6px;
+}
+.sami-figma-stat-sub {
+  display: flex; align-items: center; gap: 8px; font-size: 10.5px;
+}
+.sami-figma-stat-sub .stat-crit { color: var(--uuif-brand-red); font-weight: 700; }
+.sami-figma-stat-sub .stat-high { color: var(--uuif-brand-orange); font-weight: 700; }
+.sami-figma-stat-viewall {
+  display: block; font-size: 11px; color: var(--uuif-text-secondary); text-decoration: none;
+  font-weight: 600; margin-top: 5px;
+}
+.sami-figma-stat-viewall:hover { color: var(--uuif-brand-orange); }
+
+/* Rec card — standalone frosted white card */
+.sami-figma-rec-card {
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.75);
+  border-radius: 10px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+  padding: 14px 16px 12px;
+  margin-bottom: 10px;
+}
+.sami-figma-rec-card:last-child { margin-bottom: 0; }
+
+/* ─── Interactive states: hover lift + selected (chat pane open) ─── */
+.sami-figma-card,
+.sami-figma-rec-card {
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease,
+              border-color 0.15s ease, background 0.15s ease;
+}
+.sami-figma-card:hover,
+.sami-figma-rec-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255,93,0,0.35);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+.sami-figma-card.selected,
+.sami-figma-rec-card.selected {
+  border-color: var(--uuif-brand-orange);
+  background: var(--uuif-surface-selected);
+  box-shadow: 0 0 0 1px var(--uuif-brand-orange), 0 6px 18px rgba(255,93,0,0.18);
+}
+/* Selected card stays anchored — no lift on hover */
+.sami-figma-card.selected:hover,
+.sami-figma-rec-card.selected:hover {
+  transform: none;
+}
+
+.sami-figma-rec-top {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 4px;
+}
+.sami-figma-rec-time {
+  font-size: 11px; color: var(--uuif-text-tertiary); white-space: nowrap; flex-shrink: 0;
+}
+.sami-figma-rec-desc {
+  font-size: 12px; color: var(--uuif-text-secondary); line-height: 1.55; margin-bottom: 10px;
+}
+.sami-figma-rec-footer {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;
+}
+.sami-figma-rec-scope {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; color: var(--uuif-text-secondary);
+}
+.sami-figma-rec-actions { display: flex; gap: 8px; align-items: center; }
+.sami-figma-btn-ghost {
+  display: inline-flex; align-items: center;
+  background: none; border: 1px solid var(--uuif-border-tertiary);
+  border-radius: var(--uuif-radius-pill); padding: 4px 12px;
+  font-size: 11.5px; color: var(--uuif-text-secondary);
+  font-family: 'Nunito Sans', sans-serif; cursor: pointer;
+}
+.sami-figma-btn-ghost:hover { border-color: var(--uuif-brand-orange); color: var(--uuif-brand-orange); }
+.sami-figma-btn-primary {
+  display: inline-flex; align-items: center;
+  background: var(--uuif-surface-primary);
+  border: 1px solid transparent;
+  border-radius: var(--uuif-radius-pill); padding: 4px 14px;
+  font-size: 11.5px; font-weight: 600; color: #fff;
+  font-family: 'Nunito Sans', sans-serif; cursor: pointer;
+}
+.sami-figma-btn-primary:hover { background: var(--uuif-brand-orange); }
+
+/* ══════════════════════════════════════════
+   SAMI FLOATING CHATBOT
+   ══════════════════════════════════════════ */
+
+/* Floating trigger button */
+.sami-fab {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--uuif-brand-orange);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(255,93,0,0.45), 0 2px 6px rgba(0,0,0,0.18);
+  transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  z-index: 9000;
+}
+.sami-fab:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 22px rgba(255,93,0,0.55), 0 3px 8px rgba(0,0,0,0.22);
+}
+.sami-fab-pulse {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: rgba(255,93,0,0.25);
+  animation: sami-pulse 2.4s ease-out infinite;
+}
+@keyframes sami-pulse {
+  0%   { transform: scale(1);   opacity: 0.7; }
+  70%  { transform: scale(1.5); opacity: 0; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+.sami-fab-tooltip {
+  position: absolute;
+  right: 62px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #1a2540;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 11px;
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.18s;
+}
+.sami-fab:hover .sami-fab-tooltip { opacity: 1; }
+.sami-fab-tooltip::after {
+  content: '';
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 5px solid transparent;
+  border-left-color: #1a2540;
+}
+
+/* Chat panel — full-height right side panel */
+.sami-chat-panel {
+  position: fixed;
+  top: 48px;                       /* dock below the top bar, embedded in the UI */
+  right: 0;
+  width: 390px;
+  height: calc(100vh - 48px);
+  background: #fff;
+  border-radius: 0;
+  border-left: 1px solid rgba(17,17,17,0.12);
+  box-shadow: -2px 0 14px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  z-index: 90;                     /* above page content, below top bar (99) */
+  overflow: hidden;
+  transform: translateX(100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.28s cubic-bezier(0.4,0,0.2,1), opacity 0.22s ease;
+}
+.sami-chat-panel.visible {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* Panel header */
+.sami-chat-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 18px 15px;
+  background: #3d5a7a;
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.sami-chat-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.sami-chat-header-title {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  font-family: 'Nunito Sans', sans-serif;
+}
+.sami-chat-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.sami-chat-header-actions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  color: rgba(255,255,255,0.75);
+  display: flex;
+  align-items: center;
+  transition: color 0.15s;
+}
+.sami-chat-header-actions button:hover { color: #fff; }
+
+/* Chat body */
+.sami-chat-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+  position: relative;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.sami-chat-body::-webkit-scrollbar { width: 4px; }
+.sami-chat-body::-webkit-scrollbar-track { background: transparent; }
+.sami-chat-body::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 4px; }
+
+/* Zero state */
+.sami-chat-zero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 20px 20px 16px;
+  overflow-y: auto;
+}
+.sami-chat-zero-bot {
+  width: 82px;
+  height: 82px;
+  border-radius: 50%;
+  background: #eef0f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  flex-shrink: 0;
+}
+.sami-chat-zero-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #1a2540;
+  margin-bottom: 6px;
+  font-family: 'Nunito Sans', sans-serif;
+}
+.sami-chat-zero-sub {
+  font-size: 12.5px;
+  color: #6b7a99;
+  text-align: center;
+  line-height: 1.5;
+  margin-bottom: 28px;
+}
+.sami-chat-suggestions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sami-chat-suggestion {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border: 1px solid #e4e8f0;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 12.5px;
+  color: #2d3a54;
+  font-family: 'Nunito Sans', sans-serif;
+  background: #fff;
+  transition: border-color 0.15s, background 0.15s;
+  text-align: left;
+  width: 100%;
+}
+.sami-chat-suggestion:hover {
+  border-color: var(--uuif-brand-orange);
+  background: rgba(255,93,0,0.03);
+}
+.sami-chat-suggestion svg { flex-shrink: 0; color: #8892a8; }
+
+/* Context view (card-opened state) */
+.sami-chat-context {
+  display: none;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+}
+.sami-chat-context.visible { display: flex; }
+.sami-chat-context::-webkit-scrollbar { width: 4px; }
+.sami-chat-context::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 4px; }
+
+.sami-ctx-card {
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid #eef0f6;
+  flex-shrink: 0;
+}
+.sami-ctx-tags {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.sami-ctx-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid;
+}
+.sami-ctx-tag.critical { color: #c70f0f; border-color: rgba(199,15,15,0.3); background: rgba(199,15,15,0.07); }
+.sami-ctx-tag.cve { color: #2d3a54; border-color: #d8dde8; background: #f4f6fb; }
+.sami-ctx-tag.new-tag { color: #2d3a54; border-color: #d8dde8; background: #f4f6fb; }
+.sami-ctx-time { font-size: 11px; color: #8892a8; margin-left: auto; }
+.sami-ctx-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #1a2540;
+  line-height: 1.35;
+  margin-bottom: 8px;
+  font-family: 'Nunito Sans', sans-serif;
+}
+.sami-ctx-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 11.5px;
+  color: #6b7a99;
+}
+.sami-ctx-meta span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sami-ctx-analysis {
+  padding: 14px 16px 0;
+  flex-shrink: 0;
+}
+.sami-ctx-section-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: #1a2540;
+  margin-bottom: 10px;
+  font-family: 'Nunito Sans', sans-serif;
+}
+.sami-ctx-analysis-box {
+  background: #f7f8fb;
+  border: 1px solid #e4e8f0;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 12.5px;
+  color: #3d4a6a;
+  line-height: 1.55;
+  margin-bottom: 14px;
+}
+
+.sami-ctx-evidence {
+  padding: 0 16px 14px;
+  flex-shrink: 0;
+}
+.sami-ctx-evidence ul {
+  margin: 0;
+  padding-left: 18px;
+}
+.sami-ctx-evidence li {
+  font-size: 12.5px;
+  color: #3d4a6a;
+  line-height: 1.6;
+  margin-bottom: 2px;
+}
+
+.sami-ctx-remediation {
+  padding: 0 16px 14px;
+  flex-shrink: 0;
+}
+.sami-ctx-remediation ul {
+  margin: 0;
+  padding-left: 18px;
+}
+.sami-ctx-remediation li {
+  font-size: 12.5px;
+  color: #3d4a6a;
+  line-height: 1.6;
+}
+
+.sami-ctx-timeline {
+  padding: 0 16px 14px;
+  flex-shrink: 0;
+}
+.sami-ctx-timeline-row {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 8px 12px;
+  font-size: 12px;
+  color: #3d4a6a;
+  line-height: 1.5;
+  padding: 3px 0;
+}
+.sami-ctx-timeline-row .tl-date { color: #8892a8; }
+
+/* Chat messages (right = user, left = SAMI) */
+.sami-chat-messages {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.sami-msg {
+  display: flex;
+  flex-direction: column;
+  max-width: 82%;
+}
+.sami-msg.user { align-self: flex-end; align-items: flex-end; }
+.sami-msg.bot  { align-self: flex-start; align-items: flex-start; }
+.sami-msg-meta {
+  font-size: 10px;
+  color: #8892a8;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.sami-msg-meta .msg-name { font-weight: 700; color: var(--uuif-brand-orange); }
+.sami-msg-bubble {
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  font-family: 'Nunito Sans', sans-serif;
+}
+.sami-msg.user .sami-msg-bubble {
+  background: #1a2540;
+  color: #fff;
+  border-bottom-right-radius: 3px;
+}
+.sami-msg.bot .sami-msg-bubble {
+  background: #f0f2f8;
+  color: #2d3a54;
+  border-bottom-left-radius: 3px;
+}
+.sami-msg-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 5px;
+}
+.sami-msg-actions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #b0b8cc;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  transition: color 0.15s;
+}
+.sami-msg-actions button:hover { color: #4a6080; }
+
+/* Context chip above input */
+.sami-chat-context-chip {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 14px;
+  background: #f0f2f8;
+  border-top: 1px solid #e4e8f0;
+  font-size: 11.5px;
+  color: #2d3a54;
+  font-weight: 600;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.sami-chat-context-chip.visible { display: flex; }
+.sami-chat-context-chip span {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sami-chat-context-chip button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #8892a8;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.sami-chat-context-chip button:hover { color: #c70f0f; }
+
+/* Input row */
+.sami-chat-input-row {
+  padding: 12px 14px 8px;
+  background: #fff;
+  border-top: 1px solid #eef0f6;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.sami-chat-input-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1.5px solid #8b82f0;
+  border-radius: var(--uuif-radius-pill);
+  padding: 8px 14px;
+  background: #fff;
+  transition: border-color 0.2s;
+}
+.sami-chat-input-wrap:focus-within {
+  border-color: var(--uuif-brand-orange);
+}
+.sami-chat-input-wrap input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 13px;
+  color: #2d3a54;
+  font-family: 'Nunito Sans', sans-serif;
+}
+.sami-chat-input-wrap input::placeholder { color: #b0b8cc; }
+.sami-chat-send {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--uuif-brand-orange);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s, transform 0.1s;
+}
+.sami-chat-send:hover { background: #e64e00; transform: scale(1.06); }
+.sami-chat-footer {
+  text-align: left;
+  font-size: 11px;
+  color: #b0b8cc;
+  padding: 2px 14px 12px;
+  background: #fff;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Hide FAB when panel is open */
+.sami-fab.open {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.7);
+}
+
+/* History — scrim covers the full panel, sub-panel slides from right */
+.sami-history-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(26,37,64,0.28);
+  z-index: 10;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+.sami-history-scrim.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* Sub-panel: ~62% width, right-anchored */
+.sami-history-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 62%;
+  height: 100%;
+  background: #fff;
+  z-index: 11;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.26s cubic-bezier(0.4,0,0.2,1);
+  pointer-events: none;
+  box-shadow: -4px 0 20px rgba(0,0,0,0.14);
+}
+.sami-history-overlay.visible {
+  transform: translateX(0);
+  pointer-events: all;
+}
+
+/* History list header — plain white, no header bar */
+.sami-history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 16px 10px;
+  flex-shrink: 0;
+}
+.sami-history-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--uuif-brand-orange);
+  font-family: 'Nunito Sans', sans-serif;
+}
+.sami-history-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #8892a8;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  transition: color 0.15s;
+}
+.sami-history-close:hover { color: #1a2540; }
+
+/* History list */
+.sami-history-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+}
+.sami-history-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 12px 16px 11px;
+  border-top: 1px solid #eef0f6;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.sami-history-item:hover { background: #f7f8fb; }
+.sami-history-item-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a2540;
+  line-height: 1.35;
+  font-family: 'Nunito Sans', sans-serif;
+}
+.sami-history-item-date {
+  font-size: 11px;
+  color: var(--uuif-brand-orange);
+  font-weight: 500;
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════ PRIMARY NAV RAIL ══════════ -->
+<nav class="primary-nav">
+
+  <!-- Swoosh logo — always fill="#FF5D00" -->
+  <div class="nav-logo">
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+      <path d="M16 3C9.37 3 4 8.37 4 15c0 5.2 3.13 9.67 7.6 11.65V26h8.8v-.35C24.87 24.67 28 20.2 28 15c0-6.63-5.37-12-12-12z" fill="#FF5D00"/>
+      <path d="M12.5 11l7 4.5-7 4.5V11z" fill="white" opacity="0.9"/>
+    </svg>
+  </div>
+
+  <!-- Dashboard (active) -->
+  <div class="nav-item active" title="Dashboard">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <rect x="3" y="3" width="7" height="7" rx="1"/>
+      <rect x="14" y="3" width="7" height="7" rx="1"/>
+      <rect x="3" y="14" width="7" height="7" rx="1"/>
+      <rect x="14" y="14" width="7" height="7" rx="1"/>
+    </svg>
+  </div>
+
+  <!-- Notifications -->
+  <div class="nav-item" title="Notifications">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+    </svg>
+    <span class="nav-badge">8</span>
+  </div>
+
+  <!-- Settings -->
+  <div class="nav-item" title="Settings">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+    </svg>
+  </div>
+
+  <!-- Tenants -->
+  <div class="nav-item" title="Tenants">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+      <circle cx="9" cy="7" r="4"/>
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+    </svg>
+  </div>
+
+  <!-- Analytics -->
+  <div class="nav-item" title="Analytics">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+    </svg>
+  </div>
+
+  <div class="nav-divider"></div>
+
+  <!-- Reports -->
+  <div class="nav-item" title="Reports">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+    </svg>
+  </div>
+
+  <!-- Profile -->
+  <div class="nav-item" title="Profile">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <circle cx="12" cy="8" r="4"/>
+      <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+    </svg>
+  </div>
+
+  <div class="nav-spacer"></div>
+
+  <!-- SonicBot (bottom-pinned) -->
+  <div class="nav-item" title="SonicBot">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    </svg>
+    <span class="nav-badge">3</span>
+  </div>
+
+</nav>
+
+<!-- ══════════ TITLE BAR ══════════ -->
+<header class="title-bar">
+  <div class="breadcrumb">
+    <a href="#">Home</a>
+    <span class="breadcrumb-sep">›</span>
+    <a href="#">Dashboard</a>
+    <span class="breadcrumb-sep">›</span>
+    <span class="breadcrumb-current">Overview</span>
+  </div>
+
+  <!-- Scope Selector — centered absolutely in the title bar -->
+  <div class="scope-selector">
+    <span class="scope-dot"></span>
+    All Tenants (Global)
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+  </div>
+
+  <div class="title-bar-icons">
+    <!-- Bell -->
+    <div class="title-bar-icon" title="Notifications">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <div class="notif-badge"></div>
+    </div>
+    <!-- Help -->
+    <div class="title-bar-icon" title="Help">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+    </div>
+    <!-- Avatar: 29×29px -->
+    <div class="avatar-wrap">
+      <div class="avatar">HN</div>
+      <span class="avatar-caret">▾</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════ PAGE ══════════ -->
+<main class="page">
+  <div class="page-content">
+
+    <!-- ── Product Overview Row ── -->
+    <div class="overview-row">
+
+      <!-- Left: product section panel -->
+      <div class="product-section">
+        <div class="ps-title">Overview</div>
+        <div class="ps-sub">Active Products</div>
+        <div class="product-card-row">
+
+          <!-- Left arrow -->
+          <button class="uuif-btn-icon" title="Previous">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+
+          <!-- Product cards -->
+          <div class="product-cards">
+
+            <!-- Firewall -->
+            <div class="product-card">
+              <div class="pc-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Firewall
+              </div>
+              <div class="pc-count">110</div>
+              <div class="pc-sublabel">Total Devices</div>
+              <div class="pc-attention" style="margin-bottom:2px;">Need Attention</div>
+              <div class="pc-attention"><span class="warn">⚠ 2</span> &nbsp;<span class="eol">EOL 6</span></div>
+            </div>
+
+            <!-- Cloud Secure Edge -->
+            <div class="product-card">
+              <div class="pc-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+                Cloud Secure Edge
+              </div>
+              <div class="pc-count">2</div>
+              <div class="pc-sublabel">Total Active Licenses</div>
+              <button class="pc-learn-btn">Learn More</button>
+            </div>
+
+            <!-- Access Point -->
+            <div class="product-card">
+              <div class="pc-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+                Access Point
+              </div>
+              <div class="pc-count">10</div>
+              <div class="pc-sublabel">Total Devices</div>
+              <div class="pc-attention" style="margin-bottom:2px;">Need Attention</div>
+              <div class="pc-attention">0</div>
+            </div>
+
+            <!-- Switch -->
+            <div class="product-card">
+              <div class="pc-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                Switch
+              </div>
+              <div class="pc-count">9</div>
+              <div class="pc-sublabel">Total Devices</div>
+              <div class="pc-attention" style="margin-bottom:2px;">Need Attention</div>
+              <div class="pc-attention">0</div>
+            </div>
+
+            <!-- Capture Client -->
+            <div class="product-card">
+              <div class="pc-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Capture Client
+              </div>
+              <div class="pc-count">2</div>
+              <div class="pc-sublabel">Total Endpoints</div>
+              <div class="pc-attention" style="margin-bottom:2px;">Need Attention</div>
+              <div class="pc-attention">0</div>
+            </div>
+
+            <!-- Capture Client MDR -->
+            <div class="product-card">
+              <div class="pc-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Capture Client MDR
+              </div>
+              <div class="pc-count">2</div>
+              <div class="pc-sublabel">Total Endpoints</div>
+              <div class="pc-attention" style="margin-bottom:2px;">Need Attention</div>
+              <div class="pc-attention">0</div>
+            </div>
+
+            <!-- SMA 1000 -->
+            <div class="product-card">
+              <div class="pc-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                SMA 1000
+              </div>
+              <div class="pc-count">6</div>
+              <div class="pc-sublabel">Total Devices</div>
+              <div class="pc-attention" style="margin-bottom:2px;">Need Attention</div>
+              <div class="pc-attention"><span class="pc-coming-soon">Coming Soon ⊙</span></div>
+            </div>
+
+          </div><!-- /product-cards -->
+
+          <!-- Right arrow -->
+          <button class="uuif-btn-icon" title="Next">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+
+        </div>
+      </div><!-- /product-section -->
+
+      <!-- Right: Org Summary dark card -->
+      <div class="org-summary">
+        <div class="os-title">Org Summary</div>
+        <div class="os-stat-label">Tenants</div>
+        <div class="os-stat-val">98</div>
+        <div class="os-stat-label">Need Attention</div>
+        <div class="os-stat-val" style="font-size:22px;">2</div>
+        <button class="os-btn">Create Tenant</button>
+      </div>
+
+    </div><!-- /overview-row -->
+
+    <!-- ── SAMI Alerts & Notifications ── -->
+    <div class="sami-section-wrap">
+      <div class="uuif-tabs sami-section-tabs">
+        <div class="uuif-tab active" onclick="switchMainTab(this, 'pane-sami-alerts')">SAMI Alerts</div>
+        <div class="uuif-tab" onclick="switchMainTab(this, 'pane-notifications')">Notifications</div>
+      </div>
+      <div class="sami-section-body">
+
+    <!-- ══ PANE: SAMI ALERTS ══ -->
+    <div id="pane-sami-alerts">
+
+    <!-- ══════════════════════════════════════
+         SAMI CONTAINER — Day-0 / Activated
+    ══════════════════════════════════════ -->
+    <div id="sami-container">
+
+      <!-- ── Day-0 Empty State ── -->
+      <div class="day0-empty" id="day0-empty">
+
+        <!-- Illustration panel -->
+        <div class="day0-illus">
+          <svg width="232" height="180" viewBox="0 0 232 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="d0bg" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#FF5D00" stop-opacity="0.07"/>
+                <stop offset="100%" stop-color="#FF5D00" stop-opacity="0"/>
+              </radialGradient>
+              <linearGradient id="d0shield" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#1f3c73"/>
+                <stop offset="100%" stop-color="#001b50"/>
+              </linearGradient>
+              <linearGradient id="d0node" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#1e3a6e"/>
+                <stop offset="100%" stop-color="#0d1a3a"/>
+              </linearGradient>
+              <style>
+                .d0-flow  { stroke-dasharray:5 4; animation:d0dash  2s  linear infinite; }
+                .d0-flowr { stroke-dasharray:5 4; animation:d0dash  2.6s linear infinite reverse; }
+                .d0-flowd { stroke-dasharray:5 4; animation:d0dash  3.2s linear infinite; }
+                @keyframes d0dash { to { stroke-dashoffset:-36; } }
+                .d0-pr1 { animation:d0ring 2.2s ease-out        infinite; }
+                .d0-pr2 { animation:d0ring 2.2s ease-out 0.74s  infinite; }
+                .d0-pr3 { animation:d0ring 2.2s ease-out 1.48s  infinite; }
+                @keyframes d0ring { 0%{r:24;opacity:0.5} 100%{r:68;opacity:0} }
+                .d0-bob  { animation:d0b 3s   ease-in-out         infinite; }
+                .d0-bob2 { animation:d0b 3.6s ease-in-out 0.5s   infinite; }
+                .d0-bob3 { animation:d0b 2.9s ease-in-out 1.1s   infinite; }
+                @keyframes d0b { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+                .d0-blink { animation:d0bl 1.7s ease-in-out infinite; }
+                @keyframes d0bl { 0%,100%{opacity:1} 50%{opacity:0.25} }
+              </style>
+            </defs>
+
+            <ellipse cx="116" cy="90" rx="100" ry="80" fill="url(#d0bg)"/>
+
+            <!-- Orbit rings -->
+            <circle cx="116" cy="90" r="52" stroke="#c8d5e8" stroke-width="1" stroke-dasharray="3 6" fill="none" opacity="0.7"/>
+            <circle cx="116" cy="90" r="76" stroke="#c8d5e8" stroke-width="1" stroke-dasharray="2 8" fill="none" opacity="0.4"/>
+
+            <!-- Pulse rings -->
+            <circle cx="116" cy="90" r="24" fill="none" stroke="#FF5D00" stroke-width="1.5" class="d0-pr1" opacity="0.5"/>
+            <circle cx="116" cy="90" r="24" fill="none" stroke="#FF5D00" stroke-width="1.5" class="d0-pr2" opacity="0.5"/>
+            <circle cx="116" cy="90" r="24" fill="none" stroke="#FF5D00" stroke-width="1.5" class="d0-pr3" opacity="0.5"/>
+
+            <!-- Connection lines -->
+            <line x1="42"  y1="38"  x2="96"  y2="72"  stroke="#5885cc" stroke-width="1"   class="d0-flow"  opacity="0.45"/>
+            <line x1="190" y1="36"  x2="138" y2="70"  stroke="#5885cc" stroke-width="1"   class="d0-flowr" opacity="0.45"/>
+            <line x1="18"  y1="96"  x2="88"  y2="90"  stroke="#FF5D00" stroke-width="1.2" class="d0-flow"  opacity="0.6"/>
+            <line x1="214" y1="94"  x2="144" y2="90"  stroke="#5885cc" stroke-width="1"   class="d0-flowr" opacity="0.45"/>
+            <line x1="50"  y1="152" x2="96"  y2="112" stroke="#FF5D00" stroke-width="1.2" class="d0-flowd" opacity="0.6"/>
+            <line x1="182" y1="150" x2="138" y2="112" stroke="#5885cc" stroke-width="1"   class="d0-flow"  opacity="0.45"/>
+
+            <!-- Animated data packets -->
+            <circle r="2.5" fill="#FF5D00" opacity="0.9">
+              <animateMotion dur="2s" repeatCount="indefinite"><mpath href="#dp1"/></animateMotion>
+            </circle>
+            <path id="dp1" d="M18,96 L88,90" fill="none"/>
+            <circle r="2" fill="#5885cc" opacity="0.85">
+              <animateMotion dur="2.4s" repeatCount="indefinite"><mpath href="#dp2"/></animateMotion>
+            </circle>
+            <path id="dp2" d="M42,38 L96,72" fill="none"/>
+            <circle r="2" fill="#FF5D00" opacity="0.9">
+              <animateMotion dur="1.9s" repeatCount="indefinite"><mpath href="#dp3"/></animateMotion>
+            </circle>
+            <path id="dp3" d="M50,152 L96,112" fill="none"/>
+
+            <!-- Top-left: Firewall node -->
+            <g transform="translate(16,18)" class="d0-bob">
+              <rect x="0" y="0" width="52" height="38" rx="6" fill="url(#d0node)" stroke="#2a4a7a" stroke-width="1"/>
+              <rect x="8" y="10" width="36" height="2.5" rx="1.2" fill="#5885cc" opacity="0.7"/>
+              <rect x="8" y="16" width="36" height="2.5" rx="1.2" fill="#FF5D00" opacity="0.6"/>
+              <rect x="8" y="22" width="24" height="2.5" rx="1.2" fill="#5885cc" opacity="0.4"/>
+              <text x="26" y="34" text-anchor="middle" font-size="7" fill="#9dafd3" font-family="system-ui">FW ×12</text>
+            </g>
+
+            <!-- Top-right: Cloud/NSv node -->
+            <g transform="translate(164,14)" class="d0-bob2">
+              <rect x="0" y="0" width="52" height="40" rx="6" fill="url(#d0node)" stroke="#2a4a7a" stroke-width="1"/>
+              <path d="M12 24 Q14 16 22 16 Q24 10 32 10 Q40 10 40 18 Q46 18 46 24 Z" fill="none" stroke="#5885cc" stroke-width="1.2" opacity="0.7"/>
+              <text x="26" y="36" text-anchor="middle" font-size="7" fill="#9dafd3" font-family="system-ui">NSv Cloud</text>
+            </g>
+
+            <!-- Left: NSM pill -->
+            <g transform="translate(0,78)" class="d0-bob3">
+              <rect x="0" y="0" width="44" height="28" rx="6" fill="#001b50" stroke="#FF5D00" stroke-width="1.2"/>
+              <text x="22" y="12" text-anchor="middle" font-size="7" font-weight="700" fill="#FF5D00" font-family="system-ui">NSM</text>
+              <rect x="5" y="16" width="34" height="2" rx="1" fill="#FF5D00" opacity="0.2"/>
+              <rect x="5" y="16" width="22" height="2" rx="1" fill="#FF5D00" opacity="0.7"/>
+              <text x="22" y="25" text-anchor="middle" font-size="6" fill="#9dafd3" font-family="system-ui">98 tenants</text>
+            </g>
+
+            <!-- Right: Switch node -->
+            <g transform="translate(188,76)" class="d0-bob">
+              <rect x="0" y="0" width="44" height="30" rx="6" fill="url(#d0node)" stroke="#2a4a7a" stroke-width="1"/>
+              <g fill="#5885cc" opacity="0.65">
+                <rect x="5"  y="8" width="6" height="4" rx="1"/>
+                <rect x="14" y="8" width="6" height="4" rx="1"/>
+                <rect x="23" y="8" width="6" height="4" rx="1"/>
+                <rect x="32" y="8" width="6" height="4" rx="1"/>
+              </g>
+              <rect x="14" y="8" width="6" height="4" rx="1" fill="#FF5D00" opacity="0.85"/>
+              <text x="22" y="24" text-anchor="middle" font-size="7" fill="#9dafd3" font-family="system-ui">SW ×48</text>
+            </g>
+
+            <!-- Bottom-left: CVE alert node -->
+            <g transform="translate(12,138)" class="d0-bob2">
+              <rect x="0" y="0" width="66" height="36" rx="6" fill="#0a0500" stroke="#FF5D00" stroke-width="1.2"/>
+              <text x="33" y="13" text-anchor="middle" font-size="7" font-weight="700" fill="#FF5D00" font-family="system-ui">CVE DETECTED</text>
+              <circle cx="10" cy="24" r="3" fill="#FF5D00"/>
+              <text x="18" y="28" font-size="6.5" fill="#cc8060" font-family="system-ui">CVSS 9.1 Critical</text>
+            </g>
+
+            <!-- Bottom-right: Anomaly node -->
+            <g transform="translate(154,136)" class="d0-bob3">
+              <rect x="0" y="0" width="66" height="36" rx="6" fill="#010810" stroke="#5885cc" stroke-width="1.2"/>
+              <text x="33" y="12" text-anchor="middle" font-size="7" font-weight="700" fill="#5885cc" font-family="system-ui">ANOMALY SCAN</text>
+              <rect x="6"  y="18" width="4" height="10" rx="1" fill="#5885cc" opacity="0.4"/>
+              <rect x="13" y="14" width="4" height="14" rx="1" fill="#5885cc" opacity="0.6"/>
+              <rect x="20" y="16" width="4" height="12" rx="1" fill="#FF5D00" opacity="0.9"/>
+              <rect x="27" y="20" width="4" height="8"  rx="1" fill="#5885cc" opacity="0.5"/>
+              <rect x="34" y="18" width="4" height="10" rx="1" fill="#5885cc" opacity="0.4"/>
+              <rect x="41" y="15" width="4" height="13" rx="1" fill="#5885cc" opacity="0.55"/>
+              <rect x="48" y="19" width="4" height="9"  rx="1" fill="#5885cc" opacity="0.4"/>
+              <text x="33" y="33" text-anchor="middle" font-size="6" fill="#78a3e5" font-family="system-ui">24/7 continuous</text>
+            </g>
+
+            <!-- Center: Shield + SAMI brain -->
+            <circle cx="116" cy="90" r="34" fill="#FF5D00" opacity="0.06"/>
+            <path d="M116 62 C116 62 96 70 96 84 L96 100 C96 110 106 118 116 122 C126 118 136 110 136 100 L136 84 C136 70 116 62 116 62Z" fill="url(#d0shield)" stroke="#2a4a7a" stroke-width="1"/>
+            <path d="M116 68 C116 68 100 75 100 87 L100 100 C100 108 109 115 116 118 C123 115 132 108 132 100 L132 87 C132 75 116 68 116 68Z" fill="none" stroke="#3b5a82" stroke-width="0.7" opacity="0.5"/>
+
+            <!-- Neural nodes -->
+            <g transform="translate(104,80)">
+              <circle cx="3"  cy="6"  r="2"   fill="#FF5D00" opacity="0.9"/>
+              <circle cx="12" cy="3"  r="2"   fill="#FF5D00" opacity="0.9"/>
+              <circle cx="21" cy="7"  r="2"   fill="#FF5D00" opacity="0.9"/>
+              <circle cx="6"  cy="17" r="2"   fill="#5885cc" opacity="0.9"/>
+              <circle cx="15" cy="14" r="2.5" fill="#FF5D00"/>
+              <circle cx="21" cy="20" r="2"   fill="#5885cc" opacity="0.9"/>
+              <circle cx="10" cy="27" r="2"   fill="#FF5D00" opacity="0.6"/>
+              <line x1="3"  y1="6"  x2="12" y2="3"  stroke="#FF5D00" stroke-width="0.7" opacity="0.6"/>
+              <line x1="12" y1="3"  x2="21" y2="7"  stroke="#FF5D00" stroke-width="0.7" opacity="0.6"/>
+              <line x1="12" y1="3"  x2="15" y2="14" stroke="#FF5D00" stroke-width="0.7" opacity="0.6"/>
+              <line x1="21" y1="7"  x2="15" y2="14" stroke="#FF5D00" stroke-width="0.7" opacity="0.6"/>
+              <line x1="3"  y1="6"  x2="6"  y2="17" stroke="#5885cc" stroke-width="0.7" opacity="0.5"/>
+              <line x1="15" y1="14" x2="21" y2="20" stroke="#FF5D00" stroke-width="0.7" opacity="0.6"/>
+              <line x1="6"  y1="17" x2="15" y2="14" stroke="#5885cc" stroke-width="0.7" opacity="0.5"/>
+              <line x1="6"  y1="17" x2="10" y2="27" stroke="#5885cc" stroke-width="0.7" opacity="0.5"/>
+            </g>
+            <text x="116" y="76" text-anchor="middle" font-size="9" fill="#FF5D00" class="d0-blink">✦</text>
+            <text x="116" y="130" text-anchor="middle" font-size="7" font-weight="800" fill="#FF5D00" letter-spacing="1.2" font-family="system-ui">SAMI</text>
+
+            <!-- Floating chips -->
+            <g transform="translate(68,50)" opacity="0.9">
+              <rect x="0" y="0" width="60" height="17" rx="8.5" fill="white" stroke="#d2dff2" stroke-width="1"/>
+              <circle cx="10" cy="8.5" r="4" fill="#59a02e"/>
+              <text x="9.5" y="12" text-anchor="middle" font-size="7" fill="white" font-family="system-ui">↓</text>
+              <text x="36" y="12" text-anchor="middle" font-size="7.5" fill="#191c25" font-weight="600" font-family="system-ui">Risk −34%</text>
+            </g>
+            <g transform="translate(108,150)" opacity="0.9">
+              <rect x="0" y="0" width="64" height="17" rx="8.5" fill="white" stroke="#d2dff2" stroke-width="1"/>
+              <circle cx="10" cy="8.5" r="4" fill="#5885cc"/>
+              <text x="9.5" y="12" text-anchor="middle" font-size="7" fill="white" font-family="system-ui">⚙</text>
+              <text x="38" y="12" text-anchor="middle" font-size="7.5" fill="#191c25" font-weight="600" font-family="system-ui">Auto-Fix Ready</text>
+            </g>
+          </svg>
+
+          <!-- Scan overlay -->
+          <div class="scan-overlay" id="scan-overlay">
+            <div class="scan-line" id="scan-line"></div>
+            <div class="scan-center">
+              <svg class="scan-shield-icon" viewBox="0 0 40 46" fill="none">
+                <path d="M20 2 C20 2 4 8 4 18 L4 32 C4 40 12 46 20 46 C28 46 36 40 36 32 L36 18 C36 8 20 2 20 2Z" fill="#001b50" stroke="#FF5D00" stroke-width="1.5"/>
+                <path d="M14 22l4 4 8-8" stroke="#FF5D00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0" id="shield-check"/>
+                <text x="20" y="28" text-anchor="middle" font-size="10" fill="#FF5D00" font-weight="800" font-family="system-ui" id="shield-spark">✦</text>
+              </svg>
+              <div class="scan-label" id="scan-label">Activating SAMI</div>
+              <div class="scan-counter"><span id="tenant-count">0</span><span>/ 98 tenants</span></div>
+              <div class="scan-sub-text" id="scan-sub">Connecting to devices…</div>
+            </div>
+            <div class="scan-progress-wrap">
+              <div class="scan-progress-bar" id="scan-progress"></div>
+            </div>
+          </div>
+
+          <!-- Success overlay -->
+          <div class="success-overlay" id="success-overlay">
+            <div class="success-check">
+              <svg width="22" height="22" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="success-text">SAMI Active</div>
+            <div class="success-subtext">98 tenants · 3 alerts found</div>
+          </div>
+
+        </div><!-- /day0-illus -->
+
+        <!-- Day-0 body -->
+        <div class="day0-body">
+
+          <!-- Eyebrow -->
+          <div class="day0-eyebrow">
+            <span class="e-dot"></span>
+            SAMI IS READY — ACTIVATION REQUIRED
+          </div>
+
+          <div class="day0-headline">
+            <span>SAMI</span> starts protecting the moment you activate
+          </div>
+          <p class="day0-sub">
+            SAMI correlates CVE intelligence, device telemetry, and behavioral signals across all 98 tenants — surfacing critical alerts before they become incidents, with one-click fixes built in.
+          </p>
+
+          <!-- Benefit pills -->
+          <div class="day0-benefits">
+            <div class="benefit-pill">
+              <div class="bp-icon" style="background:var(--uuif-surface-selected);">
+                <svg width="11" height="11" fill="none" stroke="#FF5D00" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+              </div>
+              CVE Alerts
+            </div>
+            <div class="benefit-pill">
+              <div class="bp-icon" style="background:var(--uuif-fill-blue-lightest);">
+                <svg width="11" height="11" fill="none" stroke="#5885cc" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+              </div>
+              Behavioral Anomalies
+            </div>
+            <div class="benefit-pill">
+              <div class="bp-icon" style="background:var(--uuif-fill-green-xxx-lighter);">
+                <svg width="11" height="11" fill="none" stroke="#59a02e" stroke-width="2" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              </div>
+              One-Click Remediation
+            </div>
+            <div class="benefit-pill">
+              <div class="bp-icon" style="background:var(--uuif-surface-selected);">
+                <svg width="11" height="11" fill="none" stroke="#FF5D00" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+              </div>
+              Tenant Risk Scoring
+            </div>
+            <div class="benefit-pill">
+              <div class="bp-icon" style="background:#eef0ff;">
+                <svg width="11" height="11" fill="none" stroke="#4a618f" stroke-width="2" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+              </div>
+              Ask SAMI — NL Queries
+            </div>
+          </div>
+
+          <!-- CTAs -->
+          <div class="day0-ctas">
+            <button class="btn-activate" id="activate-btn" onclick="activateSAMI()">
+              <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24" id="btn-icon"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              <span id="btn-label">Activate SAMI</span>
+            </button>
+            <button class="btn-learn">How SAMI works →</button>
+            <span class="risk-stat">
+              <svg width="11" height="11" fill="#59a02e" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Avg. 34% risk reduction in 30 days
+            </span>
+          </div>
+
+        </div><!-- /day0-body -->
+
+      </div><!-- /day0-empty -->
+
+      <!-- ══════════════════════════════════════
+           ACTIVATED STATE
+      ══════════════════════════════════════ -->
+      <div id="sami-active">
+
+        <!-- ── SAMI Header: centered greeting, no background ── -->
+        <div class="sami-active-header">
+          <div class="sami-active-top">
+            <div class="sami-active-greeting">Good morning, <span>MK</span></div>
+            <div class="sami-active-sub">SAMI processed <strong>1,247</strong> events in the last hour</div>
+          </div>
+          <div class="sami-active-ask-row">
+            <div class="sami-active-ask">
+              <svg width="15" height="15" viewBox="0 0 10 10" fill="#ff5d00"><path d="M5 1l.93 2.57L8.5 4.5l-2.57.93L5 8l-.93-2.57L1.5 4.5l2.57-.93z"/></svg>
+              <input type="text" placeholder="Ask SAMI anything — e.g. &quot;Show renewals at risk this month&quot;">
+              <span class="sami-ask-kbd">⌘ K</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Two-column layout — no container boxes, cards float on gradient -->
+        <div class="sami-figma-grid">
+
+          <!-- LEFT: NEED ATTENTION -->
+          <div class="sami-figma-col">
+            <div class="sami-figma-col-header">
+              <span class="sami-figma-col-title">NEED ATTENTION</span>
+              <a class="sami-figma-viewall" href="#">View all ›</a>
+            </div>
+
+            <!-- Alert card 1 -->
+            <div class="sami-figma-card">
+              <div class="sami-figma-card-top">
+                <div class="sami-figma-card-dot"></div>
+                <div class="sami-figma-card-content">
+                  <div class="sami-figma-card-title-row">
+                    <div class="sami-figma-card-title">Device Remote Branch 2 (2CB8EDB53448) interface X2 down</div>
+                    <div class="sami-figma-card-time">3 hrs ago <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#b0b8cc" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg></div>
+                  </div>
+                  <div class="sami-figma-card-desc">Interface X2 on Remote Branch 2 device (MAC: 2C:B8:ED:B5:34:48) has gone down unexpectedly. The link failure may result in degraded connectivity or loss of redundancy for traffic traversing this branch segment. Immediate investigatio…</div>
+                  <div class="sami-figma-card-footer">
+                    <div class="sami-figma-card-tags">
+                      <span class="sami-figma-pill pill-emergency">Emergency</span>
+                      <span class="sami-figma-card-tag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Acme Tenant 1</span>
+                      <span class="sami-figma-card-tag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Remote Branch 2</span>
+                    </div>
+                    <div class="sami-figma-card-actions">
+                      <button class="sami-figma-btn-outline">Reboot Firewall</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Alert card 2 -->
+            <div class="sami-figma-card">
+              <div class="sami-figma-card-top">
+                <div class="sami-figma-card-dot"></div>
+                <div class="sami-figma-card-content">
+                  <div class="sami-figma-card-title-row">
+                    <div class="sami-figma-card-title">Device Remote Branch 2 (2CB8EDB53448) interface X2 down</div>
+                    <div class="sami-figma-card-time">3 hrs ago <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#b0b8cc" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg></div>
+                  </div>
+                  <div class="sami-figma-card-desc">Interface X2 on Remote Branch 2 device (MAC: 2C:B8:ED:B5:34:48) has gone down unexpectedly. The link failure may result in degraded connectivity or loss of redundancy for traffic traversing this branch segment. Immediate investigatio…</div>
+                  <div class="sami-figma-card-footer">
+                    <div class="sami-figma-card-tags">
+                      <span class="sami-figma-pill pill-emergency">Emergency</span>
+                      <span class="sami-figma-card-tag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Acme Tenant 1</span>
+                      <span class="sami-figma-card-tag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Remote Branch 2</span>
+                    </div>
+                    <div class="sami-figma-card-actions">
+                      <button class="sami-figma-btn-outline">Reboot Firewall</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Alert card 3 -->
+            <div class="sami-figma-card">
+              <div class="sami-figma-card-top">
+                <div class="sami-figma-card-dot"></div>
+                <div class="sami-figma-card-content">
+                  <div class="sami-figma-card-title-row">
+                    <div class="sami-figma-card-title">Device Remote Branch 2 (2CB8EDB53448) interface X2 down</div>
+                    <div class="sami-figma-card-time">3 hrs ago <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#b0b8cc" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg></div>
+                  </div>
+                  <div class="sami-figma-card-desc">Interface X2 on Remote Branch 2 device (MAC: 2C:B8:ED:B5:34:48) has gone down unexpectedly. The link failure may result in degraded connectivity or loss of redundancy for traffic traversing this branch segment. Immediate investigatio…</div>
+                  <div class="sami-figma-card-footer">
+                    <div class="sami-figma-card-tags">
+                      <span class="sami-figma-pill pill-emergency">Emergency</span>
+                      <span class="sami-figma-card-tag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Acme Tenant 1</span>
+                      <span class="sami-figma-card-tag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Remote Branch 2</span>
+                    </div>
+                    <div class="sami-figma-card-actions">
+                      <button class="sami-figma-btn-outline">Reboot Firewall</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Alert card 4 -->
+            <div class="sami-figma-card">
+              <div class="sami-figma-card-top">
+                <div class="sami-figma-card-dot"></div>
+                <div class="sami-figma-card-content">
+                  <div class="sami-figma-card-title-row">
+                    <div class="sami-figma-card-title">Device Remote Branch 2 (2CB8EDB53448) interface X2 down</div>
+                    <div class="sami-figma-card-time">3 hrs ago <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#b0b8cc" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg></div>
+                  </div>
+                  <div class="sami-figma-card-desc">Interface X2 on Remote Branch 2 device (MAC: 2C:B8:ED:B5:34:48) has gone down unexpectedly. The link failure may result in degraded connectivity or loss of redundancy for traffic traversing this branch segment. Immediate investigatio…</div>
+                  <div class="sami-figma-card-footer">
+                    <div class="sami-figma-card-tags">
+                      <span class="sami-figma-pill pill-emergency">Emergency</span>
+                      <span class="sami-figma-card-tag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Acme Tenant 1</span>
+                      <span class="sami-figma-card-tag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Remote Branch 2</span>
+                    </div>
+                    <div class="sami-figma-card-actions">
+                      <button class="sami-figma-btn-outline">Reboot Firewall</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /left col -->
+
+          <!-- RIGHT: AI RECOMMENDATIONS -->
+          <div class="sami-figma-col">
+            <div class="sami-figma-col-header" style="flex-direction:column; align-items:flex-start; gap:2px;">
+              <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+                <span class="sami-figma-col-title">AI RECOMMENDATIONS</span>
+                <a class="sami-figma-viewall" href="#">View all ›</a>
+              </div>
+              <div class="sami-figma-col-subtitle">SAMI processed 1,247 events in the last hour</div>
+            </div>
+
+            <!-- Stat cards row -->
+            <div class="sami-figma-stats">
+              <!-- CVE Vulnerabilities -->
+              <div class="sami-figma-stat-card">
+                <div class="sami-figma-stat-label">CVE Vulnerabilities</div>
+                <div class="sami-figma-stat-top">
+                  <div class="sami-figma-stat-val" style="color:#191c25;">8</div>
+                  <svg width="52" height="38" viewBox="0 0 52 38">
+                    <rect x="0"  y="26" width="6" height="12" rx="1" fill="#5885cc" opacity="0.35"/>
+                    <rect x="8"  y="18" width="6" height="20" rx="1" fill="#5885cc" opacity="0.5"/>
+                    <rect x="16" y="22" width="6" height="16" rx="1" fill="#5885cc" opacity="0.45"/>
+                    <rect x="24" y="10" width="6" height="28" rx="1" fill="#5885cc" opacity="0.6"/>
+                    <rect x="32" y="14" width="6" height="24" rx="1" fill="#5885cc" opacity="0.55"/>
+                    <rect x="40" y="4"  width="6" height="34" rx="1" fill="#5885cc" opacity="0.85"/>
+                  </svg>
+                </div>
+                <div class="sami-figma-stat-sub">
+                  <span><span class="stat-crit">2</span> CRITICAL</span>
+                  <span><span class="stat-high">3</span> HIGH</span>
+                </div>
+                <a href="#" class="sami-figma-stat-viewall">View All &gt;</a>
+              </div>
+              <!-- Behavioral Anomalies -->
+              <div class="sami-figma-stat-card">
+                <div class="sami-figma-stat-label">Behavioral Anomalies</div>
+                <div class="sami-figma-stat-top">
+                  <div class="sami-figma-stat-val" style="color:#191c25;">20</div>
+                  <!-- Area/wave chart shape for behavioral -->
+                  <svg width="52" height="38" viewBox="0 0 52 38" fill="none">
+                    <path d="M0 28 C6 20, 12 32, 18 22 C24 12, 30 30, 36 18 C42 6, 48 24, 52 16 L52 38 L0 38 Z" fill="#4caf82" opacity="0.5"/>
+                    <path d="M0 28 C6 20, 12 32, 18 22 C24 12, 30 30, 36 18 C42 6, 48 24, 52 16" stroke="#4caf82" stroke-width="2" fill="none"/>
+                  </svg>
+                </div>
+                <div class="sami-figma-stat-sub">
+                  <span><span class="stat-crit">2</span> CRITICAL</span>
+                  <span><span class="stat-high">3</span> HIGH</span>
+                </div>
+                <a href="#" class="sami-figma-stat-viewall">View All &gt;</a>
+              </div>
+              <!-- Policy Gaps Found -->
+              <div class="sami-figma-stat-card">
+                <div class="sami-figma-stat-label">Policy Gaps Found</div>
+                <div class="sami-figma-stat-top">
+                  <div class="sami-figma-stat-val" style="color:#191c25;">8</div>
+                  <svg width="52" height="38" viewBox="0 0 52 38">
+                    <rect x="0"  y="16" width="6" height="22" rx="1" fill="#5885cc" opacity="0.35"/>
+                    <rect x="8"  y="24" width="6" height="14" rx="1" fill="#5885cc" opacity="0.5"/>
+                    <rect x="16" y="12" width="6" height="26" rx="1" fill="#5885cc" opacity="0.45"/>
+                    <rect x="24" y="20" width="6" height="18" rx="1" fill="#5885cc" opacity="0.6"/>
+                    <rect x="32" y="28" width="6" height="10" rx="1" fill="#5885cc" opacity="0.55"/>
+                    <rect x="40" y="4"  width="6" height="34" rx="1" fill="#5885cc" opacity="0.85"/>
+                  </svg>
+                </div>
+                <div class="sami-figma-stat-sub">
+                  <span><span class="stat-crit">2</span> CRITICAL</span>
+                  <span><span class="stat-high">3</span> HIGH</span>
+                </div>
+                <a href="#" class="sami-figma-stat-viewall">View All &gt;</a>
+              </div>
+            </div>
+
+            <!-- Rec card 1 -->
+            <!-- Rec card 1 — Critical -->
+            <div class="sami-figma-rec-card">
+              <div class="sami-figma-rec-top">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <div class="sami-figma-card-dot"></div>
+                  <div class="sami-figma-card-title" style="margin:0;">3 Gateways Unreachable — Northgate Health &amp; Delta Logistics</div>
+                </div>
+                <span class="sami-figma-rec-time">3 hrs ago</span>
+              </div>
+              <div class="sami-figma-rec-desc" style="margin-top:6px;">Anomalous east-west traffic observed across 4 internal segments over 2 hours. SAMI detected credential reuse patterns consistent with lateral movement TTPs …</div>
+              <div class="sami-figma-rec-footer">
+                <div class="sami-figma-card-tags">
+                  <span class="sami-figma-pill pill-critical">Critical</span>
+                  <span class="sami-figma-card-tag">CVE Vulnerabilities</span>
+                  <span class="sami-figma-card-tag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Multiple tenants</span>
+                  <span class="sami-figma-card-tag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> 3 Firewalls</span>
+                </div>
+                <div class="sami-figma-rec-actions">
+                  <button class="sami-figma-btn-outline">Enforce policy</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Rec card 2 — High -->
+            <div class="sami-figma-rec-card">
+              <div class="sami-figma-rec-top">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <div class="sami-figma-card-dot dot-orange"></div>
+                  <div class="sami-figma-card-title" style="margin:0;">3 Gateways Unreachable — Northgate Health &amp; Delta Logistics</div>
+                </div>
+                <span class="sami-figma-rec-time">3 hrs ago</span>
+              </div>
+              <div class="sami-figma-rec-desc" style="margin-top:6px;">Anomalous east-west traffic observed across 4 internal segments over 2 hours. SAMI detected credential reuse patterns consistent with lateral movement TTPs …</div>
+              <div class="sami-figma-rec-footer">
+                <div class="sami-figma-card-tags">
+                  <span class="sami-figma-pill pill-high">High</span>
+                  <span class="sami-figma-card-tag">CVE Vulnerabilities</span>
+                  <span class="sami-figma-card-tag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Multiple tenants</span>
+                  <span class="sami-figma-card-tag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> 3 Firewalls</span>
+                </div>
+                <div class="sami-figma-rec-actions">
+                  <button class="sami-figma-btn-outline">Enforce policy</button>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /right col -->
+
+        </div><!-- /sami-figma-grid -->
+      </div><!-- /sami-active -->
+
+    </div><!-- /sami-container -->
+
+    </div><!-- /pane-sami-alerts -->
+
+    <!-- ══ PANE: NOTIFICATIONS (from UM landing page) ══ -->
+    <div id="pane-notifications" style="display:none;">
+      <div class="notif">
+        <div class="notif-head">
+          <div class="notif-title">NOTIFICATIONS</div>
+          <div class="notif-sub">Notifications for Product Alerts</div>
+        </div>
+
+        <div class="notif-toolbar">
+          <span class="filter-icon">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+          </span>
+          <div class="search-wrap">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input class="search-input" placeholder="Search friendly name / issue type / priority / tenant etc."/>
+          </div>
+
+          <div class="totals-block">
+            <div class="total-item"><div class="total-label">TOTAL</div><div class="total-value" id="notif-totalAll">141</div></div>
+            <div class="total-item"><div class="total-label">SECURITY</div><div class="total-value" id="notif-totalSec">1</div></div>
+            <div class="total-item"><div class="total-label">SYSTEM</div><div class="total-value" id="notif-totalSys">140</div></div>
+            <div class="total-item"><div class="total-label">LICENSE</div><div class="total-value" id="notif-totalLic">0</div></div>
+          </div>
+
+          <div class="time-range">
+            <div class="radio-circle"></div>
+            <div class="time-select">24 Hours <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></div>
+            <div class="radio-circle"></div>
+            <div class="custom-label">Custom</div>
+          </div>
+
+          <div class="toolbar-actions">
+            <button class="toolbar-btn">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+              Export
+            </button>
+            <button class="toolbar-btn">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              Refresh
+            </button>
+            <button class="toolbar-btn">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+              Map
+            </button>
+            <button class="toolbar-btn active">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+              List
+            </button>
+          </div>
+        </div>
+
+        <div class="notif-tabs">
+          <div class="notif-tab active" data-notif-tab="firewalls">FIREWALLS</div>
+          <div class="notif-tab" data-notif-tab="ap">ACCESS POINTS</div>
+          <div class="notif-tab" data-notif-tab="sw">SWITCHES</div>
+          <div class="notif-tab" data-notif-tab="cc">CAPTURE CLIENT</div>
+          <div class="notif-tab" data-notif-tab="ccmdr">CAPTURE CLIENT MDR</div>
+        </div>
+
+        <!-- ── FIREWALLS PANE ── -->
+        <div id="notif-pane-firewalls">
+          <table class="notif-table">
+            <thead>
+              <tr>
+                <th style="width:30px;"><div class="notif-check"></div></th>
+                <th class="sortable" style="width:110px;">LOCAL TIME</th>
+                <th>MESSAGE</th>
+                <th style="width:80px;">PRIORITY</th>
+                <th style="width:130px;">TENANT</th>
+                <th style="width:130px;">ALERT STATE</th>
+                <th style="width:120px;">SOURCE IP</th>
+                <th style="width:110px;">TYPE</th>
+                <th style="width:130px;">FRIENDLY NAME</th>
+                <th style="width:100px;">CATEGORY</th>
+                <th style="width:70px;">ACTION</th>
+              </tr>
+            </thead>
+            <tbody id="notif-alert-table-body">
+              <tr>
+                <td><div class="notif-check"></div></td>
+                <td class="notif-local-time"><span>11 May 2026</span><span style="color:var(--uuif-text-tertiary);">21:49:51</span></td>
+                <td>Device interface X0 up</td>
+                <td><span class="priority-info">Info</span></td>
+                <td><div class="notif-tenant-cell"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>Acme Tenant 1</div></td>
+                <td><div class="state-dropdown">New <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></div></td>
+                <td class="notif-source-ip">122.171.19.150</td>
+                <td><div class="notif-type-cell"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M9 21h6M12 17v4"/></svg>Interfaces</div></td>
+                <td>Remote Branch 2</td>
+                <td class="notif-category">SYSTEM</td>
+                <td style="color:var(--uuif-text-tertiary);">-</td>
+              </tr>
+              <tr>
+                <td><div class="notif-check"></div></td>
+                <td class="notif-local-time"><span>11 May 2026</span><span style="color:var(--uuif-text-tertiary);">21:49:41</span></td>
+                <td>Device interface X0 down</td>
+                <td><span class="priority-warning">Warning</span></td>
+                <td><div class="notif-tenant-cell"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>Westfield IT</div></td>
+                <td><div class="state-dropdown">New <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></div></td>
+                <td class="notif-source-ip">122.171.19.150</td>
+                <td><div class="notif-type-cell"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M9 21h6M12 17v4"/></svg>Interfaces</div></td>
+                <td>Remote Branch 2</td>
+                <td class="notif-category">SYSTEM</td>
+                <td style="color:var(--uuif-text-tertiary);">-</td>
+              </tr>
+              <tr>
+                <td><div class="notif-check"></div></td>
+                <td class="notif-local-time"><span>11 May 2026</span><span style="color:var(--uuif-text-tertiary);">21:38:29</span></td>
+                <td>Device interface X2 up</td>
+                <td><span class="priority-info">Info</span></td>
+                <td><div class="notif-tenant-cell"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>Riverside Mfg</div></td>
+                <td><div class="state-dropdown">New <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></div></td>
+                <td class="notif-source-ip">122.171.19.150</td>
+                <td><div class="notif-type-cell"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M9 21h6M12 17v4"/></svg>Interfaces</div></td>
+                <td>Remote Branch 2</td>
+                <td class="notif-category">SYSTEM</td>
+                <td style="color:var(--uuif-text-tertiary);">-</td>
+              </tr>
+              <tr>
+                <td><div class="notif-check"></div></td>
+                <td class="notif-local-time"><span>11 May 2026</span><span style="color:var(--uuif-text-tertiary);">21:38:18</span></td>
+                <td>Device interface X2 down</td>
+                <td><span class="priority-warning">Warning</span></td>
+                <td><div class="notif-tenant-cell"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>Northgate Health</div></td>
+                <td><div class="state-dropdown">New <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></div></td>
+                <td class="notif-source-ip">122.171.19.150</td>
+                <td><div class="notif-type-cell"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M9 21h6M12 17v4"/></svg>Interfaces</div></td>
+                <td>Remote Branch 2</td>
+                <td class="notif-category">SYSTEM</td>
+                <td style="color:var(--uuif-text-tertiary);">-</td>
+              </tr>
+              <tr>
+                <td><div class="notif-check"></div></td>
+                <td class="notif-local-time"><span>11 May 2026</span><span style="color:var(--uuif-text-tertiary);">21:27:47</span></td>
+                <td>Device interface X3 up</td>
+                <td><span class="priority-info">Info</span></td>
+                <td><div class="notif-tenant-cell"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>Acme Tenant 1</div></td>
+                <td><div class="state-dropdown">New <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></div></td>
+                <td class="notif-source-ip">122.171.19.150</td>
+                <td><div class="notif-type-cell"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M9 21h6M12 17v4"/></svg>Interfaces</div></td>
+                <td>Remote Branch 2</td>
+                <td class="notif-category">SYSTEM</td>
+                <td style="color:var(--uuif-text-tertiary);">-</td>
+              </tr>
+              <tr>
+                <td><div class="notif-check"></div></td>
+                <td class="notif-local-time"><span>11 May 2026</span><span style="color:var(--uuif-text-tertiary);">21:26:45</span></td>
+                <td>Device interface X3 down</td>
+                <td><span class="priority-warning">Warning</span></td>
+                <td><div class="notif-tenant-cell"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>Multiregion_june_US</div></td>
+                <td><div class="state-dropdown">New <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></div></td>
+                <td class="notif-source-ip">122.171.19.150</td>
+                <td><div class="notif-type-cell"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M9 21h6M12 17v4"/></svg>Interfaces</div></td>
+                <td>Remote Branch 2</td>
+                <td class="notif-category">SYSTEM</td>
+                <td style="color:var(--uuif-text-tertiary);">-</td>
+              </tr>
+              <tr>
+                <td><div class="notif-check"></div></td>
+                <td class="notif-local-time"><span>11 May 2026</span><span style="color:var(--uuif-text-tertiary);">21:20:28</span></td>
+                <td>Device interface X3 up</td>
+                <td><span class="priority-info">Info</span></td>
+                <td><div class="notif-tenant-cell"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>Acme Tenant 1</div></td>
+                <td><div class="state-dropdown">New <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></div></td>
+                <td class="notif-source-ip">122.171.19.150</td>
+                <td><div class="notif-type-cell"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M9 21h6M12 17v4"/></svg>Interfaces</div></td>
+                <td>Remote Branch 2</td>
+                <td class="notif-category">SYSTEM</td>
+                <td style="color:var(--uuif-text-tertiary);">-</td>
+              </tr>
+              <tr>
+                <td><div class="notif-check"></div></td>
+                <td class="notif-local-time"><span>11 May 2026</span><span style="color:var(--uuif-text-tertiary);">21:19:17</span></td>
+                <td>Device interface X3 down</td>
+                <td><span class="priority-warning">Warning</span></td>
+                <td><div class="notif-tenant-cell"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>Westfield IT</div></td>
+                <td><div class="state-dropdown">New <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></div></td>
+                <td class="notif-source-ip">122.171.19.150</td>
+                <td><div class="notif-type-cell"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M9 21h6M12 17v4"/></svg>Interfaces</div></td>
+                <td>Remote Branch 2</td>
+                <td class="notif-category">SYSTEM</td>
+                <td style="color:var(--uuif-text-tertiary);">-</td>
+              </tr>
+              <tr>
+                <td><div class="notif-check"></div></td>
+                <td class="notif-local-time"><span>11 May 2026</span><span style="color:var(--uuif-text-tertiary);">21:14:01</span></td>
+                <td>Device interface X0 up</td>
+                <td><span class="priority-info">Info</span></td>
+                <td><div class="notif-tenant-cell"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>Riverside Mfg</div></td>
+                <td><div class="state-dropdown">New <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></div></td>
+                <td class="notif-source-ip">122.171.19.150</td>
+                <td><div class="notif-type-cell"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M9 21h6M12 17v4"/></svg>Interfaces</div></td>
+                <td>Remote Branch 2</td>
+                <td class="notif-category">SYSTEM</td>
+                <td style="color:var(--uuif-text-tertiary);">-</td>
+              </tr>
+              <tr>
+                <td><div class="notif-check"></div></td>
+                <td class="notif-local-time"><span>11 May 2026</span><span style="color:var(--uuif-text-tertiary);">21:13:51</span></td>
+                <td>Device interface X0 down</td>
+                <td><span class="priority-warning">Warning</span></td>
+                <td><div class="notif-tenant-cell"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>Acme Tenant 1</div></td>
+                <td><div class="state-dropdown">New <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></div></td>
+                <td class="notif-source-ip">122.171.19.150</td>
+                <td><div class="notif-type-cell"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M9 21h6M12 17v4"/></svg>Interfaces</div></td>
+                <td>Remote Branch 2</td>
+                <td class="notif-category">SYSTEM</td>
+                <td style="color:var(--uuif-text-tertiary);">-</td>
+              </tr>
+              <tr>
+                <td><div class="notif-check"></div></td>
+                <td class="notif-local-time"><span>11 May 2026</span><span style="color:var(--uuif-text-tertiary);">20:57:22</span></td>
+                <td>Device interface X0 up</td>
+                <td><span class="priority-info">Info</span></td>
+                <td><div class="notif-tenant-cell"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>Northgate Health</div></td>
+                <td><div class="state-dropdown">New <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></div></td>
+                <td class="notif-source-ip">122.171.19.150</td>
+                <td><div class="notif-type-cell"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M9 21h6M12 17v4"/></svg>Interfaces</div></td>
+                <td>Remote Branch 2</td>
+                <td class="notif-category">SYSTEM</td>
+                <td style="color:var(--uuif-text-tertiary);">-</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div><!-- /pane-notifications -->
+
+    </div><!-- /sami-section-body -->
+    </div><!-- /sami-section-wrap -->
+
+  </div><!-- /page-content -->
+</main>
+
+<script>
+/* ─── Main tab switching (SAMI Alerts / Notifications) ─── */
+function switchMainTab(el, paneId) {
+  document.querySelectorAll('.sami-section-tabs .uuif-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('pane-sami-alerts').style.display = paneId === 'pane-sami-alerts' ? '' : 'none';
+  document.getElementById('pane-notifications').style.display = paneId === 'pane-notifications' ? '' : 'none';
+}
+
+/* ─── Notifications inner tabs ─── */
+(function () {
+  document.addEventListener('click', function (e) {
+    const t = e.target.closest('[data-notif-tab]');
+    if (!t) return;
+    document.querySelectorAll('[data-notif-tab]').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    const key = t.dataset.notifTab;
+    document.getElementById('notif-pane-firewalls').style.display = '';
+  });
+})();
+
+/* ─── Notifications scope data ─── */
+const NOTIF_SCOPE_DATA = {
+  all: {
+    totals: { total: 141, sec: 1, sys: 140, lic: 0 },
+    samiHeader: {
+      title: 'SAMI Triage Summary — 4 grouped insights from 68 raw alerts',
+      sub: 'AI-clustered across Firewalls, Access Points, Switches, Capture Client, and CC MDR · Last update 2 min ago',
+      chips: [
+        { cls:'chip-critical', text:'1 Critical' },
+        { cls:'chip-high', text:'1 High' },
+        { cls:'chip-medium', text:'1 Medium' },
+        { cls:'chip-resolved', text:'1 Resolved' }
+      ]
+    },
+    samiRows: [
+      { sev:'critical', title:'Coordinated lateral movement — same adversary TTP across 3 tenants, 7 endpoints auto-isolated', time:'14 May 2026 · 02:07–08:09', tenants:'Acme Corp · Westfield IT · Riverside Mfg', rootCauseClass:'cause-red', rootCause:'Root cause: shared C2 beacon · IP cluster 45.77.x.x', rawAlerts:'47 raw alerts', cta:'Escalate to clients' },
+      { sev:'high', title:'License expiry cluster — 4 tenants, $287K ARR at risk, SKUs pre-built for 3 accounts', time:'Expiring 25 May–8 Jun 2026', tenants:'swapna6 · Acme Tenant 1 · Westfield IT · Multiregion_june_US', rootCauseClass:'cause-orange', rootCause:'Root cause: renewal not initiated on any of 4 accounts', rawAlerts:'4 raw alerts', cta:'Start renewals' },
+      { sev:'medium', title:'Interface flap loop — Remote Branch 2 X2/X3 cycling, likely upstream switch fault, not a security event', time:'13–14 May 2026 · 02:01–22:44', tenants:'Acme Tenant 1 · 122.171.19.150', rootCauseClass:'cause-blue', rootCause:'Root cause: oscillating link state on upstream switch port', rawAlerts:'14 raw alerts', cta:'Check switch port' },
+      { sev:'resolved', title:'Disk scan completed — 3 Capture Client endpoints, all clean, auto-resolved by SAMI', time:'11 May 2026 · 01:37', tenants:'ccqanoam_premier', rootCauseClass:'cause-green', rootCause:'Auto-resolved · no action required', rawAlerts:'3 raw alerts', resolved:true }
+    ],
+    notifRows: [
+      { time:'21:49:51', msg:'X0 up',   prio:'Info',    tenant:'Acme Tenant 1' },
+      { time:'21:49:41', msg:'X0 down', prio:'Warning', tenant:'Westfield IT' },
+      { time:'21:38:29', msg:'X2 up',   prio:'Info',    tenant:'Riverside Mfg' },
+      { time:'21:38:18', msg:'X2 down', prio:'Warning', tenant:'Northgate Health' },
+      { time:'21:27:47', msg:'X3 up',   prio:'Info',    tenant:'Acme Tenant 1' },
+      { time:'21:26:45', msg:'X3 down', prio:'Warning', tenant:'Multiregion_june_US' },
+      { time:'21:20:28', msg:'X3 up',   prio:'Info',    tenant:'Acme Tenant 1' },
+      { time:'21:19:17', msg:'X3 down', prio:'Warning', tenant:'Westfield IT' },
+      { time:'21:14:01', msg:'X0 up',   prio:'Info',    tenant:'Riverside Mfg' },
+      { time:'21:13:51', msg:'X0 down', prio:'Warning', tenant:'Acme Tenant 1' },
+      { time:'20:57:22', msg:'X0 up',   prio:'Info',    tenant:'Northgate Health' }
+    ]
+  }
+};
+
+function renderNotifications(scopeKey) {
+  const d = NOTIF_SCOPE_DATA[scopeKey] || NOTIF_SCOPE_DATA['all'];
+
+  // Totals
+  const setIfExists = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  setIfExists('notif-totalAll', d.totals.total);
+  setIfExists('notif-totalSec', d.totals.sec);
+  setIfExists('notif-totalSys', d.totals.sys);
+  setIfExists('notif-totalLic', d.totals.lic);
+
+  // SAMI Alerts header
+  const hdr = d.samiHeader;
+  document.getElementById('notifSamiAlertsHeader').innerHTML = `
+    <div class="sami-alerts-header-left">
+      <div class="sami-alerts-icon">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="12" rx="2"/><circle cx="9" cy="13" r="1.2" fill="currentColor"/><circle cx="15" cy="13" r="1.2" fill="currentColor"/><path d="M12 3v4"/></svg>
+      </div>
+      <div>
+        <div class="sami-alerts-header-title">${hdr.title}</div>
+        <div class="sami-alerts-header-sub">${hdr.sub}</div>
+      </div>
+    </div>
+    <div class="sami-summary-chips">
+      ${hdr.chips.map(c => `<span class="sami-summary-chip ${c.cls}">${c.text}</span>`).join('')}
+    </div>
+  `;
+
+  // SAMI Alerts rows
+  document.getElementById('notifSamiAlertsRows').innerHTML = d.samiRows.map(r => `
+    <div class="sami-alerts-row sev-${r.sev}">
+      <div class="sami-row-left">
+        <span class="sami-pill">SAMI</span>
+        <div class="sami-row-content">
+          <div class="sami-row-title">${r.title}</div>
+          <div class="sami-row-meta">
+            <span class="sami-meta-time">${r.time}</span>
+            <span class="sami-meta-tenants">${r.tenants}</span>
+            <span class="sami-root-cause ${r.rootCauseClass}">${r.rootCause}</span>
+          </div>
+        </div>
+      </div>
+      <div class="sami-row-right">
+        <span class="raw-alerts-pill">${r.rawAlerts}</span>
+        ${r.resolved ? `<span class="resolved-badge">RESOLVED</span>` : `<button class="cta-primary">${r.cta}</button>`}
+        <button class="why-group">
+          Why this group?
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
+        </button>
+      </div>
+    </div>
+  `).join('');
+
+  // Firewalls table
+  const tbody = document.getElementById('notif-alert-table-body');
+  if (tbody) {
+    tbody.innerHTML = d.notifRows.map(r => {
+      const prioClass = r.prio === 'Warning' ? 'priority-warning' : 'priority-info';
+      return `
+        <tr>
+          <td><div class="notif-check"></div></td>
+          <td class="notif-local-time"><span>11 May 2026</span><span style="color:var(--uuif-text-tertiary);">${r.time}</span></td>
+          <td>${r.msg.startsWith('X') ? 'Device interface ' + r.msg : r.msg}</td>
+          <td><span class="${prioClass}">${r.prio}</span></td>
+          <td>
+            <div class="notif-tenant-cell">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+              ${r.tenant}
+            </div>
+          </td>
+          <td>
+            <div class="state-dropdown">
+              New
+              <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
+            </div>
+          </td>
+          <td class="notif-source-ip">122.171.19.150</td>
+          <td>
+            <div class="notif-type-cell">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M9 21h6M12 17v4"/></svg>
+              ${r.msg.startsWith('X') ? 'Interfaces' : 'Security'}
+            </div>
+          </td>
+          <td>Remote Branch 2</td>
+          <td class="notif-category">SYSTEM</td>
+          <td style="color:var(--uuif-text-tertiary);">-</td>
+        </tr>
+      `;
+    }).join('');
+  }
+}
+
+/* Tab switching (legacy — kept for any other .uuif-tab uses) */
+function switchTab(el) {
+  document.querySelectorAll('.uuif-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+/* Dismiss active banner */
+function dismissBanner() {
+  const banner = document.getElementById('active-banner');
+  if (!banner || banner.classList.contains('dimissing')) return;
+  banner.classList.add('dimissing');
+  setTimeout(() => { banner.style.display = 'none'; }, 450);
+}
+
+/* Activate SAMI animation */
+function activateSAMI() {
+  const btn       = document.getElementById('activate-btn');
+  const btnIcon   = document.getElementById('btn-icon');
+  const btnLabel  = document.getElementById('btn-label');
+  const overlay   = document.getElementById('scan-overlay');
+  const scanLine  = document.getElementById('scan-line');
+  const progress  = document.getElementById('scan-progress');
+  const counter   = document.getElementById('tenant-count');
+  const scanLabel = document.getElementById('scan-label');
+  const scanSub   = document.getElementById('scan-sub');
+  const successOv = document.getElementById('success-overlay');
+  const day0      = document.getElementById('day0-empty');
+  const active    = document.getElementById('sami-active');
+
+  if (btn.classList.contains('scanning') || btn.classList.contains('done')) return;
+
+  /* Phase 1: Button → scanning */
+  btn.classList.add('scanning');
+  btnIcon.innerHTML = `<circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="24" stroke-dashoffset="8" class="spin-icon"/>`;
+  btnLabel.textContent = 'Activating…';
+
+  setTimeout(() => {
+    overlay.classList.add('visible');
+    scanLine.classList.add('sweeping');
+  }, 200);
+
+  /* Phase 2: Counter + progress bar */
+  const totalTenants = 98;
+  const duration     = 2400;
+  const startTime    = performance.now();
+
+  const scanMessages = [
+    { at: 0,    label: 'Activating SAMI',    sub: 'Connecting to devices…' },
+    { at: 0.20, label: 'Scanning tenants',   sub: 'Analyzing firewall configs…' },
+    { at: 0.45, label: 'Scanning tenants',   sub: 'Checking CVE exposure…' },
+    { at: 0.65, label: 'Detecting anomalies',sub: 'Running behavioral analysis…' },
+    { at: 0.82, label: 'Correlating signals',sub: 'Cross-referencing threat intel…' },
+    { at: 0.94, label: 'Building alerts',    sub: 'Prioritizing by risk score…' },
+  ];
+  let msgIndex = 0;
+
+  function tick(now) {
+    const elapsed      = now - startTime;
+    const progress_pct = Math.min(elapsed / duration, 1);
+
+    counter.textContent = Math.round(progress_pct * totalTenants);
+    progress.style.width = (progress_pct * 100) + '%';
+    progress.style.transition = 'width 0.08s linear';
+
+    while (msgIndex < scanMessages.length && progress_pct >= scanMessages[msgIndex].at) {
+      scanLabel.textContent = scanMessages[msgIndex].label;
+      scanSub.textContent   = scanMessages[msgIndex].sub;
+      msgIndex++;
+    }
+
+    if (progress_pct < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      /* Phase 3: Scan complete */
+      counter.textContent = totalTenants;
+      progress.style.width = '100%';
+      scanLine.classList.remove('sweeping');
+      scanLabel.textContent = 'Scan complete';
+      scanSub.textContent   = '3 alerts found across 98 tenants';
+
+      setTimeout(() => {
+        overlay.classList.remove('visible');
+        successOv.classList.add('visible');
+      }, 300);
+
+      /* Phase 4: Transition to active state */
+      setTimeout(() => {
+        successOv.classList.remove('visible');
+        day0.classList.add('exiting');
+
+        setTimeout(() => {
+          day0.style.display = 'none';
+          active.classList.add('entering');
+          active.style.display = 'flex';
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              active.classList.add('visible');
+            });
+          });
+        }, 500);
+      }, 1200);
+    }
+  }
+
+  requestAnimationFrame(tick);
+}
+
+// Initial notifications render
+renderNotifications('all');
+</script>
+
+<!-- ══════════════════════════════════════════
+     SAMI FLOATING CHATBOT
+     ══════════════════════════════════════════ -->
+
+<!-- Floating Action Button -->
+<button class="sami-fab" id="sami-fab" onclick="toggleSamiChat()" aria-label="Ask SAMI">
+  <div class="sami-fab-pulse"></div>
+  <!-- Robot icon -->
+  <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+    <rect x="7" y="11" width="18" height="14" rx="3" fill="white" opacity="0.95"/>
+    <rect x="10" y="15" width="4" height="4" rx="1" fill="#ff5d00"/>
+    <rect x="18" y="15" width="4" height="4" rx="1" fill="#ff5d00"/>
+    <path d="M13 23h6" stroke="#ff5d00" stroke-width="1.5" stroke-linecap="round"/>
+    <rect x="14.5" y="7" width="3" height="4" rx="1.5" fill="white" opacity="0.9"/>
+    <circle cx="16" cy="7" r="2" fill="white" opacity="0.9"/>
+    <line x1="4" y1="16" x2="7" y2="16" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.85"/>
+    <line x1="25" y1="16" x2="28" y2="16" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.85"/>
+  </svg>
+  <div class="sami-fab-tooltip">Ask SAMI</div>
+</button>
+
+<!-- Chat Panel -->
+<div class="sami-chat-panel" id="sami-chat-panel">
+
+  <!-- History scrim (dims the left portion) -->
+  <div class="sami-history-scrim" id="sami-history-scrim" onclick="toggleSamiHistory()"></div>
+
+  <!-- History sub-panel (slides in from right, ~62% width) -->
+  <div class="sami-history-overlay" id="sami-history-overlay">
+    <div class="sami-history-header">
+      <div class="sami-history-title">Conversations (6)</div>
+      <button class="sami-history-close" onclick="toggleSamiHistory()" title="Close">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="sami-history-body">
+      <div class="sami-history-item" onclick="toggleSamiHistory()">
+        <div class="sami-history-item-title">I want to build a new security policy</div>
+        <div class="sami-history-item-date">December-21-2025, 04:45PM</div>
+      </div>
+      <div class="sami-history-item" onclick="toggleSamiHistory()">
+        <div class="sami-history-item-title">Give a summary of Alert Analytics</div>
+        <div class="sami-history-item-date">December-1-2025, 01:22PM</div>
+      </div>
+      <div class="sami-history-item" onclick="toggleSamiHistory()">
+        <div class="sami-history-item-title">Build a Security Policy</div>
+        <div class="sami-history-item-date">November-15-2025, 04:45PM</div>
+      </div>
+      <div class="sami-history-item" onclick="toggleSamiHistory()">
+        <div class="sami-history-item-title">Give me an overview of system status</div>
+        <div class="sami-history-item-date">October-2-2025, 04:45PM</div>
+      </div>
+      <div class="sami-history-item" onclick="toggleSamiHistory()">
+        <div class="sami-history-item-title">How can i change my password?</div>
+        <div class="sami-history-item-date">September-6-2025, 04:45PM</div>
+      </div>
+      <div class="sami-history-item" onclick="toggleSamiHistory()">
+        <div class="sami-history-item-title">How can i upgrade my firewall firmware?</div>
+        <div class="sami-history-item-date">July-11-2025, 04:45PM</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="sami-chat-header" id="sami-chat-header">
+    <div class="sami-chat-avatar">
+      <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
+        <rect x="7" y="11" width="18" height="14" rx="3" fill="white" opacity="0.95"/>
+        <rect x="10" y="15" width="4" height="4" rx="1" fill="#ff5d00"/>
+        <rect x="18" y="15" width="4" height="4" rx="1" fill="#ff5d00"/>
+        <path d="M13 23h6" stroke="#ff5d00" stroke-width="1.5" stroke-linecap="round"/>
+        <rect x="14.5" y="7" width="3" height="4" rx="1.5" fill="white" opacity="0.9"/>
+        <circle cx="16" cy="7" r="2" fill="white" opacity="0.9"/>
+      </svg>
+    </div>
+    <div class="sami-chat-header-title" id="sami-chat-title">Ask SAMI</div>
+    <div class="sami-chat-header-actions">
+      <button title="New chat" onclick="resetSamiChat()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </button>
+      <button title="History" onclick="toggleSamiHistory()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </button>
+      <button title="Expand">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+      </button>
+      <button title="Close" onclick="toggleSamiChat()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="sami-chat-body" id="sami-chat-body">
+
+    <!-- Zero state -->
+    <div class="sami-chat-zero" id="sami-chat-zero">
+      <div class="sami-chat-zero-bot">
+        <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
+          <rect x="7" y="11" width="18" height="14" rx="3" fill="#4a6080"/>
+          <rect x="10" y="15" width="4" height="4" rx="1" fill="#ff5d00"/>
+          <rect x="18" y="15" width="4" height="4" rx="1" fill="#ff5d00"/>
+          <path d="M13 23h6" stroke="#ff5d00" stroke-width="1.5" stroke-linecap="round"/>
+          <rect x="14.5" y="7" width="3" height="4" rx="1.5" fill="#4a6080"/>
+          <circle cx="16" cy="7" r="2" fill="#4a6080"/>
+          <line x1="4" y1="16" x2="7" y2="16" stroke="#4a6080" stroke-width="2" stroke-linecap="round"/>
+          <line x1="25" y1="16" x2="28" y2="16" stroke="#4a6080" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="sami-chat-zero-title">Hi, I'm SAMI 👋</div>
+      <div class="sami-chat-zero-sub">I'm here to help with product questions,<br>guidance, and support - just ask!</div>
+      <div class="sami-chat-suggestions">
+        <button class="sami-chat-suggestion" onclick="samiSuggest('How do I configure a VPN?')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          How do I configure a VPN?
+        </button>
+        <button class="sami-chat-suggestion" onclick="samiSuggest('What are the latest security best practices?')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          What are the latest security best practices?
+        </button>
+        <button class="sami-chat-suggestion" onclick="samiSuggest('Explain firewall zones')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          Explain firewall zones
+        </button>
+        <button class="sami-chat-suggestion" onclick="samiSuggest('How do I upgrade firmware?')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          How do I upgrade firmware?
+        </button>
+        <button class="sami-chat-suggestion" onclick="samiSuggest('Troubleshoot connectivity issues')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Troubleshoot connectivity issues
+        </button>
+      </div>
+    </div>
+
+    <!-- Context view — shown when card is clicked -->
+    <div class="sami-chat-context" id="sami-chat-context">
+
+      <!-- Context card summary -->
+      <div class="sami-ctx-card" id="sami-ctx-card">
+        <div class="sami-ctx-tags" id="sami-ctx-tags">
+          <span class="sami-ctx-tag critical"><span style="width:7px;height:7px;border-radius:50%;background:#c70f0f;display:inline-block;"></span> Critical</span>
+          <span class="sami-ctx-tag cve">CVE Vulnerabilities</span>
+          <span class="sami-ctx-tag new-tag">New</span>
+          <span class="sami-ctx-time" id="sami-ctx-time">3 hrs ago</span>
+        </div>
+        <div class="sami-ctx-title" id="sami-ctx-title">3 Gateways Unreachable — Northgate Health &amp; Delta Logistics</div>
+        <div class="sami-ctx-meta" id="sami-ctx-meta">
+          <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg> Multiple tenants</span>
+          <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg> 3 Firewalls</span>
+        </div>
+      </div>
+
+      <!-- SAMI Analysis -->
+      <div class="sami-ctx-analysis">
+        <div class="sami-ctx-section-title">SAMI Analysis</div>
+        <div class="sami-ctx-analysis-box" id="sami-ctx-analysis">
+          Anomalous east-west traffic observed across 4 internal segments over 2 hours. SAMI detected credential reuse patterns consistent with lateral movement TTPs ...
+        </div>
+      </div>
+
+      <!-- Evidence -->
+      <div class="sami-ctx-evidence">
+        <div class="sami-ctx-section-title">Evidence</div>
+        <ul id="sami-ctx-evidence-list">
+          <li>CVSS score: 9.8 (Critical) · NVD-confirmed</li>
+          <li>12 firewalls running vulnerable firmware (≤ 7.1.1-907)</li>
+          <li>Exploit attempts detected on 2 devices in last 24h</li>
+          <li>Patch 7.1.2-1023 passed compatibility check across all 12 devices</li>
+        </ul>
+      </div>
+
+      <!-- Remediation -->
+      <div class="sami-ctx-remediation">
+        <div class="sami-ctx-section-title">Remediation</div>
+        <ul id="sami-ctx-remediation-list">
+          <li>Go to NSM firewall view</li>
+          <li>Click cons as</li>
+        </ul>
+      </div>
+
+      <!-- Timeline -->
+      <div class="sami-ctx-timeline">
+        <div class="sami-ctx-section-title">Timeline</div>
+        <div id="sami-ctx-timeline-list">
+          <div class="sami-ctx-timeline-row"><span class="tl-date">Apr 16, 09:12</span><span>CVE disclosed by SonicWall PSIRT</span></div>
+          <div class="sami-ctx-timeline-row"><span class="tl-date">Apr 18, 14:30</span><span>PoC exploit code published to GitHub</span></div>
+          <div class="sami-ctx-timeline-row"><span class="tl-date">Apr 21, 03:48</span><span>SAMI detected 2 probe attempts against FW-PROD-07</span></div>
+          <div class="sami-ctx-timeline-row"><span class="tl-date">Apr 22, 07:00</span><span>Patch pre-staged · ready to deploy</span></div>
+        </div>
+      </div>
+
+      <!-- Chat messages -->
+      <div class="sami-chat-messages" id="sami-chat-messages">
+        <!-- User bubble: Schedule Tonight -->
+        <div class="sami-msg user">
+          <div class="sami-msg-bubble">Schedule Tonight</div>
+        </div>
+        <!-- Bot bubble -->
+        <div class="sami-msg bot">
+          <div class="sami-msg-meta">
+            <svg width="14" height="14" viewBox="0 0 32 32" fill="none"><rect x="7" y="11" width="18" height="14" rx="3" fill="#ff5d00"/><rect x="10" y="15" width="4" height="4" rx="1" fill="white"/><rect x="18" y="15" width="4" height="4" rx="1" fill="white"/></svg>
+            <span class="msg-name">SAMI</span>
+            <span>11:10:43 AM</span>
+          </div>
+          <div class="sami-msg-bubble">Sure, Do you want to apply it to all devices?</div>
+          <div class="sami-msg-actions">
+            <button title="Thumbs up"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"/><path d="M7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3"/></svg></button>
+            <button title="Thumbs down"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 003 3l4-9V2H5.72a2 2 0 00-2 1.7l-1.38 9a2 2 0 002 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0122 4v7a2.31 2.31 0 01-2.33 2H17"/></svg></button>
+            <button title="Copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
+            <button title="Share"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
+          </div>
+        </div>
+        <!-- User bubble: Yes -->
+        <div class="sami-msg user">
+          <div class="sami-msg-bubble">Yes</div>
+        </div>
+      </div>
+
+    </div><!-- /sami-chat-context -->
+  </div><!-- /sami-chat-body -->
+
+  <!-- Context chip (shown when card opened) -->
+  <div class="sami-chat-context-chip" id="sami-ctx-chip">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6b7a99" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+    <span id="sami-ctx-chip-label">Context: 3 Gateways Unreachable...</span>
+    <button onclick="clearSamiContext()" title="Remove context">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+
+  <!-- Input row -->
+  <div class="sami-chat-input-row">
+    <div class="sami-chat-input-wrap">
+      <svg width="12" height="12" viewBox="0 0 10 10" fill="#ff5d00"><path d="M5 1l.93 2.57L8.5 4.5l-2.57.93L5 8l-.93-2.57L1.5 4.5l2.57-.93z"/></svg>
+      <input type="text" id="sami-chat-input" placeholder="Ask SAMI anything..." onkeydown="if(event.key==='Enter') samiSend()">
+    </div>
+    <button class="sami-chat-send" onclick="samiSend()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+  <div class="sami-chat-footer">01/100 Queries Used ⓘ</div>
+
+</div><!-- /sami-chat-panel -->
+
+<script>
+/* ── SAMI Chatbot JS ── */
+var samiChatOpen = false;
+var samiCurrentContext = null;
+
+function toggleSamiChat() {
+  samiChatOpen = !samiChatOpen;
+  var panel = document.getElementById('sami-chat-panel');
+  var fab = document.getElementById('sami-fab');
+  if (samiChatOpen) {
+    panel.classList.add('visible');
+    fab.classList.add('open');
+    // Reflow page content to make room for the embedded pane
+    document.body.classList.add('sami-pane-open');
+    document.getElementById('sami-chat-input').focus();
+  } else {
+    panel.classList.remove('visible');
+    fab.classList.remove('open');
+    // Restore full-width content
+    document.body.classList.remove('sami-pane-open');
+    // Also close history if open
+    document.getElementById('sami-history-overlay').classList.remove('visible');
+    document.getElementById('sami-history-scrim').classList.remove('visible');
+    // Clear the selected-card highlight
+    clearSamiCardSelection();
+  }
+}
+
+function toggleSamiHistory() {
+  var overlay = document.getElementById('sami-history-overlay');
+  var scrim   = document.getElementById('sami-history-scrim');
+  var isOpen  = overlay.classList.toggle('visible');
+  scrim.classList.toggle('visible', isOpen);
+}
+
+function openSamiChat() {
+  if (!samiChatOpen) toggleSamiChat();
+}
+
+function resetSamiChat() {
+  clearSamiContext();
+  document.getElementById('sami-chat-input').value = '';
+}
+
+function clearSamiContext() {
+  samiCurrentContext = null;
+  document.getElementById('sami-chat-context').classList.remove('visible');
+  document.getElementById('sami-chat-zero').style.display = 'flex';
+  document.getElementById('sami-ctx-chip').classList.remove('visible');
+  document.getElementById('sami-chat-title').textContent = 'Ask SAMI';
+}
+
+function samiSuggest(text) {
+  document.getElementById('sami-chat-input').value = text;
+  document.getElementById('sami-chat-input').focus();
+}
+
+function samiSend() {
+  var input = document.getElementById('sami-chat-input');
+  var text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+
+  // If no context, just focus the input (demo — not a real chat)
+  if (!samiCurrentContext) {
+    var zero = document.getElementById('sami-chat-zero');
+    zero.querySelector('.sami-chat-zero-title').textContent = 'Thinking…';
+    setTimeout(function() {
+      zero.querySelector('.sami-chat-zero-title').textContent = 'Hi, I\'m SAMI 👋';
+    }, 1200);
+  }
+}
+
+// Card context data keyed by type
+var samiContextData = {
+  alert: {
+    tags: [
+      { label: 'Emergency', cls: 'critical', dot: true },
+      { label: 'CVE Vulnerabilities', cls: 'cve' }
+    ],
+    time: '3 hrs ago',
+    title: 'Device Remote Branch 2 (2CB8EDB53448) interface X2 down',
+    meta: [
+      { icon: 'building', text: 'Acme Tenant 1' },
+      { icon: 'home', text: 'Remote Branch 2' }
+    ],
+    analysis: 'Interface X2 on Remote Branch 2 device (MAC: 2C:B8:ED:B5:34:48) has gone down unexpectedly. The link failure may result in degraded connectivity or loss of redundancy for traffic traversing this branch segment.',
+    evidence: [
+      'Interface X2 last heartbeat: 3 hrs ago',
+      'No maintenance window scheduled at time of failure',
+      'BGP route withdrawal detected on upstream router',
+      'Redundancy path via X3 is active but degraded'
+    ],
+    remediation: [
+      'Check physical cable and SFP on interface X2',
+      'Review BGP routing table for unexpected changes',
+      'Consider failover to standby firewall'
+    ],
+    timeline: [
+      { date: 'Today, 06:15', event: 'Interface X2 went down — no prior warning' },
+      { date: 'Today, 06:17', event: 'SAMI detected anomaly and raised alert' },
+      { date: 'Today, 06:20', event: 'BGP withdrawal confirmed on upstream router' },
+      { date: 'Today, 09:12', event: 'Alert escalated — no remediation action taken' }
+    ]
+  },
+  rec: {
+    tags: [
+      { label: 'Critical', cls: 'critical', dot: true },
+      { label: 'CVE Vulnerabilities', cls: 'cve' },
+      { label: 'New', cls: 'new-tag' }
+    ],
+    time: '3 hrs ago',
+    title: '3 Gateways Unreachable — Northgate Health & Delta Logistics',
+    meta: [
+      { icon: 'building', text: 'Multiple tenants' },
+      { icon: 'home', text: '3 Firewalls' }
+    ],
+    analysis: 'Anomalous east-west traffic observed across 4 internal segments over 2 hours. SAMI detected credential reuse patterns consistent with lateral movement TTPs ...',
+    evidence: [
+      'CVSS score: 9.8 (Critical) · NVD-confirmed',
+      '12 firewalls running vulnerable firmware (≤ 7.1.1-907)',
+      'Exploit attempts detected on 2 devices in last 24h',
+      'Patch 7.1.2-1023 passed compatibility check across all 12 devices'
+    ],
+    remediation: [
+      'Go to NSM firewall view',
+      'Apply patch 7.1.2-1023 to all affected devices',
+      'Enforce MFA on all admin accounts immediately'
+    ],
+    timeline: [
+      { date: 'Apr 16, 09:12', event: 'CVE disclosed by SonicWall PSIRT' },
+      { date: 'Apr 18, 14:30', event: 'PoC exploit code published to GitHub' },
+      { date: 'Apr 21, 03:48', event: 'SAMI detected 2 probe attempts against FW-PROD-07' },
+      { date: 'Apr 22, 07:00', event: 'Patch pre-staged · ready to deploy' }
+    ]
+  }
+};
+
+function openSamiWithContext(type) {
+  var data = samiContextData[type] || samiContextData.rec;
+  samiCurrentContext = data;
+
+  // Update panel title
+  document.getElementById('sami-chat-title').textContent = 'SAMI Assistant';
+
+  // Build tags
+  var tagsHtml = data.tags.map(function(t) {
+    var dotHtml = t.dot ? '<span style="width:7px;height:7px;border-radius:50%;background:#c70f0f;display:inline-block;margin-right:2px;"></span>' : '';
+    return '<span class="sami-ctx-tag ' + t.cls + '">' + dotHtml + t.label + '</span>';
+  }).join('');
+  tagsHtml += '<span class="sami-ctx-time">' + data.time + '</span>';
+  document.getElementById('sami-ctx-tags').innerHTML = tagsHtml;
+
+  // Title and meta
+  document.getElementById('sami-ctx-title').textContent = data.title;
+  var metaHtml = data.meta.map(function(m) {
+    var iconSvg = m.icon === 'building'
+      ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>'
+      : '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>';
+    return '<span>' + iconSvg + ' ' + m.text + '</span>';
+  }).join('');
+  document.getElementById('sami-ctx-meta').innerHTML = metaHtml;
+
+  // Analysis, evidence, remediation, timeline
+  document.getElementById('sami-ctx-analysis').textContent = data.analysis;
+  document.getElementById('sami-ctx-evidence-list').innerHTML = data.evidence.map(function(e) {
+    return '<li>' + e + '</li>';
+  }).join('');
+  document.getElementById('sami-ctx-remediation-list').innerHTML = data.remediation.map(function(r) {
+    return '<li>' + r + '</li>';
+  }).join('');
+  document.getElementById('sami-ctx-timeline-list').innerHTML = data.timeline.map(function(t) {
+    return '<div class="sami-ctx-timeline-row"><span class="tl-date">' + t.date + '</span><span>' + t.event + '</span></div>';
+  }).join('');
+
+  // Context chip
+  document.getElementById('sami-ctx-chip-label').textContent = 'Context: ' + data.title.substring(0, 38) + '…';
+  document.getElementById('sami-ctx-chip').classList.add('visible');
+
+  // Show context, hide zero
+  document.getElementById('sami-chat-zero').style.display = 'none';
+  document.getElementById('sami-chat-context').classList.add('visible');
+
+  // Open panel
+  openSamiChat();
+
+  // Scroll context to top
+  document.getElementById('sami-chat-body').scrollTop = 0;
+}
+
+// Mark one card as the active (selected) card, clearing any prior selection
+function selectSamiCard(card) {
+  document.querySelectorAll('.sami-figma-card.selected, .sami-figma-rec-card.selected')
+    .forEach(function(c) { c.classList.remove('selected'); });
+  if (card) card.classList.add('selected');
+}
+// Clear card selection (called when the chat pane closes)
+function clearSamiCardSelection() {
+  document.querySelectorAll('.sami-figma-card.selected, .sami-figma-rec-card.selected')
+    .forEach(function(c) { c.classList.remove('selected'); });
+}
+
+// Wire up all alert and rec cards to open chatbot with context
+document.addEventListener('DOMContentLoaded', function() {
+  // Alert cards (left column)
+  document.querySelectorAll('.sami-figma-card').forEach(function(card) {
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', function(e) {
+      // Don't trigger if button inside card was clicked
+      if (e.target.closest('button')) return;
+      selectSamiCard(card);
+      openSamiWithContext('alert');
+    });
+  });
+  // Recommendation cards (right column)
+  document.querySelectorAll('.sami-figma-rec-card').forEach(function(card) {
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', function(e) {
+      if (e.target.closest('button')) return;
+      selectSamiCard(card);
+      openSamiWithContext('rec');
+    });
+  });
+});
+</script>
+
+</body>
+</html>

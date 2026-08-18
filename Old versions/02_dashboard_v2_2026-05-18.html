@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Unified Management — Dashboard + SAMI Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    color-scheme: light;
+
+    /* UUIF 9.2 canonical */
+    --uuif-font: 'Nunito Sans', system-ui, sans-serif;
+
+    --uuif-surface-bg: #fafafa;
+    --uuif-surface-card: #ffffff;
+    --uuif-surface-tertiary: #f4f6f9;
+    --uuif-surface-primary: #5b74a7;
+    --uuif-surface-primary-hover: #4a6396;
+
+    --uuif-brand-navy: #001b50;
+    --uuif-brand-orange: #ff5d00;
+    --uuif-brand-red: #c70f0f;
+    --uuif-brand-green: #59a02e;
+    --uuif-brand-yellow: #f3ac3d;
+    --uuif-brand-blue: #1e6fbe;
+
+    --uuif-text-1: #0e1116;
+    --uuif-text-2: #4a5160;
+    --uuif-text-3: #6b7280;
+    --uuif-border: #e3e6ec;
+    --uuif-border-strong: #cfd4dc;
+
+    --uuif-radius-sm: 6px;
+    --uuif-radius-md: 10px;
+    --uuif-radius-lg: 14px;
+    --uuif-radius-pill: 88px;
+
+    --uuif-shadow-sm: 0 1px 2px rgba(14,17,22,0.04);
+    --uuif-shadow-md: 0 4px 12px rgba(14,17,22,0.06);
+
+    /* aliases */
+    --bg: var(--uuif-surface-bg);
+    --card: var(--uuif-surface-card);
+    --text-1: var(--uuif-text-1);
+    --text-2: var(--uuif-text-2);
+    --text-3: var(--uuif-text-3);
+    --border: var(--uuif-border);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text-1); font-family: var(--uuif-font); font-size: 13px; line-height: 1.45; }
+
+  /* ---------- App shell ---------- */
+  .app { display: grid; grid-template-columns: 60px 1fr; min-height: 100vh; }
+  .sidebar {
+    background: var(--card);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; align-items: center;
+    padding: 10px 0; gap: 6px;
+  }
+  .sidebar .logo {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--uuif-brand-navy); color: white;
+    display: grid; place-items: center; font-weight: 800; font-size: 13px;
+    margin-bottom: 8px;
+  }
+  .nav-item {
+    width: 40px; height: 40px; border-radius: 8px;
+    display: grid; place-items: center; color: var(--text-2);
+    cursor: pointer; font-size: 16px;
+  }
+  .nav-item:hover { background: var(--uuif-surface-tertiary); color: var(--text-1); }
+  .nav-item.active { background: var(--uuif-surface-tertiary); color: var(--uuif-brand-orange); }
+
+  .main { display: flex; flex-direction: column; min-width: 0; }
+
+  .topbar {
+    height: 46px; background: var(--card); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 20px; gap: 16px;
+  }
+  .topbar .crumbs { font-size: 12px; color: var(--text-3); }
+  .topbar .crumbs strong { color: var(--text-1); font-weight: 600; }
+  .topbar .spacer { flex: 1; }
+  .topbar .pill {
+    padding: 4px 10px; border-radius: var(--uuif-radius-pill);
+    background: var(--uuif-surface-tertiary); color: var(--text-2);
+    font-size: 11px; font-weight: 600;
+  }
+
+  /* ---------- Content ---------- */
+  .content { padding: 18px 20px 28px; }
+  .page-head { display: flex; align-items: end; justify-content: space-between; margin-bottom: 16px; }
+  .page-title { font-size: 20px; font-weight: 700; margin: 0; letter-spacing: -0.01em; }
+  .page-sub { color: var(--text-3); font-size: 12px; margin-top: 2px; }
+
+  /* Section label (UUIF pattern) */
+  .section-label {
+    display: flex; align-items: center; gap: 10px;
+    margin: 0 0 10px 0;
+  }
+  .section-label::before {
+    content: ""; width: 3px; height: 14px; background: var(--uuif-brand-orange); border-radius: 2px;
+  }
+  .section-label .label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+    color: var(--uuif-brand-orange); text-transform: uppercase;
+  }
+  .section-label .rule {
+    flex: 1; height: 1px; background: var(--border);
+  }
+
+  /* ---------- Grid (matches sketch) ---------- */
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(380px, 1.1fr) minmax(0, 1.4fr) minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    gap: 14px;
+  }
+  .col-queue { grid-row: 1 / span 2; }
+  .card-cve { grid-column: 2; grid-row: 1; }
+  .card-policy { grid-column: 2; grid-row: 2; }
+  .card-behav { grid-column: 3; grid-row: 1; }
+  .card-renewal { grid-column: 3; grid-row: 2; }
+
+  /* ---------- Card base ---------- */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--uuif-radius-lg);
+    box-shadow: var(--uuif-shadow-sm);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .card-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .card-title { font-size: 13px; font-weight: 700; margin: 0; }
+  .card-sub { font-size: 11px; color: var(--text-3); }
+  .card-body { padding: 12px 14px; flex: 1; }
+
+  /* ---------- Left: Triage Queue ---------- */
+  .queue {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--uuif-radius-lg);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .queue-head {
+    padding: 12px 14px;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .queue-head h3 {
+    margin: 0; font-size: 14px; font-weight: 700; color: var(--text-1);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .queue-head h3::before {
+    content: ""; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--uuif-brand-red); box-shadow: 0 0 0 3px rgba(199,15,15,0.15);
+  }
+  .queue-count {
+    padding: 3px 10px; border-radius: var(--uuif-radius-pill);
+    background: var(--uuif-brand-red); color: white;
+    font-size: 11px; font-weight: 700;
+  }
+  .queue-filters {
+    display: flex; gap: 6px; padding: 10px 14px;
+    border-bottom: 1px solid var(--border); background: var(--uuif-surface-tertiary);
+    flex-wrap: wrap;
+  }
+  .chip {
+    padding: 4px 10px; border-radius: var(--uuif-radius-pill);
+    background: var(--card); border: 1px solid var(--border);
+    font-size: 11px; font-weight: 600; color: var(--text-2);
+    cursor: pointer;
+  }
+  .chip.active { background: var(--uuif-brand-navy); color: white; border-color: var(--uuif-brand-navy); }
+  .chip .n { opacity: 0.7; margin-left: 4px; font-weight: 500; }
+
+  .queue-list { padding: 8px; overflow-y: auto; }
+  .queue-item {
+    padding: 12px;
+    border-radius: var(--uuif-radius-md);
+    border: 1px solid #f3d4d4;
+    background: #fdf3f3;
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .queue-item:hover { background: #fbeaea; }
+
+  .qi-row1 { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+  .qi-cat {
+    font-size: 9px; font-weight: 800; letter-spacing: 0.08em;
+    text-transform: uppercase; padding: 2px 7px; border-radius: var(--uuif-radius-pill);
+  }
+  .qi-cat.cve { background: rgba(199,15,15,0.1); color: var(--uuif-brand-red); }
+  .qi-cat.behav { background: rgba(243,172,61,0.18); color: #a06d0a; }
+  .qi-cat.policy { background: rgba(30,111,190,0.12); color: var(--uuif-brand-blue); }
+  .qi-cat.renewal { background: rgba(89,160,46,0.15); color: #3d7a18; }
+  .qi-sev {
+    font-size: 9px; font-weight: 700;
+    padding: 2px 7px; border-radius: var(--uuif-radius-pill);
+    letter-spacing: 0.06em;
+    background: var(--uuif-brand-red); color: white;
+  }
+
+  .qi-why {
+    margin-left: auto;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--card);
+    color: var(--text-2);
+    border: 1px solid var(--border);
+    display: inline-grid; place-items: center;
+    font-size: 10px; font-weight: 700;
+    cursor: pointer; user-select: none;
+  }
+  .qi-why:hover { background: var(--uuif-brand-navy); color: white; border-color: var(--uuif-brand-navy); }
+
+  .qi-title { font-size: 13px; font-weight: 700; color: #7a0808; margin-bottom: 4px; line-height: 1.3; }
+  .qi-desc { font-size: 12px; color: var(--text-2); line-height: 1.45; margin-bottom: 8px; }
+  .qi-actions { display: flex; gap: 6px; align-items: center; }
+  .qi-meta { font-size: 10px; color: var(--text-3); margin-left: auto; font-weight: 500; }
+
+  /* Buttons */
+  .btn {
+    padding: 5px 12px;
+    border-radius: var(--uuif-radius-pill);
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text-1);
+    font-family: var(--uuif-font); font-size: 11px; font-weight: 600;
+    cursor: pointer;
+    line-height: 1.4;
+  }
+  .btn:hover { background: var(--uuif-surface-tertiary); }
+  .btn-primary {
+    background: var(--uuif-surface-primary); color: white; border-color: var(--uuif-surface-primary);
+  }
+  .btn-primary:hover { background: var(--uuif-surface-primary-hover); border-color: var(--uuif-surface-primary-hover); }
+  .btn-ghost { background: transparent; border-color: transparent; color: var(--text-2); }
+  .btn-ghost:hover { background: var(--uuif-surface-tertiary); color: var(--text-1); }
+
+  .queue-foot {
+    padding: 10px 14px; border-top: 1px solid var(--border);
+    background: var(--uuif-surface-tertiary);
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 11px; color: var(--text-3);
+  }
+  .queue-foot a { color: var(--uuif-surface-primary); font-weight: 600; text-decoration: none; }
+
+  /* ---------- CVE card ---------- */
+  .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 12px; }
+  .stat {
+    padding: 10px 12px;
+    background: var(--uuif-surface-tertiary);
+    border-radius: var(--uuif-radius-md);
+  }
+  .stat .v { font-size: 20px; font-weight: 700; color: var(--text-1); line-height: 1.1; }
+  .stat .l { font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px; font-weight: 600; }
+  .stat.crit .v { color: var(--uuif-brand-red); }
+  .stat.high .v { color: var(--uuif-brand-orange); }
+
+  .cve-chart-wrap { height: 160px; margin-bottom: 12px; }
+  .cve-list { border-top: 1px solid var(--border); padding-top: 10px; }
+  .cve-list h4 { font-size: 11px; font-weight: 700; color: var(--text-2); margin: 0 0 8px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .cve-row {
+    display: grid; grid-template-columns: 90px 1fr 80px 70px;
+    align-items: center; gap: 10px;
+    padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 12px;
+  }
+  .cve-row:last-child { border-bottom: none; }
+  .cve-id { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--uuif-brand-blue); font-weight: 600; }
+  .cve-name { color: var(--text-1); }
+  .cve-cvss { font-weight: 700; }
+  .cve-cvss.crit { color: var(--uuif-brand-red); }
+  .cve-cvss.high { color: var(--uuif-brand-orange); }
+  .cve-affect { color: var(--text-3); font-size: 11px; text-align: right; }
+
+  /* ---------- Behaviour card ---------- */
+  .behav-donut { height: 130px; margin-bottom: 10px; }
+  .behav-list { display: flex; flex-direction: column; gap: 6px; }
+  .behav-item { display: flex; align-items: center; gap: 8px; font-size: 12px; padding: 6px 8px; border-radius: 6px; }
+  .behav-item:hover { background: var(--uuif-surface-tertiary); }
+  .behav-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .behav-label { flex: 1; color: var(--text-2); }
+  .behav-count { font-weight: 700; color: var(--text-1); }
+
+  /* ---------- Policy card ---------- */
+  .policy-list { display: flex; flex-direction: column; gap: 8px; }
+  .policy-row {
+    display: grid; grid-template-columns: 1fr auto auto;
+    gap: 10px; align-items: center;
+    padding: 10px 12px;
+    background: var(--uuif-surface-tertiary);
+    border-radius: var(--uuif-radius-md);
+  }
+  .policy-name { font-weight: 600; font-size: 12px; color: var(--text-1); }
+  .policy-desc { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+  .policy-tenants { font-size: 11px; color: var(--text-2); font-weight: 600; }
+
+  /* ---------- Renewal card ---------- */
+  .renewal-summary {
+    padding: 12px;
+    background: linear-gradient(135deg, rgba(199,15,15,0.06), rgba(255,93,0,0.04));
+    border-radius: var(--uuif-radius-md);
+    margin-bottom: 10px;
+  }
+  .renewal-big {
+    font-size: 26px; font-weight: 700; color: var(--uuif-brand-red);
+    line-height: 1.1;
+  }
+  .renewal-cap { font-size: 11px; color: var(--text-2); margin-top: 4px; }
+  .renewal-list { display: flex; flex-direction: column; gap: 6px; }
+  .renewal-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 10px; border-radius: 6px; font-size: 12px;
+  }
+  .renewal-row:hover { background: var(--uuif-surface-tertiary); }
+  .renewal-tenant { color: var(--text-1); font-weight: 600; }
+  .renewal-days { font-size: 11px; }
+  .renewal-days.urgent { color: var(--uuif-brand-red); font-weight: 700; }
+  .renewal-days.soon { color: var(--uuif-brand-orange); font-weight: 600; }
+
+  /* ---------- SAMI Insight cards (used inside CVE / Behaviour / Policy) ---------- */
+  .insight-list { display: flex; flex-direction: column; gap: 8px; }
+  .insight {
+    border: 1px solid var(--border);
+    border-radius: var(--uuif-radius-md);
+    padding: 10px 12px;
+    background: var(--card);
+    position: relative;
+  }
+  .insight.sev-crit { background: #fdf3f3; border-color: #f3d4d4; }
+  .insight.sev-high { background: #fff6ee; border-color: #f7d9c2; }
+  .insight.sev-med  { background: #fffbeb; border-color: #f1e3b2; }
+  .insight.sev-low  { background: #f0f6fc; border-color: #d0e0ee; }
+
+  .insight-head {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 4px;
+  }
+  .insight-sev {
+    font-size: 9px; font-weight: 700; padding: 2px 7px;
+    border-radius: var(--uuif-radius-pill); letter-spacing: 0.06em;
+  }
+  .insight-sev.crit { background: var(--uuif-brand-red); color: white; }
+  .insight-sev.high { background: #ffe2cf; color: #b04600; }
+  .insight-sev.med  { background: #fff3d6; color: #8a6708; }
+  .insight-sev.low  { background: #e1ecf7; color: #1e5180; }
+
+  .why-btn {
+    margin-left: auto;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--card);
+    color: var(--text-2);
+    border: 1px solid var(--border);
+    display: inline-grid; place-items: center;
+    font-size: 10px; font-weight: 700;
+    cursor: pointer;
+    user-select: none;
+  }
+  .why-btn:hover { background: var(--uuif-brand-navy); color: white; border-color: var(--uuif-brand-navy); }
+
+  .insight-title {
+    font-size: 13px; font-weight: 700; color: var(--text-1);
+    margin: 2px 0 4px;
+    line-height: 1.3;
+  }
+  .insight.sev-crit .insight-title { color: #7a0808; }
+  .insight-desc {
+    font-size: 12px; color: var(--text-2);
+    line-height: 1.45;
+    margin-bottom: 8px;
+  }
+  .insight-actions {
+    display: flex; gap: 6px; align-items: center;
+  }
+  .insight-meta {
+    font-size: 10px; color: var(--text-3);
+    margin-left: auto;
+    font-weight: 500;
+  }
+
+  /* Popover */
+  .why-popover {
+    position: absolute;
+    top: 32px; right: 10px;
+    width: 280px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--uuif-radius-md);
+    box-shadow: 0 8px 24px rgba(14,17,22,0.12);
+    padding: 12px;
+    z-index: 50;
+    display: none;
+  }
+  .why-popover.open { display: block; }
+  .why-popover::before {
+    content: "";
+    position: absolute;
+    top: -6px; right: 16px;
+    width: 10px; height: 10px;
+    background: var(--card);
+    border-left: 1px solid var(--border);
+    border-top: 1px solid var(--border);
+    transform: rotate(45deg);
+  }
+  .why-pop-label {
+    font-size: 9px; font-weight: 800; letter-spacing: 0.12em;
+    color: var(--uuif-brand-orange); text-transform: uppercase;
+    margin-bottom: 6px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .why-pop-label::before { content: "✦"; }
+  .why-pop-body { font-size: 11.5px; color: var(--text-2); line-height: 1.5; }
+  .why-pop-body strong { color: var(--text-1); font-weight: 700; }
+  .why-pop-body ul { margin: 6px 0 0; padding-left: 16px; }
+  .why-pop-body li { margin-bottom: 3px; }
+
+  /* Renewal enrichment */
+  .renewal-row { display: grid !important; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; }
+  .renewal-arr { font-size: 11px; color: var(--text-2); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+  /* ============== Page routing ============== */
+  .page[hidden] { display: none !important; }
+
+  /* ============== Device overview cards ============== */
+  .device-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .device-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--uuif-radius-lg);
+    padding: 14px 16px;
+    box-shadow: var(--uuif-shadow-sm);
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .device-row { display: flex; align-items: center; justify-content: space-between; }
+  .device-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: grid; place-items: center;
+    font-size: 16px;
+  }
+  .device-status { font-size: 14px; line-height: 1; color: var(--uuif-brand-green); }
+  .device-status.warn { color: var(--uuif-brand-orange); }
+  .device-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--text-3);
+  }
+  .device-count {
+    font-size: 26px; font-weight: 700; color: var(--text-1);
+    line-height: 1; font-variant-numeric: tabular-nums;
+  }
+  .device-meta { font-size: 12px; color: var(--uuif-brand-green); font-weight: 600; }
+  .device-meta.warn { color: var(--uuif-brand-orange); }
+
+  /* ============== SAMI Insights section ============== */
+  .sami-section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--uuif-radius-lg);
+    padding: 16px 18px;
+    margin-bottom: 18px;
+    box-shadow: var(--uuif-shadow-sm);
+  }
+  .sami-section-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .sami-section-title { display: flex; align-items: center; gap: 10px; }
+  .sami-mark {
+    width: 24px; height: 24px;
+    border-radius: 6px;
+    background: rgba(255,93,0,0.12);
+    color: var(--uuif-brand-orange);
+    display: grid; place-items: center;
+    font-size: 13px; font-weight: 700;
+  }
+  .sami-section-title h2 {
+    margin: 0; font-size: 15px; font-weight: 700; color: var(--text-1);
+  }
+  .sami-section-sub {
+    font-size: 11px; color: var(--text-3); margin-left: 6px;
+  }
+  .sami-section-link {
+    font-size: 12px; font-weight: 600;
+    color: var(--uuif-surface-primary); text-decoration: none;
+  }
+  .sami-section-link:hover { text-decoration: underline; }
+
+  .sami-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 1.1fr;
+    gap: 14px;
+  }
+  .sami-col {
+    border: 1px solid var(--border);
+    border-radius: var(--uuif-radius-md);
+    background: var(--card);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .sami-col-head {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    background: var(--uuif-surface-tertiary);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .sami-col-head h3 {
+    margin: 0; font-size: 12px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--text-2);
+  }
+  .sami-count {
+    font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: var(--uuif-radius-pill);
+  }
+  .sami-count.critical { background: var(--uuif-brand-red); color: white; }
+  .sami-count.muted { background: var(--card); color: var(--text-3); border: 1px solid var(--border); }
+  .sami-col-body { padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+
+  .sami-col-more {
+    font-size: 11px; font-weight: 600;
+    color: var(--uuif-surface-primary); text-decoration: none;
+    margin-top: 2px;
+  }
+  .sami-col-more:hover { text-decoration: underline; }
+
+  /* Mini insights inside Needs Attention column */
+  .mini-insight {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--uuif-radius-md);
+    padding: 10px;
+  }
+  .mini-row1 { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+  .mini-title { font-size: 12.5px; font-weight: 700; color: var(--text-1); line-height: 1.3; margin-bottom: 4px; }
+  .mini-desc { font-size: 11.5px; color: var(--text-2); line-height: 1.45; margin-bottom: 8px; }
+  .mini-actions { display: flex; gap: 6px; }
+  .mini-insight .btn { padding: 4px 10px; font-size: 11px; }
+
+  /* By Type rows */
+  .type-row { display: flex; flex-direction: column; gap: 6px; }
+  .type-row-main { display: flex; align-items: center; justify-content: space-between; }
+  .type-name {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12.5px; font-weight: 600; color: var(--text-1);
+  }
+  .type-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .type-dot.cve { background: var(--uuif-brand-red); }
+  .type-dot.behav { background: var(--uuif-brand-orange); }
+  .type-dot.policy { background: var(--uuif-brand-blue); }
+  .type-dot.renewal { background: var(--uuif-brand-green); }
+  .type-counts { display: flex; gap: 8px; align-items: baseline; }
+  .count-crit {
+    font-size: 11px; font-weight: 700;
+    color: var(--uuif-brand-red);
+  }
+  .count-other { font-size: 11px; color: var(--text-3); }
+  .type-bar {
+    height: 4px; border-radius: 2px;
+    background: var(--uuif-surface-tertiary);
+    overflow: hidden; display: flex;
+  }
+  .bar-crit { background: var(--uuif-brand-red); }
+  .bar-other { background: var(--uuif-border-strong); }
+
+  /* Tenant Health table */
+  .tenant-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 12px;
+  }
+  .tenant-table thead th {
+    text-align: left;
+    font-size: 10px; font-weight: 700;
+    color: var(--text-3); text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 6px 8px; border-bottom: 1px solid var(--border);
+  }
+  .tenant-table tbody td {
+    padding: 8px; border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .tenant-table tbody tr:last-child td { border-bottom: none; }
+  .tenant-table .t-name { color: var(--text-1); font-weight: 600; }
+  .tenant-table .t-ind { color: var(--text-3); }
+  .ta-r { text-align: right; }
+  .crit-pill {
+    background: var(--uuif-brand-red); color: white;
+    font-size: 11px; font-weight: 700;
+    padding: 1px 9px; border-radius: var(--uuif-radius-pill);
+    font-variant-numeric: tabular-nums;
+  }
+  .ok-pill {
+    color: var(--uuif-brand-green); font-size: 13px;
+  }
+
+  /* ============== Alerts & Notifications ============== */
+  .alerts-section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--uuif-radius-lg);
+    padding: 16px 18px;
+    box-shadow: var(--uuif-shadow-sm);
+  }
+  .alerts-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .alerts-title { display: flex; align-items: center; gap: 10px; }
+  .alerts-icon {
+    width: 24px; height: 24px;
+    border-radius: 6px;
+    background: rgba(199,15,15,0.1);
+    color: var(--uuif-brand-red);
+    display: grid; place-items: center;
+    font-size: 13px;
+  }
+  .alerts-title h2 {
+    margin: 0; font-size: 15px; font-weight: 700; color: var(--text-1);
+  }
+  .alerts-badge {
+    background: var(--uuif-brand-red); color: white;
+    font-size: 10px; font-weight: 700;
+    padding: 2px 8px; border-radius: var(--uuif-radius-pill);
+    letter-spacing: 0.04em;
+  }
+  .alerts-actions { display: flex; gap: 6px; }
+
+  .alerts-tabs {
+    display: flex; gap: 4px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+  .alerts-tab {
+    padding: 8px 14px;
+    font-size: 12px; font-weight: 600; color: var(--text-3);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+  }
+  .alerts-tab .n { color: var(--text-3); margin-left: 4px; font-weight: 500; }
+  .alerts-tab.active { color: var(--uuif-brand-orange); border-bottom-color: var(--uuif-brand-orange); }
+  .alerts-tab.active .n { color: var(--uuif-brand-orange); }
+  .alerts-tab:hover:not(.active) { color: var(--text-1); }
+
+  .alerts-table { width: 100%; border-collapse: collapse; }
+  .alerts-table thead th {
+    text-align: left;
+    font-size: 10px; font-weight: 700;
+    color: var(--text-3); text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 8px 10px; border-bottom: 1px solid var(--border);
+  }
+  .alerts-table tbody td {
+    padding: 12px 10px; border-bottom: 1px solid var(--border);
+    font-size: 12px; vertical-align: middle;
+  }
+  .alerts-table tbody tr:last-child td { border-bottom: none; }
+  .alerts-table tbody tr:hover { background: var(--uuif-surface-tertiary); }
+
+  .a-sev {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 10px; font-weight: 700;
+    padding: 3px 9px; border-radius: var(--uuif-radius-pill);
+    letter-spacing: 0.04em;
+  }
+  .a-sev.crit { background: #fdf3f3; color: var(--uuif-brand-red); border: 1px solid #f3d4d4; }
+  .a-sev.crit::before { content: "●"; font-size: 8px; }
+  .a-sev.warn { background: #fff6ee; color: #b04600; border: 1px solid #f7d9c2; }
+  .a-sev.warn::before { content: "⚠"; font-size: 9px; }
+  .a-sev.info { background: #f0f6fc; color: #1e5180; border: 1px solid #d0e0ee; }
+  .a-sev.info::before { content: "ⓘ"; font-size: 9px; }
+
+  .a-tenant { font-weight: 700; color: var(--text-1); }
+  .a-ind { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+  .a-msg { font-weight: 600; color: var(--text-1); }
+  .a-meta { font-size: 11px; color: var(--text-3); margin-top: 2px; font-family: 'JetBrains Mono', monospace; }
+  .ai-link {
+    color: var(--uuif-brand-orange); font-weight: 600;
+    font-family: var(--uuif-font);
+    cursor: pointer;
+  }
+  .ai-link:hover { text-decoration: underline; }
+  .a-time { color: var(--text-3); font-size: 11px; white-space: nowrap; }
+
+  .btn-danger {
+    background: var(--uuif-brand-red); color: white;
+    border-color: var(--uuif-brand-red);
+  }
+  .btn-danger:hover { background: #a30c0c; border-color: #a30c0c; }
+
+  /* Responsiveness */
+  @media (max-width: 1200px) {
+    .grid { grid-template-columns: 1fr 1fr; }
+    .col-queue { grid-column: 1 / -1; grid-row: 1; }
+    .card-cve { grid-column: 1; grid-row: 2; }
+    .card-behav { grid-column: 2; grid-row: 2; }
+    .card-policy { grid-column: 1; grid-row: 3; }
+    .card-renewal { grid-column: 2; grid-row: 3; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">S</div>
+    <div class="nav-item active" data-nav="dashboard" title="Dashboard">⊞</div>
+    <div class="nav-item" data-nav="sami" title="SAMI Dashboard">✦</div>
+    <div class="nav-item" title="Tenants">⌂</div>
+    <div class="nav-item" title="Inventory">▦</div>
+    <div class="nav-item" title="Licenses">◇</div>
+  </aside>
+
+  <main class="main">
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="crumbs" id="crumbs"><strong>Dashboard</strong></div>
+      <div class="spacer"></div>
+      <div class="pill">All Tenants · 55</div>
+      <div class="pill">Last sync · 2m</div>
+      <button class="btn">Filters</button>
+      <button class="btn btn-primary">Run SAMI scan</button>
+    </header>
+
+    <!-- ============== PAGE 1: DASHBOARD ============== -->
+    <section class="content page" data-page="dashboard">
+      <div class="page-head">
+        <div>
+          <h1 class="page-title">Dashboard</h1>
+          <div class="page-sub">All tenants · operational and AI insights overview</div>
+        </div>
+      </div>
+
+      <!-- Device overview cards -->
+      <div class="device-grid">
+        <div class="device-card">
+          <div class="device-row">
+            <span class="device-icon" style="background: rgba(89,160,46,0.12); color: var(--uuif-brand-green);">▣</span>
+            <span class="device-status ok">●</span>
+          </div>
+          <div class="device-label">Firewall</div>
+          <div class="device-row">
+            <span class="device-count">78</span>
+            <span class="device-meta">Online</span>
+          </div>
+        </div>
+        <div class="device-card">
+          <div class="device-row">
+            <span class="device-icon" style="background: rgba(89,160,46,0.12); color: var(--uuif-brand-green);">▭</span>
+            <span class="device-status ok">●</span>
+          </div>
+          <div class="device-label">Capture Client</div>
+          <div class="device-row">
+            <span class="device-count">20</span>
+            <span class="device-meta">Online</span>
+          </div>
+        </div>
+        <div class="device-card">
+          <div class="device-row">
+            <span class="device-icon" style="background: rgba(89,160,46,0.12); color: var(--uuif-brand-green);">⌥</span>
+            <span class="device-status ok">●</span>
+          </div>
+          <div class="device-label">Access Point</div>
+          <div class="device-row">
+            <span class="device-count">5</span>
+            <span class="device-meta">Online</span>
+          </div>
+        </div>
+        <div class="device-card">
+          <div class="device-row">
+            <span class="device-icon" style="background: rgba(89,160,46,0.12); color: var(--uuif-brand-green);">⌬</span>
+            <span class="device-status ok">●</span>
+          </div>
+          <div class="device-label">Switch</div>
+          <div class="device-row">
+            <span class="device-count">4</span>
+            <span class="device-meta">Online</span>
+          </div>
+        </div>
+        <div class="device-card">
+          <div class="device-row">
+            <span class="device-icon" style="background: rgba(255,93,0,0.12); color: var(--uuif-brand-orange);">▤</span>
+            <span class="device-status warn">●</span>
+          </div>
+          <div class="device-label">SMA 1000</div>
+          <div class="device-row">
+            <span class="device-count">6</span>
+            <span class="device-meta warn">1 Offline</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SAMI Insights section -->
+      <div class="sami-section">
+        <div class="sami-section-head">
+          <div class="sami-section-title">
+            <span class="sami-mark">✦</span>
+            <h2>SAMI Insights</h2>
+            <span class="sami-section-sub">AI-powered analysis across all tenants · last updated 2m ago</span>
+          </div>
+          <a href="#" class="sami-section-link" data-goto="sami">Go to SAMI Dashboard →</a>
+        </div>
+
+        <div class="sami-grid">
+
+          <!-- Needs Attention -->
+          <div class="sami-col">
+            <div class="sami-col-head">
+              <h3>Needs Attention</h3>
+              <span class="sami-count critical">5 critical</span>
+            </div>
+            <div class="sami-col-body">
+
+              <div class="mini-insight">
+                <div class="mini-row1">
+                  <span class="qi-cat cve">CVE</span>
+                  <span class="qi-sev">CRITICAL</span>
+                </div>
+                <div class="mini-title">SSL VPN auth bypass — 8 firewalls across Acme + Beta</div>
+                <div class="mini-desc">CVE-2025-44892 (CVSS 9.8). Public PoC; no exploitation observed yet. Patch is stable.</div>
+                <div class="mini-actions">
+                  <button class="btn btn-primary">Patch 8</button>
+                  <button class="btn">Ignore</button>
+                </div>
+              </div>
+
+              <div class="mini-insight">
+                <div class="mini-row1">
+                  <span class="qi-cat policy">POLICY</span>
+                  <span class="qi-sev">CRITICAL</span>
+                </div>
+                <div class="mini-title">Super-admin MFA not enforced on 2 tenants</div>
+                <div class="mini-desc">Beta and Delta allow password-only super-admin login. Credential stuffing already observed on these accounts.</div>
+                <div class="mini-actions">
+                  <button class="btn btn-primary">Enforce MFA</button>
+                  <button class="btn">Ignore</button>
+                </div>
+              </div>
+
+              <div class="mini-insight">
+                <div class="mini-row1">
+                  <span class="qi-cat renewal">RENEWAL</span>
+                  <span class="qi-sev">CRITICAL</span>
+                </div>
+                <div class="mini-title">Acme ATP lapses in 9 days — $42K ARR, 8 firewalls affected</div>
+                <div class="mini-desc">8 firewalls depend on ATP for Capture sandboxing. Auto-renew not enabled.</div>
+                <div class="mini-actions">
+                  <button class="btn btn-primary">Start renewal</button>
+                  <button class="btn">Snooze</button>
+                </div>
+              </div>
+
+              <a href="#" class="sami-col-more" data-goto="sami">View all 5 critical →</a>
+            </div>
+          </div>
+
+          <!-- By Type -->
+          <div class="sami-col">
+            <div class="sami-col-head">
+              <h3>By Type</h3>
+              <span class="sami-count muted">12 insights</span>
+            </div>
+            <div class="sami-col-body">
+
+              <div class="type-row">
+                <div class="type-row-main">
+                  <div class="type-name">
+                    <span class="type-dot cve"></span>
+                    CVE Vulnerability
+                  </div>
+                  <div class="type-counts">
+                    <span class="count-crit">1 critical</span>
+                    <span class="count-other">+3 others</span>
+                  </div>
+                </div>
+                <div class="type-bar">
+                  <span class="bar-crit" style="flex: 1;"></span>
+                  <span class="bar-other" style="flex: 3;"></span>
+                </div>
+              </div>
+
+              <div class="type-row">
+                <div class="type-row-main">
+                  <div class="type-name">
+                    <span class="type-dot behav"></span>
+                    Behavior Anomaly
+                  </div>
+                  <div class="type-counts">
+                    <span class="count-crit">1 critical</span>
+                    <span class="count-other">+3 others</span>
+                  </div>
+                </div>
+                <div class="type-bar">
+                  <span class="bar-crit" style="flex: 1;"></span>
+                  <span class="bar-other" style="flex: 3;"></span>
+                </div>
+              </div>
+
+              <div class="type-row">
+                <div class="type-row-main">
+                  <div class="type-name">
+                    <span class="type-dot policy"></span>
+                    Policy Gap
+                  </div>
+                  <div class="type-counts">
+                    <span class="count-crit">2 critical</span>
+                    <span class="count-other">+2 others</span>
+                  </div>
+                </div>
+                <div class="type-bar">
+                  <span class="bar-crit" style="flex: 2;"></span>
+                  <span class="bar-other" style="flex: 2;"></span>
+                </div>
+              </div>
+
+              <div class="type-row">
+                <div class="type-row-main">
+                  <div class="type-name">
+                    <span class="type-dot renewal"></span>
+                    Renewal Risk
+                  </div>
+                  <div class="type-counts">
+                    <span class="count-crit">1 critical</span>
+                    <span class="count-other">+4 others</span>
+                  </div>
+                </div>
+                <div class="type-bar">
+                  <span class="bar-crit" style="flex: 1;"></span>
+                  <span class="bar-other" style="flex: 4;"></span>
+                </div>
+              </div>
+
+              <a href="#" class="sami-col-more" data-goto="sami">View by-type detail →</a>
+            </div>
+          </div>
+
+          <!-- Tenant Health -->
+          <div class="sami-col">
+            <div class="sami-col-head">
+              <h3>Tenant Health</h3>
+              <span class="sami-count muted">55 tenants</span>
+            </div>
+            <div class="sami-col-body">
+
+              <table class="tenant-table">
+                <thead>
+                  <tr>
+                    <th>Tenant</th>
+                    <th>Industry</th>
+                    <th class="ta-r">Critical</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="t-name">Acme Corp</td>
+                    <td class="t-ind">Enterprise</td>
+                    <td class="ta-r"><span class="crit-pill">3</span></td>
+                  </tr>
+                  <tr>
+                    <td class="t-name">Beta Networks</td>
+                    <td class="t-ind">Telecom</td>
+                    <td class="ta-r"><span class="crit-pill">2</span></td>
+                  </tr>
+                  <tr>
+                    <td class="t-name">Delta Logistics</td>
+                    <td class="t-ind">Logistics</td>
+                    <td class="ta-r"><span class="crit-pill">1</span></td>
+                  </tr>
+                  <tr>
+                    <td class="t-name">Northwind</td>
+                    <td class="t-ind">Retail</td>
+                    <td class="ta-r"><span class="crit-pill">1</span></td>
+                  </tr>
+                  <tr>
+                    <td class="t-name">Crown Holdings</td>
+                    <td class="t-ind">Financial</td>
+                    <td class="ta-r"><span class="ok-pill">✓</span></td>
+                  </tr>
+                  <tr>
+                    <td class="t-name">Echo Manufacturing</td>
+                    <td class="t-ind">Manufacturing</td>
+                    <td class="ta-r"><span class="ok-pill">✓</span></td>
+                  </tr>
+                  <tr>
+                    <td class="t-name">TechCorp NYC</td>
+                    <td class="t-ind">Enterprise</td>
+                    <td class="ta-r"><span class="ok-pill">✓</span></td>
+                  </tr>
+                  <tr>
+                    <td class="t-name">MediSoft West</td>
+                    <td class="t-ind">Healthcare</td>
+                    <td class="ta-r"><span class="ok-pill">✓</span></td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <a href="#" class="sami-col-more">View all 55 tenants →</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Alerts & Notifications -->
+      <div class="alerts-section">
+        <div class="alerts-head">
+          <div class="alerts-title">
+            <span class="alerts-icon">⚠</span>
+            <h2>Alerts &amp; Notifications</h2>
+            <span class="alerts-badge">3 Critical</span>
+          </div>
+          <div class="alerts-actions">
+            <button class="btn">Export</button>
+            <button class="btn">Save filter</button>
+          </div>
+        </div>
+        <div class="alerts-tabs">
+          <span class="alerts-tab active">All <span class="n">8</span></span>
+          <span class="alerts-tab">Security <span class="n">1</span></span>
+          <span class="alerts-tab">System <span class="n">4</span></span>
+          <span class="alerts-tab">License <span class="n">3</span></span>
+        </div>
+        <table class="alerts-table">
+          <thead>
+            <tr>
+              <th>Severity</th>
+              <th>Tenant</th>
+              <th>Alert details</th>
+              <th>Time</th>
+              <th class="ta-r">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="a-sev crit">CRITICAL</span></td>
+              <td><div class="a-tenant">TechCorp NYC</div><div class="a-ind">Enterprise</div></td>
+              <td><div class="a-msg">Firewall login failure detected (multiple attempts)</div><div class="a-meta">TZ570-NYC-MAIN · <span class="ai-link">✦ AI insight available</span></div></td>
+              <td class="a-time">10 min ago</td>
+              <td class="ta-r"><button class="btn btn-danger">Investigate</button></td>
+            </tr>
+            <tr>
+              <td><span class="a-sev warn">WARNING</span></td>
+              <td><div class="a-tenant">MediSoft West</div><div class="a-ind">Healthcare</div></td>
+              <td><div class="a-msg">License expiration warning: SSL-VPN</div><div class="a-meta">NSA-3700-PDX · <span class="ai-link">✦ AI insight available</span></div></td>
+              <td class="a-time">1 hour ago</td>
+              <td class="ta-r"><button class="btn">Review</button></td>
+            </tr>
+            <tr>
+              <td><span class="a-sev warn">WARNING</span></td>
+              <td><div class="a-tenant">EduNet California</div><div class="a-ind">Education</div></td>
+              <td><div class="a-msg">High CPU utilization (89%) on firewall</div><div class="a-meta">NSA-2700-EDU · <span class="ai-link">✦ AI insight available</span></div></td>
+              <td class="a-time">2 hours ago</td>
+              <td class="ta-r"><button class="btn">Review</button></td>
+            </tr>
+            <tr>
+              <td><span class="a-sev crit">CRITICAL</span></td>
+              <td><div class="a-tenant">RetailEdge Europe</div><div class="a-ind">Retail</div></td>
+              <td><div class="a-msg">VPN tunnel down (primary)</div><div class="a-meta">TZ670-LON-HQ · <span class="ai-link">✦ AI insight available</span></div></td>
+              <td class="a-time">3 hours ago</td>
+              <td class="ta-r"><button class="btn btn-danger">Investigate</button></td>
+            </tr>
+            <tr>
+              <td><span class="a-sev crit">CRITICAL</span></td>
+              <td><div class="a-tenant">FinServPro East</div><div class="a-ind">Financial</div></td>
+              <td><div class="a-msg">License expiration: Capture ATP</div><div class="a-meta">NSA-4700-NYC · <span class="ai-link">✦ AI insight available</span></div></td>
+              <td class="a-time">5 hours ago</td>
+              <td class="ta-r"><button class="btn btn-danger">Investigate</button></td>
+            </tr>
+            <tr>
+              <td><span class="a-sev info">INFO</span></td>
+              <td><div class="a-tenant">ACME West</div><div class="a-ind">Manufacturing</div></td>
+              <td><div class="a-msg">Device health alert: memory</div><div class="a-meta">NSP-10000-CA · <span class="ai-link">✦ AI insight available</span></div></td>
+              <td class="a-time">12 hours ago</td>
+              <td class="ta-r"><button class="btn">Review</button></td>
+            </tr>
+            <tr>
+              <td><span class="a-sev info">INFO</span></td>
+              <td><div class="a-tenant">GovSecure Federal</div><div class="a-ind">Government</div></td>
+              <td><div class="a-msg">System update available: SonicOS 7.0.1-5050</div><div class="a-meta">NSA-6700-DC · <span class="ai-link">✦ AI insight available</span></div></td>
+              <td class="a-time">1 day ago</td>
+              <td class="ta-r"><button class="btn">Review</button></td>
+            </tr>
+            <tr>
+              <td><span class="a-sev warn">WARNING</span></td>
+              <td><div class="a-tenant">LogiTech Transport</div><div class="a-ind">Transportation</div></td>
+              <td><div class="a-msg">License expiration: Content Filtering</div><div class="a-meta">TZ370-SEA-01 · <span class="ai-link">✦ AI insight available</span></div></td>
+              <td class="a-time">1 day ago</td>
+              <td class="ta-r"><button class="btn">Review</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+
+    <!-- ============== PAGE 2: SAMI DASHBOARD ============== -->
+    <section class="content page" data-page="sami" hidden>
+      <div class="page-head">
+        <div>
+          <h1 class="page-title">SAMI Dashboard</h1>
+          <div class="page-sub">Cross-tenant security posture, prioritized for action</div>
+        </div>
+      </div>
+
+      <div class="section-label">
+        <span class="label">Triage &amp; Category Insights</span>
+        <span class="rule"></span>
+      </div>
+
+      <div class="grid">
+
+        <!-- LEFT: Triage Queue -->
+        <div class="col-queue queue">
+          <div class="queue-head">
+            <h3>Needs Attention</h3>
+            <span class="queue-count">5 CRITICAL</span>
+          </div>
+          <div class="queue-filters">
+            <span class="chip active">All<span class="n">5</span></span>
+            <span class="chip">CVE<span class="n">1</span></span>
+            <span class="chip">Behaviour<span class="n">1</span></span>
+            <span class="chip">Policy<span class="n">2</span></span>
+            <span class="chip">Renewal<span class="n">1</span></span>
+          </div>
+
+          <div class="queue-list">
+
+            <!-- 1: CVE Critical -->
+            <div class="queue-item">
+              <div class="qi-row1">
+                <span class="qi-cat cve">CVE</span>
+                <span class="qi-sev">CRITICAL</span>
+                <button class="qi-why" data-why="q-1">ⓘ</button>
+              </div>
+              <div class="qi-title">SSL VPN auth bypass exposed on 8 firewalls across 2 high-value tenants</div>
+              <div class="qi-desc">CVE-2025-44892 (CVSS 9.8) allows unauthenticated access through SonicOS SSL VPN. Acme Corp and Beta Networks have public-facing affected appliances. Patch is stable; proof-of-concept code is public but no exploitation observed in your fleet yet.</div>
+              <div class="qi-actions">
+                <button class="btn btn-primary">Patch 8 firewalls</button>
+                <button class="btn">Ignore</button>
+                <span class="qi-meta">2d ago</span>
+              </div>
+              <div class="why-popover" id="why-q-1">
+                <div class="why-pop-label">Why SAMI flagged this</div>
+                <div class="why-pop-body">
+                  <strong>Severity + exposure correlation.</strong>
+                  <ul>
+                    <li>CVSS 9.8 (Critical) with public PoC</li>
+                    <li>8 affected appliances are WAN-exposed</li>
+                    <li>Tenants represent $94K combined ARR</li>
+                    <li>Patch is stable; rollout risk is low</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2: Policy Critical -->
+            <div class="queue-item">
+              <div class="qi-row1">
+                <span class="qi-cat policy">POLICY</span>
+                <span class="qi-sev">CRITICAL</span>
+                <button class="qi-why" data-why="q-2">ⓘ</button>
+              </div>
+              <div class="qi-title">Super-admin MFA not enforced on 2 tenants — single password from full takeover</div>
+              <div class="qi-desc">Beta Networks and Delta Logistics allow super-admin login with password only. Behaviour Anomalies already shows credential stuffing attempts against these accounts — this gap is being actively probed, not theoretical.</div>
+              <div class="qi-actions">
+                <button class="btn btn-primary">Enforce MFA now</button>
+                <button class="btn">Ignore</button>
+                <span class="qi-meta">Linked to behav alert</span>
+              </div>
+              <div class="why-popover" id="why-q-2">
+                <div class="why-pop-label">Why SAMI flagged this</div>
+                <div class="why-pop-body">
+                  <strong>Active threat × control gap.</strong>
+                  <ul>
+                    <li>Credential stuffing observed on these tenants</li>
+                    <li>Password-only login = single point of failure</li>
+                    <li>MFA rollout takes &lt; 5 min, no downtime</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3: Behaviour Critical -->
+            <div class="queue-item">
+              <div class="qi-row1">
+                <span class="qi-cat behav">BEHAVIOUR</span>
+                <span class="qi-sev">CRITICAL</span>
+                <button class="qi-why" data-why="q-3">ⓘ</button>
+              </div>
+              <div class="qi-title">Active credential stuffing against super-admin jsmith@beta.local — MFA absent</div>
+              <div class="qi-desc">5 failed login attempts from a new geography and ASN in the past hour, while the same account has 4 active sessions from its usual location. Concurrent-session abuse pattern, not a lost laptop scenario. Combined with no MFA on this tenant, a single guessed password compromises the entire estate.</div>
+              <div class="qi-actions">
+                <button class="btn btn-primary">Force re-auth + lock account</button>
+                <button class="btn">Ignore</button>
+                <span class="qi-meta">1h ago</span>
+              </div>
+              <div class="why-popover" id="why-q-3">
+                <div class="why-pop-label">Why SAMI flagged this</div>
+                <div class="why-pop-body">
+                  <strong>Concurrent-session abuse × control gap.</strong>
+                  <ul>
+                    <li>Same user, impossible locations within 1h</li>
+                    <li>Failed ASN flagged in threat feed</li>
+                    <li>Super-admin role = high blast radius</li>
+                    <li>MFA not enforced on this tenant</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- 4: Policy Critical -->
+            <div class="queue-item">
+              <div class="qi-row1">
+                <span class="qi-cat policy">POLICY</span>
+                <span class="qi-sev">CRITICAL</span>
+                <button class="qi-why" data-why="q-4">ⓘ</button>
+              </div>
+              <div class="qi-title">Default-allow outbound on 3 perimeter firewalls — defeats DPI-SSL coverage</div>
+              <div class="qi-desc">Acme, Beta, and Crown have permit-any outbound rules at the WAN edge. Even with DPI-SSL and IPS enabled, malicious egress (data exfil, C2 callback) goes uninspected. This contradicts your org baseline policy set in 2024.</div>
+              <div class="qi-actions">
+                <button class="btn btn-primary">Apply baseline policy</button>
+                <button class="btn">Ignore</button>
+                <span class="qi-meta">Drift &gt; 60d</span>
+              </div>
+              <div class="why-popover" id="why-q-4">
+                <div class="why-pop-label">Why SAMI flagged this</div>
+                <div class="why-pop-body">
+                  <strong>Drift from your own baseline.</strong>
+                  <ul>
+                    <li>Org baseline: outbound restricted by category</li>
+                    <li>3 tenants overrode to permit-any</li>
+                    <li>Defeats downstream DPI-SSL value</li>
+                    <li>One-click revert preserves documented exceptions</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- 5: Renewal Critical -->
+            <div class="queue-item">
+              <div class="qi-row1">
+                <span class="qi-cat renewal">RENEWAL</span>
+                <span class="qi-sev">CRITICAL</span>
+                <button class="qi-why" data-why="q-5">ⓘ</button>
+              </div>
+              <div class="qi-title">Acme Corp ATP lapses in 9 days — $42K ARR plus 8 firewalls lose protection</div>
+              <div class="qi-desc">Subscription expires before next QBR. Acme has 8 firewalls currently relying on ATP for Capture sandboxing — if it lapses, those workloads lose real-time malware analysis. Acme also has open CVE findings (see CVE queue) that depend on ATP coverage.</div>
+              <div class="qi-actions">
+                <button class="btn btn-primary">Start renewal quote</button>
+                <button class="btn">Snooze</button>
+                <span class="qi-meta">Expires in 9d</span>
+              </div>
+              <div class="why-popover" id="why-q-5">
+                <div class="why-pop-label">Why SAMI flagged this</div>
+                <div class="why-pop-body">
+                  <strong>Revenue × security dependency.</strong>
+                  <ul>
+                    <li>$42K ARR, 9 days to expiry</li>
+                    <li>8 firewalls depend on ATP coverage</li>
+                    <li>Compounds with active CVE exposures</li>
+                    <li>Auto-renew not enabled for this tenant</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <div class="queue-foot">
+            <span>5 critical · across 4 categories</span>
+            <a href="#">View all 12 open →</a>
+          </div>
+        </div>
+
+        <!-- MIDDLE TOP: CVE Vulnerability -->
+        <div class="card card-cve">
+          <div class="card-head">
+            <div>
+              <h3 class="card-title">CVE Vulnerability</h3>
+              <div class="card-sub">Across 47 tenants · 218 assets scanned</div>
+            </div>
+            <button class="btn btn-ghost">View details →</button>
+          </div>
+          <div class="card-body">
+            <div class="stat-row">
+              <div class="stat crit"><div class="v">4</div><div class="l">Critical</div></div>
+              <div class="stat high"><div class="v">11</div><div class="l">High</div></div>
+              <div class="stat"><div class="v">23</div><div class="l">Medium</div></div>
+              <div class="stat"><div class="v">82%</div><div class="l">Patch rate</div></div>
+            </div>
+
+            <div class="insight-list">
+
+              <div class="insight sev-crit">
+                <div class="insight-head">
+                  
+                  <span class="insight-sev crit">CRITICAL</span>
+                  <button class="why-btn" data-why="cve-1">ⓘ</button>
+                </div>
+                <div class="insight-title">SSL VPN auth bypass exposed on 8 firewalls across 2 high-value tenants</div>
+                <div class="insight-desc">CVE-2025-44892 (CVSS 9.8) allows unauthenticated access through SonicOS SSL VPN. Acme Corp and Beta Networks have public-facing affected appliances. Patch released; no known exploits in your fleet yet, but proof-of-concept code is publicly available.</div>
+                <div class="insight-actions">
+                  <button class="btn btn-primary">Patch 8 firewalls</button>
+                  <button class="btn">Dismiss</button>
+                  <span class="insight-meta">Disclosed 2d ago</span>
+                </div>
+                <div class="why-popover" id="why-cve-1">
+                  <div class="why-pop-label">Why SAMI flagged this</div>
+                  <div class="why-pop-body">
+                    <strong>Severity + exposure correlation.</strong>
+                    <ul>
+                      <li>CVSS 9.8 (Critical) with public PoC</li>
+                      <li>8 affected appliances are WAN-exposed</li>
+                      <li>Tenants represent $94K combined ARR</li>
+                      <li>Patch is stable; rollout risk is low</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="insight sev-high">
+                <div class="insight-head">
+                  
+                  <span class="insight-sev high">HIGH</span>
+                  <button class="why-btn" data-why="cve-2">ⓘ</button>
+                </div>
+                <div class="insight-title">SMA management interface reachable from internet on 5 appliances</div>
+                <div class="insight-desc">CVE-2025-44120 affects Secure Mobile Access management ports left exposed to the WAN. Configuration drift, not the CVE itself, is the actual risk vector — these appliances also lack source-IP restrictions on the mgmt interface.</div>
+                <div class="insight-actions">
+                  <button class="btn btn-primary">Patch + restrict mgmt</button>
+                  <button class="btn">Dismiss</button>
+                  <span class="insight-meta">Disclosed 5d ago</span>
+                </div>
+                <div class="why-popover" id="why-cve-2">
+                  <div class="why-pop-label">Why SAMI flagged this</div>
+                  <div class="why-pop-body">
+                    <strong>Two-factor risk: CVE + misconfiguration.</strong>
+                    <ul>
+                      <li>CVE alone is patchable; SAMI cross-checked config</li>
+                      <li>All 5 appliances allow mgmt from 0.0.0.0/0</li>
+                      <li>Drift detected vs. your baseline policy</li>
+                      <li>Compound risk &gt; either issue alone</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="insight sev-high">
+                <div class="insight-head">
+                  
+                  <span class="insight-sev high">HIGH</span>
+                  <button class="why-btn" data-why="cve-3">ⓘ</button>
+                </div>
+                <div class="insight-title">Capture Client privilege escalation affects 12 endpoints across 4 tenants</div>
+                <div class="insight-desc">CVE-2025-43887 allows local privilege escalation on Capture Client versions &lt; 3.7.4. Affected endpoints belong to administrative users in 3 of the 4 tenants — elevating exploit blast radius if a workstation is compromised.</div>
+                <div class="insight-actions">
+                  <button class="btn btn-primary">Push client update</button>
+                  <button class="btn">Dismiss</button>
+                  <span class="insight-meta">Disclosed 8d ago</span>
+                </div>
+                <div class="why-popover" id="why-cve-3">
+                  <div class="why-pop-label">Why SAMI flagged this</div>
+                  <div class="why-pop-body">
+                    <strong>Privilege context matters more than CVSS.</strong>
+                    <ul>
+                      <li>Affected machines are admin workstations</li>
+                      <li>Privilege escalation on admin = domain-wide risk</li>
+                      <li>Auto-update available; minimal user disruption</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="insight sev-med">
+                <div class="insight-head">
+                  
+                  <span class="insight-sev med">MEDIUM</span>
+                  <button class="why-btn" data-why="cve-4">ⓘ</button>
+                </div>
+                <div class="insight-title">SonicOS admin UI XSS — low exploitability but broad surface</div>
+                <div class="insight-desc">CVE-2025-43501 requires an authenticated admin session to exploit. Risk is contained, but 6 affected appliances also lack admin MFA — increasing chance of stolen-session abuse. SAMI recommends patching with the next maintenance window.</div>
+                <div class="insight-actions">
+                  <button class="btn btn-primary">Schedule patch</button>
+                  <button class="btn">Dismiss</button>
+                  <span class="insight-meta">Disclosed 12d ago</span>
+                </div>
+                <div class="why-popover" id="why-cve-4">
+                  <div class="why-pop-label">Why SAMI flagged this</div>
+                  <div class="why-pop-body">
+                    <strong>Lower severity, but stacks with MFA gap.</strong>
+                    <ul>
+                      <li>CVSS 7.4 — exploit requires auth</li>
+                      <li>4 of 6 appliances lack admin MFA (see Policy)</li>
+                      <li>Combined risk pattern: stolen creds → XSS chain</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- MIDDLE BOTTOM: Policy Gaps -->
+        <div class="card card-policy">
+          <div class="card-head">
+            <div>
+              <h3 class="card-title">Policy Gaps</h3>
+              <div class="card-sub">Drift from org baseline · 7 findings</div>
+            </div>
+            <button class="btn btn-ghost">View details →</button>
+          </div>
+          <div class="card-body">
+            <div class="insight-list">
+
+              <div class="insight sev-crit">
+                <div class="insight-head">
+                  
+                  <span class="insight-sev crit">CRITICAL</span>
+                  <button class="why-btn" data-why="pol-1">ⓘ</button>
+                </div>
+                <div class="insight-title">Default-allow outbound on 3 perimeter firewalls undermines your other controls</div>
+                <div class="insight-desc">Acme, Beta, and Crown have permit-any outbound rules at the WAN edge. Even with DPI-SSL and IPS enabled, malicious egress (data exfil, C2 callback) goes uninspected. This contradicts your org baseline policy set in 2024.</div>
+                <div class="insight-actions">
+                  <button class="btn btn-primary">Apply baseline policy</button>
+                  <button class="btn">Dismiss</button>
+                  <span class="insight-meta">Drift &gt; 60d</span>
+                </div>
+                <div class="why-popover" id="why-pol-1">
+                  <div class="why-pop-label">Why SAMI flagged this</div>
+                  <div class="why-pop-body">
+                    <strong>Drift from your own baseline.</strong>
+                    <ul>
+                      <li>Org baseline: outbound by category</li>
+                      <li>3 tenants overrode to permit-any</li>
+                      <li>Defeats downstream DPI-SSL value</li>
+                      <li>One-click revert preserves exceptions</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="insight sev-crit">
+                <div class="insight-head">
+                  
+                  <span class="insight-sev crit">CRITICAL</span>
+                  <button class="why-btn" data-why="pol-2">ⓘ</button>
+                </div>
+                <div class="insight-title">Super-admin MFA not enforced on 2 tenants — single password from full takeover</div>
+                <div class="insight-desc">Beta Networks and Delta Logistics allow super-admin login with password only. Behaviour Anomalies card already shows credential stuffing attempts against admin accounts — this gap is being actively probed, not theoretical.</div>
+                <div class="insight-actions">
+                  <button class="btn btn-primary">Enforce MFA now</button>
+                  <button class="btn">Dismiss</button>
+                  <span class="insight-meta">Linked to behav-2</span>
+                </div>
+                <div class="why-popover" id="why-pol-2">
+                  <div class="why-pop-label">Why SAMI flagged this</div>
+                  <div class="why-pop-body">
+                    <strong>Active threat × control gap.</strong>
+                    <ul>
+                      <li>Credential stuffing observed on these tenants</li>
+                      <li>Password-only login = single point of failure</li>
+                      <li>MFA rollout takes &lt; 5 min, no downtime</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="insight sev-high">
+                <div class="insight-head">
+                  
+                  <span class="insight-sev high">HIGH</span>
+                  <button class="why-btn" data-why="pol-3">ⓘ</button>
+                </div>
+                <div class="insight-title">TLS inspection disabled on 4 edge firewalls — encrypted threats bypass scanning</div>
+                <div class="insight-desc">DPI-SSL was turned off on Beta, Crown, Delta, Echo edges — likely to resolve a certificate compatibility issue. Your threat feed shows 73% of malware in the last 30 days arrived over TLS. SAMI recommends re-enabling with exceptions for known-good destinations.</div>
+                <div class="insight-actions">
+                  <button class="btn btn-primary">Re-enable with exceptions</button>
+                  <button class="btn">Dismiss</button>
+                  <span class="insight-meta">Disabled 47d ago</span>
+                </div>
+                <div class="why-popover" id="why-pol-3">
+                  <div class="why-pop-label">Why SAMI flagged this</div>
+                  <div class="why-pop-body">
+                    <strong>Operational fix created a security gap.</strong>
+                    <ul>
+                      <li>4 tenants disabled DPI-SSL globally</li>
+                      <li>Threat feed: 73% of malware over TLS</li>
+                      <li>Exception-list approach restores coverage</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="insight sev-med">
+                <div class="insight-head">
+                  
+                  <span class="insight-sev med">MEDIUM</span>
+                  <button class="why-btn" data-why="pol-4">ⓘ</button>
+                </div>
+                <div class="insight-title">38 unused firewall rules across 11 tenants — bloat raises misconfig risk</div>
+                <div class="insight-desc">Rules with zero matches in &gt; 90 days. None are obviously dangerous, but rule sprawl makes future audits harder and increases the chance of accidental conflicts. SAMI can produce a removal candidate list ranked by safety.</div>
+                <div class="insight-actions">
+                  <button class="btn btn-primary">Generate cleanup plan</button>
+                  <button class="btn">Dismiss</button>
+                  <span class="insight-meta">Audit-driven</span>
+                </div>
+                <div class="why-popover" id="why-pol-4">
+                  <div class="why-pop-label">Why SAMI flagged this</div>
+                  <div class="why-pop-body">
+                    <strong>Hygiene, not urgency.</strong>
+                    <ul>
+                      <li>38 rules with 0 hits in 90 days</li>
+                      <li>Distributed across 11 tenants</li>
+                      <li>Lower priority than active threats</li>
+                      <li>Worth a quarterly review cycle</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT TOP: Behaviour Anomalies -->
+        <div class="card card-behav">
+          <div class="card-head">
+            <div>
+              <h3 class="card-title">Behaviour Anomalies</h3>
+              <div class="card-sub">Last 24h · 17 events</div>
+            </div>
+            <button class="btn btn-ghost">View →</button>
+          </div>
+          <div class="card-body">
+            <div class="insight-list">
+
+              <div class="insight sev-high">
+                <div class="insight-head">
+                  
+                  <span class="insight-sev high">HIGH</span>
+                  <button class="why-btn" data-why="behav-1">ⓘ</button>
+                </div>
+                <div class="insight-title">Northwind: east-west traffic 340% above baseline</div>
+                <div class="insight-desc">Sustained internal traffic spike between two VLAN segments that don't normally communicate. Pattern resembles lateral movement, but coincides with a scheduled backup window — confirm before treating as incident.</div>
+                <div class="insight-actions">
+                  <button class="btn btn-primary">Investigate flows</button>
+                  <button class="btn">Dismiss</button>
+                  <span class="insight-meta">18m ago</span>
+                </div>
+                <div class="why-popover" id="why-behav-1">
+                  <div class="why-pop-label">Why SAMI flagged this</div>
+                  <div class="why-pop-body">
+                    <strong>Statistical + behavioral anomaly.</strong>
+                    <ul>
+                      <li>340% deviation, 4σ above 30-day baseline</li>
+                      <li>Source/dest pairing not seen in 90 days</li>
+                      <li>Backup window overlap noted, not confirmed</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="insight sev-high">
+                <div class="insight-head">
+                  
+                  <span class="insight-sev high">HIGH</span>
+                  <button class="why-btn" data-why="behav-2">ⓘ</button>
+                </div>
+                <div class="insight-title">5 auth failures from new geography for super-admin role</div>
+                <div class="insight-desc">Admin account jsmith@beta.local attempted login from a new country and ASN. No successful sessions yet. Same user has 4 successful sessions from usual location in the same hour — credential stuffing pattern, not lost laptop.</div>
+                <div class="insight-actions">
+                  <button class="btn btn-primary">Force re-auth + MFA</button>
+                  <button class="btn">Dismiss</button>
+                  <span class="insight-meta">1h ago</span>
+                </div>
+                <div class="why-popover" id="why-behav-2">
+                  <div class="why-pop-label">Why SAMI flagged this</div>
+                  <div class="why-pop-body">
+                    <strong>Concurrent-session pattern.</strong>
+                    <ul>
+                      <li>Same user, two impossible locations within 1h</li>
+                      <li>Failed attempts from new ASN flagged in threat feed</li>
+                      <li>Super-admin role = high blast radius</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="insight sev-med">
+                <div class="insight-head">
+                  
+                  <span class="insight-sev med">MEDIUM</span>
+                  <button class="why-btn" data-why="behav-3">ⓘ</button>
+                </div>
+                <div class="insight-title">Unusual DNS query volume from finance segment</div>
+                <div class="insight-desc">3 endpoints in Crown Holdings finance VLAN issuing 12x normal DNS query rate, many to newly-registered domains. Possible DNS tunneling for data exfiltration — pattern matches known C2 techniques but volume is below confidence threshold.</div>
+                <div class="insight-actions">
+                  <button class="btn btn-primary">Quarantine + analyze</button>
+                  <button class="btn">Dismiss</button>
+                  <span class="insight-meta">2h ago</span>
+                </div>
+                <div class="why-popover" id="why-behav-3">
+                  <div class="why-pop-label">Why SAMI flagged this</div>
+                  <div class="why-pop-body">
+                    <strong>Multi-signal correlation, low confidence.</strong>
+                    <ul>
+                      <li>12x DNS query rate (anomalous)</li>
+                      <li>49% queries to domains &lt; 7 days old</li>
+                      <li>Pattern resembles DNS tunneling C2</li>
+                      <li>Volume below confirmed-exfil threshold</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="insight sev-low">
+                <div class="insight-head">
+                  
+                  <span class="insight-sev low">INFO</span>
+                  <button class="why-btn" data-why="behav-4">ⓘ</button>
+                </div>
+                <div class="insight-title">After-hours admin logins increased 60% across the fleet this week</div>
+                <div class="insight-desc">Aggregate trend, not a specific incident. Could indicate elevated change activity (maintenance window?), or shift in admin habits. Worth a glance, no action required unless you weren't expecting it.</div>
+                <div class="insight-actions">
+                  <button class="btn btn-primary">View activity log</button>
+                  <button class="btn">Dismiss</button>
+                  <span class="insight-meta">This week</span>
+                </div>
+                <div class="why-popover" id="why-behav-4">
+                  <div class="why-pop-label">Why SAMI flagged this</div>
+                  <div class="why-pop-body">
+                    <strong>Trend signal, not anomaly.</strong>
+                    <ul>
+                      <li>60% week-over-week increase</li>
+                      <li>Distributed across 8 tenants, no single hotspot</li>
+                      <li>Surfaced for awareness, not response</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT BOTTOM: Renewal Risk -->
+        <div class="card card-renewal">
+          <div class="card-head">
+            <div>
+              <h3 class="card-title">Renewal Risk</h3>
+              <div class="card-sub">Next 30 days</div>
+            </div>
+            <button class="btn btn-ghost">View →</button>
+          </div>
+          <div class="card-body">
+            <div class="renewal-summary">
+              <div class="renewal-big">$184K</div>
+              <div class="renewal-cap">ARR at risk across 6 tenants</div>
+            </div>
+            <div class="renewal-list">
+              <div class="renewal-row">
+                <span class="renewal-tenant">Acme Corp</span>
+                <span class="renewal-arr">$42K</span>
+                <span class="renewal-days urgent">9 days</span>
+              </div>
+              <div class="renewal-row">
+                <span class="renewal-tenant">Beta Networks</span>
+                <span class="renewal-arr">$38K</span>
+                <span class="renewal-days urgent">12 days</span>
+              </div>
+              <div class="renewal-row">
+                <span class="renewal-tenant">Crown Holdings</span>
+                <span class="renewal-arr">$56K</span>
+                <span class="renewal-days soon">18 days</span>
+              </div>
+              <div class="renewal-row">
+                <span class="renewal-tenant">Delta Logistics</span>
+                <span class="renewal-arr">$24K</span>
+                <span class="renewal-days soon">22 days</span>
+              </div>
+              <div class="renewal-row">
+                <span class="renewal-tenant">Echo Manufacturing</span>
+                <span class="renewal-arr">$24K</span>
+                <span class="renewal-days">27 days</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const COL_RED = css('--uuif-brand-red');
+  const COL_ORANGE = css('--uuif-brand-orange');
+  const COL_YELLOW = css('--uuif-brand-yellow');
+  const COL_GREEN = css('--uuif-brand-green');
+  const COL_BLUE = css('--uuif-brand-blue');
+  const COL_PRIMARY = css('--uuif-surface-primary');
+  const COL_TEXT3 = css('--uuif-text-3');
+  const COL_BORDER = css('--uuif-border');
+
+  Chart.defaults.font.family = "'Nunito Sans', system-ui, sans-serif";
+  Chart.defaults.color = COL_TEXT3;
+  Chart.defaults.borderColor = COL_BORDER;
+
+  // Sparklines removed in v14 — queue items now use SAMI insight format
+
+  // CVE chart removed in v13 — card now uses SAMI insight format
+
+  // Behaviour donut removed in v13 — card now uses SAMI insight format
+
+  // ----- Page routing -----
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => {
+      p.hidden = (p.dataset.page !== name);
+    });
+    document.querySelectorAll('.nav-item[data-nav]').forEach(n => {
+      n.classList.toggle('active', n.dataset.nav === name);
+    });
+    const crumbs = document.getElementById('crumbs');
+    if (crumbs) {
+      crumbs.innerHTML = name === 'sami'
+        ? 'SAMI · <strong>Dashboard</strong>'
+        : '<strong>Dashboard</strong>';
+    }
+    window.scrollTo(0, 0);
+  }
+  document.querySelectorAll('.nav-item[data-nav]').forEach(n => {
+    n.addEventListener('click', () => showPage(n.dataset.nav));
+  });
+  document.querySelectorAll('[data-goto]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      showPage(el.dataset.goto);
+    });
+  });
+
+  // ----- Why SAMI flagged this — popover toggle -----
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.why-btn, .qi-why');
+    const isInsidePopover = e.target.closest('.why-popover');
+
+    // close all if click outside
+    if (!btn && !isInsidePopover) {
+      document.querySelectorAll('.why-popover.open').forEach(p => p.classList.remove('open'));
+      return;
+    }
+
+    if (btn) {
+      e.stopPropagation();
+      const key = btn.dataset.why;
+      const pop = document.getElementById('why-' + key);
+      const wasOpen = pop.classList.contains('open');
+      // close all others
+      document.querySelectorAll('.why-popover.open').forEach(p => p.classList.remove('open'));
+      if (!wasOpen) pop.classList.add('open');
+    }
+  });
+</script>
+
+</body>
+</html>

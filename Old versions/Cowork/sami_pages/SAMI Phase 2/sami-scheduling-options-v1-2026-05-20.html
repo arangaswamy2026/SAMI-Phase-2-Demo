@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAMI — Scheduling & Status Patterns</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f2f5;color:#1a2332;font-size:13px;}
+
+/* ── Sidebar ─────────────────────────────────────────── */
+.sidebar{position:fixed;left:0;top:0;width:48px;height:100vh;background:#0d1526;display:flex;flex-direction:column;align-items:center;z-index:200;}
+.sidebar-logo{width:48px;height:48px;background:#E85D1A;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sidebar-logo svg{width:26px;height:26px;fill:white;}
+.sb-icon{width:48px;height:44px;display:flex;align-items:center;justify-content:center;color:#7a8ba0;cursor:pointer;position:relative;}
+.sb-icon:hover{color:#fff;}
+.sb-icon.active{color:#fff;border-left:2px solid #E85D1A;}
+.sb-icon .badge{position:absolute;top:7px;right:7px;background:#E85D1A;color:white;font-size:9px;font-weight:700;border-radius:8px;min-width:16px;height:16px;display:flex;align-items:center;justify-content:center;padding:0 3px;}
+.sb-spacer{flex:1;}
+
+/* ── Topbar ──────────────────────────────────────────── */
+.topbar{position:fixed;left:48px;right:0;top:0;height:44px;background:#fff;border-bottom:1px solid #e2e6ea;display:flex;align-items:center;padding:0 16px;z-index:199;gap:8px;}
+.breadcrumb{display:flex;align-items:center;gap:4px;font-size:12.5px;color:#555;flex:1;}
+.breadcrumb a{color:#3b7dd8;text-decoration:none;}
+.tenant-sel{display:flex;align-items:center;gap:6px;border:1px solid #d0d7de;border-radius:20px;padding:4px 12px;font-size:12.5px;cursor:pointer;}
+.tenant-sel .dot{width:8px;height:8px;background:#E85D1A;border-radius:50%;}
+.topbar-r{display:flex;align-items:center;gap:10px;}
+.ib{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#555;position:relative;}
+.ib:hover{background:#f0f2f5;}
+.nb{position:absolute;top:2px;right:2px;width:8px;height:8px;background:#E85D1A;border-radius:50%;}
+.avatar{width:30px;height:30px;border-radius:50%;background:#1a3a5c;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+
+/* ── Page wrapper ────────────────────────────────────── */
+.page{margin-left:48px;padding-top:44px;min-height:100vh;display:flex;flex-direction:column;}
+
+/* ── Option switcher bar ─────────────────────────────── */
+.switcher-bar{background:#fff;border-bottom:1px solid #e2e6ea;padding:14px 20px;flex-shrink:0;}
+.sb-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.sb-header-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#888;}
+.sb-header-title{font-size:14px;font-weight:800;color:#1a2332;}
+.sb-header-sub{font-size:12px;color:#888;margin-left:auto;}
+.opt-cards{display:flex;gap:10px;}
+.opt-card{flex:1;border:2px solid #e2e6ea;border-radius:10px;padding:12px 14px;cursor:pointer;transition:all 0.2s;background:#fff;position:relative;}
+.opt-card:hover{border-color:#ccc;background:#fafbfc;}
+.opt-card.selected{border-color:#E85D1A;background:#fff8f5;}
+.opt-card.selected .oc-letter{background:#E85D1A;color:#fff;}
+.oc-top{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.oc-letter{width:26px;height:26px;border-radius:6px;background:#f0f2f5;color:#555;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s;}
+.oc-name{font-size:13px;font-weight:700;color:#1a2332;}
+.oc-desc{font-size:11.5px;color:#666;line-height:1.5;}
+.oc-pill{position:absolute;top:10px;right:10px;font-size:10px;font-weight:700;border-radius:10px;padding:2px 8px;}
+.oc-pill.best{background:#edfaf3;color:#1a6b3c;}
+.oc-pill.context{background:#eff5ff;color:#3b7dd8;}
+.oc-pill.minimal{background:#f3eeff;color:#6b3bcc;}
+
+/* ── Dashboard area ──────────────────────────────────── */
+.dash-area{padding:14px 20px;flex:1;}
+
+/* Compact product strip */
+.product-strip{display:flex;gap:8px;margin-bottom:12px;overflow-x:hidden;}
+.ps-card{background:#fff;border:1px solid #e2e6ea;border-radius:6px;padding:8px 12px;min-width:110px;flex-shrink:0;}
+.ps-label{font-size:9.5px;font-weight:700;text-transform:uppercase;color:#888;letter-spacing:0.3px;margin-bottom:2px;}
+.ps-val{font-size:20px;font-weight:800;color:#1a2332;line-height:1;}
+.ps-sub{font-size:10px;color:#aaa;margin-top:1px;}
+.ps-attn{font-size:10px;color:#E85D1A;margin-top:2px;font-weight:600;}
+.org-chip{background:#1a2f4e;color:#fff;border-radius:6px;padding:8px 12px;min-width:130px;flex-shrink:0;}
+.org-chip .oc-t{font-size:9.5px;color:#8ba3be;text-transform:uppercase;letter-spacing:0.3px;margin-bottom:3px;}
+.org-chip .oc-v{font-size:22px;font-weight:800;line-height:1;margin-bottom:1px;}
+.org-chip .oc-s{font-size:10px;color:#8ba3be;}
+.org-chip button{margin-top:6px;background:#2a4a6e;border:none;color:#fff;font-size:11px;padding:4px 10px;border-radius:4px;cursor:pointer;width:100%;}
+
+/* SAMI tabs */
+.sami-tabs{display:flex;gap:0;border-bottom:1px solid #e2e6ea;margin-bottom:12px;}
+.sami-tab{padding:8px 14px;font-size:13px;cursor:pointer;color:#666;border-bottom:2px solid transparent;margin-bottom:-1px;}
+.sami-tab.active{color:#E85D1A;border-bottom-color:#E85D1A;font-weight:600;}
+
+/* Ask SAMI */
+.ask-sami{display:flex;align-items:center;gap:8px;border:1.5px solid #3b7dd8;border-radius:22px;padding:8px 14px;background:#fff;box-shadow:0 0 0 3px rgba(59,125,216,0.08);margin-bottom:14px;}
+.ask-sami .spark{color:#E85D1A;font-size:14px;}
+.ask-sami input{border:none;outline:none;flex:1;font-size:12.5px;color:#555;background:transparent;}
+.ask-sami .kbd{font-size:10px;color:#999;background:#f0f2f5;border-radius:3px;padding:2px 5px;font-family:monospace;}
+
+/* Two-col layout */
+.alerts-layout{display:flex;gap:12px;}
+.alerts-col{flex:1;}
+.recs-col{flex:1;}
+.col-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.col-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:#1a2332;}
+.view-all{font-size:12px;color:#3b7dd8;cursor:pointer;text-decoration:none;}
+.view-all:hover{text-decoration:underline;}
+
+/* ── Shared alert card ───────────────────────────────── */
+.alert-card{background:#fff;border:1px solid #e2e6ea;border-radius:8px;padding:12px 14px;margin-bottom:8px;transition:all 0.25s;position:relative;}
+.alert-card:hover{border-color:#d0d7de;box-shadow:0 1px 4px rgba(0,0,0,0.06);}
+.ac-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+.ac-type{font-size:10.5px;font-weight:600;display:flex;align-items:center;gap:4px;}
+.ac-type.cve{color:#E85D1A;}
+.ac-type.cve::before{content:'';width:5px;height:5px;background:#E85D1A;border-radius:50%;}
+.ac-type.device{color:#c0392b;}
+.ac-type.device::before{content:'';width:5px;height:5px;background:#c0392b;border-radius:50%;}
+.ac-type.behavioral{color:#3b7dd8;}
+.ac-type.behavioral::before{content:'';width:5px;height:5px;background:#3b7dd8;border-radius:50%;}
+.ac-type.policy{color:#6b3bcc;}
+.ac-type.policy::before{content:'';width:5px;height:5px;background:#6b3bcc;border-radius:50%;}
+.ac-time{font-size:11px;color:#999;}
+.ac-title{font-size:13px;font-weight:700;color:#1a2332;margin-bottom:6px;line-height:1.3;}
+.sami-badge{display:flex;align-items:flex-start;gap:5px;background:#fff8f5;border-radius:4px;padding:6px 8px;font-size:11.5px;color:#555;margin-bottom:8px;line-height:1.4;}
+.sb-tag{background:#E85D1A;color:#fff;font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px;flex-shrink:0;margin-top:1px;}
+.ac-footer{display:flex;align-items:center;justify-content:space-between;}
+.ac-scope{display:flex;gap:10px;font-size:11px;color:#666;align-items:center;flex-wrap:wrap;}
+.ac-scope span{display:flex;align-items:center;gap:3px;}
+.ac-actions{display:flex;gap:6px;flex-shrink:0;}
+.btn-p{background:#E85D1A;color:#fff;border:none;border-radius:4px;padding:5px 10px;font-size:11.5px;cursor:pointer;font-weight:600;white-space:nowrap;}
+.btn-p:hover{background:#d14d10;}
+.btn-s{background:#fff;color:#555;border:1px solid #d0d7de;border-radius:4px;padding:5px 10px;font-size:11.5px;cursor:pointer;white-space:nowrap;}
+.btn-s:hover{background:#f5f7fa;}
+
+/* ── OPTION A: Tabbed Work Queue ─────────────────────── */
+.work-tabs{display:flex;gap:0;border-bottom:2px solid #e2e6ea;margin-bottom:10px;}
+.work-tab{padding:7px 12px;font-size:12.5px;cursor:pointer;color:#666;border-bottom:2px solid transparent;margin-bottom:-2px;display:flex;align-items:center;gap:5px;transition:color 0.15s;}
+.work-tab:hover{color:#333;}
+.work-tab.active{color:#E85D1A;border-bottom-color:#E85D1A;font-weight:700;}
+.work-tab .tab-badge{background:#e2e6ea;color:#555;font-size:9.5px;font-weight:700;border-radius:10px;padding:1px 6px;}
+.work-tab.active .tab-badge{background:#E85D1A;color:#fff;}
+.work-tab .tab-badge.blink{animation:tabPulse 1.5s ease-in-out infinite;}
+@keyframes tabPulse{0%,100%{background:#E85D1A;color:#fff;}50%{background:#ff8c5a;color:#fff;}}
+
+/* Scheduled list (Option A) */
+.sched-list{display:flex;flex-direction:column;gap:6px;}
+.sched-row{background:#fff;border:1px solid #e2e6ea;border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;}
+.sr-time-block{min-width:110px;flex-shrink:0;}
+.sr-date{font-size:11.5px;font-weight:700;color:#3b7dd8;}
+.sr-clock{font-size:11px;color:#888;}
+.sr-dot{width:8px;height:8px;border-radius:50%;background:#3b7dd8;flex-shrink:0;}
+.sr-body{flex:1;}
+.sr-title{font-size:12.5px;font-weight:700;color:#1a2332;}
+.sr-scope{font-size:11px;color:#888;margin-top:2px;}
+.sr-actions{display:flex;gap:6px;flex-shrink:0;}
+.btn-icon{width:28px;height:28px;border:1px solid #d0d7de;border-radius:4px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#555;}
+.btn-icon:hover{background:#f5f7fa;}
+.btn-icon.del:hover{background:#fff5f5;border-color:#ffb8b8;color:#c0392b;}
+
+/* In-progress list (Option A) */
+.inprog-list{display:flex;flex-direction:column;gap:8px;}
+.ip-card{background:#fff;border:1px solid #e2e6ea;border-radius:8px;padding:12px 14px;}
+.ip-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;}
+.ip-title{font-size:13px;font-weight:700;color:#1a2332;}
+.ip-tenant{font-size:11px;color:#888;margin-top:2px;}
+.ip-since{font-size:11px;color:#aaa;}
+.ip-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.ip-bar-wrap{flex:1;height:6px;background:#f0f2f5;border-radius:10px;overflow:hidden;}
+.ip-bar{height:100%;border-radius:10px;background:linear-gradient(90deg,#E85D1A,#f5a623);}
+.ip-bar.complete{background:#1a6b3c;}
+.ip-pct{font-size:11.5px;font-weight:700;color:#E85D1A;min-width:32px;}
+.ip-meta{display:flex;align-items:center;justify-content:space-between;}
+.ip-eta{font-size:11px;color:#888;}
+.ip-acts{display:flex;gap:6px;}
+
+/* ── OPTION B: Inline States ─────────────────────────── */
+/* Status banner */
+.status-banner{background:#fff;border:1px solid #e2e6ea;border-radius:8px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all 0.2s;}
+.status-banner:hover{border-color:#ccc;background:#fafbfc;}
+.sb-chips{display:flex;gap:8px;flex:1;flex-wrap:wrap;}
+.sb-chip{display:flex;align-items:center;gap:5px;border-radius:20px;padding:4px 10px;font-size:11.5px;font-weight:600;}
+.sb-chip.active-c{background:#fff3ed;color:#E85D1A;border:1px solid #ffd0b0;}
+.sb-chip.sched-c{background:#eff5ff;color:#3b7dd8;border:1px solid #b8d0f8;}
+.sb-chip.prog-c{background:#edfaf3;color:#1a6b3c;border:1px solid #9be4be;}
+.sb-pulse{width:7px;height:7px;border-radius:50%;background:#E85D1A;animation:blink 1.2s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.sb-right{font-size:12px;color:#3b7dd8;display:flex;align-items:center;gap:4px;flex-shrink:0;}
+
+/* Inline scheduled card state */
+.alert-card.state-scheduled{border-color:#b8d0f8;background:#f8fbff;opacity:0.9;}
+.alert-card.state-scheduled .ac-title{color:#2a5299;}
+.scheduled-state-bar{display:flex;align-items:center;justify-content:space-between;background:#eff5ff;border-radius:5px;padding:6px 10px;margin-bottom:8px;border:1px solid #dce8fd;}
+.ssb-left{display:flex;align-items:center;gap:7px;font-size:12px;color:#2a5299;font-weight:600;}
+.ssb-edit{font-size:11px;color:#3b7dd8;cursor:pointer;text-decoration:underline;}
+.ssb-cancel{font-size:11px;color:#c0392b;cursor:pointer;margin-left:6px;}
+
+/* Inline in-progress card state */
+.alert-card.state-inprog{border-color:#9be4be;border-left:3px solid #1a6b3c;}
+.inprog-bar-section{margin-bottom:8px;}
+.ipb-label{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+.ipb-status{font-size:12px;font-weight:700;color:#1a6b3c;display:flex;align-items:center;gap:5px;}
+.ipb-spinner{width:12px;height:12px;border:2px solid #edfaf3;border-top-color:#1a6b3c;border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.ipb-eta{font-size:11px;color:#888;}
+.ipb-bar-wrap{height:5px;background:#edfaf3;border-radius:10px;overflow:hidden;}
+.ipb-bar{height:100%;background:#1a6b3c;border-radius:10px;}
+
+/* ── OPTION C: Work Tray ─────────────────────────────── */
+.tray-page-wrap{position:relative;padding-bottom:52px;}/* space for tray */
+
+.work-tray-bar{position:fixed;bottom:0;left:48px;right:0;background:#1a2332;color:#fff;z-index:150;transition:height 0.3s ease;height:44px;overflow:hidden;border-top:2px solid #E85D1A;}
+.work-tray-bar.expanded{height:240px;}
+
+/* Tray collapsed bar */
+.tray-collapsed{height:44px;display:flex;align-items:center;padding:0 20px;gap:0;cursor:pointer;flex-shrink:0;}
+.tc-label{font-size:12px;font-weight:700;color:#fff;letter-spacing:0.3px;margin-right:16px;}
+.tc-chips{display:flex;gap:10px;flex:1;}
+.tc-chip{display:flex;align-items:center;gap:5px;font-size:12px;color:#c8d8e8;}
+.tc-chip .pulse{width:7px;height:7px;border-radius:50%;background:#1a6b3c;animation:blink 1.2s ease-in-out infinite;}
+.tc-chip .dot-s{width:7px;height:7px;border-radius:50%;background:#3b7dd8;flex-shrink:0;}
+.tray-toggle{margin-left:auto;display:flex;align-items:center;gap:5px;font-size:11.5px;color:#8ba3be;}
+.tray-toggle svg{transition:transform 0.3s;}
+.tray-toggle.open svg{transform:rotate(180deg);}
+
+/* Tray expanded body */
+.tray-body{height:196px;display:flex;overflow:hidden;}
+.tray-col{flex:1;overflow-y:auto;padding:10px 16px 10px;border-right:1px solid #263a54;}
+.tray-col:last-child{border-right:none;}
+.tray-col-header{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#8ba3be;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.tray-col-header span{background:#263a54;color:#8ba3be;font-size:9.5px;font-weight:700;border-radius:10px;padding:1px 6px;}
+.tray-ip-card{background:#263a54;border-radius:6px;padding:8px 10px;margin-bottom:6px;}
+.tip-title{font-size:12px;font-weight:700;color:#fff;margin-bottom:4px;}
+.tip-tenant{font-size:11px;color:#8ba3be;margin-bottom:6px;}
+.tip-bar-wrap{height:4px;background:#1a2332;border-radius:10px;overflow:hidden;margin-bottom:4px;}
+.tip-bar{height:100%;border-radius:10px;background:linear-gradient(90deg,#1a6b3c,#27ae60);}
+.tip-meta{display:flex;align-items:center;justify-content:space-between;}
+.tip-pct{font-size:11px;color:#27ae60;font-weight:700;}
+.tip-acts{display:flex;gap:5px;}
+.tray-btn{font-size:10.5px;color:#8ba3be;background:transparent;border:1px solid #3a5069;border-radius:3px;padding:2px 7px;cursor:pointer;}
+.tray-btn:hover{color:#fff;border-color:#8ba3be;}
+.tray-btn.primary{color:#E85D1A;border-color:#E85D1A;}
+.tray-sched-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #263a54;}
+.tray-sched-row:last-child{border:none;}
+.tsr-dot{width:7px;height:7px;border-radius:50%;background:#3b7dd8;flex-shrink:0;}
+.tsr-body{flex:1;}
+.tsr-title{font-size:11.5px;font-weight:600;color:#c8d8e8;}
+.tsr-time{font-size:10.5px;color:#8ba3be;margin-top:1px;}
+.tsr-acts{display:flex;gap:4px;}
+
+/* Rec stat chips (shared) */
+.rec-stats{display:flex;gap:8px;margin-bottom:10px;}
+.rec-stat{flex:1;background:#fff;border:1px solid #e2e6ea;border-radius:6px;padding:9px 11px;}
+.rs-val{font-size:20px;font-weight:800;line-height:1;margin-bottom:3px;}
+.rs-val.cve{color:#E85D1A;}
+.rs-val.beh{color:#3b7dd8;}
+.rs-val.pol{color:#1a2332;}
+.rs-val.arr{color:#1a6b3c;font-size:16px;}
+.rs-label{font-size:10px;font-weight:700;text-transform:uppercase;color:#888;letter-spacing:0.3px;}
+
+/* ── Scheduler modal ─────────────────────────────────── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:500;display:none;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.scheduler-modal{background:#fff;border-radius:12px;width:340px;box-shadow:0 8px 40px rgba(0,0,0,0.18);overflow:hidden;}
+.sm-header{padding:14px 18px 0;border-bottom:1px solid #f0f2f5;padding-bottom:12px;}
+.sm-title{font-size:14px;font-weight:800;color:#1a2332;margin-bottom:3px;}
+.sm-alert-name{font-size:12px;color:#888;}
+.sm-body{padding:14px 18px;}
+.sm-section{margin-bottom:14px;}
+.sm-label{font-size:10.5px;font-weight:700;text-transform:uppercase;color:#aaa;letter-spacing:0.5px;margin-bottom:8px;}
+.quick-times{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.qt-btn{background:#f5f7fa;border:2px solid #e2e6ea;border-radius:7px;padding:8px 10px;cursor:pointer;text-align:left;transition:all 0.15s;}
+.qt-btn:hover{border-color:#ccc;background:#eef0f3;}
+.qt-btn.selected{border-color:#E85D1A;background:#fff8f5;}
+.qt-label{font-size:12.5px;font-weight:700;color:#1a2332;}
+.qt-sub{font-size:11px;color:#888;margin-top:1px;}
+.custom-section{background:#f9fafc;border:1px solid #e2e6ea;border-radius:8px;padding:12px;margin-top:8px;}
+.custom-row{display:flex;gap:8px;}
+.custom-field{flex:1;}
+.cf-label{font-size:11px;font-weight:600;color:#666;margin-bottom:4px;}
+.cf-select{width:100%;border:1px solid #d0d7de;border-radius:6px;padding:6px 8px;font-size:12.5px;color:#1a2332;background:#fff;cursor:pointer;}
+.sm-consideration{background:#fff8f5;border:1px solid #ffd0b0;border-radius:6px;padding:9px 11px;font-size:11.5px;color:#7a3500;line-height:1.5;display:flex;gap:7px;}
+.sm-consideration .con-tag{background:#E85D1A;color:#fff;font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px;flex-shrink:0;margin-top:1px;}
+.sm-footer{padding:12px 18px;border-top:1px solid #f0f2f5;display:flex;justify-content:flex-end;gap:8px;}
+.sm-cancel{background:#fff;border:1px solid #d0d7de;border-radius:6px;padding:7px 14px;font-size:12.5px;cursor:pointer;color:#555;}
+.sm-confirm{background:#E85D1A;color:#fff;border:none;border-radius:6px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-weight:700;}
+.sm-confirm:hover{background:#d14d10;}
+
+/* ── Utilities ───────────────────────────────────────── */
+.fade-in{animation:fadeIn 0.28s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
+.tag-pill{font-size:10px;font-weight:700;border-radius:10px;padding:2px 8px;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo"><svg viewBox="0 0 24 24"><path d="M12 2C8 2 4 6 4 10c0 4 2 7 5 9v3h6v-3c3-2 5-5 5-9 0-4-4-8-8-8z"/></svg></div>
+  <div class="sb-icon active"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div>
+  <div class="sb-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="badge">8</span></div>
+  <div class="sb-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 3v1M12 20v1M3 12h1M20 12h1"/></svg></div>
+  <div class="sb-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+  <div class="sb-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+  <div class="sb-spacer"></div>
+  <div class="sb-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="badge">3</span></div>
+</nav>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="breadcrumb">
+    <a href="sami-page1-dashboard-v2-2026-05-20.html">Home</a>
+    <span style="color:#ccc">›</span><a href="#">Dashboard</a>
+    <span style="color:#ccc">›</span><span style="color:#333;font-weight:600">Scheduling &amp; Status Patterns</span>
+  </div>
+  <div class="tenant-sel"><div class="dot"></div> All Tenants (Global) <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+  <div class="topbar-r">
+    <div class="ib"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg><div class="nb"></div></div>
+    <div class="ib"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+    <div class="avatar">HN</div>
+  </div>
+</header>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- OPTION SWITCHER -->
+  <div class="switcher-bar">
+    <div class="sb-header">
+      <div>
+        <div class="sb-header-label">Design Exploration</div>
+        <div class="sb-header-title">Scheduling Deferred Actions &amp; Checking In-Progress Status</div>
+      </div>
+      <div class="sb-header-sub">Select an option to preview the pattern →</div>
+    </div>
+    <div class="opt-cards">
+      <div class="opt-card selected" id="optA" onclick="setOption('A')">
+        <span class="oc-pill best">Clearest org</span>
+        <div class="oc-top"><div class="oc-letter">A</div><div class="oc-name">Tabbed Work Queue</div></div>
+        <div class="oc-desc">Active, Scheduled, and In-Progress alerts live in separate tabs. Clean separation — scheduled work is never lost in the noise.</div>
+      </div>
+      <div class="opt-card" id="optB" onclick="setOption('B')">
+        <span class="oc-pill context">Most context</span>
+        <div class="oc-top"><div class="oc-letter">B</div><div class="oc-name">Inline States</div></div>
+        <div class="oc-desc">All alerts remain in one list. Each card shows its current state — active, scheduled, or in-progress — inline without tab switching.</div>
+      </div>
+      <div class="opt-card" id="optC" onclick="setOption('C')">
+        <span class="oc-pill minimal">Least disruptive</span>
+        <div class="oc-top"><div class="oc-letter">C</div><div class="oc-name">Persistent Work Tray</div></div>
+        <div class="oc-desc">A fixed bottom tray collects all deferred and running tasks. The alert feed stays clean; the tray is always accessible.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD MOCKUP -->
+  <div class="dash-area" id="dashArea">
+    <!-- Rendered by JS -->
+  </div>
+</div>
+
+<!-- SCHEDULER MODAL -->
+<div class="modal-overlay" id="schedulerModal" onclick="closeSchedulerOnOverlay(event)">
+  <div class="scheduler-modal" onclick="event.stopPropagation()">
+    <div class="sm-header">
+      <div class="sm-title">Schedule this action for later</div>
+      <div class="sm-alert-name" id="smAlertName">SSL VPN Patch — 12 Firewalls, 4 Tenants</div>
+    </div>
+    <div class="sm-body">
+      <div class="sm-section">
+        <div class="sm-label">Quick options</div>
+        <div class="quick-times">
+          <div class="qt-btn selected" onclick="selectQuickTime(this,'Tonight','Thu May 22 · 10:00 PM')">
+            <div class="qt-label">Tonight 10pm</div>
+            <div class="qt-sub">Thu May 22 · change window</div>
+          </div>
+          <div class="qt-btn" onclick="selectQuickTime(this,'Tomorrow','Fri May 23 · 09:00 AM')">
+            <div class="qt-label">Tomorrow 9am</div>
+            <div class="qt-sub">Fri May 23</div>
+          </div>
+          <div class="qt-btn" onclick="selectQuickTime(this,'Monday','Mon May 25 · 10:00 PM')">
+            <div class="qt-label">Monday 10pm</div>
+            <div class="qt-sub">After weekend freeze</div>
+          </div>
+          <div class="qt-btn" onclick="selectQuickTime(this,'Custom','')">
+            <div class="qt-label">Custom date &amp; time</div>
+            <div class="qt-sub">Pick any window</div>
+          </div>
+        </div>
+        <div class="custom-section" id="customSection" style="display:none;">
+          <div class="custom-row">
+            <div class="custom-field">
+              <div class="cf-label">Date</div>
+              <select class="cf-select"><option>May 22, 2026</option><option>May 23, 2026</option><option>May 24, 2026</option><option>May 25, 2026</option><option>May 26, 2026</option></select>
+            </div>
+            <div class="custom-field">
+              <div class="cf-label">Time</div>
+              <select class="cf-select"><option>08:00 AM</option><option>10:00 AM</option><option>02:00 PM</option><option>06:00 PM</option><option>10:00 PM</option><option>11:30 PM</option></select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sm-consideration">
+        <span class="con-tag">SAMI</span>
+        <span id="smConsideration">Tonight 10pm aligns with Acme Corp's change window. Beta Networks has no restriction and can be patched any time — but probe attempts are active now. Consider deploying Beta Networks immediately and scheduling Acme Corp for tonight.</span>
+      </div>
+    </div>
+    <div class="sm-footer">
+      <button class="sm-cancel" onclick="closeScheduler()">Cancel</button>
+      <button class="sm-confirm" onclick="confirmSchedule()">Confirm schedule →</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT SCHEDULE MODAL -->
+<div class="modal-overlay" id="editModal" onclick="closeEditOnOverlay(event)">
+  <div class="scheduler-modal" onclick="event.stopPropagation()">
+    <div class="sm-header">
+      <div class="sm-title">Edit scheduled action</div>
+      <div class="sm-alert-name" id="editAlertName"></div>
+    </div>
+    <div class="sm-body">
+      <div class="sm-section">
+        <div class="sm-label">Currently scheduled for</div>
+        <div style="background:#f5f7fa;border-radius:8px;padding:10px 12px;font-size:13px;font-weight:700;color:#3b7dd8;margin-bottom:12px;" id="currentScheduleTime"></div>
+        <div class="sm-label">Change to</div>
+        <div class="quick-times">
+          <div class="qt-btn" onclick="selectQuickTime(this,'Tonight','Thu May 22 · 10:00 PM')"><div class="qt-label">Tonight 10pm</div><div class="qt-sub">Thu May 22</div></div>
+          <div class="qt-btn" onclick="selectQuickTime(this,'Tomorrow','Fri May 23 · 09:00 AM')"><div class="qt-label">Tomorrow 9am</div><div class="qt-sub">Fri May 23</div></div>
+          <div class="qt-btn" onclick="selectQuickTime(this,'Monday','Mon May 25 · 10:00 PM')"><div class="qt-label">Monday 10pm</div><div class="qt-sub">Change freeze lifts</div></div>
+          <div class="qt-btn" onclick="selectQuickTime(this,'Custom','')"><div class="qt-label">Custom</div><div class="qt-sub">Pick date &amp; time</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="sm-footer">
+      <button class="sm-cancel" onclick="closeEditModal()" style="color:#c0392b;border-color:#ffb8b8;">Cancel &amp; remove</button>
+      <button class="sm-cancel" onclick="closeEditModal()">Keep current</button>
+      <button class="sm-confirm" onclick="closeEditModal()">Update schedule →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Data ─────────────────────────────────────────────────
+let currentOption = 'A';
+let workTab = 'active'; // for Option A: active | scheduled | inprogress
+let trayExpanded = false; // for Option C
+let scheduledTarget = null;
+let selectedQuickTime = 'Tonight';
+let selectedQuickLabel = 'Thu May 22 · 10:00 PM';
+
+// Alerts already in a deferred/scheduled/in-progress state (pre-populated for demo)
+const PRE_SCHEDULED = [
+  { id:'s1', title:'SSL VPN Patch — Acme Corp, Westfield IT', scope:'7 firewalls · 2 tenants', date:'Thu May 22', time:'10:00 PM', dotColor:'#E85D1A' },
+  { id:'s2', title:'MFA Policy Enforcement — Crown Logistics', scope:'11 admin accounts', date:'Fri May 23', time:'09:00 AM', dotColor:'#3b7dd8' },
+  { id:'s3', title:'SSL VPN Patch — Westfield IT', scope:'3 firewalls · change freeze lifted Mon', date:'Mon May 25', time:'10:00 PM', dotColor:'#6b3bcc' },
+];
+const PRE_INPROG = [
+  { id:'p1', title:'SSL VPN Patch — Beta Networks', tenant:'Beta Networks · 3 firewalls', pct:72, eta:'~2 min remaining', since:'Started 11:04 PM' },
+  { id:'p2', title:'Gateway Connectivity Diagnosis', tenant:'Northgate Health · FW-NH-02, FW-NH-03', pct:38, eta:'~6 min remaining', since:'Started 11:07 PM' },
+];
+
+// ── Icon SVGs ─────────────────────────────────────────────
+const I_TENANT = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>`;
+const I_FW     = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
+const I_EDIT   = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
+const I_TRASH  = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>`;
+const I_PAUSE  = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`;
+const I_EYE    = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+
+// ── Alert card templates ──────────────────────────────────
+function alertCard_CVE(opts={}) {
+  const isScheduled = opts.state === 'scheduled';
+  const isInProg = opts.state === 'inprog';
+  return `<div class="alert-card ${isScheduled?'state-scheduled':''} ${isInProg?'state-inprog':''} fade-in">
+    <div class="ac-meta">
+      <div class="ac-type cve">CVE Vulnerability</div>
+      <div class="ac-time">${isScheduled?'📅 Scheduled':isInProg?'⚡ In Progress':'2 hrs ago'}</div>
+    </div>
+    <div class="ac-title">SSL VPN Auth Bypass (CVE-2026-1142) — 12 Firewalls, 4 Tenants</div>
+    ${isScheduled ? `<div class="scheduled-state-bar">
+      <div class="ssb-left">📅 &nbsp;Scheduled for Thu May 22 · 10:00 PM — Acme Corp &amp; Westfield IT (7 FW)</div>
+      <div><span class="ssb-edit" onclick="openEditModal('SSL VPN Patch — Acme Corp &amp; Westfield IT','Thu May 22 · 10:00 PM')">Edit</span><span class="ssb-cancel" onclick="this.closest('.alert-card').classList.remove('state-scheduled');this.closest('.alert-card').querySelector('.scheduled-state-bar').remove();this.closest('.alert-card').querySelector('.ac-time').textContent='2 hrs ago';">Cancel</span></div>
+    </div>` : ''}
+    ${isInProg ? `<div class="inprog-bar-section">
+      <div class="ipb-label"><div class="ipb-status"><div class="ipb-spinner"></div> Deploying patch — 7 / 12 devices complete</div><div class="ipb-eta">~3 min remaining</div></div>
+      <div class="ipb-bar-wrap"><div class="ipb-bar" style="width:58%"></div></div>
+    </div>` : ''}
+    <div class="sami-badge"><span class="sb-tag">SAMI</span><span>CVSS 9.8. Unauthenticated RCE on SonicOS &lt; 7.1.2-1023. Active PoC. 12 firewalls across Acme Corp, Beta Networks, Westfield IT, Crown Logistics. Patch pre-staged and verified.</span></div>
+    <div class="ac-footer">
+      <div class="ac-scope"><span>${I_TENANT} 4 Tenants</span><span>${I_FW} 12 Firewalls</span></div>
+      <div class="ac-actions">
+        ${isInProg ? `<button class="btn-s" onclick="window.location.href='sami-cve-interactive-v1-2026-05-20.html'">${I_EYE} View live status</button>` :
+          isScheduled ? `<button class="btn-s" onclick="openEditModal('SSL VPN Patch — Acme Corp &amp; Westfield IT','Thu May 22 · 10:00 PM')">${I_EDIT} Edit</button>` :
+          `<button class="btn-s" onclick="openScheduler('SSL VPN Auth Bypass — 12 Firewalls, 4 Tenants')">Schedule later</button>
+           <button class="btn-p" onclick="window.location.href='sami-cve-interactive-v1-2026-05-20.html'">Deploy patch →</button>`}
+      </div>
+    </div>
+  </div>`;
+}
+
+function alertCard_Gateway(opts={}) {
+  const isInProg = opts.state === 'inprog';
+  return `<div class="alert-card ${isInProg?'state-inprog':''} fade-in">
+    <div class="ac-meta">
+      <div class="ac-type device">Device Alert</div>
+      <div class="ac-time">${isInProg?'⚡ Diagnosing':'3 hrs ago'}</div>
+    </div>
+    <div class="ac-title">3 Gateways Unreachable — Northgate Health &amp; Delta Logistics</div>
+    ${isInProg ? `<div class="inprog-bar-section">
+      <div class="ipb-label"><div class="ipb-status"><div class="ipb-spinner"></div> Running connectivity diagnosis</div><div class="ipb-eta">~6 min remaining</div></div>
+      <div class="ipb-bar-wrap"><div class="ipb-bar" style="width:38%"></div></div>
+    </div>` : ''}
+    <div class="sami-badge"><span class="sb-tag">SAMI</span><span>FW-NH-02, FW-NH-03, FW-DL-01 offline 3h+ after BGP route change. 847 endpoints at Northgate Health branch uninspected. No SD-WAN failover path configured.</span></div>
+    <div class="ac-footer">
+      <div class="ac-scope"><span>${I_TENANT} 2 Tenants</span><span>${I_FW} 3 Firewalls offline</span></div>
+      <div class="ac-actions">
+        ${isInProg ? `<button class="btn-s">${I_PAUSE} Pause</button><button class="btn-p">${I_EYE} View status</button>` :
+          `<button class="btn-s" onclick="openScheduler('Gateway Diagnosis — FW-NH-02, FW-NH-03, FW-DL-01')">Schedule</button><button class="btn-p">Diagnose →</button>`}
+      </div>
+    </div>
+  </div>`;
+}
+
+function alertCard_Creds(opts={}) {
+  const isScheduled = opts.state === 'scheduled';
+  return `<div class="alert-card ${isScheduled?'state-scheduled':''} fade-in">
+    <div class="ac-meta">
+      <div class="ac-type behavioral">Behavioral Anomaly</div>
+      <div class="ac-time">${isScheduled?'📅 Scheduled':'1 hr ago'}</div>
+    </div>
+    <div class="ac-title">Credential Stuffing — Beta Networks &amp; Crown Logistics Super-Admin Accounts</div>
+    ${isScheduled ? `<div class="scheduled-state-bar">
+      <div class="ssb-left">📅 &nbsp;MFA enforcement scheduled — Fri May 23 · 09:00 AM</div>
+      <div><span class="ssb-edit" onclick="openEditModal('MFA Enforcement — Beta Networks &amp; Crown Logistics','Fri May 23 · 09:00 AM')">Edit</span><span class="ssb-cancel" onclick="this.closest('.alert-card').classList.remove('state-scheduled');this.closest('.alert-card').querySelector('.scheduled-state-bar').remove();this.closest('.alert-card').querySelector('.ac-time').textContent='1 hr ago';">Cancel</span></div>
+    </div>` : ''}
+    <div class="sami-badge"><span class="sb-tag">SAMI</span><span>18 failed logins from 3 geographies. Concurrent active sessions from known IPs running alongside probes. Both accounts use password-only auth.</span></div>
+    <div class="ac-footer">
+      <div class="ac-scope"><span>${I_TENANT} 2 Tenants</span><span>2 Admin accounts</span></div>
+      <div class="ac-actions">
+        ${isScheduled ? `<button class="btn-s" onclick="openEditModal('MFA Enforcement','Fri May 23 · 09:00 AM')">${I_EDIT} Edit</button>` :
+          `<button class="btn-s" onclick="openScheduler('MFA Enforcement — Beta Networks &amp; Crown Logistics')">Schedule</button><button class="btn-p">Force MFA →</button>`}
+      </div>
+    </div>
+  </div>`;
+}
+
+function alertCard_Policy() {
+  return `<div class="alert-card fade-in">
+    <div class="ac-meta">
+      <div class="ac-type policy">Policy Gap</div>
+      <div class="ac-time" style="color:#f5a623;">Drift &gt;45d</div>
+    </div>
+    <div class="ac-title">Permit-Any Outbound Bypassing DPI-SSL — Acme, Beta &amp; Westfield, 9 Firewalls</div>
+    <div class="sami-badge"><span class="sb-tag">SAMI</span><span>Default-allow at WAN interface across 9 firewalls. 2.3TB uninspected outbound in last 7 days. Replacement rule set prepared, zero-disruption deployment ready.</span></div>
+    <div class="ac-footer">
+      <div class="ac-scope"><span>${I_TENANT} 3 Tenants</span><span>${I_FW} 9 Firewalls</span></div>
+      <div class="ac-actions">
+        <button class="btn-s" onclick="openScheduler('DPI-SSL Policy Baseline — 3 Tenants, 9 FW')">Schedule</button>
+        <button class="btn-p">Apply baseline →</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── Recs column (shared) ──────────────────────────────────
+function recsColumn() {
+  return `<div class="recs-col">
+    <div class="col-header">
+      <div class="col-title">SAMI Recommendations</div>
+      <a class="view-all" href="sami-page2-recommendation-v2-2026-05-20.html">View all</a>
+    </div>
+    <div class="rec-stats">
+      <div class="rec-stat"><div class="rs-val cve">8</div><div class="rs-label">CVE Vulnerabilities</div></div>
+      <div class="rec-stat"><div class="rs-val beh">5</div><div class="rs-label">Behavioral</div></div>
+      <div class="rec-stat"><div class="rs-val pol">5</div><div class="rs-label">Policy Gaps</div></div>
+      <div class="rec-stat"><div class="rs-val arr">$287K</div><div class="rs-label">ARR at Risk</div></div>
+    </div>
+    <div style="background:#fff8f5;border:1px solid #ffd0b0;border-radius:8px;padding:11px 14px;font-size:12px;color:#7a3500;line-height:1.6;display:flex;gap:7px;align-items:flex-start;">
+      <span style="background:#E85D1A;color:#fff;font-size:9px;font-weight:700;border-radius:3px;padding:2px 5px;flex-shrink:0;margin-top:2px;">SAMI</span>
+      <span>Across your 4 highest-risk tenants, there are <strong>2 actions currently in progress</strong> and <strong>3 actions scheduled for this week</strong>. Crown Logistics approval for the SSL VPN patch is still pending — SAMI will auto-deploy on approval and notify you when complete.</span>
+    </div>
+  </div>`;
+}
+
+// ── Dashboard chrome ──────────────────────────────────────
+function dashChrome() {
+  return `<div class="product-strip">
+    <div class="ps-card"><div class="ps-label">Firewall</div><div class="ps-val">110</div><div class="ps-sub">Total devices</div><div class="ps-attn">⚠ 2 · EOL 6</div></div>
+    <div class="ps-card"><div class="ps-label">Access Point</div><div class="ps-val">10</div><div class="ps-sub">Total devices</div></div>
+    <div class="ps-card"><div class="ps-label">Switch</div><div class="ps-val">9</div><div class="ps-sub">Total devices</div></div>
+    <div class="ps-card"><div class="ps-label">Capture Client</div><div class="ps-val">2</div><div class="ps-sub">Endpoints</div></div>
+    <div class="ps-card"><div class="ps-label">SMA 1000</div><div class="ps-val">6</div><div class="ps-sub">Total devices</div></div>
+    <div style="flex:1;"></div>
+    <div class="org-chip"><div class="oc-t">Org Summary</div><div class="oc-v">98</div><div class="oc-s">Tenants · 2 need attention</div><button>Create Tenant</button></div>
+  </div>
+  <div class="sami-tabs">
+    <div class="sami-tab active">SAMI Alerts</div>
+    <div class="sami-tab">Notifications</div>
+  </div>
+  <div class="ask-sami">
+    <span class="spark">✦</span>
+    <input type="text" placeholder='Ask SAMI anything — e.g. "What actions are scheduled for tonight?"'>
+    <span class="kbd">⌘</span><span class="kbd">K</span>
+  </div>`;
+}
+
+// ── OPTION A: Tabbed Work Queue ───────────────────────────
+function renderOptionA() {
+  const scheduledCount = PRE_SCHEDULED.length;
+  const inProgCount = PRE_INPROG.length;
+
+  let tabContent = '';
+  if (workTab === 'active') {
+    tabContent = `
+      <div class="alerts-layout">
+        <div class="alerts-col">
+          <div class="col-header"><div class="col-title">Active Alerts</div></div>
+          ${alertCard_CVE()}
+          ${alertCard_Gateway()}
+          ${alertCard_Policy()}
+        </div>
+        ${recsColumn()}
+      </div>`;
+  } else if (workTab === 'scheduled') {
+    tabContent = `
+      <div class="col-header" style="margin-bottom:10px;">
+        <div class="col-title">Scheduled Actions</div>
+        <span style="font-size:11.5px;color:#888;">Sorted by earliest first</span>
+      </div>
+      <div class="sched-list">
+        ${PRE_SCHEDULED.map(s => `
+        <div class="sched-row fade-in">
+          <div class="sr-time-block">
+            <div class="sr-date">${s.date}</div>
+            <div class="sr-clock">🕙 ${s.time}</div>
+          </div>
+          <div class="sr-dot" style="background:${s.dotColor};"></div>
+          <div class="sr-body">
+            <div class="sr-title">${s.title}</div>
+            <div class="sr-scope">${s.scope}</div>
+          </div>
+          <div class="sr-actions">
+            <button class="btn-icon" title="Edit schedule" onclick="openEditModal('${s.title}','${s.date} · ${s.time}')">${I_EDIT}</button>
+            <button class="btn-icon del" title="Cancel">${I_TRASH}</button>
+          </div>
+        </div>`).join('')}
+      </div>
+      <div style="margin-top:12px;padding:10px 14px;background:#f9fafc;border:1px dashed #d0d7de;border-radius:8px;display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-size:12px;color:#888;">Want to schedule a new action manually?</span>
+        <button class="btn-s" style="font-size:12px;" onclick="openScheduler('Custom action')">+ Schedule action</button>
+      </div>`;
+  } else {
+    tabContent = `
+      <div class="col-header" style="margin-bottom:10px;">
+        <div class="col-title">In Progress</div>
+        <span style="font-size:11.5px;color:#888;">Live — updates every 30s</span>
+      </div>
+      <div class="inprog-list">
+        ${PRE_INPROG.map(p => `
+        <div class="ip-card fade-in">
+          <div class="ip-head">
+            <div><div class="ip-title">${p.title}</div><div class="ip-tenant">${p.tenant}</div></div>
+            <div class="ip-since">${p.since}</div>
+          </div>
+          <div class="ip-bar-row">
+            <div class="ip-bar-wrap"><div class="ip-bar" style="width:${p.pct}%"></div></div>
+            <div class="ip-pct">${p.pct}%</div>
+          </div>
+          <div class="ip-meta">
+            <div class="ip-eta">${p.eta}</div>
+            <div class="ip-acts">
+              <button class="btn-s" style="font-size:11px;">${I_PAUSE} Pause</button>
+              <button class="btn-p" style="font-size:11px;" onclick="window.location.href='sami-cve-interactive-v1-2026-05-20.html'">${I_EYE} View live</button>
+            </div>
+          </div>
+        </div>`).join('')}
+      </div>
+      <div style="margin-top:12px;background:#edfaf3;border:1px solid #9be4be;border-radius:8px;padding:10px 14px;font-size:12px;color:#1a4a2e;display:flex;gap:7px;align-items:flex-start;">
+        <span style="background:#1a6b3c;color:#fff;font-size:9px;font-weight:700;border-radius:3px;padding:2px 5px;flex-shrink:0;margin-top:1px;">SAMI</span>
+        <span>SAMI will notify you when each in-progress action completes. If an issue arises mid-deployment, SAMI will auto-pause and surface the problem here for your review.</span>
+      </div>`;
+  }
+
+  document.getElementById('dashArea').innerHTML = `
+    ${dashChrome()}
+    <div class="work-tabs">
+      <div class="work-tab ${workTab==='active'?'active':''}" onclick="setWorkTab('active')">
+        Active <span class="work-tab ${workTab==='active'?'active':''}" style="background:none;border:none;padding:0;"> </span><span class="tab-badge">5</span>
+      </div>
+      <div class="work-tab ${workTab==='scheduled'?'active':''}" onclick="setWorkTab('scheduled')">
+        Scheduled <span class="tab-badge ${workTab==='scheduled'?'blink':''}">3</span>
+      </div>
+      <div class="work-tab ${workTab==='inprogress'?'active':''}" onclick="setWorkTab('inprogress')">
+        In Progress <span class="tab-badge ${workTab==='inprogress'?'blink':''}">2</span>
+      </div>
+    </div>
+    ${tabContent}`;
+}
+
+function setWorkTab(tab) {
+  workTab = tab;
+  renderOptionA();
+}
+
+// ── OPTION B: Inline States ───────────────────────────────
+function renderOptionB() {
+  document.getElementById('dashArea').innerHTML = `
+    ${dashChrome()}
+    <div class="status-banner" onclick="this.style.display='none'">
+      <div class="sb-chips">
+        <div class="sb-chip active-c"><div class="sb-pulse"></div> 3 active alerts</div>
+        <div class="sb-chip prog-c">⚡ 2 in progress</div>
+        <div class="sb-chip sched-c">📅 3 scheduled this week</div>
+      </div>
+      <div class="sb-right">All actions <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+    </div>
+    <div class="alerts-layout">
+      <div class="alerts-col">
+        <div class="col-header">
+          <div class="col-title">Need Attention</div>
+          <span style="font-size:11px;color:#888;">All states · scroll to review</span>
+        </div>
+        ${alertCard_CVE({state:'inprog'})}
+        ${alertCard_Gateway()}
+        ${alertCard_Creds({state:'scheduled'})}
+        ${alertCard_Policy()}
+      </div>
+      ${recsColumn()}
+    </div>`;
+}
+
+// ── OPTION C: Work Tray ───────────────────────────────────
+function renderOptionC() {
+  document.getElementById('dashArea').innerHTML = `
+    <div class="tray-page-wrap">
+      ${dashChrome()}
+      <div class="alerts-layout">
+        <div class="alerts-col">
+          <div class="col-header"><div class="col-title">Need Attention</div></div>
+          ${alertCard_CVE()}
+          ${alertCard_Gateway()}
+          ${alertCard_Creds()}
+          ${alertCard_Policy()}
+        </div>
+        ${recsColumn()}
+      </div>
+    </div>`;
+  renderTray();
+}
+
+function renderTray() {
+  const existing = document.getElementById('workTray');
+  if (existing) existing.remove();
+
+  const tray = document.createElement('div');
+  tray.id = 'workTray';
+  tray.className = `work-tray-bar ${trayExpanded ? 'expanded' : ''}`;
+
+  tray.innerHTML = `
+    <div class="tray-collapsed" onclick="toggleTray()">
+      <span class="tc-label">SAMI Work Tray</span>
+      <div class="tc-chips">
+        <div class="tc-chip"><div class="pulse"></div> &nbsp;2 in progress</div>
+        <div class="tc-chip"><div class="dot-s"></div> &nbsp;3 scheduled this week</div>
+      </div>
+      <div class="tray-toggle ${trayExpanded ? 'open' : ''}">
+        ${trayExpanded ? 'Collapse' : 'Expand'} &nbsp;
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+      </div>
+    </div>
+    <div class="tray-body">
+      <div class="tray-col">
+        <div class="tray-col-header">⚡ In Progress <span>2</span></div>
+        ${PRE_INPROG.map(p => `
+        <div class="tray-ip-card">
+          <div class="tip-title">${p.title}</div>
+          <div class="tip-tenant">${p.tenant}</div>
+          <div class="tip-bar-wrap"><div class="tip-bar" style="width:${p.pct}%"></div></div>
+          <div class="tip-meta">
+            <span class="tip-pct">${p.pct}% · ${p.eta}</span>
+            <div class="tip-acts">
+              <button class="tray-btn">${I_PAUSE} Pause</button>
+              <button class="tray-btn primary" onclick="window.location.href='sami-cve-interactive-v1-2026-05-20.html'">${I_EYE} View</button>
+            </div>
+          </div>
+        </div>`).join('')}
+      </div>
+      <div class="tray-col">
+        <div class="tray-col-header">📅 Scheduled <span>3</span></div>
+        ${PRE_SCHEDULED.map(s => `
+        <div class="tray-sched-row">
+          <div class="tsr-dot"></div>
+          <div class="tsr-body">
+            <div class="tsr-title">${s.title}</div>
+            <div class="tsr-time">${s.date} · ${s.time}</div>
+          </div>
+          <div class="tsr-acts">
+            <button class="tray-btn" onclick="openEditModal('${s.title}','${s.date} · ${s.time}')">${I_EDIT}</button>
+            <button class="tray-btn">${I_TRASH}</button>
+          </div>
+        </div>`).join('')}
+        <div style="margin-top:8px;">
+          <button class="tray-btn" style="width:100%;text-align:center;padding:5px;font-size:11px;" onclick="openScheduler('New action')">+ Schedule new action</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(tray);
+}
+
+function toggleTray() {
+  trayExpanded = !trayExpanded;
+  renderTray();
+}
+
+// ── Option switcher ───────────────────────────────────────
+function setOption(opt) {
+  currentOption = opt;
+  workTab = 'active';
+  trayExpanded = false;
+  ['A','B','C'].forEach(o => {
+    document.getElementById('opt'+o).classList.toggle('selected', o === opt);
+  });
+  // Remove tray if switching away from C
+  const tray = document.getElementById('workTray');
+  if (tray && opt !== 'C') tray.remove();
+  switch(opt) {
+    case 'A': renderOptionA(); break;
+    case 'B': renderOptionB(); break;
+    case 'C': renderOptionC(); break;
+  }
+}
+
+// ── Scheduler modal ───────────────────────────────────────
+function openScheduler(alertName) {
+  scheduledTarget = alertName;
+  document.getElementById('smAlertName').textContent = alertName;
+  document.getElementById('schedulerModal').classList.add('open');
+}
+function closeScheduler() {
+  document.getElementById('schedulerModal').classList.remove('open');
+}
+function closeSchedulerOnOverlay(e) {
+  if (e.target === document.getElementById('schedulerModal')) closeScheduler();
+}
+function confirmSchedule() {
+  closeScheduler();
+  // Show a brief toast
+  const toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:#1a2332;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:600;box-shadow:0 4px 20px rgba(0,0,0,0.2);display:flex;align-items:center;gap:8px;';
+  toast.innerHTML = `<span style="color:#27ae60;font-size:15px;">✓</span> Scheduled for ${selectedQuickLabel} — you'll be notified before it runs`;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3500);
+  // Refresh current option to show state change
+  setTimeout(() => {
+    if (currentOption === 'A') { workTab = 'scheduled'; renderOptionA(); }
+    else if (currentOption === 'B') renderOptionB();
+    else renderOptionC();
+  }, 400);
+}
+function selectQuickTime(el, label, sub) {
+  document.querySelectorAll('.qt-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedQuickTime = label;
+  selectedQuickLabel = sub || label;
+  document.getElementById('customSection').style.display = label === 'Custom' ? 'block' : 'none';
+  // Update SAMI consideration
+  const considerations = {
+    'Tonight': 'Tonight 10pm aligns with Acme Corp\'s change window. Beta Networks has no restriction — probe attempts are active now. Consider deploying Beta immediately and scheduling Acme for tonight.',
+    'Tomorrow': 'Friday morning is lower-risk for most tenants. Note that Westfield IT has peak trading on weekends — Friday changes should complete well before market open.',
+    'Monday': 'Monday 10pm is after Westfield IT\'s change freeze lifts. Safe for all tenants. However, Crown Logistics and Acme Corp remain exposed all weekend — consider patching those tenants earlier.',
+    'Custom': 'SAMI will validate your chosen window against tenant change policies and notify you of any conflicts before the action runs.'
+  };
+  const el2 = document.getElementById('smConsideration');
+  if (el2) el2.textContent = considerations[label] || '';
+}
+
+// ── Edit modal ────────────────────────────────────────────
+function openEditModal(name, currentTime) {
+  document.getElementById('editAlertName').textContent = name;
+  document.getElementById('currentScheduleTime').textContent = currentTime;
+  document.getElementById('editModal').classList.add('open');
+}
+function closeEditModal() {
+  document.getElementById('editModal').classList.remove('open');
+}
+function closeEditOnOverlay(e) {
+  if (e.target === document.getElementById('editModal')) closeEditModal();
+}
+
+// ── Boot ──────────────────────────────────────────────────
+renderOptionA();
+</script>
+</body>
+</html>

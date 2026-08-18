@@ -1,0 +1,2112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAMI · Dashboard v4.0</title>
+<meta name="version" content="v4.0 — Created 2026-05-18">
+<meta name="description" content="SAMI Dashboard v4.0. Adds tenant scope switching (All Tenants ↔ single tenant) with refined data per scope. View All Insights and sidebar nav #2 open the SAMI Insights dashboard.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
+<style>
+/* ═══ UUIF 9.2 TOKENS ═══ */
+:root {
+  --uuif-brand-navy:               #001b50;
+  --uuif-brand-orange:             #ff5d00;
+  --uuif-brand-red:                #c70f0f;
+  --uuif-brand-yellow:             #f3ac3d;
+  --uuif-surface-container:        #ffffff;
+  --uuif-surface-bg:               #f4f6f9;
+  --uuif-surface-primary:          #5b74a7;
+  --uuif-surface-secondary:        #d2dff2;
+  --uuif-surface-tertiary:         #f6f8fe;
+  --uuif-text-primary:             #191c25;
+  --uuif-text-secondary:           #4a618f;
+  --uuif-text-tertiary:            #888888;
+  --uuif-border-tertiary:          #cccccc;
+  --uuif-border-transparent:       rgba(17,17,17,0.09);
+  --uuif-fill-orange-x-darker:     #c24903;
+  --uuif-radius-6:                 6px;
+  --uuif-radius-8:                 8px;
+  --uuif-shadow-sm:                0px 1px 6px 2px rgba(0,0,0,0.12);
+
+  --bg:           var(--uuif-surface-bg);
+  --white:        var(--uuif-surface-container);
+  --border:       var(--uuif-border-tertiary);
+  --text-1:       var(--uuif-text-primary);
+  --text-3:       var(--uuif-text-secondary);
+  --red:          var(--uuif-brand-red);
+  --orange:       var(--uuif-brand-orange);
+
+  --sidebar-w: 60px;
+  --topbar-h:  46px;
+  --font:      'Nunito Sans', sans-serif;
+  --radius:    var(--uuif-radius-6);
+  --radius-lg: var(--uuif-radius-8);
+
+  /* SAMI-specific accents */
+  --sami-purple:        #6b46c1;
+  --sami-purple-bg:     #f5f3ff;
+  --sami-purple-border: #e0d7fd;
+  --behavioral-blue:    #2563eb;
+  --behavioral-bg:      #e6efff;
+  --policy-green:       #10b981;
+  --policy-green-bg:    #e8f7f0;
+  --warning:            #f59e0b;
+  --link:               #1e6fe8;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; background: var(--bg); color-scheme: light; }
+body { font-family: var(--font); background: var(--uuif-surface-bg); color: var(--uuif-text-primary); font-size: 13px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+button { font-family: var(--font); cursor: pointer; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+/* ═══ APP SHELL ═══ */
+.app { display: flex; height: 100vh; width: 100%; overflow: hidden; }
+
+/* ─── SIDEBAR ─── */
+.sidebar {
+  width: var(--sidebar-w); background: #001b50;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 0; flex-shrink: 0; z-index: 30;
+}
+.sb-logo { width: 100%; display: flex; align-items: center; justify-content: center; padding: 12px 8px; flex-shrink: 0; }
+.sb-logo img { width: 32px; height: 32px; object-fit: contain; display: block; }
+.sb-btn {
+  width: 100%; padding: 12px 8px;
+  border: none; background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; position: relative; transition: background 0.15s;
+}
+.sb-btn img { width: 28px; height: 28px; object-fit: contain; display: block; }
+.sb-btn:hover { background: rgba(255,255,255,0.07); }
+.sb-btn.active { background: transparent; }
+.sb-btn.active::before { content:''; position:absolute; left:2px; top:16px; bottom:16px; width:2px; border-radius:0 2px 2px 0; background:#ff5d00; }
+.sb-btn .tooltip {
+  display: none; position: absolute; left: 52px; top: 50%;
+  transform: translateY(-50%); background: #111827; color: white;
+  padding: 4px 8px; border-radius: 5px; font-size: 11px; font-weight: 500;
+  white-space: nowrap; z-index: 100;
+}
+.sb-btn:hover .tooltip { display: block; }
+.sb-badge {
+  position: absolute; top: 6px; right: 4px;
+  min-width: 16px; height: 16px; border-radius: 8px;
+  background: var(--red); color: white; font-size: 9px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; padding: 0 3px;
+}
+
+/* ─── MAIN ─── */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+/* ─── TOPBAR ─── */
+.topbar {
+  height: var(--topbar-h); background: var(--white);
+  border-bottom: 1px solid var(--uuif-border-tertiary);
+  display: flex; align-items: center; padding: 0 24px; gap: 12px;
+  flex-shrink: 0; z-index: 20;
+}
+.topbar-breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 14px; font-family: var(--font); flex-shrink: 0; }
+.tb-crumb-link { color: #0066cc; text-decoration: none; font-weight: 400; letter-spacing: -0.011em; white-space: nowrap; }
+.tb-crumb-link:hover { text-decoration: underline; }
+.tb-crumb-sep { color: #99a1af; font-weight: 400; }
+.tb-crumb-current { color: #364153; font-weight: 400; letter-spacing: -0.011em; white-space: nowrap; }
+.tb-tenant-select {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--white); border: 1px solid #d1d5dc; border-radius: 8px;
+  padding: 0 13px; height: 36px; min-width: 220px; max-width: 320px;
+  cursor: pointer; gap: 8px; flex: 1;
+}
+.tb-tenant-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.tb-tenant-left svg { flex-shrink: 0; }
+.tb-tenant-name { font-size: 14px; font-weight: 500; color: #364153; letter-spacing: -0.011em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tb-tenant-chevron { flex-shrink: 0; }
+.tb-spacer { flex: 1; }
+.tb-right { display: flex; align-items: center; gap: 4px; }
+.tb-icon-btn {
+  width: 36px; height: 36px; border-radius: 10px;
+  border: none; background: transparent; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: background 0.15s;
+  position: relative; flex-shrink: 0;
+}
+.tb-icon-btn:hover { background: var(--bg); }
+.tb-notif-dot { position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; border-radius: 50%; background: #ff6900; border: 1.5px solid white; }
+.tb-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--uuif-surface-primary); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 400; color: white; flex-shrink: 0; }
+
+/* ─── CONTENT AREA ─── */
+.content-wrap { flex: 1; display: flex; overflow: hidden; position: relative; }
+.content-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; background: var(--uuif-surface-bg); }
+.content-inner { padding: 20px 24px; max-width: 1600px; margin: 0 auto; }
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* SAMI DASHBOARD CONTENT STYLES                                    */
+/* ═══════════════════════════════════════════════════════════════ */
+
+/* Section card */
+.card {
+  background: var(--white);
+  border: 1px solid var(--uuif-border-transparent);
+  border-radius: var(--radius-lg);
+  margin-bottom: 16px;
+}
+.card-pad { padding: 18px 20px; }
+
+/* ─── OVERVIEW ROW ─── */
+.overview-row { display: flex; gap: 14px; margin-bottom: 16px; }
+.overview-card { flex: 1; padding: 16px 18px; }
+.overview-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+.overview-title { font-size: 12px; font-weight: 800; letter-spacing: 0.5px; color: var(--uuif-text-primary); }
+.overview-sub { font-size: 11px; color: var(--uuif-text-tertiary); margin-top: 2px; font-weight: 500; }
+.carousel-arrows { display: flex; gap: 4px; }
+.carousel-arrow {
+  width: 24px; height: 24px; border: 1px solid var(--border);
+  border-radius: 4px; display: flex; align-items: center; justify-content: center;
+  color: var(--uuif-text-secondary); background: white;
+}
+
+.product-grid { display: flex; gap: 10px; }
+.product-card {
+  flex: 1; border: 1px solid #e5e8ee;
+  border-radius: var(--radius); padding: 12px 14px;
+  background: white; min-width: 0;
+}
+.product-name {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 800; color: var(--uuif-text-primary);
+  margin-bottom: 10px; letter-spacing: 0.3px;
+}
+.product-name svg { color: var(--uuif-text-secondary); width: 14px; height: 14px; }
+.product-metric-label { font-size: 11px; color: var(--uuif-text-tertiary); margin-bottom: 2px; }
+.product-metric-value { font-size: 22px; font-weight: 800; color: var(--uuif-text-primary); line-height: 1.1; margin-bottom: 10px; font-family: var(--font); }
+.product-attention-label { font-size: 11px; color: var(--uuif-text-tertiary); margin-bottom: 2px; }
+.product-attention-value { font-size: 16px; font-weight: 700; color: var(--uuif-brand-navy); display: flex; align-items: center; gap: 6px; }
+.attention-warning { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; }
+.attention-warning svg { color: var(--warning); width: 14px; height: 14px; }
+.eol-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: #f3f4f8; padding: 2px 6px; border-radius: 3px;
+  font-size: 10px; font-weight: 700; color: var(--uuif-text-secondary); margin-left: 4px;
+}
+.coming-soon {
+  color: var(--orange); font-size: 12px; font-weight: 700;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.learn-more-btn {
+  border: 1px solid var(--border); background: white;
+  color: var(--uuif-text-primary); font-size: 11px;
+  padding: 5px 14px; border-radius: 4px; font-weight: 500;
+}
+
+/* Org summary (right column) */
+.org-summary {
+  background: var(--uuif-brand-navy); color: white;
+  border-radius: var(--radius-lg); padding: 16px 18px;
+  width: 180px; flex-shrink: 0; display: flex; flex-direction: column;
+}
+.org-title { font-size: 12px; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 12px; }
+.org-label { font-size: 10px; letter-spacing: 0.5px; color: #b5bbd0; margin-top: 10px; font-weight: 600; }
+.org-value { font-size: 22px; font-weight: 800; margin: 2px 0 8px 0; }
+.create-btn {
+  margin-top: auto; background: #3a4060; color: #b5bbd0;
+  border: none; border-radius: 4px; padding: 7px 12px;
+  font-size: 11px; font-weight: 600;
+}
+
+/* ─── SAMI BRIEFING ─── */
+.sami-briefing { padding: 18px 20px; }
+.sami-head { display: flex; align-items: center; margin-bottom: 16px; gap: 12px; }
+.sami-icon-box {
+  width: 44px; height: 44px; background: var(--orange);
+  border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  color: white;
+}
+.sami-title-block { flex: 1; }
+.sami-title { font-size: 16px; font-weight: 800; color: var(--uuif-text-primary); }
+.sami-subtitle { font-size: 11px; color: var(--uuif-text-tertiary); margin-top: 2px; font-weight: 500; }
+.view-all-link { font-size: 12px; color: var(--link); text-decoration: underline; font-weight: 500; }
+
+.briefing-body { display: flex; gap: 16px; }
+.briefing-left { width: 210px; display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; }
+.stat-block {
+  border: 1px solid #e5e8ee; border-radius: var(--radius);
+  padding: 12px 14px; background: white;
+}
+.stat-label { font-size: 10px; font-weight: 800; letter-spacing: 0.5px; color: var(--uuif-text-secondary); margin-bottom: 6px; }
+.stat-value { font-size: 22px; font-weight: 800; line-height: 1; }
+.stat-value.red { color: var(--red); }
+.stat-value.purple { color: var(--sami-purple); }
+.stat-value.teal { color: var(--policy-green); }
+.stat-value.orange { color: var(--orange); }
+.view-recs { font-size: 11px; color: var(--link); margin-top: 6px; cursor: pointer; }
+
+.briefing-right {
+  flex: 1; border: 1px solid #e5e8ee;
+  border-radius: var(--radius); background: #fafbfd;
+  padding: 14px 16px; min-width: 0;
+}
+.needs-head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.lightning-icon {
+  width: 24px; height: 24px; background: #f0f2f7;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  color: var(--orange);
+}
+.needs-title { font-size: 13px; font-weight: 800; color: var(--uuif-text-primary); display: flex; align-items: center; gap: 6px; }
+.attention-pill {
+  background: var(--orange); color: white;
+  border-radius: 10px; font-size: 10px; font-weight: 700;
+  padding: 1px 8px;
+}
+.attention-meta { font-size: 11px; color: var(--uuif-text-tertiary); margin-top: 1px; }
+.view-all-right { margin-left: auto; font-size: 11px; color: var(--link); cursor: pointer; font-weight: 500; }
+
+.alert-cards { display: flex; gap: 12px; align-items: stretch; }
+.alert-card {
+  flex: 1; background: white;
+  border: 1px solid #e5e8ee; border-radius: var(--radius);
+  padding: 12px 14px; min-width: 0;
+}
+.alert-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.alert-pill {
+  font-size: 10px; font-weight: 700; padding: 2px 9px; border-radius: 10px;
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.alert-pill.behavioral { background: var(--behavioral-bg); color: var(--behavioral-blue); }
+.alert-pill.policy { background: var(--policy-green-bg); color: var(--policy-green); }
+.alert-pill::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.alert-time { font-size: 11px; color: var(--uuif-text-tertiary); }
+.alert-title { font-size: 13px; font-weight: 800; color: var(--uuif-text-primary); margin-bottom: 8px; }
+
+.sami-analysis {
+  background: var(--sami-purple-bg); border: 1px solid var(--sami-purple-border);
+  border-radius: 4px; padding: 8px 10px; margin-bottom: 10px;
+}
+.sami-analysis-label {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 800; color: var(--sami-purple);
+  margin-bottom: 4px; letter-spacing: 0.3px;
+}
+.sami-analysis-text { font-size: 11.5px; line-height: 1.5; color: #2d2a4a; }
+
+.tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+.tag { font-size: 10px; color: var(--uuif-text-secondary); background: #f3f4f8; padding: 2px 7px; border-radius: 3px; font-weight: 500; }
+
+.alert-actions { display: flex; gap: 8px; }
+.btn {
+  font-size: 11px; padding: 5px 12px; border-radius: 4px;
+  border: 1px solid var(--border); background: white;
+  color: var(--uuif-text-primary); font-weight: 600;
+}
+.btn:hover { background: #f8f9fb; }
+
+/* scroll bar indicator on the right */
+.alert-cards-wrap { position: relative; }
+.scroll-indicator {
+  position: absolute; right: -6px; top: 10px; bottom: 10px;
+  width: 3px; background: #e5e8ee; border-radius: 2px;
+}
+.scroll-indicator::after {
+  content: ''; position: absolute; right: 0; top: 0;
+  width: 3px; height: 30%; background: var(--orange); border-radius: 2px;
+}
+
+/* ─── NOTIFICATIONS ─── */
+.notif { padding: 16px 20px; }
+.notif-head { margin-bottom: 14px; }
+.notif-title { font-size: 12px; font-weight: 800; letter-spacing: 0.5px; color: var(--uuif-text-primary); }
+.notif-sub { font-size: 11px; color: var(--uuif-text-tertiary); margin-top: 2px; font-weight: 500; }
+.notif-toolbar {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 12px; padding-bottom: 12px;
+  border-bottom: 1px solid #e5e8ee;
+}
+.filter-icon { color: var(--uuif-text-secondary); cursor: pointer; display: flex; }
+.search-wrap { position: relative; display: flex; align-items: center; }
+.search-wrap svg { position: absolute; left: 9px; color: var(--uuif-text-tertiary); width: 14px; height: 14px; }
+.search-input {
+  border: 1px solid var(--border); border-radius: 4px;
+  padding: 6px 10px 6px 30px; font-size: 11px; width: 320px;
+  color: var(--uuif-text-primary); background: white; font-family: var(--font);
+}
+
+.totals-block { display: flex; align-items: center; gap: 22px; margin-left: 10px; }
+.total-item { text-align: center; }
+.total-label { font-size: 10px; font-weight: 800; color: var(--uuif-text-tertiary); letter-spacing: 0.4px; margin-bottom: 2px; }
+.total-value { font-size: 16px; font-weight: 800; color: var(--orange); }
+
+.time-range { display: flex; align-items: center; gap: 8px; margin-left: 10px; }
+.radio-circle { width: 12px; height: 12px; border: 1.5px solid var(--uuif-text-tertiary); border-radius: 50%; }
+.time-select {
+  border: 1px solid var(--border); border-radius: 4px;
+  padding: 5px 8px; font-size: 11px; color: var(--uuif-text-primary);
+  background: white; display: flex; align-items: center; gap: 6px; font-weight: 600;
+}
+.custom-label { font-size: 11px; color: var(--uuif-text-secondary); display: flex; align-items: center; gap: 6px; font-weight: 500; }
+
+.toolbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.toolbar-btn {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; color: var(--uuif-text-secondary);
+  background: white; border: none; padding: 4px 8px; font-weight: 600;
+}
+.toolbar-btn.active {
+  background: var(--uuif-text-primary); color: white;
+  border-radius: 4px; padding: 5px 10px;
+}
+
+/* Tabs */
+.tabs { display: flex; border-bottom: 1px solid #e5e8ee; }
+.tab {
+  padding: 10px 20px; font-size: 12px; font-weight: 700;
+  color: var(--uuif-text-tertiary); cursor: pointer;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  letter-spacing: 0.3px;
+}
+.tab.active { color: var(--orange); border-bottom-color: var(--orange); }
+
+/* Table */
+table { width: 100%; border-collapse: collapse; }
+th {
+  text-align: left; font-size: 10px; font-weight: 800;
+  letter-spacing: 0.4px; color: var(--uuif-text-secondary);
+  padding: 10px 8px; background: var(--bg);
+  border-bottom: 1px solid #e5e8ee;
+}
+th.sortable::after { content: ' ↓'; color: var(--orange); }
+td {
+  padding: 10px 8px; font-size: 11.5px;
+  color: var(--uuif-text-primary);
+  border-bottom: 1px solid #eef0f4; vertical-align: top;
+}
+tbody tr:hover { background: #fafbfd; }
+.check { width: 14px; height: 14px; border: 1px solid var(--uuif-text-tertiary); border-radius: 2px; background: white; }
+.local-time { font-size: 11px; color: var(--uuif-text-primary); }
+.local-time span { display: block; }
+.priority-info { color: var(--uuif-text-tertiary); font-size: 11px; }
+.priority-warning { color: var(--warning); font-size: 11px; font-weight: 600; }
+.tenant-cell { display: flex; align-items: center; gap: 4px; color: var(--uuif-text-primary); }
+.tenant-cell svg { color: var(--orange); width: 12px; height: 12px; }
+.state-dropdown {
+  border: 1px solid var(--border); border-radius: 4px;
+  padding: 4px 8px; font-size: 11px;
+  display: flex; align-items: center; justify-content: space-between;
+  width: 110px; color: var(--uuif-text-primary); background: white;
+}
+.source-ip { font-size: 11px; color: var(--uuif-text-primary); }
+.type-cell { display: flex; align-items: center; gap: 5px; color: var(--uuif-text-primary); }
+.type-cell svg { color: var(--behavioral-blue); width: 14px; height: 14px; }
+.category { font-size: 11px; color: var(--uuif-text-primary); font-weight: 600; }
+
+/* ─── SAMI ALERTS TAB ─── */
+.sami-tab-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.sami-tab-pill::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--sami-purple); box-shadow: 0 0 0 2px var(--sami-purple-bg);
+}
+
+.sami-alerts-wrap { padding: 0; }
+.sami-alerts-row {
+  display: flex; align-items: flex-start;
+  padding: 14px 18px 14px 16px;
+  border-bottom: 1px solid #eef0f4;
+  border-left: 3px solid transparent;
+  position: relative;
+  background: white;
+  transition: background 0.12s;
+}
+.sami-alerts-row:hover { background: #fafbfd; }
+.sami-alerts-row.sev-critical { border-left-color: var(--red); }
+.sami-alerts-row.sev-high     { border-left-color: var(--warning); }
+.sami-alerts-row.sev-medium   { border-left-color: var(--behavioral-blue); }
+.sami-alerts-row.sev-resolved { border-left-color: var(--policy-green); }
+
+.sami-row-left {
+  flex: 1; min-width: 0; display: flex; gap: 10px;
+}
+.sami-pill {
+  background: var(--uuif-brand-navy); color: white;
+  font-size: 9px; font-weight: 800; letter-spacing: 0.6px;
+  padding: 3px 7px; border-radius: 4px;
+  display: inline-flex; align-items: center;
+  flex-shrink: 0; margin-top: 2px;
+  font-family: var(--font);
+}
+.sami-row-content { flex: 1; min-width: 0; }
+.sami-row-title {
+  font-size: 13px; font-weight: 700;
+  color: var(--uuif-text-primary);
+  line-height: 1.4; margin-bottom: 4px;
+}
+.sami-row-meta {
+  font-size: 11.5px;
+  color: var(--uuif-text-tertiary);
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: 6px 12px;
+}
+.sami-meta-time { color: var(--uuif-text-tertiary); font-weight: 500; }
+.sami-meta-tenants { color: var(--uuif-text-secondary); font-weight: 500; }
+.sami-root-cause {
+  font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+  font-size: 11px;
+  background: transparent;
+  padding: 1px 0;
+}
+.sami-root-cause.cause-red   { color: var(--red); }
+.sami-root-cause.cause-blue  { color: var(--behavioral-blue); }
+.sami-root-cause.cause-green { color: var(--policy-green); }
+.sami-root-cause.cause-orange{ color: var(--orange); }
+
+.sami-row-right {
+  display: flex; align-items: center; gap: 10px;
+  flex-shrink: 0; margin-left: 16px;
+}
+.raw-alerts-pill {
+  display: inline-flex; align-items: center;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 11px; font-weight: 600;
+  color: var(--uuif-text-secondary);
+  padding: 3px 10px;
+}
+.cta-primary {
+  background: var(--uuif-brand-navy);
+  color: white; border: none;
+  font-size: 11.5px; font-weight: 700;
+  padding: 6px 13px; border-radius: 5px;
+  font-family: var(--font);
+}
+.cta-primary:hover { background: #001440; }
+
+.resolved-badge {
+  display: inline-flex; align-items: center;
+  font-size: 11px; font-weight: 800; letter-spacing: 0.5px;
+  color: var(--policy-green);
+  padding: 4px 8px;
+}
+
+.why-group {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11.5px; color: var(--uuif-text-secondary);
+  background: transparent; border: none;
+  cursor: pointer; font-weight: 500;
+}
+.why-group:hover { color: var(--link); }
+.why-group svg { color: var(--uuif-text-tertiary); }
+
+/* SAMI Alerts header strip */
+.sami-alerts-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 18px;
+  background: linear-gradient(180deg, #f9f7ff 0%, #ffffff 100%);
+  border-bottom: 1px solid #eef0f4;
+}
+.sami-alerts-header-left { display: flex; align-items: center; gap: 10px; }
+.sami-alerts-icon {
+  width: 24px; height: 24px;
+  background: var(--orange);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: white;
+}
+.sami-alerts-header-title {
+  font-size: 13px; font-weight: 800;
+  color: var(--uuif-text-primary);
+}
+.sami-alerts-header-sub {
+  font-size: 11px; color: var(--uuif-text-tertiary); font-weight: 500;
+  margin-top: 1px;
+}
+.sami-summary-chips {
+  display: flex; gap: 8px;
+}
+.sami-summary-chip {
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.3px;
+  padding: 3px 9px; border-radius: 10px;
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.sami-summary-chip::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+}
+.chip-critical { background: #fdecec; color: var(--red); }
+.chip-critical::before { background: var(--red); }
+.chip-high { background: #fff4e0; color: #b96e00; }
+.chip-high::before { background: var(--warning); }
+.chip-medium { background: var(--behavioral-bg); color: var(--behavioral-blue); }
+.chip-medium::before { background: var(--behavioral-blue); }
+.chip-resolved { background: var(--policy-green-bg); color: var(--policy-green); }
+.chip-resolved::before { background: var(--policy-green); }
+
+/* Footer */
+.footer-bar {
+  display: flex; justify-content: space-between;
+  padding: 12px 0 0 0; font-size: 11px;
+  color: var(--uuif-text-tertiary);
+}
+.footer-bar a { color: var(--uuif-text-tertiary); text-decoration: none; margin-left: 14px; }
+
+/* Help bubble */
+.help-bubble {
+  position: fixed; bottom: 20px; right: 20px;
+  width: 40px; height: 40px; background: var(--orange);
+  border-radius: 50%; color: white;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 12px rgba(255,93,0,0.4);
+  font-weight: 800; font-size: 18px; z-index: 50;
+}
+
+/* ─── TENANT SCOPE DROPDOWN ─── */
+.tb-tenant-select { position: relative; }
+.tenant-dropdown {
+  position: absolute; top: 100%; left: 0; right: 0;
+  background: white; border: 1px solid var(--border);
+  border-radius: 8px; margin-top: 4px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  z-index: 50; display: none; overflow: hidden;
+  min-width: 280px;
+}
+.tenant-dropdown.open { display: block; }
+.tenant-dropdown-search {
+  padding: 8px 10px; border-bottom: 1px solid #eef0f4;
+  position: relative;
+}
+.tenant-dropdown-search input {
+  width: 100%; border: 1px solid var(--border); border-radius: 5px;
+  padding: 5px 10px 5px 28px; font-size: 12px;
+  font-family: var(--font); color: var(--uuif-text-primary);
+}
+.tenant-dropdown-search svg {
+  position: absolute; left: 18px; top: 50%;
+  transform: translateY(-50%); color: var(--uuif-text-tertiary);
+}
+.tenant-section-label {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.5px;
+  color: var(--uuif-text-tertiary);
+  padding: 8px 12px 4px 12px;
+}
+.tenant-option {
+  padding: 8px 12px; cursor: pointer;
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; color: var(--uuif-text-primary);
+}
+.tenant-option:hover { background: #f4f6f9; }
+.tenant-option.active { background: #f5f3ff; color: var(--sami-purple); font-weight: 700; }
+.tenant-option-icon {
+  width: 22px; height: 22px; border-radius: 5px;
+  background: #f0f2f7; display: flex; align-items: center; justify-content: center;
+  color: var(--uuif-text-secondary); flex-shrink: 0;
+}
+.tenant-option.global .tenant-option-icon { background: var(--uuif-brand-navy); color: white; }
+.tenant-option-name { flex: 1; }
+.tenant-option-meta {
+  font-size: 10px; color: var(--uuif-text-tertiary); font-weight: 500;
+}
+
+/* ─── SCOPE PILL on the dashboard ─── */
+.scope-context-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 14px; margin-bottom: 14px;
+  background: white;
+  border: 1px solid #e5e8ee; border-radius: 6px;
+}
+.scope-context-bar.single { border-left: 3px solid var(--sami-purple); }
+.scope-context-bar.global { border-left: 3px solid var(--uuif-brand-navy); }
+.scope-icon {
+  width: 28px; height: 28px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  color: white;
+}
+.scope-context-bar.global .scope-icon { background: var(--uuif-brand-navy); }
+.scope-context-bar.single .scope-icon { background: var(--sami-purple); }
+.scope-context-label {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.5px;
+  color: var(--uuif-text-tertiary);
+}
+.scope-context-name {
+  font-size: 13px; font-weight: 700; color: var(--uuif-text-primary);
+}
+.scope-context-meta {
+  margin-left: auto; font-size: 11px; color: var(--uuif-text-tertiary);
+  display: flex; align-items: center; gap: 14px;
+}
+.scope-context-meta strong { color: var(--uuif-text-primary); font-weight: 700; }
+
+/* ─── INSIGHTS MODAL (iframe overlay) ─── */
+.insights-modal {
+  position: fixed; inset: 0;
+  background: rgba(15, 18, 40, 0.55);
+  z-index: 100; display: none;
+  align-items: stretch; justify-content: center;
+  padding: 0;
+}
+.insights-modal.open { display: flex; }
+.insights-frame-wrap {
+  background: white;
+  width: 100%; height: 100%;
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.insights-frame-bar {
+  height: 44px;
+  background: var(--uuif-brand-navy);
+  color: white;
+  display: flex; align-items: center;
+  padding: 0 18px; gap: 12px;
+  flex-shrink: 0;
+}
+.insights-frame-title {
+  font-size: 13px; font-weight: 700; letter-spacing: 0.3px;
+  display: flex; align-items: center; gap: 8px;
+}
+.insights-frame-title svg { color: var(--orange); }
+.insights-frame-close {
+  margin-left: auto;
+  background: transparent; border: 1px solid rgba(255,255,255,0.3);
+  color: white; font-size: 12px; font-weight: 600;
+  padding: 4px 12px; border-radius: 4px;
+  cursor: pointer; font-family: var(--font);
+  display: flex; align-items: center; gap: 6px;
+}
+.insights-frame-close:hover { background: rgba(255,255,255,0.1); }
+.insights-frame {
+  flex: 1; border: none; background: white;
+}
+
+/* ══ MAIN PANEL TABS (AI Insights / Notifications) ══ */
+.mp-tabs-bar {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--uuif-border-transparent, rgba(17,17,17,0.09));
+  margin-bottom: 16px;
+}
+.mp-tab {
+  padding: 10px 20px;
+  font-size: 13px; font-weight: 600;
+  color: var(--uuif-text-tertiary, #888);
+  background: none; border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer; transition: all 0.15s;
+  font-family: var(--font);
+}
+.mp-tab:hover { color: var(--text-1); }
+.mp-tab.active { color: var(--orange); border-bottom-color: var(--orange); }
+.mp-tab-pane { display: block; }
+.mp-tab-pane.mp-hidden { display: none; }
+
+/* ══ AI INSIGHTS 2-COL LAYOUT ══ */
+.ai-insights-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 16px;
+  align-items: start;
+}
+@media (max-width: 1100px) {
+  .ai-insights-layout { grid-template-columns: 1fr; }
+}
+.ai-panel-label {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.8px;
+  color: var(--uuif-text-tertiary, #888);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+
+/* ══ TRIAGE LIST — Needs Attention ══ */
+.triage-list { display: flex; flex-direction: column; gap: 0; }
+.triage-item {
+  padding: 14px 16px;
+  border-bottom: 1px solid #eef0f4;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.triage-item:last-child { border-bottom: none; }
+.triage-item-header { display: flex; align-items: center; gap: 8px; }
+.triage-sev-tag {
+  font-size: 9.5px; font-weight: 800; letter-spacing: 0.5px;
+  padding: 2px 7px; border-radius: 3px; text-transform: uppercase;
+  border: 1px solid currentColor;
+}
+.triage-sev-emergency { color: #c70f0f; }
+.triage-sev-warning   { color: #b96e00; }
+.triage-count {
+  font-size: 11px; font-weight: 600; color: #888;
+  margin-left: auto;
+}
+.triage-title {
+  font-size: 13px; font-weight: 700;
+  color: #191c25; line-height: 1.4;
+}
+.triage-sami-rec {
+  font-size: 12px; color: #4a618f; line-height: 1.55;
+}
+.triage-meta {
+  display: flex; flex-wrap: wrap; gap: 6px 14px;
+  font-size: 11px; color: #888; margin-top: 2px;
+}
+.triage-meta-item { display: flex; align-items: center; gap: 4px; }
+.triage-meta-item svg { opacity: 0.6; }
+.triage-actions { display: flex; gap: 8px; margin-top: 4px; }
+.triage-expand {
+  font-size: 11px; color: #4a618f; font-weight: 600;
+  background: none; border: 1px solid #d2dff2;
+  border-radius: 4px; padding: 4px 10px; cursor: pointer;
+  font-family: var(--font);
+}
+.triage-expand:hover { border-color: #4a618f; }
+.triage-act-btn {
+  font-size: 11px; font-weight: 700;
+  background: #001b50; color: white; border: none;
+  border-radius: 4px; padding: 4px 12px; cursor: pointer;
+  font-family: var(--font);
+}
+.triage-act-btn:hover { background: #001440; }
+
+/* ══ REC LIST — SAMI Recommendation ══ */
+.rec-list { display: flex; flex-direction: column; gap: 0; }
+.rec-item {
+  padding: 14px 16px;
+  border-bottom: 1px solid #eef0f4;
+  display: flex; flex-direction: column; gap: 5px;
+}
+.rec-item:last-child { border-bottom: none; }
+.rec-item-header { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.rec-type-tag {
+  font-size: 9.5px; font-weight: 800; letter-spacing: 0.5px;
+  padding: 2px 7px; border-radius: 3px; text-transform: uppercase;
+  border: 1px solid currentColor;
+}
+.rec-tag-cve        { color: #c70f0f; }
+.rec-tag-policy     { color: #059669; }
+.rec-tag-behaviour  { color: #2563eb; }
+.rec-tag-renewal    { color: #d97706; }
+.rec-sev-tag {
+  font-size: 9.5px; font-weight: 800; letter-spacing: 0.5px;
+  padding: 2px 7px; border-radius: 3px; text-transform: uppercase;
+  background: #c70f0f; color: white; border: none;
+}
+.rec-time { font-size: 11px; color: #888; margin-left: auto; }
+.rec-title {
+  font-size: 13px; font-weight: 700; color: #191c25; line-height: 1.4;
+}
+.rec-body { font-size: 12px; color: #4a618f; line-height: 1.55; }
+.rec-actions { display: flex; gap: 8px; margin-top: 4px; align-items: center; }
+.rec-act-primary {
+  font-size: 11.5px; font-weight: 700;
+  background: #001b50; color: white; border: none;
+  border-radius: 5px; padding: 5px 12px; cursor: pointer;
+  font-family: var(--font);
+}
+.rec-act-primary:hover { background: #001440; }
+.rec-act-ghost {
+  font-size: 11.5px; font-weight: 500;
+  background: none; color: #4a618f;
+  border: 1px solid #d2dff2; border-radius: 5px;
+  padding: 5px 12px; cursor: pointer; font-family: var(--font);
+}
+.rec-act-ghost:hover { border-color: #4a618f; }
+.rec-linked { font-size: 11px; color: #888; margin-left: auto; }
+
+/* ══ SECTION HEADER ══ */
+.ai-section-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px 10px;
+  border-bottom: 1px solid #eef0f4;
+}
+.ai-section-head-title {
+  font-size: 11px; font-weight: 800; letter-spacing: 0.7px;
+  color: #888; text-transform: uppercase;
+}
+.ai-section-head-count {
+  font-size: 11px; font-weight: 700; color: #fff;
+  background: #c70f0f; border-radius: 10px;
+  padding: 1px 8px; margin-left: 8px;
+}
+.ai-section-head-meta { font-size: 11px; color: #888; }
+
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ══ SIDEBAR (from shell) ══ -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <img src="https://www.figma.com/api/mcp/asset/af72a922-5b17-4efb-b643-542de0b6821b" alt="SonicWall" />
+    </div>
+    <button class="sb-btn active">
+      <img src="https://www.figma.com/api/mcp/asset/23781e02-cdcf-41cf-ad89-a57ab8fd1258" alt="Dashboard" />
+      <span class="tooltip">Overview</span>
+    </button>
+    <button class="sb-btn" id="sbInsightsBtn">
+      <img src="https://www.figma.com/api/mcp/asset/07d17e53-bd41-418e-80c8-54588951329f" alt="Attention" />
+      <span class="tooltip">All Insights</span>
+      <span class="sb-badge">8</span>
+    </button>
+    <button class="sb-btn">
+      <img src="https://www.figma.com/api/mcp/asset/ba7aa594-ac47-42bd-9aa6-cb022e6537fa" alt="Tenants" />
+      <span class="tooltip">Tenants</span>
+    </button>
+    <button class="sb-btn">
+      <img src="https://www.figma.com/api/mcp/asset/36e7cf81-e0e1-4157-a1a8-eb636235b28c" alt="Inventory" />
+      <span class="tooltip">Inventory</span>
+    </button>
+    <button class="sb-btn">
+      <img src="https://www.figma.com/api/mcp/asset/4f977422-9f98-4f64-b11a-e3c77d731ae6" alt="ZTP" />
+      <span class="tooltip">ZTP</span>
+    </button>
+    <button class="sb-btn">
+      <img src="https://www.figma.com/api/mcp/asset/1aeedfec-e559-4368-8273-23855a995792" alt="NSM" />
+      <span class="tooltip">NSM</span>
+    </button>
+    <button class="sb-btn">
+      <img src="https://www.figma.com/api/mcp/asset/706cd8d7-f081-4619-aae3-7041ab83d9c5" alt="WNM" />
+      <span class="tooltip">WNM</span>
+    </button>
+    <button class="sb-btn">
+      <img src="https://www.figma.com/api/mcp/asset/4b469d80-4be0-4db7-b132-6e9abeba4d73" alt="CC" />
+      <span class="tooltip">Capture Client</span>
+    </button>
+    <button class="sb-btn">
+      <img src="https://www.figma.com/api/mcp/asset/7d3de2ee-1c30-4ebb-9842-7ba8b469f040" alt="CC MDR" />
+      <span class="tooltip">CC MDR</span>
+    </button>
+    <button class="sb-btn">
+      <img src="https://www.figma.com/api/mcp/asset/79ba83c9-8844-4ab2-8d34-7a88bed11fd8" alt="CSE" />
+      <span class="tooltip">Licenses</span>
+      <span class="sb-badge" style="background:var(--orange);">3</span>
+    </button>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <div class="main">
+
+    <!-- ── TOPBAR (from shell) ── -->
+    <div class="topbar">
+      <nav class="topbar-breadcrumb">
+        <a class="tb-crumb-link" href="#">Home</a>
+        <span class="tb-crumb-sep">\</span>
+        <a class="tb-crumb-link" href="#">Dashboard</a>
+        <span class="tb-crumb-sep">\</span>
+        <span class="tb-crumb-current">Overview</span>
+      </nav>
+      <div class="tb-spacer"></div>
+      <div class="tb-tenant-select" id="tenantSelector">
+        <div class="tb-tenant-left">
+          <svg id="tenantIcon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="6" stroke="#364153" stroke-width="1.25"/>
+            <circle cx="8" cy="8" r="2.5" fill="#ff5d00"/>
+          </svg>
+          <span class="tb-tenant-name" id="tenantNameLabel">All Tenants (Global)</span>
+        </div>
+        <div class="tb-tenant-chevron">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M4 6l4 4 4-4" stroke="#364153" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <div class="tenant-dropdown" id="tenantDropdown">
+          <div class="tenant-dropdown-search">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input placeholder="Search tenants..."/>
+          </div>
+          <div class="tenant-section-label">SCOPE</div>
+          <div class="tenant-option global active" data-scope="all" data-name="All Tenants (Global)">
+            <div class="tenant-option-icon">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
+            </div>
+            <div class="tenant-option-name">All Tenants (Global)</div>
+            <div class="tenant-option-meta">98 tenants</div>
+          </div>
+          <div class="tenant-section-label">TENANTS</div>
+          <div class="tenant-option" data-scope="single" data-name="Acme Corp" data-tenant-id="acme">
+            <div class="tenant-option-icon">AC</div>
+            <div class="tenant-option-name">Acme Corp</div>
+            <div class="tenant-option-meta">12 devices</div>
+          </div>
+          <div class="tenant-option" data-scope="single" data-name="Westfield IT" data-tenant-id="westfield">
+            <div class="tenant-option-icon">WI</div>
+            <div class="tenant-option-name">Westfield IT</div>
+            <div class="tenant-option-meta">8 devices</div>
+          </div>
+          <div class="tenant-option" data-scope="single" data-name="Riverside Mfg" data-tenant-id="riverside">
+            <div class="tenant-option-icon">RM</div>
+            <div class="tenant-option-name">Riverside Mfg</div>
+            <div class="tenant-option-meta">5 devices</div>
+          </div>
+          <div class="tenant-option" data-scope="single" data-name="Northgate Health" data-tenant-id="northgate">
+            <div class="tenant-option-icon">NH</div>
+            <div class="tenant-option-name">Northgate Health</div>
+            <div class="tenant-option-meta">15 devices</div>
+          </div>
+          <div class="tenant-option" data-scope="single" data-name="Multiregion_june_US" data-tenant-id="multiregion">
+            <div class="tenant-option-icon">MU</div>
+            <div class="tenant-option-name">Multiregion_june_US</div>
+            <div class="tenant-option-meta">22 devices</div>
+          </div>
+        </div>
+      </div>
+      <div class="tb-spacer"></div>
+      <div class="tb-right">
+        <button class="tb-icon-btn">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M10 2.5A5.5 5.5 0 0 0 4.5 8v2.5L3 12.5h14l-1.5-2V8A5.5 5.5 0 0 0 10 2.5Z" stroke="#374151" stroke-width="1.4" fill="none"/>
+            <path d="M8.5 14.5a1.5 1.5 0 0 0 3 0" stroke="#374151" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+          <div class="tb-notif-dot"></div>
+        </button>
+        <button class="tb-icon-btn">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="10" r="7.5" stroke="#374151" stroke-width="1.4"/>
+            <path d="M7.5 7.5a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2-2.5 3.5" stroke="#374151" stroke-width="1.4" stroke-linecap="round"/>
+            <circle cx="10" cy="14" r="0.8" fill="#374151"/>
+          </svg>
+        </button>
+        <div class="tb-avatar">HN</div>
+      </div>
+    </div>
+
+    <!-- ── CONTENT ── -->
+    <div class="content-wrap">
+      <div class="content-scroll">
+        <div class="content-inner">
+
+          <!-- ── SCOPE CONTEXT BAR ── -->
+          <div class="scope-context-bar global" id="scopeContextBar">
+            <div class="scope-icon" id="scopeIcon">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
+            </div>
+            <div>
+              <div class="scope-context-label" id="scopeLabel">CURRENT SCOPE</div>
+              <div class="scope-context-name" id="scopeName">All Tenants — 98 active</div>
+            </div>
+            <div class="scope-context-meta" id="scopeMeta">
+              <span><strong>141</strong> total alerts</span>
+              <span><strong>11</strong> need attention</span>
+              <span><strong>$287K</strong> ARR at risk</span>
+            </div>
+          </div>
+
+          <!-- ══════════════════════════════════════════════════════ -->
+          <!-- OVERVIEW ROW                                            -->
+          <!-- ══════════════════════════════════════════════════════ -->
+          <div class="overview-row" id="overviewRow">
+            <div class="card overview-card">
+              <div class="overview-head">
+                <div>
+                  <div class="overview-title" id="overviewTitle">OVERVIEW</div>
+                  <div class="overview-sub" id="overviewSub">Active Product</div>
+                </div>
+                <div class="carousel-arrows">
+                  <div class="carousel-arrow"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg></div>
+                  <div class="carousel-arrow"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div>
+                </div>
+              </div>
+              <div class="product-grid">
+
+                <div class="product-card">
+                  <div class="product-name">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                    FIREWALL
+                  </div>
+                  <div class="product-metric-label">Total Devices</div>
+                  <div class="product-metric-value">110</div>
+                  <div class="product-attention-label">Need Attention</div>
+                  <div class="product-attention-value">
+                    <span class="attention-warning"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>2</span>
+                    <span class="eol-pill">EOL <span style="color:var(--uuif-text-primary);">6</span></span>
+                  </div>
+                </div>
+
+                <div class="product-card">
+                  <div class="product-name">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
+                    CLOUD SECURE EDGE
+                  </div>
+                  <div class="product-metric-label">Total Active Licenses</div>
+                  <div class="product-metric-value">2</div>
+                  <button class="learn-more-btn">Learn More</button>
+                </div>
+
+                <div class="product-card">
+                  <div class="product-name">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.111 16.404a5.5 5.5 0 117.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/></svg>
+                    ACCESS POINT
+                  </div>
+                  <div class="product-metric-label">Total Devices</div>
+                  <div class="product-metric-value">10</div>
+                  <div class="product-attention-label">Need Attention</div>
+                  <div class="product-attention-value">0</div>
+                </div>
+
+                <div class="product-card">
+                  <div class="product-name">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="1"/><circle cx="7" cy="12" r="1" fill="currentColor"/><circle cx="11" cy="12" r="1" fill="currentColor"/></svg>
+                    SWITCH
+                  </div>
+                  <div class="product-metric-label">Total Devices</div>
+                  <div class="product-metric-value">9</div>
+                  <div class="product-attention-label">Need Attention</div>
+                  <div class="product-attention-value">0</div>
+                </div>
+
+                <div class="product-card">
+                  <div class="product-name">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    CAPTURE CLIENT
+                  </div>
+                  <div class="product-metric-label">Total Endpoints</div>
+                  <div class="product-metric-value">2</div>
+                  <div class="product-attention-label">Need Attention</div>
+                  <div class="product-attention-value">0</div>
+                </div>
+
+                <div class="product-card">
+                  <div class="product-name">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    CAPTURE CLIENT MDR
+                  </div>
+                  <div class="product-metric-label">Total Endpoints</div>
+                  <div class="product-metric-value">2</div>
+                  <div class="product-attention-label">Need Attention</div>
+                  <div class="product-attention-value">0</div>
+                </div>
+
+                <div class="product-card">
+                  <div class="product-name">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M9 21h6"/></svg>
+                    SMA 1000
+                  </div>
+                  <div class="product-metric-label">Total Devices</div>
+                  <div class="product-metric-value">6</div>
+                  <div class="product-attention-label">Need Attention</div>
+                  <div class="coming-soon">
+                    Coming Soon
+                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="org-summary" id="orgSummary">
+              <div class="org-title">ORG SUMMARY</div>
+              <div class="org-label">TENANTs</div>
+              <div class="org-value">98</div>
+              <div class="org-label">Need Attention</div>
+              <div class="org-value">2</div>
+              <button class="create-btn">Create Tenant</button>
+            </div>
+          </div>
+
+          <!-- ══════════════════════════════════════════════════════ -->
+          <!-- AI INSIGHTS / NOTIFICATIONS TABS             -->
+          <!-- ══════════════════════════════════════════════════════ -->
+
+          <!-- ── MAIN PANEL TABS ── -->
+          <div class="mp-tabs-bar">
+            <button class="mp-tab active" onclick="setMpTab('insights',this)">❖ AI Insights</button>
+            <button class="mp-tab" onclick="setMpTab('notifications',this)">Notifications</button>
+          </div>
+
+          <!-- ── AI INSIGHTS PANE ── -->
+          <div class="mp-tab-pane" id="mpPane-insights">
+            <div class="ai-insights-layout" style="grid-template-columns:1fr 1fr;">
+
+              <!-- Left 50%: Needs Attention -->
+              <div class="ai-insights-main">
+                <section class="card notif" style="padding:0;overflow:hidden;">
+                  <div class="ai-section-head">
+                    <div style="display:flex;align-items:center;gap:6px;">
+                      <span class="ai-section-head-title">Needs Attention</span>
+                      <span class="ai-section-head-count">2</span>
+                    </div>
+                    <span class="ai-section-head-meta">SAMI AI · from 50 firewall alerts</span>
+                  </div>
+                  <div class="triage-list">
+
+                    <!-- Group 1: Health Status Emergency -->
+                    <div class="triage-item">
+                      <div class="triage-item-header">
+                        <span class="triage-sev-tag triage-sev-emergency">Emergency</span>
+                        <span style="font-size:11px;color:#888;">Health Status</span>
+                        <span class="triage-count">9 alerts</span>
+                      </div>
+                      <div class="triage-title">Device Connectivity Failures — Remote Branch 1 &amp; 2</div>
+                      <div class="triage-sami-rec">
+                        ✦ <strong>SAMI:</strong> 9 Emergency-level connection failures on 2 devices under Acme Tenant 1. Cyclical failure pattern suggests upstream ISP instability or power event. Both branches share the same /24 subnet — likely a common upstream fault rather than device-specific issues.
+                      </div>
+                      <div class="triage-meta">
+                        <span class="triage-meta-item">
+                          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                          Acme Tenant 1
+                        </span>
+                        <span class="triage-meta-item">
+                          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                          Remote Branch 1 · Remote Branch 2
+                        </span>
+                        <span class="triage-meta-item">IPs: 103.19.168.24 · 122.171.19.205</span>
+                      </div>
+                      <div class="triage-actions">
+                        <button class="triage-act-btn">Check connectivity</button>
+                        <button class="triage-expand">View 9 alerts ↓</button>
+                        <button class="triage-expand">View tenants &amp; devices</button>
+                      </div>
+                    </div>
+
+                    <!-- Group 2: Interface Flap -->
+                    <div class="triage-item">
+                      <div class="triage-item-header">
+                        <span class="triage-sev-tag triage-sev-warning">Warning</span>
+                        <span style="font-size:11px;color:#888;">Interfaces</span>
+                        <span class="triage-count">40 alerts</span>
+                      </div>
+                      <div class="triage-title">Interface Flap Loop — Remote Branch 2 (X0, X2, X3)</div>
+                      <div class="triage-sami-rec">
+                        ✦ <strong>SAMI:</strong> 40 interface state changes across X0, X2, X3 on Remote Branch 2 — consistent up/down cycling pattern over 7 days. High probability of upstream switch port fault or physical cable instability. Not a security event. Recommend checking switch port and cable at Remote Branch 2.
+                      </div>
+                      <div class="triage-meta">
+                        <span class="triage-meta-item">
+                          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                          Acme Tenant 1
+                        </span>
+                        <span class="triage-meta-item">
+                          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                          Remote Branch 2
+                        </span>
+                        <span class="triage-meta-item">Interfaces: X0, X2, X3 · IP: 122.171.19.150</span>
+                      </div>
+                      <div class="triage-actions">
+                        <button class="triage-act-btn">Check switch port</button>
+                        <button class="triage-expand">View 40 alerts ↓</button>
+                        <button class="triage-expand">View tenants &amp; devices</button>
+                      </div>
+                    </div>
+
+                  </div><!-- /triage-list -->
+                </section>
+              </div><!-- /ai-insights-main -->
+
+              <!-- Right 50%: SAMI Recommendation -->
+              <div class="ai-insights-aside">
+                <section class="card notif" style="padding:0;overflow:hidden;">
+                  <div class="ai-section-head">
+                    <div style="display:flex;align-items:center;gap:6px;">
+                      <span class="ai-section-head-title">SAMI Recommendation</span>
+                      <span class="ai-section-head-count">5</span>
+                    </div>
+                    <span class="ai-section-head-meta">4 critical · 1 high</span>
+                  </div>
+                  <div class="rec-list">
+
+                    <!-- Rec 1: CVE -->
+                    <div class="rec-item">
+                      <div class="rec-item-header">
+                        <span class="rec-type-tag rec-tag-cve">CVE</span>
+                        <span class="rec-sev-tag">Critical</span>
+                        <span class="rec-time">2d ago</span>
+                      </div>
+                      <div class="rec-title">SSL VPN auth bypass exposed on 8 firewalls across 2 high-value tenants</div>
+                      <div class="rec-body">CVE-2025-44892 (CVSS 9.8) allows unauthenticated access through SonicOS SSL VPN. Acme Corp and Beta Networks have public-facing affected appliances. Patch is stable; proof-of-concept code is public but no exploitation observed in your fleet yet.</div>
+                      <div class="rec-actions">
+                        <button class="rec-act-primary">Patch 8 firewalls</button>
+                        <button class="rec-act-ghost">Ignore</button>
+                      </div>
+                    </div>
+
+                    <!-- Rec 2: Policy -->
+                    <div class="rec-item">
+                      <div class="rec-item-header">
+                        <span class="rec-type-tag rec-tag-policy">Policy</span>
+                        <span class="rec-sev-tag">Critical</span>
+                      </div>
+                      <div class="rec-title">Super-admin MFA not enforced on 2 tenants — single password from full takeover</div>
+                      <div class="rec-body">Beta Networks and Delta Logistics allow super-admin login with password only. Behaviour Anomalies already shows credential stuffing attempts against these accounts — this gap is being actively probed, not theoretical.</div>
+                      <div class="rec-actions">
+                        <button class="rec-act-primary">Enforce MFA now</button>
+                        <button class="rec-act-ghost">Ignore</button>
+                        <span class="rec-linked">Linked to behav alert</span>
+                      </div>
+                    </div>
+
+                    <!-- Rec 3: Behaviour -->
+                    <div class="rec-item">
+                      <div class="rec-item-header">
+                        <span class="rec-type-tag rec-tag-behaviour">Behaviour</span>
+                        <span class="rec-sev-tag">Critical</span>
+                        <span class="rec-time">1h ago</span>
+                      </div>
+                      <div class="rec-title">Active credential stuffing against super-admin jsmith@beta.local — MFA absent</div>
+                      <div class="rec-body">5 failed login attempts from a new geography and ASN in the past hour, while the same account has 4 active sessions from its usual location. Concurrent-session abuse pattern, not a lost laptop scenario. Combined with no MFA on this tenant, a single guessed password compromises the entire estate.</div>
+                      <div class="rec-actions">
+                        <button class="rec-act-primary">Force re-auth + lock account</button>
+                        <button class="rec-act-ghost">Ignore</button>
+                      </div>
+                    </div>
+
+                    <!-- Rec 4: Policy -->
+                    <div class="rec-item">
+                      <div class="rec-item-header">
+                        <span class="rec-type-tag rec-tag-policy">Policy</span>
+                        <span class="rec-sev-tag">Critical</span>
+                        <span class="rec-time">Drift &gt; 60d</span>
+                      </div>
+                      <div class="rec-title">Default-allow outbound on 3 perimeter firewalls — defeats DPI-SSL coverage</div>
+                      <div class="rec-body">Acme, Beta, and Crown have permit-any outbound rules at the WAN edge. Even with DPI-SSL and IPS enabled, malicious egress (data exfil, C2 callback) goes uninspected. This contradicts your org baseline policy set in 2024.</div>
+                      <div class="rec-actions">
+                        <button class="rec-act-primary">Apply baseline policy</button>
+                        <button class="rec-act-ghost">Ignore</button>
+                      </div>
+                    </div>
+
+                    <!-- Rec 5: Renewal -->
+                    <div class="rec-item">
+                      <div class="rec-item-header">
+                        <span class="rec-type-tag rec-tag-renewal">Renewal</span>
+                        <span class="rec-sev-tag">Critical</span>
+                        <span class="rec-time">Expires in 9d</span>
+                      </div>
+                      <div class="rec-title">Acme Corp ATP lapses in 9 days — $42K ARR plus 8 firewalls lose protection</div>
+                      <div class="rec-body">Subscription expires before next QBR. Acme has 8 firewalls currently relying on ATP for Capture sandboxing — if it lapses, those workloads lose real-time malware analysis. Acme also has open CVE findings (see CVE queue) that depend on ATP coverage.</div>
+                      <div class="rec-actions">
+                        <button class="rec-act-primary">Start renewal quote</button>
+                        <button class="rec-act-ghost">Snooze</button>
+                      </div>
+                    </div>
+
+                  </div><!-- /rec-list -->
+                </section>
+              </div><!-- /ai-insights-aside -->
+
+            </div><!-- /ai-insights-layout -->
+          </div><!-- /mpPane-insights -->
+
+          <!-- ── NOTIFICATIONS PANE ── -->
+          <div class="mp-tab-pane mp-hidden" id="mpPane-notifications">
+            <section class="card notif">
+              <div class="notif-head">
+                <div class="notif-title">NOTIFICATIONS</div>
+                <div class="notif-sub">Notifications for Product Alerts</div>
+              </div>
+              <div class="notif-toolbar">
+              <span class="filter-icon">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+              </span>
+              <div class="search-wrap">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                <input class="search-input" placeholder="Search friendly name / issue type / priority / tenant etc."/>
+              </div>
+
+              <div class="totals-block">
+                <div class="total-item"><div class="total-label">TOTAL</div><div class="total-value" id="totalAll">141</div></div>
+                <div class="total-item"><div class="total-label">SECURITY</div><div class="total-value" id="totalSec">1</div></div>
+                <div class="total-item"><div class="total-label">SYSTEM</div><div class="total-value" id="totalSys">140</div></div>
+                <div class="total-item"><div class="total-label">LICENSE</div><div class="total-value" id="totalLic">0</div></div>
+              </div>
+
+              <div class="time-range">
+                <div class="radio-circle"></div>
+                <div class="time-select">24 Hours <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></div>
+                <div class="radio-circle"></div>
+                <div class="custom-label">Custom</div>
+              </div>
+
+              <div class="toolbar-actions">
+                <button class="toolbar-btn">
+                  <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                  Export
+                </button>
+                <button class="toolbar-btn">
+                  <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                  Refresh
+                </button>
+                <button class="toolbar-btn">
+                  <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+                  Map
+                </button>
+                <button class="toolbar-btn active">
+                  <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+                  List
+                </button>
+              </div>
+            </div>
+
+            
+              <div class="tabs" id="notif-tabs">
+              <div class="tab active" data-tab="firewalls">FIREWALLS</div>
+              <div class="tab" data-tab="ap">ACCESS POINTS</div>
+              <div class="tab" data-tab="sw">SWITCHES</div>
+              <div class="tab" data-tab="cc">CAPTURE CLIENT</div>
+              <div class="tab" data-tab="ccmdr">CAPTURE CLIENT MDR</div>
+            </div>
+              <!-- ── FIREWALLS PANE (default active in Notifications) ── -->
+              <!-- ── FIREWALLS PANE (existing table, hidden by default) ── -->
+            <div id="pane-firewalls" class="tab-pane" >
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width:30px;"><div class="check"></div></th>
+                    <th class="sortable" style="width:110px;">LOCAL TIME</th>
+                    <th>MESSAGE</th>
+                    <th style="width:80px;">PRIORITY</th>
+                    <th style="width:130px;">TENANT</th>
+                    <th style="width:130px;">ALERT STATE</th>
+                    <th style="width:120px;">SOURCE IP</th>
+                    <th style="width:110px;">TYPE</th>
+                    <th style="width:130px;">FRIENDLY NAME</th>
+                    <th style="width:100px;">CATEGORY</th>
+                    <th style="width:70px;">ACTION</th>
+                  </tr>
+                </thead>
+                <tbody id="alert-table-body"></tbody>
+              </table>
+            </div>
+
+            </section>
+          </div><!-- /mpPane-notifications -->
+
+          <div class="footer-bar">
+            <div>Copyright SonicWall</div>
+            <div>
+              <a href="#">Legal</a>
+              <a href="#">Privacy</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="help-bubble">?</div>
+
+<!-- ── INSIGHTS MODAL (iframe to v11 dashboard) ── -->
+<div class="insights-modal" id="insightsModal">
+  <div class="insights-frame-wrap">
+    <div class="insights-frame-bar">
+      <div class="insights-frame-title">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="12" rx="2"/><circle cx="9" cy="13" r="1.2" fill="currentColor"/><circle cx="15" cy="13" r="1.2" fill="currentColor"/><path d="M12 3v4"/></svg>
+        SAMI · All Insights Dashboard
+      </div>
+      <button class="insights-frame-close" id="closeInsights">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+        Close
+      </button>
+    </div>
+    <iframe class="insights-frame" id="insightsFrame" src=""></iframe>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DATA — DIFFERENT FOR ALL-TENANTS vs SINGLE-TENANT VIEWS
+// ═══════════════════════════════════════════════════════════════
+
+const SCOPE_DATA = {
+
+  // ─── ALL TENANTS (GLOBAL) ───────────────────────────────────
+  all: {
+    scopeLabel: 'CURRENT SCOPE',
+    scopeName: 'All Tenants — 98 active',
+    scopeMeta: '<span><strong>141</strong> total alerts</span><span><strong>11</strong> need attention</span><span><strong>$287K</strong> ARR at risk</span>',
+    icon: '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>',
+    showOrgSummary: true,
+    briefing: {
+      cve: '5', behavioral: '3', policy: '6',
+      riskLabel: 'ARR AT RENEWAL RISK', risk: '$287K',
+      needsCount: '11', needsMeta: '4 critical · 7 high &amp; low',
+      cards: [
+        {
+          type: 'behavioral', label: 'Behavioral', time: 'Apr 22 · 07:18 AM',
+          title: 'Lateral Movement Detected — FW-PROD-07',
+          analysis: 'Anomalous east-west traffic observed across 4 internal segments over 2 hours. SAMI detected credential reuse patterns consistent with lateral movement TTPs (MITRE T1550). Containment is recommended before further propagation.',
+          tags: ['#lateral-movement','#credential-reuse','#east-west','#MITRE-T1550'],
+          actions: ['Investigate','Dismiss']
+        },
+        {
+          type: 'policy', label: 'Policy gap', time: 'Apr 21 · 11:02 PM',
+          title: 'Admin Accounts Missing MFA — 3 Tenants',
+          analysis: 'Acme Corp, Westfield IT, and Northgate Health have admin accounts with MFA disabled. This violates SonicWall baseline policy and leaves privileged access exposed to credential-stuffing attacks. SAMI can auto-enforce this policy across all 3 tenants.',
+          tags: ['#MFA','#admin-access','#policy-violation','#credential-stuffing','#3-tenants'],
+          actions: ['Enforce policy','Snooze']
+        }
+      ]
+    },
+    notifTotals: { total: 141, sec: 1, sys: 140, lic: 0 },
+    samiHeader: {
+      title: 'SAMI Triage Summary — 4 grouped insights from 68 raw alerts',
+      sub: 'AI-clustered across Firewalls, Access Points, Switches, Capture Client, and CC MDR · Last update 2 min ago',
+      chips: [
+        { cls:'chip-critical', text:'1 Critical' },
+        { cls:'chip-high', text:'1 High' },
+        { cls:'chip-medium', text:'1 Medium' },
+        { cls:'chip-resolved', text:'1 Resolved' }
+      ]
+    },
+    samiRows: [
+      {
+        sev:'critical',
+        title:'Coordinated lateral movement — same adversary TTP across 3 tenants, 7 endpoints auto-isolated',
+        time:'14 May 2026 · 02:07–08:09',
+        tenants:'Acme Corp · Westfield IT · Riverside Mfg',
+        rootCauseClass:'cause-red',
+        rootCause:'Root cause: shared C2 beacon · IP cluster 45.77.x.x',
+        rawAlerts:'47 raw alerts',
+        cta:'Escalate to clients'
+      },
+      {
+        sev:'high',
+        title:'License expiry cluster — 4 tenants, $287K ARR at risk, SKUs pre-built for 3 accounts',
+        time:'Expiring 25 May–8 Jun 2026',
+        tenants:'swapna6 · Acme Tenant 1 · Westfield IT · Multiregion_june_US',
+        rootCauseClass:'cause-orange',
+        rootCause:'Root cause: renewal not initiated on any of 4 accounts',
+        rawAlerts:'4 raw alerts',
+        cta:'Start renewals'
+      },
+      {
+        sev:'medium',
+        title:'Interface flap loop — Remote Branch 2 X2/X3 cycling, likely upstream switch fault, not a security event',
+        time:'13–14 May 2026 · 02:01–22:44',
+        tenants:'Acme Tenant 1 · 122.171.19.150',
+        rootCauseClass:'cause-blue',
+        rootCause:'Root cause: oscillating link state on upstream switch port',
+        rawAlerts:'14 raw alerts',
+        cta:'Check switch port'
+      },
+      {
+        sev:'resolved',
+        title:'Disk scan completed — 3 Capture Client endpoints, all clean, auto-resolved by SAMI',
+        time:'11 May 2026 · 01:37',
+        tenants:'ccqanoam_premier',
+        rootCauseClass:'cause-green',
+        rootCause:'Auto-resolved · no action required',
+        rawAlerts:'3 raw alerts',
+        resolved:true
+      }
+    ],
+    notifRows: [
+      { time:'21:49:51', msg:'X0 up',   prio:'Info',    tenant:'Acme Tenant 1' },
+      { time:'21:49:41', msg:'X0 down', prio:'Warning', tenant:'Westfield IT' },
+      { time:'21:38:29', msg:'X2 up',   prio:'Info',    tenant:'Riverside Mfg' },
+      { time:'21:38:18', msg:'X2 down', prio:'Warning', tenant:'Northgate Health' },
+      { time:'21:27:47', msg:'X3 up',   prio:'Info',    tenant:'Acme Tenant 1' },
+      { time:'21:26:45', msg:'X3 down', prio:'Warning', tenant:'Multiregion_june_US' },
+      { time:'21:20:28', msg:'X3 up',   prio:'Info',    tenant:'Acme Tenant 1' },
+      { time:'21:19:17', msg:'X3 down', prio:'Warning', tenant:'Westfield IT' },
+      { time:'21:14:01', msg:'X0 up',   prio:'Info',    tenant:'Riverside Mfg' },
+      { time:'21:13:51', msg:'X0 down', prio:'Warning', tenant:'Acme Tenant 1' },
+      { time:'20:57:22', msg:'X0 up',   prio:'Info',    tenant:'Northgate Health' },
+    ]
+  },
+
+  // ─── SINGLE TENANT — ACME CORP (example) ─────────────────────
+  acme: {
+    scopeLabel: 'SINGLE TENANT',
+    scopeName: 'Acme Corp · 12 devices · 4 sites',
+    scopeMeta: '<span><strong>23</strong> alerts</span><span><strong>2</strong> need attention</span><span><strong>$84K</strong> ARR at risk</span>',
+    icon: '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>',
+    showOrgSummary: false,
+    briefing: {
+      cve: '2', behavioral: '1', policy: '3',
+      riskLabel: 'RENEWAL RISK', risk: '$84K',
+      needsCount: '2', needsMeta: '1 critical · 1 high',
+      cards: [
+        {
+          type: 'behavioral', label: 'Behavioral', time: 'May 14 · 02:07 AM',
+          title: 'Lateral Movement Detected — FW-ACME-HQ-01',
+          analysis: 'Acme HQ firewall logged unusual east-west traffic between the Finance VLAN and the Engineering subnet. 4 endpoints showed credential-reuse patterns matching MITRE T1550. SAMI has auto-isolated 2 endpoints and recommends manual review of the other 2.',
+          tags: ['#lateral-movement','#FW-ACME-HQ-01','#finance-vlan','#MITRE-T1550'],
+          actions: ['Investigate','Acknowledge']
+        },
+        {
+          type: 'policy', label: 'Policy gap', time: 'May 13 · 11:02 PM',
+          title: 'MFA Disabled on 2 Admin Accounts at Acme Corp',
+          analysis: 'admin@acme.local and netops@acme.local have MFA disabled. Acme Corp policy baseline requires MFA on all admin accounts. SAMI can enforce this now without disrupting active sessions.',
+          tags: ['#MFA','#admin-access','#acme-baseline','#2-accounts'],
+          actions: ['Enforce now','Snooze 7 days']
+        }
+      ]
+    },
+    notifTotals: { total: 23, sec: 1, sys: 22, lic: 0 },
+    samiHeader: {
+      title: 'SAMI Triage Summary — 3 grouped insights from 18 raw alerts',
+      sub: 'AI-clustered for Acme Corp · Last update 1 min ago',
+      chips: [
+        { cls:'chip-critical', text:'1 Critical' },
+        { cls:'chip-high', text:'1 High' },
+        { cls:'chip-resolved', text:'1 Resolved' }
+      ]
+    },
+    samiRows: [
+      {
+        sev:'critical',
+        title:'Lateral movement detected — Acme HQ Finance VLAN → Engineering subnet, 2 endpoints auto-isolated',
+        time:'14 May 2026 · 02:07–04:18',
+        tenants:'Acme Corp · FW-ACME-HQ-01 · 10.12.4.0/24',
+        rootCauseClass:'cause-red',
+        rootCause:'Root cause: credential reuse · MITRE T1550 · 2 hosts pivoting',
+        rawAlerts:'12 raw alerts',
+        cta:'Investigate'
+      },
+      {
+        sev:'high',
+        title:'License expiry — Acme Corp Gateway Security Services expiring in 18 days, $84K ARR',
+        time:'Expiring 5 Jun 2026',
+        tenants:'Acme Corp · GAV + IPS + Botnet bundle',
+        rootCauseClass:'cause-orange',
+        rootCause:'Root cause: auto-renewal disabled in MySonicWall',
+        rawAlerts:'3 raw alerts',
+        cta:'Start renewal'
+      },
+      {
+        sev:'resolved',
+        title:'Firmware update completed — 4 Acme branch firewalls upgraded to 7.1.2-1023 successfully',
+        time:'12 May 2026 · 23:14',
+        tenants:'Acme Corp · 4 branch sites',
+        rootCauseClass:'cause-green',
+        rootCause:'Auto-resolved · all devices reporting healthy',
+        rawAlerts:'3 raw alerts',
+        resolved:true
+      }
+    ],
+    notifRows: [
+      { time:'21:49:51', msg:'X0 up',   prio:'Info',    tenant:'Acme Corp · HQ' },
+      { time:'21:49:41', msg:'X0 down', prio:'Warning', tenant:'Acme Corp · HQ' },
+      { time:'21:38:29', msg:'X2 up',   prio:'Info',    tenant:'Acme Corp · Branch-NYC' },
+      { time:'21:38:18', msg:'X2 down', prio:'Warning', tenant:'Acme Corp · Branch-NYC' },
+      { time:'21:27:47', msg:'X3 up',   prio:'Info',    tenant:'Acme Corp · Branch-SF' },
+      { time:'21:26:45', msg:'X3 down', prio:'Warning', tenant:'Acme Corp · Branch-SF' },
+      { time:'21:20:28', msg:'X3 up',   prio:'Info',    tenant:'Acme Corp · Branch-AUS' },
+    ]
+  },
+
+  // ─── SINGLE TENANT — WESTFIELD IT ───────────────────────────
+  westfield: {
+    scopeLabel: 'SINGLE TENANT',
+    scopeName: 'Westfield IT · 8 devices · 2 sites',
+    scopeMeta: '<span><strong>14</strong> alerts</span><span><strong>3</strong> need attention</span><span><strong>$42K</strong> ARR at risk</span>',
+    icon: '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>',
+    showOrgSummary: false,
+    briefing: {
+      cve: '4', behavioral: '2', policy: '1',
+      riskLabel: 'RENEWAL RISK', risk: '$42K',
+      needsCount: '3', needsMeta: '1 critical · 2 high',
+      cards: [
+        {
+          type: 'behavioral', label: 'Behavioral', time: 'May 15 · 01:14 PM',
+          title: 'DNS Tunneling Suspected — FW-WEST-DC-02',
+          analysis: 'High-frequency DNS queries with unusually long subdomains observed from host 10.4.2.18 inside Westfield DC. Pattern is consistent with C2 exfiltration over DNS. SAMI recommends blocking the offending domain and running EDR on the host.',
+          tags: ['#DNS-tunnel','#C2-suspected','#FW-WEST-DC-02','#host-10.4.2.18'],
+          actions: ['Block domain','Run EDR scan']
+        },
+        {
+          type: 'policy', label: 'Policy gap', time: 'May 14 · 09:30 AM',
+          title: '"Any-Any" Permissive Rule on Westfield Edge Firewall',
+          analysis: 'FW-WEST-EDGE-01 has an active rule allowing any source to any destination on TCP 8443. This violates least-privilege baseline. SAMI suggests narrowing to a specific application object and zone pair.',
+          tags: ['#permissive-rule','#FW-WEST-EDGE-01','#TCP-8443','#policy-violation'],
+          actions: ['Apply fix','Review rule']
+        }
+      ]
+    },
+    notifTotals: { total: 14, sec: 2, sys: 12, lic: 0 },
+    samiHeader: {
+      title: 'SAMI Triage Summary — 2 grouped insights from 9 raw alerts',
+      sub: 'AI-clustered for Westfield IT · Last update 3 min ago',
+      chips: [
+        { cls:'chip-critical', text:'1 Critical' },
+        { cls:'chip-high', text:'1 High' }
+      ]
+    },
+    samiRows: [
+      {
+        sev:'critical',
+        title:'DNS tunneling pattern — Westfield DC host 10.4.2.18 beaconing every 60s, likely C2 exfiltration',
+        time:'15 May 2026 · 13:14 — ongoing',
+        tenants:'Westfield IT · FW-WEST-DC-02 · host 10.4.2.18',
+        rootCauseClass:'cause-red',
+        rootCause:'Root cause: unsigned executable + long-subdomain DNS · MITRE T1071.004',
+        rawAlerts:'6 raw alerts',
+        cta:'Quarantine host'
+      },
+      {
+        sev:'high',
+        title:'Permissive Any-Any rule on FW-WEST-EDGE-01 — fix pre-staged, awaiting approval',
+        time:'14 May 2026 · 09:30',
+        tenants:'Westfield IT · FW-WEST-EDGE-01',
+        rootCauseClass:'cause-blue',
+        rootCause:'Root cause: emergency rule from incident #4471 never reverted',
+        rawAlerts:'3 raw alerts',
+        cta:'Apply SAMI fix'
+      }
+    ],
+    notifRows: [
+      { time:'13:14:01', msg:'DNS anomaly · port 53', prio:'Warning', tenant:'Westfield · DC' },
+      { time:'13:13:51', msg:'Host 10.4.2.18 high egress', prio:'Warning', tenant:'Westfield · DC' },
+      { time:'09:30:22', msg:'Rule "any-any-8443" matched 18×', prio:'Warning', tenant:'Westfield · Edge' },
+      { time:'08:14:12', msg:'X0 up',   prio:'Info',    tenant:'Westfield · Edge' },
+      { time:'07:49:41', msg:'X1 down', prio:'Warning', tenant:'Westfield · DC' },
+    ]
+  },
+
+  // ─── SINGLE TENANT — RIVERSIDE MFG ──────────────────────────
+  riverside: {
+    scopeLabel: 'SINGLE TENANT',
+    scopeName: 'Riverside Mfg · 5 devices · 1 site',
+    scopeMeta: '<span><strong>9</strong> alerts</span><span><strong>1</strong> need attention</span><span><strong>$0</strong> ARR at risk</span>',
+    icon: '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>',
+    showOrgSummary: false,
+    briefing: {
+      cve: '1', behavioral: '1', policy: '0',
+      riskLabel: 'RENEWAL RISK', risk: '$0',
+      needsCount: '1', needsMeta: '1 critical · 0 high',
+      cards: [
+        {
+          type: 'behavioral', label: 'Behavioral', time: 'May 14 · 03:42 AM',
+          title: 'OT Network Scan Detected — Riverside Plant Floor',
+          analysis: 'Internal host on the IT network (10.20.5.41) is probing OT subnet 192.168.50.0/24 across ports 102, 502, and 44818. This pattern matches reconnaissance against industrial control systems. SAMI strongly recommends isolating the host before any pivoting occurs.',
+          tags: ['#OT-scan','#ICS-protocols','#riverside-plant','#MITRE-T1046'],
+          actions: ['Isolate host','Notify SOC']
+        }
+      ]
+    },
+    notifTotals: { total: 9, sec: 1, sys: 8, lic: 0 },
+    samiHeader: {
+      title: 'SAMI Triage Summary — 1 grouped insight from 6 raw alerts',
+      sub: 'AI-clustered for Riverside Mfg · Last update 5 min ago',
+      chips: [
+        { cls:'chip-critical', text:'1 Critical' }
+      ]
+    },
+    samiRows: [
+      {
+        sev:'critical',
+        title:'OT reconnaissance — IT host scanning plant-floor ICS protocols (Modbus, S7Comm, EtherNet/IP)',
+        time:'14 May 2026 · 03:42–04:10',
+        tenants:'Riverside Mfg · IT-host 10.20.5.41 → OT 192.168.50.0/24',
+        rootCauseClass:'cause-red',
+        rootCause:'Root cause: lateral movement attempt across IT/OT boundary',
+        rawAlerts:'6 raw alerts',
+        cta:'Isolate IT host'
+      }
+    ],
+    notifRows: [
+      { time:'03:42:01', msg:'ICS port 502 scan',  prio:'Warning', tenant:'Riverside · Plant' },
+      { time:'03:42:11', msg:'ICS port 102 scan',  prio:'Warning', tenant:'Riverside · Plant' },
+      { time:'03:43:22', msg:'ICS port 44818 scan',prio:'Warning', tenant:'Riverside · Plant' },
+    ]
+  },
+
+  // ─── SINGLE TENANT — NORTHGATE HEALTH ────────────────────────
+  northgate: {
+    scopeLabel: 'SINGLE TENANT',
+    scopeName: 'Northgate Health · 15 devices · 6 clinics',
+    scopeMeta: '<span><strong>34</strong> alerts</span><span><strong>4</strong> need attention</span><span><strong>$118K</strong> ARR at risk</span>',
+    icon: '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>',
+    showOrgSummary: false,
+    briefing: {
+      cve: '7', behavioral: '2', policy: '4',
+      riskLabel: 'RENEWAL RISK', risk: '$118K',
+      needsCount: '4', needsMeta: '2 critical · 2 high',
+      cards: [
+        {
+          type: 'policy', label: 'Policy gap', time: 'May 16 · 08:12 AM',
+          title: 'PHI-Adjacent Traffic Without DPI-SSL — 3 Clinics',
+          analysis: 'Three Northgate clinics (NG-CLINIC-04, 07, 11) are passing HL7-over-HTTPS traffic without DPI-SSL inspection enabled. HIPAA audit context: this creates a blind spot for PHI exfiltration. SAMI can enable DPI-SSL with the existing cert chain in one click.',
+          tags: ['#HIPAA','#DPI-SSL','#HL7','#3-clinics'],
+          actions: ['Enable DPI-SSL','Review cert chain']
+        },
+        {
+          type: 'behavioral', label: 'Behavioral', time: 'May 15 · 22:48 PM',
+          title: 'Off-Hours Admin Login — NG-CLINIC-11',
+          analysis: 'Admin login from 203.0.113.47 (geo: Bucharest, RO) at 22:48 local time. Northgate baseline expects admin logins from US East between 06:00–20:00. Host is outside business hours and geographic norm.',
+          tags: ['#abnormal-login','#geo-anomaly','#after-hours','#NG-CLINIC-11'],
+          actions: ['Force logout','Reset credentials']
+        }
+      ]
+    },
+    notifTotals: { total: 34, sec: 3, sys: 31, lic: 0 },
+    samiHeader: {
+      title: 'SAMI Triage Summary — 4 grouped insights from 22 raw alerts',
+      sub: 'AI-clustered for Northgate Health · HIPAA-aware grouping · Last update 4 min ago',
+      chips: [
+        { cls:'chip-critical', text:'2 Critical' },
+        { cls:'chip-high', text:'2 High' }
+      ]
+    },
+    samiRows: [
+      {
+        sev:'critical',
+        title:'PHI exposure risk — 3 clinics passing HL7/HTTPS without DPI-SSL, HIPAA audit-relevant',
+        time:'16 May 2026 · 08:12',
+        tenants:'Northgate Health · NG-CLINIC-04, 07, 11',
+        rootCauseClass:'cause-red',
+        rootCause:'Root cause: DPI-SSL disabled · cert chain valid · one-click fix available',
+        rawAlerts:'9 raw alerts',
+        cta:'Enable DPI-SSL'
+      },
+      {
+        sev:'critical',
+        title:'Off-hours admin login from Bucharest, RO — NG-CLINIC-11, outside policy geo and time window',
+        time:'15 May 2026 · 22:48',
+        tenants:'Northgate Health · NG-CLINIC-11 · 203.0.113.47',
+        rootCauseClass:'cause-red',
+        rootCause:'Root cause: credential possibly compromised · MFA not enforced',
+        rawAlerts:'4 raw alerts',
+        cta:'Force logout'
+      },
+      {
+        sev:'high',
+        title:'License renewal — Northgate Capture ATP expiring in 24 days, $48K ARR',
+        time:'Expiring 11 Jun 2026',
+        tenants:'Northgate Health · Capture ATP',
+        rootCauseClass:'cause-orange',
+        rootCause:'Root cause: renewal quote sent · awaiting customer PO',
+        rawAlerts:'2 raw alerts',
+        cta:'Follow up'
+      },
+      {
+        sev:'high',
+        title:'Stale firewall rules — 7 rules across 4 clinics with 0 hits in 90+ days',
+        time:'Audit completed 14 May 2026',
+        tenants:'Northgate Health · 4 clinics',
+        rootCauseClass:'cause-blue',
+        rootCause:'Root cause: orphaned rules from 2024 vendor migration',
+        rawAlerts:'7 raw alerts',
+        cta:'Review & remove'
+      }
+    ],
+    notifRows: [
+      { time:'22:48:01', msg:'Admin login from RO',     prio:'Warning', tenant:'Northgate · NG-CLINIC-11' },
+      { time:'08:12:14', msg:'DPI-SSL disabled · HL7',  prio:'Warning', tenant:'Northgate · NG-CLINIC-04' },
+      { time:'08:12:18', msg:'DPI-SSL disabled · HL7',  prio:'Warning', tenant:'Northgate · NG-CLINIC-07' },
+      { time:'08:12:22', msg:'DPI-SSL disabled · HL7',  prio:'Warning', tenant:'Northgate · NG-CLINIC-11' },
+      { time:'06:14:01', msg:'X0 up',                   prio:'Info',    tenant:'Northgate · NG-CLINIC-04' },
+    ]
+  },
+
+  multiregion: {
+    scopeLabel: 'SINGLE TENANT',
+    scopeName: 'Multiregion_june_US · 22 devices · 9 regions',
+    scopeMeta: '<span><strong>61</strong> alerts</span><span><strong>5</strong> need attention</span><span><strong>$163K</strong> ARR at risk</span>',
+    icon: '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>',
+    showOrgSummary: false,
+    briefing: {
+      cve: '9', behavioral: '4', policy: '7',
+      riskLabel: 'RENEWAL RISK', risk: '$163K',
+      needsCount: '5', needsMeta: '2 critical · 3 high',
+      cards: [
+        {
+          type: 'behavioral', label: 'Behavioral', time: 'May 17 · 04:22 AM',
+          title: 'Synchronized Outbound Beaconing — 4 Regions, Same C2',
+          analysis: 'Hosts in us-east-1, us-west-2, eu-west-1, and ap-south-1 all beaconing to 198.51.100.42 every 300 seconds. Pattern is consistent with a deployed implant across the fleet. SAMI has blocked the destination at edge and recommends EDR sweep.',
+          tags: ['#beaconing','#C2','#4-regions','#fleet-wide'],
+          actions: ['Run fleet EDR','Threat hunt']
+        },
+        {
+          type: 'policy', label: 'Policy gap', time: 'May 16 · 14:08 PM',
+          title: 'Config Drift — 11 Devices Diverged from Baseline',
+          analysis: '11 of 22 Multiregion devices have running configs that no longer match the gold baseline. Drift includes added permit rules, modified NAT, and 3 disabled IPS signatures. SAMI can diff each device against baseline and produce a rollback plan.',
+          tags: ['#config-drift','#11-devices','#baseline-violation'],
+          actions: ['View drift report','Roll back']
+        }
+      ]
+    },
+    notifTotals: { total: 61, sec: 4, sys: 57, lic: 0 },
+    samiHeader: {
+      title: 'SAMI Triage Summary — 5 grouped insights from 38 raw alerts',
+      sub: 'AI-clustered for Multiregion_june_US · Fleet-wide pattern detection · Last update 1 min ago',
+      chips: [
+        { cls:'chip-critical', text:'2 Critical' },
+        { cls:'chip-high', text:'3 High' }
+      ]
+    },
+    samiRows: [
+      {
+        sev:'critical',
+        title:'Fleet-wide C2 beaconing — same destination across 4 AWS regions, implant suspected',
+        time:'17 May 2026 · 04:22 — ongoing',
+        tenants:'Multiregion · us-east-1, us-west-2, eu-west-1, ap-south-1',
+        rootCauseClass:'cause-red',
+        rootCause:'Root cause: 300s interval beacons to 198.51.100.42 from 7 hosts',
+        rawAlerts:'18 raw alerts',
+        cta:'Initiate threat hunt'
+      },
+      {
+        sev:'critical',
+        title:'Config drift across 11 devices — IPS signatures disabled, NAT modified, permit rules added',
+        time:'16 May 2026 · 14:08',
+        tenants:'Multiregion · 11 of 22 devices',
+        rootCauseClass:'cause-red',
+        rootCause:'Root cause: unauthorized changes outside change-control window',
+        rawAlerts:'11 raw alerts',
+        cta:'View drift report'
+      },
+      {
+        sev:'high',
+        title:'License renewal cluster — 3 SKUs expiring in 30 days, $163K combined ARR',
+        time:'Expiring 8–18 Jun 2026',
+        tenants:'Multiregion · CGSS + ATP + NSM',
+        rootCauseClass:'cause-orange',
+        rootCause:'Root cause: procurement freeze · escalation required',
+        rawAlerts:'3 raw alerts',
+        cta:'Escalate to AE'
+      },
+      {
+        sev:'high',
+        title:'HA failover events on 2 regional clusters — both recovered, root cause pending',
+        time:'14–16 May 2026',
+        tenants:'Multiregion · us-east-1, eu-west-1',
+        rootCauseClass:'cause-blue',
+        rootCause:'Root cause: WAN flap on primary · investigation in progress',
+        rawAlerts:'4 raw alerts',
+        cta:'View HA logs'
+      },
+      {
+        sev:'high',
+        title:'Capacity warning — 3 devices >85% CPU sustained for 24h, upgrade candidates',
+        time:'16 May 2026 (24h window)',
+        tenants:'Multiregion · ap-south-1, us-west-2',
+        rootCauseClass:'cause-blue',
+        rootCause:'Root cause: DPI-SSL load · hardware approaching EOL',
+        rawAlerts:'2 raw alerts',
+        cta:'Plan upgrade'
+      }
+    ],
+    notifRows: [
+      { time:'04:22:01', msg:'Outbound beacon · 198.51.100.42', prio:'Warning', tenant:'Multiregion · us-east-1' },
+      { time:'04:22:05', msg:'Outbound beacon · 198.51.100.42', prio:'Warning', tenant:'Multiregion · us-west-2' },
+      { time:'04:22:08', msg:'Outbound beacon · 198.51.100.42', prio:'Warning', tenant:'Multiregion · eu-west-1' },
+      { time:'04:22:11', msg:'Outbound beacon · 198.51.100.42', prio:'Warning', tenant:'Multiregion · ap-south-1' },
+      { time:'14:08:42', msg:'Config drift · 11 devices',       prio:'Warning', tenant:'Multiregion · fleet' },
+    ]
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER FUNCTIONS
+// ═══════════════════════════════════════════════════════════════
+
+function renderScope(scopeKey) {
+  const d = SCOPE_DATA[scopeKey];
+  if (!d) return;
+
+  // Topbar label
+  document.getElementById('tenantNameLabel').textContent =
+    scopeKey === 'all' ? 'All Tenants (Global)' : d.scopeName.split(' · ')[0];
+
+  // Active option in dropdown
+  document.querySelectorAll('.tenant-option').forEach(o => {
+    o.classList.toggle('active', o.dataset.tenantId === scopeKey || (scopeKey === 'all' && o.dataset.scope === 'all'));
+  });
+
+  // Scope context bar
+  const ctxBar = document.getElementById('scopeContextBar');
+  ctxBar.classList.toggle('global', scopeKey === 'all');
+  ctxBar.classList.toggle('single', scopeKey !== 'all');
+  document.getElementById('scopeIcon').innerHTML = d.icon;
+  document.getElementById('scopeLabel').textContent = d.scopeLabel;
+  document.getElementById('scopeName').textContent = d.scopeName;
+  document.getElementById('scopeMeta').innerHTML = d.scopeMeta;
+
+  // Org summary visibility (only in All Tenants)
+  document.getElementById('orgSummary').style.display = d.showOrgSummary ? 'flex' : 'none';
+
+  // Briefing stats
+  document.getElementById('statCVE').textContent = d.briefing.cve;
+  document.getElementById('statBehavioral').textContent = d.briefing.behavioral;
+  document.getElementById('statPolicy').textContent = d.briefing.policy;
+  document.getElementById('statRiskLabel').textContent = d.briefing.riskLabel;
+  document.getElementById('statRisk').textContent = d.briefing.risk;
+  document.getElementById('needsCount').textContent = d.briefing.needsCount;
+  document.getElementById('needsMeta').innerHTML = d.briefing.needsMeta;
+
+  // Briefing cards
+  const cardsWrap = document.getElementById('briefingAlertCards');
+  cardsWrap.innerHTML = d.briefing.cards.map(c => `
+    <div class="alert-card">
+      <div class="alert-head">
+        <span class="alert-pill ${c.type}">${c.label}</span>
+        <span class="alert-time">${c.time}</span>
+      </div>
+      <div class="alert-title">${c.title}</div>
+      <div class="sami-analysis">
+        <div class="sami-analysis-label">
+          <svg width="10" height="10" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4-6.2-4.5-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
+          SAMI ANALYSIS
+        </div>
+        <div class="sami-analysis-text">${c.analysis}</div>
+      </div>
+      <div class="tags">${c.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+      <div class="alert-actions">${c.actions.map(a => `<button class="btn">${a}</button>`).join('')}</div>
+    </div>
+  `).join('');
+
+  // Notification totals
+  document.getElementById('totalAll').textContent = d.notifTotals.total;
+  document.getElementById('totalSec').textContent = d.notifTotals.sec;
+  document.getElementById('totalSys').textContent = d.notifTotals.sys;
+  document.getElementById('totalLic').textContent = d.notifTotals.lic;
+
+  // SAMI Alerts header
+  const hdr = d.samiHeader;
+  document.getElementById('samiAlertsHeader').innerHTML = `
+    <div class="sami-alerts-header-left">
+      <div class="sami-alerts-icon">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="12" rx="2"/><circle cx="9" cy="13" r="1.2" fill="currentColor"/><circle cx="15" cy="13" r="1.2" fill="currentColor"/><path d="M12 3v4"/></svg>
+      </div>
+      <div>
+        <div class="sami-alerts-header-title">${hdr.title}</div>
+        <div class="sami-alerts-header-sub">${hdr.sub}</div>
+      </div>
+    </div>
+    <div class="sami-summary-chips">
+      ${hdr.chips.map(c => `<span class="sami-summary-chip ${c.cls}">${c.text}</span>`).join('')}
+    </div>
+  `;
+
+  // SAMI Alerts rows
+  document.getElementById('samiAlertsRows').innerHTML = d.samiRows.map(r => `
+    <div class="sami-alerts-row sev-${r.sev}">
+      <div class="sami-row-left">
+        <span class="sami-pill">SAMI</span>
+        <div class="sami-row-content">
+          <div class="sami-row-title">${r.title}</div>
+          <div class="sami-row-meta">
+            <span class="sami-meta-time">${r.time}</span>
+            <span class="sami-meta-tenants">${r.tenants}</span>
+            <span class="sami-root-cause ${r.rootCauseClass}">${r.rootCause}</span>
+          </div>
+        </div>
+      </div>
+      <div class="sami-row-right">
+        <span class="raw-alerts-pill">${r.rawAlerts}</span>
+        ${r.resolved ? `<span class="resolved-badge">RESOLVED</span>` : `<button class="cta-primary">${r.cta}</button>`}
+        <button class="why-group">
+          Why this group?
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
+        </button>
+      </div>
+    </div>
+  `).join('');
+
+  // Firewalls notification table
+  const tbody = document.getElementById('alert-table-body');
+  tbody.innerHTML = d.notifRows.map(r => {
+    const prioClass = r.prio === 'Warning' ? 'priority-warning' : 'priority-info';
+    return `
+      <tr>
+        <td><div class="check"></div></td>
+        <td class="local-time"><span>11 May 2026</span><span style="color:var(--uuif-text-tertiary);">${r.time}</span></td>
+        <td>${r.msg.startsWith('X') ? 'Device interface ' + r.msg : r.msg}</td>
+        <td><span class="${prioClass}">${r.prio}</span></td>
+        <td>
+          <div class="tenant-cell">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+            ${r.tenant}
+          </div>
+        </td>
+        <td>
+          <div class="state-dropdown">
+            New
+            <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
+          </div>
+        </td>
+        <td class="source-ip">122.171.19.150</td>
+        <td>
+          <div class="type-cell">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M9 21h6M12 17v4"/></svg>
+            ${r.msg.startsWith('X') ? 'Interfaces' : 'Security'}
+          </div>
+        </td>
+        <td>Remote Branch 2</td>
+        <td class="category">SYSTEM</td>
+        <td style="color:var(--uuif-text-tertiary);">-</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EVENT WIRING
+// ═══════════════════════════════════════════════════════════════
+
+// Tenant dropdown toggle
+const tenantSelector = document.getElementById('tenantSelector');
+const tenantDropdown = document.getElementById('tenantDropdown');
+tenantSelector.addEventListener('click', (e) => {
+  e.stopPropagation();
+  tenantDropdown.classList.toggle('open');
+});
+document.addEventListener('click', () => tenantDropdown.classList.remove('open'));
+tenantDropdown.addEventListener('click', (e) => e.stopPropagation());
+
+// Tenant option selection
+document.querySelectorAll('.tenant-option').forEach(opt => {
+  opt.addEventListener('click', () => {
+    const scope = opt.dataset.scope === 'all' ? 'all' : opt.dataset.tenantId;
+    renderScope(scope);
+    tenantDropdown.classList.remove('open');
+  });
+});
+
+// Tab switching
+const tabs = document.querySelectorAll('.tab');
+tabs.forEach(t => {
+  t.addEventListener('click', () => {
+    tabs.forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    const key = t.dataset.tab;
+    document.getElementById('pane-sami').style.display = 'none';
+    document.getElementById('pane-firewalls').style.display = 'none';
+    if (key === 'sami') document.getElementById('pane-sami').style.display = 'block';
+    else document.getElementById('pane-firewalls').style.display = 'block';
+  });
+});
+
+// Insights modal — opened from View All Insights link AND sidebar #2
+const insightsModal = document.getElementById('insightsModal');
+const insightsFrame = document.getElementById('insightsFrame');
+const INSIGHTS_URL = 'SAMI_AllInsights_v2.1_2026-05-18.html';
+
+function openInsights() {
+  insightsFrame.src = INSIGHTS_URL;
+  insightsModal.classList.add('open');
+}
+function closeInsights() {
+  insightsModal.classList.remove('open');
+  insightsFrame.src = '';
+}
+
+document.getElementById('viewAllInsightsLink').addEventListener('click', (e) => {
+  e.preventDefault();
+  openInsights();
+});
+document.getElementById('sbInsightsBtn').addEventListener('click', (e) => {
+  e.preventDefault();
+  openInsights();
+});
+document.getElementById('closeInsights').addEventListener('click', closeInsights);
+insightsModal.addEventListener('click', (e) => {
+  if (e.target === insightsModal) closeInsights();
+});
+
+// Initial render
+renderScope('all');
+
+function setMpTab(tab, btn) {
+  document.querySelectorAll('.mp-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.mp-tab-pane').forEach(p => p.classList.add('mp-hidden'));
+  var pane = document.getElementById('mpPane-' + tab);
+  if (pane) pane.classList.remove('mp-hidden');
+}
+
+</script>
+</body>
+</html>

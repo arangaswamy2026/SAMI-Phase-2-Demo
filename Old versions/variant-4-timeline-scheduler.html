@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+  Design reference: UUIF 9.2 — Timeline Scheduler. Gantt timeline + list + detail. Variant 4 of 5.
+  Informed by: sami-rec-scheduling-v1-uuif.html (tokens, sidebar, topbar, footer states, scheduler UX)
+  Gap noted: Gantt-style timeline panel is a custom SAMI pattern not defined in UUIF 9.2.
+             Timeline blocks/markers extrapolated from UUIF 9.2 fill/border tokens.
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAMI Recommendations — Timeline Scheduler (UUIF 9.2)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
+<style>
+
+/* ─── TOKEN DEFINITIONS ─────────────────────────────────────────────────── */
+:root {
+  /* Text */
+  --uuif-text-primary:   #191c25;
+  --uuif-text-secondary: #4a618f;
+  --uuif-text-tertiary:  #888888;
+  --uuif-text-contrast:  #ffffff;
+  --uuif-text-disabled:  rgba(17,17,17,0.3);
+  --uuif-text-hover:     #ff5d00;
+  --uuif-text-highlight: #0c2b67;
+
+  /* Surface */
+  --uuif-surface-container: #ffffff;
+  --uuif-surface-bg:        #f4f6f9;
+  --uuif-surface-primary:   #5b74a7;
+  --uuif-surface-secondary: #d2dff2;
+  --uuif-surface-tertiary:  #f6f8fe;
+  --uuif-surface-hover:     rgba(17,17,17,0.06);
+  --uuif-surface-selected:  rgba(255,72,26,0.09);
+  --uuif-surface-disabled:  #e8eff9;
+  --uuif-surface-model:     #f0f2f5;
+  --uuif-surface-contrast:  #111315;
+
+  /* Border */
+  --uuif-border-primary:     #ff5d00;
+  --uuif-border-secondary:   #78a3e5;
+  --uuif-border-tertiary:    #cccccc;
+  --uuif-border-transparent: rgba(17,17,17,0.09);
+  --uuif-border-disabled:    #d2dff2;
+  --uuif-border-hover:       #ff5d00;
+
+  /* Icon */
+  --uuif-icon-primary:   #5885cc;
+  --uuif-icon-secondary: #9dafd3;
+  --uuif-icon-tertiary:  #62686d;
+  --uuif-icon-hover:     #ff5d00;
+
+  /* Brand */
+  --uuif-brand-navy:   #001b50;
+  --uuif-brand-blue:   #1f3c73;
+  --uuif-brand-orange: #ff5d00;
+  --uuif-brand-green:  #59a02e;
+  --uuif-brand-red:    #c70f0f;
+  --uuif-brand-yellow: #f3ac3d;
+
+  /* Fill */
+  --uuif-fill-blue-lightest:      #f6f8fe;
+  --uuif-fill-green-xxx-lighter:  #e3efdc;
+  --uuif-fill-yellow-xxx-lighter: #ffe9be;
+  --uuif-fill-red-lightest:       #fff0f0;
+  --uuif-fill-orange-x-lighter:   #fff0e8;
+
+  /* Spacing */
+  --uuif-sp-1: 2px;  --uuif-sp-2: 4px;  --uuif-sp-3: 8px;
+  --uuif-sp-4: 12px; --uuif-sp-5: 16px; --uuif-sp-6: 20px;
+  --uuif-sp-7: 24px; --uuif-sp-8: 32px;
+
+  /* Radius */
+  --uuif-radius-4:    4px;
+  --uuif-radius-6:    6px;
+  --uuif-radius-8:    8px;
+  --uuif-radius-12:   12px;
+  --uuif-radius-pill: 88px;
+
+  /* Shadow */
+  --uuif-shadow-sm: 0px 1px 6px 2px rgba(0,0,0,0.12);
+  --uuif-shadow-md: 0px 4px 12px 0px rgba(0,0,0,0.16);
+}
+
+/* ─── RESET + BASE ──────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Nunito Sans', sans-serif;
+  background: var(--uuif-surface-bg);
+  color: var(--uuif-text-primary);
+  font-size: 13px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── SIDEBAR ───────────────────────────────────────────────────────────── */
+.sidebar {
+  position: fixed; left: 0; top: 0; width: 60px; height: 100vh;
+  background: var(--uuif-brand-navy);
+  display: flex; flex-direction: column; align-items: center;
+  z-index: 200;
+}
+.sidebar-logo {
+  width: 60px; height: 52px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.sidebar-logo svg { width: 28px; height: 28px; }
+.sidebar-icon {
+  width: 60px; height: 48px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--uuif-icon-secondary);
+  cursor: pointer; position: relative; transition: color .15s;
+  border-left: 2px solid transparent;
+}
+.sidebar-icon:hover { color: var(--uuif-icon-hover); }
+.sidebar-icon.active {
+  background: rgba(17,17,17,0.4);
+  border-left-color: var(--uuif-brand-orange);
+  color: var(--uuif-brand-orange);
+}
+.sidebar-icon .badge {
+  position: absolute; top: 8px; right: 8px;
+  background: var(--uuif-brand-orange); color: #fff;
+  font-size: 9px; font-weight: 700;
+  border-radius: var(--uuif-radius-pill);
+  min-width: 16px; height: 16px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 var(--uuif-sp-2);
+}
+.sidebar-spacer { flex: 1; }
+.sidebar-icon svg { flex-shrink: 0; }
+
+/* ─── TOPBAR ────────────────────────────────────────────────────────────── */
+.topbar {
+  position: fixed; left: 60px; right: 0; top: 0; height: 46px;
+  background: var(--uuif-surface-container);
+  border-bottom: 1px solid var(--uuif-border-transparent);
+  display: flex; align-items: center;
+  padding: 0 var(--uuif-sp-5); z-index: 199; gap: var(--uuif-sp-3);
+}
+.breadcrumb {
+  display: flex; align-items: center; gap: var(--uuif-sp-2);
+  font-size: 12px; color: var(--uuif-text-secondary); flex: 1;
+}
+.breadcrumb a { color: var(--uuif-icon-primary); text-decoration: none; }
+.breadcrumb a:hover { color: var(--uuif-text-hover); }
+.breadcrumb span { color: var(--uuif-text-tertiary); }
+.tenant-selector {
+  display: flex; align-items: center; gap: var(--uuif-sp-2);
+  border: 1px solid var(--uuif-border-tertiary);
+  border-radius: var(--uuif-radius-pill);
+  padding: var(--uuif-sp-2) var(--uuif-sp-4);
+  font-size: 12px; cursor: pointer;
+  font-family: 'Nunito Sans', sans-serif;
+  background: var(--uuif-surface-container);
+  color: var(--uuif-text-primary); transition: border-color .15s;
+}
+.tenant-selector:hover { border-color: var(--uuif-border-secondary); }
+.tenant-selector .dot { width: 8px; height: 8px; background: var(--uuif-brand-orange); border-radius: 50%; }
+.topbar-icons { display: flex; align-items: center; gap: var(--uuif-sp-3); }
+.icon-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--uuif-text-tertiary);
+  transition: background .15s; position: relative;
+}
+.icon-btn:hover { background: var(--uuif-surface-hover); }
+.notif-badge {
+  position: absolute; top: 4px; right: 4px;
+  width: 8px; height: 8px; background: var(--uuif-brand-orange); border-radius: 50%;
+}
+.avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--uuif-brand-blue); color: #fff;
+  font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+
+/* ─── PAGE LAYOUT ───────────────────────────────────────────────────────── */
+.page { margin-left: 60px; padding-top: 46px; min-height: 100vh; display: flex; flex-direction: column; }
+.page-content { padding: var(--uuif-sp-4) var(--uuif-sp-5) var(--uuif-sp-3); display: flex; flex-direction: column; flex: 1; }
+
+/* ─── PAGE HEADER ───────────────────────────────────────────────────────── */
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  height: 48px; flex-shrink: 0;
+}
+.page-header-left { display: flex; align-items: center; gap: var(--uuif-sp-3); }
+.back-btn {
+  width: 28px; height: 28px; border: none; background: transparent;
+  cursor: pointer; color: var(--uuif-brand-orange);
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--uuif-radius-4); transition: background .15s;
+}
+.back-btn:hover { background: var(--uuif-surface-selected); }
+.page-title { font-size: 18px; font-weight: 700; color: var(--uuif-text-primary); }
+.page-sub { font-size: 12px; color: var(--uuif-text-tertiary); margin-left: var(--uuif-sp-3); }
+.page-header-right { display: flex; align-items: center; gap: var(--uuif-sp-3); }
+.btn-export {
+  background: var(--uuif-surface-container);
+  border: 1px solid var(--uuif-border-secondary);
+  border-radius: var(--uuif-radius-pill);
+  padding: var(--uuif-sp-2) var(--uuif-sp-5);
+  font-size: 13px; cursor: pointer; color: var(--uuif-text-secondary);
+  font-weight: 500; display: flex; align-items: center; gap: var(--uuif-sp-2);
+  font-family: 'Nunito Sans', sans-serif; transition: all .15s; white-space: nowrap;
+}
+.btn-export:hover { border-color: var(--uuif-border-hover); color: var(--uuif-text-hover); }
+
+/* ─── TIMELINE PANEL ────────────────────────────────────────────────────── */
+.timeline-panel {
+  background: var(--uuif-surface-container);
+  border: 1px solid var(--uuif-border-transparent);
+  border-radius: var(--uuif-radius-8);
+  box-shadow: var(--uuif-shadow-sm);
+  margin-bottom: var(--uuif-sp-3);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.timeline-panel-header {
+  display: flex; align-items: center;
+  padding: var(--uuif-sp-3) var(--uuif-sp-5);
+  border-bottom: 1px solid var(--uuif-border-transparent);
+  gap: var(--uuif-sp-4);
+}
+.tph-title { font-size: 13px; font-weight: 700; color: var(--uuif-text-highlight); }
+.tph-counts { display: flex; align-items: center; gap: var(--uuif-sp-4); font-size: 12px; }
+.tph-count { display: flex; align-items: center; gap: var(--uuif-sp-2); }
+.tph-dot { width: 7px; height: 7px; border-radius: 50%; }
+.tph-dot.green  { background: var(--uuif-brand-green); }
+.tph-dot.blue   { background: var(--uuif-surface-primary); }
+.tph-dot.orange { background: var(--uuif-brand-orange); }
+.tph-sep { color: var(--uuif-border-tertiary); }
+.timeline-ruler {
+  display: flex; position: relative; height: 22px;
+  border-bottom: 1px solid var(--uuif-border-transparent);
+  background: var(--uuif-surface-bg);
+}
+.tl-day-col {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 600; color: var(--uuif-text-tertiary);
+  border-right: 1px solid var(--uuif-border-transparent);
+  text-transform: uppercase; letter-spacing: 0.04em;
+  position: relative;
+}
+.tl-day-col:last-child { border-right: none; }
+.tl-day-col.today-col {
+  color: var(--uuif-brand-orange);
+  font-weight: 800;
+  background: var(--uuif-fill-orange-x-lighter);
+}
+.tl-day-col .today-tag {
+  background: var(--uuif-brand-orange); color: #fff;
+  font-size: 8px; font-weight: 800;
+  border-radius: var(--uuif-radius-4); padding: 1px 4px;
+  margin-left: 3px; letter-spacing: 0.04em;
+}
+.timeline-bars-area {
+  position: relative; height: 78px; padding: 6px 0 4px;
+  overflow: hidden;
+}
+/* Vertical grid lines behind bars */
+.timeline-bars-area .tl-grid {
+  position: absolute; top: 0; bottom: 0; pointer-events: none;
+  display: flex; width: 100%;
+}
+.tl-grid-col {
+  flex: 1;
+  border-right: 1px dashed rgba(17,17,17,0.06);
+}
+.tl-grid-col:last-child { border-right: none; }
+
+/* TODAY vertical line */
+.today-line {
+  position: absolute; top: 0; bottom: 0;
+  border-left: 2px dashed var(--uuif-brand-orange);
+  z-index: 5; pointer-events: none;
+}
+.today-line-label {
+  position: absolute; top: 2px; left: 3px;
+  font-size: 9px; font-weight: 800;
+  color: var(--uuif-brand-orange); letter-spacing: 0.05em;
+}
+
+/* Bar rows */
+.tl-bar-row {
+  position: absolute; left: 0; right: 0;
+  height: 22px;
+}
+.tl-bar-row:nth-child(2) { top: 6px; }
+.tl-bar-row:nth-child(3) { top: 32px; }
+.tl-bar-row:nth-child(4) { top: 58px; /* overflow hidden */ }
+
+/* Bar block */
+.tl-bar {
+  position: absolute;
+  height: 22px; border-radius: var(--uuif-radius-4);
+  display: flex; align-items: center; padding: 0 8px;
+  font-size: 11px; font-weight: 600; white-space: nowrap;
+  cursor: pointer; overflow: hidden;
+  transition: box-shadow .15s, filter .15s;
+  user-select: none;
+}
+.tl-bar:hover { filter: brightness(0.94); box-shadow: var(--uuif-shadow-sm); }
+.tl-bar.selected { outline: 2px solid var(--uuif-brand-orange); outline-offset: 1px; }
+
+/* In-progress bar (green) */
+.tl-bar.inprogress {
+  background: var(--uuif-brand-green);
+  color: #fff;
+}
+.tl-bar.inprogress .tl-bar-prog {
+  position: absolute; left: 0; top: 0; bottom: 0;
+  background: rgba(255,255,255,0.22);
+  border-radius: var(--uuif-radius-4);
+}
+@keyframes bar-pulse {
+  0%,100% { opacity: 1; }
+  50%      { opacity: 0.6; }
+}
+.tl-bar.inprogress { animation: bar-pulse 2.4s ease-in-out infinite; }
+
+/* Scheduled bar (blue) */
+.tl-bar.scheduled {
+  background: var(--uuif-surface-secondary);
+  color: var(--uuif-surface-primary);
+  border: 1px solid var(--uuif-border-secondary);
+}
+
+/* Needs-action diamond marker */
+.tl-diamond-wrap {
+  position: absolute; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.tl-diamond {
+  width: 14px; height: 14px;
+  background: var(--uuif-brand-orange);
+  transform: rotate(45deg);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.tl-diamond-label {
+  font-size: 10px; font-weight: 600; color: var(--uuif-brand-orange);
+  white-space: nowrap; margin-left: 8px;
+}
+.tl-diamond-wrap.selected .tl-diamond {
+  outline: 2px solid var(--uuif-brand-orange); outline-offset: 2px;
+}
+
+/* Tooltip */
+.tl-tooltip {
+  position: fixed; z-index: 300;
+  background: var(--uuif-surface-contrast);
+  color: var(--uuif-text-contrast);
+  font-size: 11px; font-weight: 600;
+  border-radius: var(--uuif-radius-6);
+  padding: var(--uuif-sp-2) var(--uuif-sp-4);
+  pointer-events: none;
+  opacity: 0; transition: opacity .1s;
+  white-space: nowrap;
+  box-shadow: var(--uuif-shadow-md);
+}
+.tl-tooltip.visible { opacity: 1; }
+
+/* ─── TWO-COLUMN AREA ───────────────────────────────────────────────────── */
+.two-col {
+  display: flex; gap: 0; flex: 1;
+  min-height: 0; border-radius: var(--uuif-radius-8);
+  box-shadow: var(--uuif-shadow-sm);
+  border: 1px solid var(--uuif-border-transparent);
+  overflow: hidden;
+}
+
+/* ─── PRIORITY LIST (left) ──────────────────────────────────────────────── */
+.list-col {
+  width: 360px; flex-shrink: 0;
+  background: var(--uuif-surface-container);
+  border-right: 1px solid var(--uuif-border-transparent);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.list-col-header {
+  padding: var(--uuif-sp-3) var(--uuif-sp-5);
+  border-bottom: 1px solid var(--uuif-border-transparent);
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.07em; color: var(--uuif-text-highlight);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.list-col-header-right { display: flex; align-items: center; gap: var(--uuif-sp-2); }
+.list-sort-btn {
+  font-size: 11px; font-weight: 500; color: var(--uuif-icon-primary);
+  background: none; border: 1px solid var(--uuif-border-disabled);
+  border-radius: var(--uuif-radius-pill); padding: 2px 8px;
+  cursor: pointer; font-family: 'Nunito Sans', sans-serif;
+  transition: border-color .15s;
+}
+.list-sort-btn:hover { border-color: var(--uuif-border-secondary); }
+.list-items-scroll { flex: 1; overflow-y: auto; }
+
+/* List item card */
+.list-item {
+  padding: var(--uuif-sp-3) var(--uuif-sp-5);
+  border-bottom: 1px solid var(--uuif-border-transparent);
+  cursor: pointer; transition: background .12s;
+  border-left: 3px solid transparent;
+  display: flex; flex-direction: column; gap: var(--uuif-sp-2);
+}
+.list-item:hover { background: var(--uuif-surface-hover); }
+.list-item.selected {
+  background: var(--uuif-surface-selected);
+  border-left-color: var(--uuif-brand-orange);
+}
+.li-row1 { display: flex; align-items: center; justify-content: space-between; }
+.li-cat {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; display: flex; align-items: center; gap: 5px;
+}
+.li-cat-dot { width: 6px; height: 6px; border-radius: 50%; }
+.li-cat.cve    .li-cat-dot { background: var(--uuif-brand-red); }
+.li-cat.device .li-cat-dot { background: var(--uuif-brand-orange); }
+.li-cat.behavioral .li-cat-dot { background: var(--uuif-icon-primary); }
+.li-cat.policy .li-cat-dot { background: var(--uuif-surface-primary); }
+.li-cat.subscription .li-cat-dot { background: var(--uuif-brand-yellow); }
+.li-cat.cve    { color: var(--uuif-brand-red); }
+.li-cat.device { color: var(--uuif-brand-orange); }
+.li-cat.behavioral { color: var(--uuif-icon-primary); }
+.li-cat.policy { color: var(--uuif-surface-primary); }
+.li-cat.subscription { color: var(--uuif-brand-yellow); }
+.li-status-chip {
+  font-size: 10px; font-weight: 700;
+  border-radius: var(--uuif-radius-4); padding: 2px 7px;
+  border: 1px solid; height: 20px; display: inline-flex; align-items: center; gap: 5px;
+}
+.li-status-chip.inprogress {
+  background: var(--uuif-fill-green-xxx-lighter);
+  color: var(--uuif-brand-green); border-color: var(--uuif-brand-green);
+}
+.li-status-chip.scheduled {
+  background: var(--uuif-fill-blue-lightest);
+  color: var(--uuif-surface-primary); border-color: var(--uuif-border-secondary);
+}
+.li-status-chip.needs-action {
+  background: var(--uuif-fill-yellow-xxx-lighter);
+  color: var(--uuif-brand-yellow); border-color: var(--uuif-brand-yellow);
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner-mini {
+  width: 8px; height: 8px;
+  border: 1.5px solid var(--uuif-brand-green); border-top-color: transparent;
+  border-radius: 50%; animation: spin .8s linear infinite; display: inline-block;
+}
+.li-title {
+  font-size: 13px; font-weight: 700; color: var(--uuif-text-primary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.li-row3 { display: flex; align-items: center; justify-content: space-between; }
+.li-tenants { font-size: 11px; color: var(--uuif-text-secondary); }
+.li-updated { font-size: 11px; color: var(--uuif-text-tertiary); }
+.li-progress-mini {
+  height: 3px; background: var(--uuif-border-disabled);
+  border-radius: var(--uuif-radius-pill); overflow: hidden; margin-top: 2px;
+}
+.li-progress-fill {
+  height: 100%; background: var(--uuif-brand-green);
+  border-radius: var(--uuif-radius-pill);
+}
+
+/* ─── DETAIL PANEL (right) ──────────────────────────────────────────────── */
+.detail-col {
+  flex: 1; background: var(--uuif-surface-container);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.detail-scroll { flex: 1; overflow-y: auto; }
+.detail-header {
+  padding: var(--uuif-sp-5) var(--uuif-sp-6) var(--uuif-sp-4);
+  border-bottom: 1px solid var(--uuif-border-transparent);
+}
+.detail-badge-row { display: flex; align-items: center; gap: var(--uuif-sp-3); margin-bottom: var(--uuif-sp-3); }
+.d-cat-tag {
+  font-size: 11px; font-weight: 700;
+  border-radius: var(--uuif-radius-4); padding: 3px 8px;
+  border: 1px solid;
+}
+.d-cat-tag.cve    { background: var(--uuif-fill-red-lightest); color: var(--uuif-brand-red); border-color: var(--uuif-brand-red); }
+.d-cat-tag.device { background: var(--uuif-fill-orange-x-lighter); color: var(--uuif-brand-orange); border-color: var(--uuif-brand-orange); }
+.d-cat-tag.behavioral { background: var(--uuif-fill-blue-lightest); color: var(--uuif-icon-primary); border-color: var(--uuif-border-secondary); }
+.d-cat-tag.policy { background: var(--uuif-fill-blue-lightest); color: var(--uuif-surface-primary); border-color: var(--uuif-border-secondary); }
+.d-cat-tag.subscription { background: var(--uuif-fill-yellow-xxx-lighter); color: var(--uuif-brand-yellow); border-color: var(--uuif-brand-yellow); }
+.detail-title { font-size: 16px; font-weight: 700; color: var(--uuif-text-primary); line-height: 1.35; margin-bottom: var(--uuif-sp-3); }
+.detail-scope {
+  display: flex; gap: var(--uuif-sp-4); font-size: 12px;
+  color: var(--uuif-text-secondary); align-items: center; flex-wrap: wrap;
+}
+.detail-scope-item { display: flex; align-items: center; gap: var(--uuif-sp-2); }
+
+/* SAMI note banner */
+.sami-note {
+  margin: var(--uuif-sp-4) var(--uuif-sp-6) 0;
+  background: var(--uuif-fill-blue-lightest);
+  border: 1px solid var(--uuif-border-secondary);
+  border-radius: var(--uuif-radius-6);
+  padding: var(--uuif-sp-3) var(--uuif-sp-4);
+  font-size: 13px; color: var(--uuif-text-primary);
+  line-height: 1.6; display: flex; align-items: flex-start; gap: var(--uuif-sp-3);
+}
+.sami-note .sn-tag {
+  background: var(--uuif-brand-orange); color: #fff;
+  font-size: 10px; font-weight: 700; border-radius: var(--uuif-radius-4);
+  padding: 2px 5px; flex-shrink: 0; margin-top: 2px;
+}
+
+/* Detail body */
+.detail-body { padding: var(--uuif-sp-5) var(--uuif-sp-6); flex: 1; }
+.section-label {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.07em; color: var(--uuif-text-tertiary); margin-bottom: var(--uuif-sp-3);
+}
+.evidence-item {
+  display: flex; align-items: center; gap: var(--uuif-sp-3);
+  padding: var(--uuif-sp-2) 0; font-size: 13px; color: var(--uuif-text-primary);
+  border-bottom: 1px solid var(--uuif-border-transparent);
+}
+.evidence-item:last-child { border-bottom: none; }
+.ev-icon {
+  width: 24px; height: 24px; border-radius: var(--uuif-radius-4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+}
+.ev-icon.blue   { background: var(--uuif-fill-blue-lightest); }
+.ev-icon.gray   { background: var(--uuif-surface-model); }
+.ev-icon.yellow { background: var(--uuif-fill-yellow-xxx-lighter); }
+.ev-icon.green  { background: var(--uuif-fill-green-xxx-lighter); }
+.ev-icon.red    { background: var(--uuif-fill-red-lightest); }
+.ev-text { flex: 1; font-size: 12px; color: var(--uuif-text-secondary); line-height: 1.5; }
+.ev-text strong { color: var(--uuif-text-primary); font-weight: 600; }
+.tl-section { margin-top: var(--uuif-sp-5); }
+.tl-entry {
+  display: flex; gap: var(--uuif-sp-4); padding: var(--uuif-sp-2) 0;
+  font-size: 12px; border-bottom: 1px solid var(--uuif-border-transparent); color: var(--uuif-text-primary);
+}
+.tl-entry:last-child { border-bottom: none; }
+.tl-entry-date { color: var(--uuif-icon-primary); font-weight: 600; min-width: 130px; flex-shrink: 0; }
+
+/* ─── DETAIL FOOTER ─────────────────────────────────────────────────────── */
+.detail-footer-wrap {
+  border-top: 1px solid var(--uuif-border-transparent);
+  background: var(--uuif-surface-container);
+  flex-shrink: 0;
+}
+
+/* Default footer */
+.df-default {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--uuif-sp-3) var(--uuif-sp-6);
+}
+.df-link { font-size: 13px; color: var(--uuif-icon-primary); cursor: pointer; text-decoration: underline; }
+.df-actions { display: flex; gap: var(--uuif-sp-3); align-items: center; }
+.btn-sched-later {
+  background: var(--uuif-surface-container);
+  border: 1px solid var(--uuif-border-secondary);
+  border-radius: var(--uuif-radius-pill);
+  padding: var(--uuif-sp-2) var(--uuif-sp-5);
+  font-size: 13px; cursor: pointer; color: var(--uuif-text-secondary);
+  font-weight: 500; display: flex; align-items: center; gap: 6px;
+  font-family: 'Nunito Sans', sans-serif; transition: all .15s;
+}
+.btn-sched-later:hover { border-color: var(--uuif-border-hover); color: var(--uuif-text-hover); }
+.btn-primary {
+  background: var(--uuif-surface-primary); color: #fff;
+  border: none; border-radius: var(--uuif-radius-pill);
+  padding: var(--uuif-sp-2) var(--uuif-sp-5);
+  font-size: 13px; cursor: pointer; font-weight: 700;
+  font-family: 'Nunito Sans', sans-serif; transition: background .15s;
+}
+.btn-primary:hover { background: var(--uuif-brand-navy); }
+
+/* Scheduling footer */
+.df-scheduling {
+  padding: var(--uuif-sp-4) var(--uuif-sp-6) var(--uuif-sp-5);
+  border-top: 2px solid var(--uuif-border-secondary);
+  background: var(--uuif-fill-blue-lightest);
+}
+.sch-header {
+  font-size: 13px; font-weight: 700; color: var(--uuif-text-primary);
+  margin-bottom: var(--uuif-sp-3); display: flex; align-items: center; gap: 6px;
+}
+.sch-header-icon { color: var(--uuif-surface-primary); font-size: 15px; }
+.sch-time-row { display: flex; gap: var(--uuif-sp-2); margin-bottom: var(--uuif-sp-3); flex-wrap: wrap; }
+.sch-time-btn {
+  background: var(--uuif-surface-container);
+  border: 1.5px solid var(--uuif-border-tertiary);
+  border-radius: var(--uuif-radius-pill);
+  padding: var(--uuif-sp-2) var(--uuif-sp-4);
+  font-size: 12px; cursor: pointer; color: var(--uuif-text-secondary);
+  font-weight: 500; font-family: 'Nunito Sans', sans-serif; transition: all .15s;
+}
+.sch-time-btn:hover   { border-color: var(--uuif-border-hover); color: var(--uuif-text-hover); }
+.sch-time-btn.active {
+  border-color: var(--uuif-border-secondary);
+  background: var(--uuif-surface-secondary);
+  color: var(--uuif-surface-primary); font-weight: 700;
+}
+.sch-reasoning {
+  background: var(--uuif-fill-yellow-xxx-lighter);
+  border: 1px solid var(--uuif-brand-yellow);
+  border-radius: var(--uuif-radius-6);
+  padding: var(--uuif-sp-3) var(--uuif-sp-4);
+  font-size: 12px; color: var(--uuif-text-primary); line-height: 1.6;
+  margin-bottom: var(--uuif-sp-3); display: flex; align-items: flex-start; gap: var(--uuif-sp-3);
+}
+.sch-reasoning .sr-tag {
+  background: var(--uuif-brand-yellow); color: #fff;
+  font-size: 9px; font-weight: 700; border-radius: var(--uuif-radius-4);
+  padding: 2px 5px; flex-shrink: 0; margin-top: 2px;
+}
+.sch-footer-row { display: flex; align-items: center; justify-content: flex-end; gap: var(--uuif-sp-3); }
+.btn-cancel {
+  background: none; border: none; cursor: pointer;
+  font-size: 13px; color: var(--uuif-text-secondary);
+  font-family: 'Nunito Sans', sans-serif; font-weight: 500;
+  padding: var(--uuif-sp-2) var(--uuif-sp-4); border-radius: var(--uuif-radius-pill); transition: background .15s;
+}
+.btn-cancel:hover { background: var(--uuif-surface-hover); }
+.btn-confirm {
+  background: var(--uuif-brand-navy); color: #fff;
+  border: none; border-radius: var(--uuif-radius-pill);
+  padding: var(--uuif-sp-2) var(--uuif-sp-6);
+  font-size: 13px; cursor: pointer; font-weight: 700;
+  font-family: 'Nunito Sans', sans-serif; transition: background .15s;
+}
+.btn-confirm:hover { background: var(--uuif-brand-blue); }
+
+/* Scheduled footer */
+.df-scheduled {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--uuif-sp-3) var(--uuif-sp-6);
+  background: var(--uuif-fill-blue-lightest);
+}
+.df-sched-info { display: flex; align-items: center; gap: var(--uuif-sp-3); }
+.df-sched-icon { color: var(--uuif-surface-primary); font-size: 18px; }
+.df-sched-text { font-size: 13px; font-weight: 700; color: var(--uuif-text-primary); }
+.df-sched-sub  { font-size: 11px; color: var(--uuif-text-tertiary); margin-top: 2px; }
+.df-sched-links { display: flex; gap: 4px; align-items: center; }
+.df-sched-links button {
+  background: none; border: none; cursor: pointer;
+  font-size: 12px; padding: var(--uuif-sp-2) var(--uuif-sp-3);
+  border-radius: var(--uuif-radius-4); font-weight: 600;
+  font-family: 'Nunito Sans', sans-serif; transition: background .15s;
+}
+.btn-edit   { color: var(--uuif-icon-primary); }
+.btn-edit:hover   { background: var(--uuif-surface-secondary) !important; }
+.btn-cancel-s { color: var(--uuif-brand-red) !important; }
+.btn-cancel-s:hover { background: var(--uuif-fill-red-lightest) !important; }
+.btn-dnow {
+  color: var(--uuif-brand-orange) !important; font-weight: 700 !important;
+  border: 1px solid var(--uuif-border-primary) !important;
+  border-radius: var(--uuif-radius-pill) !important;
+}
+.btn-dnow:hover { background: var(--uuif-surface-selected) !important; }
+
+/* In-progress footer */
+.df-inprogress {
+  padding: var(--uuif-sp-3) var(--uuif-sp-6);
+  background: var(--uuif-fill-green-xxx-lighter);
+}
+.df-ip-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--uuif-sp-3); }
+.df-ip-label { font-size: 13px; font-weight: 700; color: var(--uuif-brand-green); display: flex; align-items: center; gap: 6px; }
+.df-ip-eta { font-size: 11px; color: var(--uuif-text-tertiary); }
+.df-prog-bar { height: 6px; background: var(--uuif-border-disabled); border-radius: var(--uuif-radius-pill); overflow: hidden; }
+.df-prog-fill { height: 100%; background: var(--uuif-brand-green); border-radius: var(--uuif-radius-pill); transition: width 1s; }
+.df-ip-bottom { display: flex; align-items: center; justify-content: space-between; margin-top: var(--uuif-sp-3); }
+.df-ip-status { font-size: 12px; color: var(--uuif-text-secondary); }
+.df-ip-links { display: flex; gap: var(--uuif-sp-3); }
+.df-ip-links button {
+  background: none; border: none; cursor: pointer;
+  font-size: 12px; padding: var(--uuif-sp-2) var(--uuif-sp-3);
+  border-radius: var(--uuif-radius-4); font-weight: 600;
+  font-family: 'Nunito Sans', sans-serif; transition: background .15s;
+}
+.btn-view  { color: var(--uuif-icon-primary); text-decoration: underline; cursor: pointer; }
+.btn-pause { color: var(--uuif-text-tertiary) !important; border: 1px solid var(--uuif-border-tertiary) !important; border-radius: var(--uuif-radius-4) !important; }
+.btn-pause:hover { background: var(--uuif-surface-model) !important; }
+
+/* ─── TOAST ─────────────────────────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 400;
+  background: var(--uuif-surface-contrast); color: var(--uuif-text-contrast);
+  border-radius: var(--uuif-radius-8); padding: var(--uuif-sp-3) var(--uuif-sp-5);
+  font-size: 13px; font-weight: 600;
+  display: flex; align-items: center; gap: var(--uuif-sp-3);
+  box-shadow: var(--uuif-shadow-md);
+  transform: translateY(80px); opacity: 0;
+  transition: transform .3s, opacity .3s;
+  max-width: 360px;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast-icon { font-size: 16px; flex-shrink: 0; }
+.toast-check { color: #59a02e; }
+
+/* ─── SCROLLBAR ─────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--uuif-border-disabled); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--uuif-icon-secondary); }
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SIDEBAR — Primary Nav Rail
+══════════════════════════════════════════════════════════════════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg viewBox="0 0 28 28" fill="none">
+      <rect width="28" height="28" rx="6" fill="#ff5d00"/>
+      <path d="M7 14 L12 9 L12 12 L21 12 L21 16 L12 16 L12 19 Z" fill="white"/>
+    </svg>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+  </div>
+  <div class="sidebar-icon active">
+    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+    <span class="badge">5</span>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+  </div>
+  <div class="sidebar-spacer"></div>
+  <div class="sidebar-icon">
+    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+  </div>
+</aside>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     TOPBAR
+══════════════════════════════════════════════════════════════════════════ -->
+<header class="topbar">
+  <nav class="breadcrumb">
+    <a href="#">NSM</a>
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4.5 3L7.5 6L4.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    <a href="#">SAMI</a>
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4.5 3L7.5 6L4.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    <span>Recommendations</span>
+  </nav>
+  <button class="tenant-selector">
+    <span class="dot"></span>
+    All Tenants (12)
+    <svg width="12" height="12" fill="none" viewBox="0 0 12 12"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+  </button>
+  <div class="topbar-icons">
+    <div class="icon-btn">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+    </div>
+    <div class="icon-btn">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+      <span class="notif-badge"></span>
+    </div>
+    <div class="icon-btn">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    </div>
+    <div class="avatar">AR</div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     PAGE
+══════════════════════════════════════════════════════════════════════════ -->
+<main class="page">
+  <div class="page-content">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <div class="page-header-left">
+        <button class="back-btn" title="Back">
+          <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <div>
+          <div class="page-title">Recommendations
+            <span style="font-size:13px;font-weight:400;color:var(--uuif-text-tertiary);margin-left:8px;">Timeline Scheduler</span>
+          </div>
+          <div style="font-size:11px;color:var(--uuif-text-tertiary);margin-top:2px;">May 18–24, 2026 · Work queue · 5 items</div>
+        </div>
+      </div>
+      <div class="page-header-right">
+        <button class="btn-export">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+          Export
+        </button>
+        <button class="btn-export" style="border-color:var(--uuif-brand-orange);color:var(--uuif-brand-orange);">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          Settings
+        </button>
+      </div>
+    </div>
+
+    <!-- TIMELINE PANEL -->
+    <div class="timeline-panel" id="timelinePanel">
+      <!-- Panel header -->
+      <div class="timeline-panel-header">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--uuif-surface-primary)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span class="tph-title">Work Queue — 7 Day View</span>
+        <div class="tph-counts">
+          <span class="tph-count"><span class="tph-dot green"></span> 1 deploying</span>
+          <span class="tph-sep">·</span>
+          <span class="tph-count"><span class="tph-dot blue"></span> 2 scheduled</span>
+          <span class="tph-sep">·</span>
+          <span class="tph-count"><span class="tph-dot orange"></span> 2 need action</span>
+        </div>
+      </div>
+
+      <!-- Day ruler -->
+      <div class="timeline-ruler" id="tlRuler">
+        <div class="tl-day-col today-col">Mon 18 <span class="today-tag">TODAY</span></div>
+        <div class="tl-day-col">Tue 19</div>
+        <div class="tl-day-col">Wed 20</div>
+        <div class="tl-day-col">Thu 21</div>
+        <div class="tl-day-col">Fri 22</div>
+        <div class="tl-day-col">Sat 23</div>
+        <div class="tl-day-col">Sun 24</div>
+      </div>
+
+      <!-- Bars area -->
+      <div class="timeline-bars-area" id="tlBarsArea">
+        <!-- Grid lines (drawn by JS) -->
+        <div class="tl-grid" id="tlGrid"></div>
+        <!-- Today line (drawn by JS) -->
+        <div class="today-line" id="todayLine">
+          <span class="today-line-label">NOW</span>
+        </div>
+        <!-- Bars injected by JS -->
+      </div>
+    </div>
+
+    <!-- TWO-COLUMN: LIST + DETAIL -->
+    <div class="two-col" style="flex:1;min-height:0;">
+
+      <!-- PRIORITY LIST -->
+      <div class="list-col">
+        <div class="list-col-header">
+          Priority Queue
+          <div class="list-col-header-right">
+            <button class="list-sort-btn">Urgency ▾</button>
+          </div>
+        </div>
+        <div class="list-items-scroll" id="listItems">
+          <!-- Injected by JS -->
+        </div>
+      </div>
+
+      <!-- DETAIL PANEL -->
+      <div class="detail-col" id="detailCol">
+        <div class="detail-scroll" id="detailScroll">
+          <div class="detail-header" id="detailHeader"></div>
+          <div class="sami-note" id="detailSamiNote" style="display:none;"></div>
+          <div class="detail-body" id="detailBody"></div>
+        </div>
+        <div class="detail-footer-wrap" id="detailFooter"></div>
+      </div>
+    </div>
+
+  </div><!-- /page-content -->
+</main>
+
+<!-- TOOLTIP -->
+<div class="tl-tooltip" id="tlTooltip"></div>
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-icon toast-check">✓</span>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════════════════════════════════ */
+
+/* Timeline config: 7 days × 24 hours = 168 hours total span
+   Origin: Mon May 18 00:00.
+   "NOW" = ~09:00 Mon May 18 = hour 9 */
+const TOTAL_HOURS = 7 * 24;           // 168
+const NOW_HOUR = 9;                    // 09:00 Mon May 18
+
+function pct(hour) { return (hour / TOTAL_HOURS) * 100; }
+
+/* Item definitions */
+const ITEMS = [
+  {
+    id: 0,
+    cat: 'cve',
+    catLabel: 'CVE Vulnerability',
+    title: 'SSL VPN Auth Bypass CVE-2026-1142',
+    titleShort: 'SSL VPN Auth Bypass CVE-2026-1142',
+    status: 'inprogress',
+    statusLabel: 'In Progress',
+    tenants: '7 of 12 devices',
+    updated: '09:02 today',
+    progress: 72,
+    eta: '~28 min remaining',
+    samiNote: 'SAMI is actively patching 7 of 12 affected devices. Remaining 5 devices are queued and will complete within the current maintenance window. No manual intervention required.',
+    evidence: [
+      { icon: '🛡️', cls: 'blue', text: '<strong>CVE-2026-1142</strong> — CVSS 9.1 Critical. Auth bypass via malformed SAML assertion in SSL-VPN portal.' },
+      { icon: '📊', cls: 'gray', text: '<strong>7 of 12 devices</strong> patched successfully. 5 remaining: fw-boston-02, fw-dallas-01, fw-london-01, fw-tokyo-01, fw-sydney-01.' },
+      { icon: '✅', cls: 'green', text: 'Zero service interruption detected. SAMI sequenced by tenant to avoid concurrent reboots.' }
+    ],
+    timeline: [
+      { date: 'Mon May 18, 08:34 AM', text: 'SAMI detected 12 affected devices across 4 tenants.' },
+      { date: 'Mon May 18, 09:00 AM', text: 'Patch deployment initiated — first batch (7 devices) began.' },
+      { date: 'Mon May 18, 09:30 AM (est)', text: 'Remaining 5 devices to complete patching.' }
+    ],
+    /* Gantt */
+    barType: 'inprogress',
+    barStart: NOW_HOUR - 0.5,   // started ~08:30
+    barEnd:   NOW_HOUR + 0.47,  // ~09:28 completion
+    barLabel: 'CVE Patch · 72%'
+  },
+  {
+    id: 1,
+    cat: 'device',
+    catLabel: 'Device Alert',
+    title: '3 Gateways Unreachable',
+    titleShort: '3 Gateways Unreachable',
+    status: 'scheduled',
+    statusLabel: 'Scheduled',
+    schedTime: 'Tonight 11:00 PM',
+    schedTimeShort: 'Tonight 11 PM',
+    tenants: 'Acme Corp, Westfield IT',
+    updated: '1 hr ago',
+    samiNote: 'SAMI will run gateway diagnostics at 11:00 PM, within Acme Corp\'s maintenance window (10 PM–2 AM). Expected duration: 12 minutes. Results will be sent to your inbox.',
+    evidence: [
+      { icon: '⚠️', cls: 'yellow', text: '<strong>3 gateways</strong> offline: fw-acme-03, fw-west-01, fw-west-02. Last heartbeat 47 min ago.' },
+      { icon: '📊', cls: 'gray', text: 'No upstream ISP events detected. Likely local hardware or config issue.' }
+    ],
+    timeline: [
+      { date: 'Mon May 18, 08:13 AM', text: 'Gateways became unreachable.' },
+      { date: 'Mon May 18, 08:15 AM', text: 'SAMI raised alert and queued diagnostic.' },
+      { date: 'Tonight 11:00 PM', text: 'BGP Diagnosis scheduled to run.' }
+    ],
+    barType: 'scheduled',
+    barStart: 23,    // 11 PM Mon May 18
+    barEnd:   23.2,
+    barLabel: 'BGP Diagnosis'
+  },
+  {
+    id: 2,
+    cat: 'behavioral',
+    catLabel: 'Behavioral Anomaly',
+    title: 'Credential Stuffing Detected',
+    titleShort: 'Credential Stuffing Detected',
+    status: 'needs-action',
+    statusLabel: 'Needs Action',
+    tenants: 'Crown Logistics',
+    updated: '22 min ago',
+    samiNote: 'SAMI has isolated the attack surface and rate-limited suspicious IPs. A full policy block requires your approval — this affects 4 tenant endpoints. Review and confirm to deploy.',
+    evidence: [
+      { icon: '🔒', cls: 'blue', text: '<strong>4,200+ failed login attempts</strong> in 15 min from 18 distinct IPs. Pattern matches credential stuffing toolkit.' },
+      { icon: '⚠️', cls: 'yellow', text: '<strong>3 accounts</strong> show suspicious successful logins — SAMI has flagged for MFA re-auth.' },
+      { icon: '🛡️', cls: 'red', text: 'SAMI auto-rate-limited top offending IPs. Full block requires confirmation.' }
+    ],
+    timeline: [
+      { date: 'Mon May 18, 08:41 AM', text: 'Anomaly first detected by SAMI behavioral engine.' },
+      { date: 'Mon May 18, 08:43 AM', text: 'SAMI applied rate limit to top 5 source IPs.' },
+      { date: 'Pending approval', text: 'Full policy block and MFA re-auth awaiting confirmation.' }
+    ],
+    barType: 'diamond',
+    barStart: NOW_HOUR,
+    barLabel: 'Needs Action'
+  },
+  {
+    id: 3,
+    cat: 'policy',
+    catLabel: 'Policy Gap',
+    title: 'Permit-Any Outbound DPI-SSL',
+    titleShort: 'Permit-Any Outbound DPI-SSL',
+    status: 'scheduled',
+    statusLabel: 'Scheduled',
+    schedTime: 'Monday 2:00 AM',
+    schedTimeShort: 'Mon 2 AM',
+    tenants: '4 tenants · 18 devices',
+    updated: '3 hr ago',
+    samiNote: 'Monday 2:00 AM is optimal — all 4 tenant maintenance windows align. No concurrent SAMI operations are queued for that window. Estimated deployment: 22 minutes.',
+    evidence: [
+      { icon: '🔍', cls: 'blue', text: '<strong>Permit-Any Outbound</strong> rule bypasses DPI-SSL inspection for all traffic on 18 devices across 4 tenants.' },
+      { icon: '📊', cls: 'gray', text: 'Affects ~14% of outbound traffic volume. Zero DPI coverage on these flows.' },
+      { icon: '✅', cls: 'green', text: 'SAMI-recommended policy restricts to known app categories and re-enables DPI-SSL.' }
+    ],
+    timeline: [
+      { date: 'Mon May 18, 06:00 AM', text: 'SAMI policy scan detected Permit-Any Outbound rule.' },
+      { date: 'Mon May 18, 06:05 AM', text: 'Fix policy generated and staged for review.' },
+      { date: 'Mon May 20, 2:00 AM', text: 'Policy push scheduled to all 4 tenants.' }
+    ],
+    barType: 'scheduled',
+    barStart: 24 + 24 + 2,   // Mon May 20 02:00 = hour 50
+    barEnd:   24 + 24 + 2.37,
+    barLabel: 'Policy Push'
+  },
+  {
+    id: 4,
+    cat: 'subscription',
+    catLabel: 'Subscription Risk',
+    title: 'ATP Subscriptions Expiring',
+    titleShort: 'ATP Subscriptions Expiring',
+    status: 'needs-action',
+    statusLabel: 'Needs Action',
+    tenants: '3 tenants · $87K ARR at risk',
+    updated: '45 min ago',
+    samiNote: 'ATP subscriptions for 3 tenants expire in 6–14 days. SAMI has drafted renewal quotes. Approve to auto-send renewal emails or escalate to account manager.',
+    evidence: [
+      { icon: '💳', cls: 'yellow', text: '<strong>3 tenants</strong> — Acme Corp (6 days), Beta Networks (11 days), Crown Logistics (14 days). Total ARR: $87,200.' },
+      { icon: '📊', cls: 'gray', text: 'Lapse in ATP coverage disables Capture ATP sandboxing and Gateway AV across affected devices.' },
+      { icon: '✅', cls: 'green', text: 'SAMI has pre-drafted renewal emails and quotes. One-click approval available below.' }
+    ],
+    timeline: [
+      { date: 'Mon May 18, 08:00 AM', text: 'SAMI flagged upcoming subscription expiry.' },
+      { date: 'Acme Corp', text: 'Expires May 24 (6 days).' },
+      { date: 'Beta Networks', text: 'Expires May 29 (11 days).' },
+      { date: 'Crown Logistics', text: 'Expires Jun 1 (14 days).' }
+    ],
+    barType: 'diamond',
+    barStart: NOW_HOUR + 0.1,
+    barLabel: 'Needs Action'
+  }
+];
+
+/* SAMI scheduling reasoning */
+const SAMI_REASONS = {
+  'Tonight 11pm': 'Tonight at 11:00 PM falls within Acme Corp\'s maintenance window (10 PM–2 AM). SAMI will sequence tenant deployments — estimated total window: 38 minutes.',
+  'Tomorrow 2am': 'Tomorrow 2:00 AM works for Westfield IT and Beta Networks. Crown Logistics has no approved Friday window — their 2 devices require separate confirmation.',
+  'Monday 2am': 'Monday 2:00 AM is optimal — all 4 tenant maintenance windows align. No concurrent SAMI operations queued.',
+  'Custom': 'SAMI will validate against all 4 tenant maintenance windows and flag any conflicts before confirming.'
+};
+
+/* Per-item primary action labels */
+const PRIMARY_LABELS = {
+  'inprogress': null,
+  'scheduled': 'Deploy Now',
+  'needs-action': 'Review & Approve'
+};
+
+/* ═══════════════════════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════════════════════ */
+let selectedId  = 0;
+let footerState = {}; // itemId -> 'default' | 'scheduling' | 'scheduled' | 'inprogress'
+let schedTimes  = {}; // itemId -> selected time label
+let itemStatuses = {}; // itemId -> runtime status (can change after scheduling)
+
+ITEMS.forEach(it => {
+  itemStatuses[it.id] = it.status;
+  footerState[it.id]  = it.status === 'inprogress' ? 'inprogress'
+                       : it.status === 'scheduled'  ? 'scheduled'
+                       : 'default';
+  schedTimes[it.id]   = it.schedTime || null;
+});
+
+/* ═══════════════════════════════════════════════════════════════════════
+   TIMELINE RENDERING
+═══════════════════════════════════════════════════════════════════════ */
+function renderTimeline() {
+  const barsArea = document.getElementById('tlBarsArea');
+  const grid     = document.getElementById('tlGrid');
+
+  /* Grid columns */
+  grid.innerHTML = '';
+  for (let i = 0; i < 7; i++) {
+    const d = document.createElement('div');
+    d.className = 'tl-grid-col';
+    grid.appendChild(d);
+  }
+
+  /* Today line at NOW */
+  const todayLine = document.getElementById('todayLine');
+  todayLine.style.left = pct(NOW_HOUR) + '%';
+
+  /* Remove old bars */
+  const oldBars = barsArea.querySelectorAll('.tl-bar, .tl-diamond-wrap, .tl-bar-row');
+  oldBars.forEach(b => b.remove());
+
+  /* Rows: 3 rows — row0=inprogress, row1=scheduled-1, row2=scheduled-2 / diamonds */
+  const rowTops = ['6px', '32px', '58px'];
+  let rowIdx = 0;
+
+  ITEMS.forEach(item => {
+    const status = itemStatuses[item.id];
+    let barType  = item.barType;
+    /* After scheduling, update bar type */
+    if (status === 'scheduled' && barType === 'diamond') barType = 'scheduled';
+
+    if (barType === 'inprogress') {
+      const el = document.createElement('div');
+      el.className = 'tl-bar inprogress' + (selectedId === item.id ? ' selected' : '');
+      el.style.left  = pct(item.barStart) + '%';
+      el.style.width = Math.max(pct(item.barEnd - item.barStart), 4) + '%';
+      el.style.top   = rowTops[0];
+      el.style.position = 'absolute';
+      /* Progress shine */
+      el.innerHTML = `<div class="tl-bar-prog" style="width:${item.progress}%"></div><span style="position:relative;z-index:1;">${item.barLabel}</span>`;
+      el.dataset.itemId = item.id;
+      addBarEvents(el, item.id);
+      barsArea.appendChild(el);
+      rowIdx = 1;
+    } else if (barType === 'scheduled') {
+      const el = document.createElement('div');
+      el.className = 'tl-bar scheduled' + (selectedId === item.id ? ' selected' : '');
+      el.style.left  = pct(item.barStart) + '%';
+      el.style.width = Math.max(pct((item.barEnd || (item.barStart + 0.3)) - item.barStart), 4) + '%';
+      el.style.top   = rowTops[rowIdx] || rowTops[2];
+      el.style.position = 'absolute';
+      el.textContent = item.barLabel;
+      el.dataset.itemId = item.id;
+      addBarEvents(el, item.id);
+      barsArea.appendChild(el);
+      rowIdx = Math.min(rowIdx + 1, 2);
+    } else if (barType === 'diamond') {
+      const wrap = document.createElement('div');
+      wrap.className = 'tl-diamond-wrap' + (selectedId === item.id ? ' selected' : '');
+      wrap.style.left     = pct(item.barStart) + '%';
+      wrap.style.top      = rowTops[rowIdx] || rowTops[2];
+      wrap.style.position = 'absolute';
+      wrap.style.height   = '22px';
+      wrap.style.display  = 'flex';
+      wrap.style.alignItems = 'center';
+      wrap.dataset.itemId = item.id;
+      wrap.innerHTML = `<div class="tl-diamond"></div><span class="tl-diamond-label">${item.barLabel}</span>`;
+      addBarEvents(wrap, item.id);
+      barsArea.appendChild(wrap);
+      rowIdx = Math.min(rowIdx + 1, 2);
+    }
+  });
+}
+
+function addBarEvents(el, id) {
+  const tooltip = document.getElementById('tlTooltip');
+  const item    = ITEMS.find(i => i.id === id);
+
+  el.addEventListener('click', () => {
+    selectedId = id;
+    renderTimeline();
+    renderList();
+    renderDetail();
+  });
+
+  el.addEventListener('mouseenter', (e) => {
+    const st = itemStatuses[id];
+    let msg = item.titleShort;
+    if (st === 'inprogress') msg += ` · ${item.progress}% · ${item.eta}`;
+    else if (st === 'scheduled') msg += ` · ${item.schedTime || schedTimes[id] || ''}`;
+    else msg += ' · Needs action';
+    tooltip.textContent = msg;
+    tooltip.classList.add('visible');
+    moveTooltip(e);
+  });
+
+  el.addEventListener('mousemove', moveTooltip);
+
+  el.addEventListener('mouseleave', () => {
+    tooltip.classList.remove('visible');
+  });
+}
+
+function moveTooltip(e) {
+  const t = document.getElementById('tlTooltip');
+  t.style.left = (e.clientX + 12) + 'px';
+  t.style.top  = (e.clientY - 28) + 'px';
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   LIST RENDERING
+═══════════════════════════════════════════════════════════════════════ */
+function renderList() {
+  const container = document.getElementById('listItems');
+  container.innerHTML = '';
+
+  ITEMS.forEach(item => {
+    const status = itemStatuses[item.id];
+    const isSelected = selectedId === item.id;
+
+    const el = document.createElement('div');
+    el.className = 'list-item' + (isSelected ? ' selected' : '');
+    el.dataset.id = item.id;
+
+    /* Status chip HTML */
+    let chipHtml = '';
+    if (status === 'inprogress') {
+      chipHtml = `<span class="li-status-chip inprogress"><span class="spinner-mini"></span> In Progress</span>`;
+    } else if (status === 'scheduled') {
+      chipHtml = `<span class="li-status-chip scheduled">⏰ ${schedTimes[item.id] || item.schedTimeShort || 'Scheduled'}</span>`;
+    } else {
+      chipHtml = `<span class="li-status-chip needs-action">⚡ Needs Action</span>`;
+    }
+
+    /* Progress bar for in-progress */
+    const progHtml = status === 'inprogress'
+      ? `<div class="li-progress-mini"><div class="li-progress-fill" style="width:${item.progress}%"></div></div>`
+      : '';
+
+    el.innerHTML = `
+      <div class="li-row1">
+        <span class="li-cat ${item.cat}"><span class="li-cat-dot"></span>${item.catLabel}</span>
+        ${chipHtml}
+      </div>
+      <div class="li-title">${item.titleShort}</div>
+      ${progHtml}
+      <div class="li-row3">
+        <span class="li-tenants">${item.tenants}</span>
+        <span class="li-updated">${item.updated}</span>
+      </div>`;
+
+    el.addEventListener('click', () => {
+      selectedId = item.id;
+      renderTimeline();
+      renderList();
+      renderDetail();
+    });
+
+    container.appendChild(el);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   DETAIL RENDERING
+═══════════════════════════════════════════════════════════════════════ */
+function renderDetail() {
+  const item   = ITEMS.find(i => i.id === selectedId);
+  const status = itemStatuses[item.id];
+  const fState = footerState[item.id];
+
+  /* Header */
+  const header = document.getElementById('detailHeader');
+  header.innerHTML = `
+    <div class="detail-badge-row">
+      <span class="d-cat-tag ${item.cat}">${item.catLabel}</span>
+      ${status === 'inprogress' ? `<span class="li-status-chip inprogress"><span class="spinner-mini"></span> In Progress · ${item.progress}%</span>` : ''}
+      ${status === 'scheduled'  ? `<span class="li-status-chip scheduled">⏰ ${schedTimes[item.id] || item.schedTime || ''}</span>` : ''}
+      ${status === 'needs-action' ? `<span class="li-status-chip needs-action">⚡ Needs Action</span>` : ''}
+    </div>
+    <div class="detail-title">${item.title}</div>
+    <div class="detail-scope">
+      <div class="detail-scope-item">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        ${item.tenants}
+      </div>
+      <div class="detail-scope-item">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Updated ${item.updated}
+      </div>
+    </div>`;
+
+  /* SAMI note */
+  const samiNote = document.getElementById('detailSamiNote');
+  samiNote.style.display = 'flex';
+  samiNote.innerHTML = `<span class="sn-tag">SAMI</span><span>${item.samiNote}</span>`;
+
+  /* Body */
+  const body = document.getElementById('detailBody');
+  const evHtml = item.evidence.map(ev =>
+    `<div class="evidence-item">
+      <div class="ev-icon ${ev.cls}">${ev.icon}</div>
+      <span class="ev-text">${ev.text}</span>
+    </div>`).join('');
+
+  const tlHtml = item.timeline.map(t =>
+    `<div class="tl-entry"><span class="tl-entry-date">${t.date}</span><span>${t.text}</span></div>`
+  ).join('');
+
+  body.innerHTML = `
+    <div class="section-label">Evidence</div>
+    <div>${evHtml}</div>
+    <div class="tl-section">
+      <div class="section-label">Activity Timeline</div>
+      ${tlHtml}
+    </div>`;
+
+  /* Footer */
+  renderFooter(item, status, fState);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   FOOTER RENDERING
+═══════════════════════════════════════════════════════════════════════ */
+function renderFooter(item, status, fState) {
+  const footer = document.getElementById('detailFooter');
+  footer.innerHTML = '';
+
+  if (fState === 'inprogress') {
+    footer.innerHTML = `
+      <div class="df-inprogress">
+        <div class="df-ip-top">
+          <div class="df-ip-label">
+            <span class="spinner-mini" style="border-color:var(--uuif-brand-green);border-top-color:transparent;"></span>
+            Deployment In Progress — ${item.progress}%
+          </div>
+          <span class="df-ip-eta">${item.eta}</span>
+        </div>
+        <div class="df-prog-bar">
+          <div class="df-prog-fill" style="width:${item.progress}%"></div>
+        </div>
+        <div class="df-ip-bottom">
+          <span class="df-ip-status">Patching ${item.tenants} · No issues detected</span>
+          <div class="df-ip-links">
+            <button class="btn-view" onclick="showToast('Opening deployment log...')">View Log</button>
+            <button class="btn-pause" onclick="showToast('Pause requested — SAMI will complete current device before pausing.')">Pause</button>
+          </div>
+        </div>
+      </div>`;
+    return;
+  }
+
+  if (fState === 'scheduled') {
+    const t = schedTimes[item.id] || item.schedTime || 'Scheduled';
+    footer.innerHTML = `
+      <div class="df-scheduled">
+        <div class="df-sched-info">
+          <span class="df-sched-icon">⏰</span>
+          <div>
+            <div class="df-sched-text">Scheduled for ${t}</div>
+            <div class="df-sched-sub">SAMI will auto-deploy · ${item.tenants}</div>
+          </div>
+        </div>
+        <div class="df-sched-links">
+          <button class="btn-edit" onclick="setFooterState(${item.id},'scheduling')">Edit</button>
+          <button class="btn-cancel-s" onclick="cancelSchedule(${item.id})">Cancel</button>
+          <button class="btn-dnow" onclick="deployNow(${item.id})">Deploy Now</button>
+        </div>
+      </div>`;
+    return;
+  }
+
+  if (fState === 'scheduling') {
+    const currentTime = schedTimes[item.id] || 'Tonight 11pm';
+    const times = ['Tonight 11pm', 'Tomorrow 2am', 'Monday 2am', 'Custom'];
+    const timeBtns = times.map(t =>
+      `<button class="sch-time-btn${t === currentTime ? ' active' : ''}" onclick="selectTime(${item.id}, this, '${t}')">${t}</button>`
+    ).join('');
+    const reasoning = SAMI_REASONS[currentTime] || SAMI_REASONS['Custom'];
+    footer.innerHTML = `
+      <div class="df-scheduling">
+        <div class="sch-header">
+          <span class="sch-header-icon">📅</span>
+          Select Deployment Window
+        </div>
+        <div class="sch-time-row">${timeBtns}</div>
+        <div class="sch-reasoning" id="schReasoning">
+          <span class="sr-tag">SAMI</span>
+          <span id="schReasoningText">${reasoning}</span>
+        </div>
+        <div class="sch-footer-row">
+          <button class="btn-cancel" onclick="setFooterState(${item.id}, 'default')">Cancel</button>
+          <button class="btn-confirm" onclick="confirmSchedule(${item.id})">Confirm Schedule</button>
+        </div>
+      </div>`;
+    return;
+  }
+
+  /* Default footer */
+  const primLabel = status === 'needs-action' ? 'Review &amp; Approve' : 'Deploy Now';
+  footer.innerHTML = `
+    <div class="df-default">
+      <span class="df-link" onclick="showToast('Opening affected device list...')">View ${item.tenants}</span>
+      <div class="df-actions">
+        <button class="btn-sched-later" onclick="setFooterState(${item.id}, 'scheduling')">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Schedule for Later
+        </button>
+        <button class="btn-primary" onclick="primaryAction(${item.id})">${primLabel}</button>
+      </div>
+    </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ACTIONS
+═══════════════════════════════════════════════════════════════════════ */
+function setFooterState(id, state) {
+  footerState[id] = state;
+  if (selectedId === id) renderDetail();
+}
+
+function selectTime(id, btn, time) {
+  schedTimes[id] = time;
+  /* Update active button */
+  btn.closest('.sch-time-row').querySelectorAll('.sch-time-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  /* Update reasoning */
+  const r = SAMI_REASONS[time] || SAMI_REASONS['Custom'];
+  const rEl = document.getElementById('schReasoningText');
+  if (rEl) rEl.textContent = r;
+}
+
+function confirmSchedule(id) {
+  const time = schedTimes[id] || 'Tonight 11pm';
+  itemStatuses[id] = 'scheduled';
+  footerState[id]  = 'scheduled';
+  schedTimes[id]   = time;
+
+  /* Update Gantt bar */
+  const item = ITEMS.find(i => i.id === id);
+  if (item.barType === 'diamond') {
+    item.barType = 'scheduled';
+    const hourMap = {
+      'Tonight 11pm':  23,
+      'Tomorrow 2am':  26,
+      'Monday 2am':    50,
+      'Custom':        36
+    };
+    item.barStart = hourMap[time] || 36;
+    item.barEnd   = item.barStart + 0.3;
+    item.barLabel = item.titleShort.split(' ').slice(0,2).join(' ');
+  }
+
+  renderTimeline();
+  renderList();
+  renderDetail();
+  showToast(`Scheduled — ${item.titleShort} · ${time}`);
+}
+
+function cancelSchedule(id) {
+  itemStatuses[id] = 'needs-action';
+  footerState[id]  = 'default';
+  schedTimes[id]   = null;
+  const item = ITEMS.find(i => i.id === id);
+  item.barType = 'diamond';
+  renderTimeline();
+  renderList();
+  renderDetail();
+  showToast('Schedule cancelled — item returned to queue.');
+}
+
+function deployNow(id) {
+  itemStatuses[id] = 'inprogress';
+  footerState[id]  = 'inprogress';
+  const item = ITEMS.find(i => i.id === id);
+  item.barType  = 'inprogress';
+  item.barStart = NOW_HOUR;
+  item.barEnd   = NOW_HOUR + 0.3;
+  item.progress = item.progress || 0;
+  renderTimeline();
+  renderList();
+  renderDetail();
+  showToast(`Deploying now — ${item.titleShort}`);
+}
+
+function primaryAction(id) {
+  const status = itemStatuses[id];
+  if (status === 'needs-action') {
+    showToast('Approval submitted — SAMI will deploy immediately.');
+    itemStatuses[id] = 'inprogress';
+    footerState[id]  = 'inprogress';
+    const item = ITEMS.find(i => i.id === id);
+    item.barType  = 'inprogress';
+    item.barStart = NOW_HOUR;
+    item.barEnd   = NOW_HOUR + 0.3;
+    item.progress = 0;
+    renderTimeline();
+    renderList();
+    renderDetail();
+  } else {
+    deployNow(id);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════════════════════════ */
+let toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════════════════════ */
+renderTimeline();
+renderList();
+renderDetail();
+</script>
+</body>
+</html>

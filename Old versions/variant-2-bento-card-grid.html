@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+  Design reference: UUIF 9.2 — Bento Card Grid layout.
+  Card mosaic with slide-over detail. Variant 2 of 5.
+  Base file: sami-rec-scheduling-v1-uuif.html
+  Gaps: "Policy Gap" category uses purple in original; no purple token in UUIF 9.2 —
+        mapped to --uuif-surface-primary (#5b74a7) per base file convention.
+        Slide-over is a custom SAMI pattern; not defined in UUIF 9.2.
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAMI Recommendation — Bento Card Grid (Variant 2 of 5)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
+<style>
+/* ─── UUIF 9.2 TOKEN DEFINITIONS ────────────────────────────────────────── */
+:root {
+  /* Text */
+  --uuif-text-primary:    #191c25;
+  --uuif-text-secondary:  #4a618f;
+  --uuif-text-tertiary:   #888888;
+  --uuif-text-contrast:   #ffffff;
+  --uuif-text-disabled:   rgba(17,17,17,0.3);
+  --uuif-text-hover:      #ff5d00;
+  --uuif-text-highlight:  #0c2b67;
+
+  /* Surface */
+  --uuif-surface-container: #ffffff;
+  --uuif-surface-bg:         #f4f6f9;
+  --uuif-surface-primary:    #5b74a7;
+  --uuif-surface-secondary:  #d2dff2;
+  --uuif-surface-tertiary:   #f6f8fe;
+  --uuif-surface-highlight:  #ff5d00;
+  --uuif-surface-hover:      rgba(17,17,17,0.06);
+  --uuif-surface-selected:   rgba(255,72,26,0.09);
+  --uuif-surface-disabled:   #e8eff9;
+  --uuif-surface-contrast:   #111315;
+  --uuif-surface-model:      #f0f2f5;
+
+  /* Border */
+  --uuif-border-primary:     #ff5d00;
+  --uuif-border-secondary:   #78a3e5;
+  --uuif-border-tertiary:    #cccccc;
+  --uuif-border-transparent: rgba(17,17,17,0.09);
+  --uuif-border-disabled:    #d2dff2;
+  --uuif-border-hover:       #ff5d00;
+
+  /* Icon */
+  --uuif-icon-primary:   #5885cc;
+  --uuif-icon-secondary: #9dafd3;
+  --uuif-icon-tertiary:  #62686d;
+  --uuif-icon-hover:     #ff5d00;
+
+  /* Branding */
+  --uuif-brand-navy:   #001b50;
+  --uuif-brand-blue:   #1f3c73;
+  --uuif-brand-orange: #ff5d00;
+  --uuif-brand-green:  #59a02e;
+  --uuif-brand-red:    #c70f0f;
+  --uuif-brand-yellow: #f3ac3d;
+
+  /* Fill */
+  --uuif-fill-blue-lightest:       #f6f8fe;
+  --uuif-fill-green-xxx-lighter:   #e3efdc;
+  --uuif-fill-yellow-xxx-lighter:  #ffe9be;
+  --uuif-fill-red-lightest:        #fff0f0;
+  --uuif-fill-green-x-darker:      #478234;
+  --uuif-fill-orange-x-darker:     #c24903;
+  --uuif-fill-red-x-darker:        #ab0a0c;
+
+  /* Spacing */
+  --uuif-sp-1:  2px;
+  --uuif-sp-2:  4px;
+  --uuif-sp-3:  8px;
+  --uuif-sp-4:  12px;
+  --uuif-sp-5:  16px;
+  --uuif-sp-6:  20px;
+  --uuif-sp-7:  24px;
+  --uuif-sp-8:  32px;
+
+  /* Radius */
+  --uuif-radius-4:    4px;
+  --uuif-radius-6:    6px;
+  --uuif-radius-8:    8px;
+  --uuif-radius-12:   12px;
+  --uuif-radius-pill: 88px;
+
+  /* Shadow */
+  --uuif-shadow-sm: 0px 1px 6px 2px rgba(0,0,0,0.08);
+  --uuif-shadow-md: 0px 4px 12px 0px rgba(0,0,0,0.16);
+
+  /* Category colors (left-border accent) */
+  --cat-cve:   #ff5d00;
+  --cat-device:#c70f0f;
+  --cat-behav: #5885cc;
+  --cat-policy:#5b74a7;
+  --cat-sub:   #59a02e;
+}
+
+/* ─── RESET + BASE ──────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Nunito Sans', sans-serif;
+  background: var(--uuif-surface-bg);
+  color: var(--uuif-text-primary);
+  font-size: 13px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── PRIMARY NAV RAIL — 60px fixed sidebar ─────────────────────────────── */
+.sidebar {
+  position: fixed; left: 0; top: 0; width: 60px; height: 100vh;
+  background: var(--uuif-brand-navy);
+  display: flex; flex-direction: column; align-items: center;
+  z-index: 300;
+}
+.sidebar-logo {
+  width: 60px; height: 52px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.sidebar-logo svg { width: 28px; height: 28px; }
+.sidebar-icon {
+  width: 60px; height: 52px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--uuif-icon-secondary);
+  cursor: pointer; position: relative; transition: color .15s;
+  border-left: 2px solid transparent;
+}
+.sidebar-icon:hover { color: var(--uuif-icon-hover); }
+.sidebar-icon.active {
+  background: rgba(17,17,17,0.4);
+  border-left-color: var(--uuif-brand-orange);
+  color: var(--uuif-brand-orange);
+}
+.sidebar-icon .badge {
+  position: absolute; top: 8px; right: 8px;
+  background: var(--uuif-brand-orange); color: var(--uuif-text-contrast);
+  font-size: 9px; font-weight: 700;
+  border-radius: var(--uuif-radius-pill);
+  min-width: 16px; height: 16px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 var(--uuif-sp-2);
+}
+.sidebar-spacer { flex: 1; }
+
+/* ─── TOP ACTION BAR — 46px ─────────────────────────────────────────────── */
+.topbar {
+  position: fixed; left: 60px; right: 0; top: 0; height: 46px;
+  background: var(--uuif-surface-container);
+  border-bottom: 1px solid var(--uuif-border-transparent);
+  display: flex; align-items: center;
+  padding: 0 var(--uuif-sp-5); z-index: 299; gap: var(--uuif-sp-3);
+}
+.breadcrumb {
+  display: flex; align-items: center; gap: var(--uuif-sp-2);
+  font-size: 12px; color: var(--uuif-text-secondary); flex: 1;
+}
+.breadcrumb a { color: var(--uuif-icon-primary); text-decoration: none; }
+.breadcrumb a:hover { color: var(--uuif-text-hover); text-decoration: underline; }
+.breadcrumb span { color: var(--uuif-text-tertiary); }
+.tenant-selector {
+  display: flex; align-items: center; gap: var(--uuif-sp-2);
+  border: 1px solid var(--uuif-border-tertiary);
+  border-radius: var(--uuif-radius-pill);
+  padding: var(--uuif-sp-2) var(--uuif-sp-4);
+  font-size: 12px; cursor: pointer; font-family: 'Nunito Sans', sans-serif;
+  background: var(--uuif-surface-container); color: var(--uuif-text-primary);
+  transition: border-color .15s;
+}
+.tenant-selector:hover { border-color: var(--uuif-border-secondary); }
+.tenant-selector .dot { width: 8px; height: 8px; background: var(--uuif-brand-orange); border-radius: 50%; }
+.topbar-icons { display: flex; align-items: center; gap: var(--uuif-sp-3); }
+.icon-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--uuif-text-tertiary);
+  transition: background .15s; position: relative;
+}
+.icon-btn:hover { background: var(--uuif-surface-hover); }
+.notif-badge {
+  position: absolute; top: 4px; right: 4px; width: 8px; height: 8px;
+  background: var(--uuif-brand-orange); border-radius: 50%;
+}
+.avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--uuif-brand-blue); color: var(--uuif-text-contrast);
+  font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+
+/* ─── PAGE WRAPPER ──────────────────────────────────────────────────────── */
+.page { margin-left: 60px; padding-top: 46px; min-height: 100vh; }
+.page-content { padding: var(--uuif-sp-5) var(--uuif-sp-6) var(--uuif-sp-8); }
+
+/* ─── PAGE HEADER ───────────────────────────────────────────────────────── */
+.page-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: var(--uuif-sp-4);
+}
+.page-header-left { display: flex; align-items: flex-start; gap: var(--uuif-sp-3); }
+.back-btn {
+  width: 28px; height: 28px; border: none; background: transparent;
+  cursor: pointer; color: var(--uuif-brand-orange);
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 3px; border-radius: var(--uuif-radius-4); text-decoration: none;
+  transition: background .15s;
+}
+.back-btn:hover { background: var(--uuif-surface-selected); }
+.page-title { font-size: 20px; font-weight: 700; color: var(--uuif-text-primary); line-height: 1.2; }
+.page-sub   { font-size: 12px; color: var(--uuif-text-tertiary); margin-top: var(--uuif-sp-1); }
+/* uuif-btn Secondary */
+.export-btn {
+  background: var(--uuif-surface-container);
+  border: 1px solid var(--uuif-border-secondary);
+  border-radius: var(--uuif-radius-pill);
+  padding: var(--uuif-sp-2) var(--uuif-sp-5);
+  font-size: 13px; cursor: pointer; font-family: 'Nunito Sans', sans-serif;
+  color: var(--uuif-text-secondary); display: flex; align-items: center;
+  gap: var(--uuif-sp-2); font-weight: 500; transition: all .15s;
+  white-space: nowrap; align-self: flex-start; margin-top: 2px;
+}
+.export-btn:hover { border-color: var(--uuif-border-hover); color: var(--uuif-text-hover); }
+
+/* ─── SUMMARY STRIP ─────────────────────────────────────────────────────── */
+.summary-strip {
+  display: flex; align-items: center; gap: var(--uuif-sp-4);
+  margin-bottom: var(--uuif-sp-5);
+}
+/* uuif-chip variants inline */
+.summary-chip {
+  display: inline-flex; align-items: center; gap: var(--uuif-sp-2);
+  font-size: 12px; font-weight: 600;
+  border-radius: var(--uuif-radius-pill);
+  padding: 4px var(--uuif-sp-4); border: 1px solid;
+  height: 26px;
+}
+/* Success chip — deploying */
+.chip-deploying {
+  background: var(--uuif-fill-green-xxx-lighter);
+  color: var(--uuif-brand-green);
+  border-color: var(--uuif-brand-green);
+}
+/* Info chip — scheduled */
+.chip-scheduled {
+  background: var(--uuif-fill-blue-lightest);
+  color: var(--uuif-surface-primary);
+  border-color: var(--uuif-border-secondary);
+}
+/* Warning chip — needs action */
+.chip-action {
+  background: var(--uuif-fill-yellow-xxx-lighter);
+  color: #c27900;
+  border-color: var(--uuif-brand-yellow);
+}
+.chip-dot {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+}
+.chip-dot.green  { background: var(--uuif-brand-green); }
+.chip-dot.blue   { background: var(--uuif-surface-primary); }
+.chip-dot.yellow { background: var(--uuif-brand-yellow); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.45} }
+.chip-dot.green { animation: pulse 1.6s infinite; }
+
+/* ─── CARD GRID — 2-column bento ────────────────────────────────────────── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--uuif-sp-5);
+}
+
+/* ─── RECOMMENDATION CARD ───────────────────────────────────────────────── */
+.rec-card {
+  background: var(--uuif-surface-container);
+  border-radius: var(--uuif-radius-8);
+  box-shadow: var(--uuif-shadow-sm);
+  border: 1px solid var(--uuif-border-transparent);
+  border-left: 3px solid var(--uuif-border-tertiary); /* overridden per category */
+  display: flex; flex-direction: column;
+  min-height: 280px;
+  cursor: pointer; transition: box-shadow .18s, transform .12s;
+  overflow: hidden;
+  position: relative;
+}
+.rec-card:hover {
+  box-shadow: var(--uuif-shadow-md);
+  transform: translateY(-1px);
+}
+.rec-card:focus-visible { outline: 2px solid var(--uuif-border-secondary); outline-offset: 2px; }
+
+/* Category left-border overrides */
+.rec-card[data-cat="cve"]    { border-left-color: var(--cat-cve); }
+.rec-card[data-cat="device"] { border-left-color: var(--cat-device); }
+.rec-card[data-cat="behav"]  { border-left-color: var(--cat-behav); }
+.rec-card[data-cat="policy"] { border-left-color: var(--cat-policy); }
+.rec-card[data-cat="sub"]    { border-left-color: var(--cat-sub); }
+
+/* ── Card header row ── */
+.card-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding: var(--uuif-sp-4) var(--uuif-sp-4) 0 var(--uuif-sp-4);
+}
+/* Category badge chip — uuif-chip label pattern */
+.cat-chip {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.03em;
+  border-radius: var(--uuif-radius-4);
+  padding: 3px var(--uuif-sp-3); border: 1px solid;
+  display: inline-block;
+}
+/* Criticality indicator */
+.crit-badge {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--uuif-brand-red); color: var(--uuif-text-contrast);
+  font-size: 11px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-left: var(--uuif-sp-2);
+}
+
+/* ── Card body ── */
+.card-body { padding: var(--uuif-sp-3) var(--uuif-sp-4) 0; flex: 1; display: flex; flex-direction: column; }
+.card-title {
+  font-size: 13px; font-weight: 700; color: var(--uuif-text-primary);
+  line-height: 1.45; margin-bottom: var(--uuif-sp-2);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.card-metric {
+  font-size: 12px; color: var(--uuif-text-secondary);
+  margin-bottom: var(--uuif-sp-3);
+  display: flex; align-items: center; gap: var(--uuif-sp-2);
+}
+.card-metric span { color: var(--uuif-text-tertiary); }
+
+/* ── Status section ── */
+.card-status { margin-bottom: var(--uuif-sp-3); }
+
+/* Progress bar — in-progress */
+.status-progress-wrap {
+  display: flex; flex-direction: column; gap: var(--uuif-sp-1);
+}
+.status-progress-label {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 11px; color: var(--uuif-brand-green); font-weight: 600;
+}
+.status-prog-bar {
+  height: 6px; background: var(--uuif-border-disabled);
+  border-radius: var(--uuif-radius-pill); overflow: hidden;
+}
+.status-prog-fill {
+  height: 100%; background: var(--uuif-brand-green);
+  border-radius: var(--uuif-radius-pill);
+}
+
+/* Scheduled date pill — uuif-chip Info */
+.status-sched-pill {
+  display: inline-flex; align-items: center; gap: var(--uuif-sp-2);
+  background: var(--uuif-fill-blue-lightest);
+  color: var(--uuif-surface-primary);
+  border: 1px solid var(--uuif-border-secondary);
+  border-radius: var(--uuif-radius-pill);
+  padding: 3px var(--uuif-sp-4);
+  font-size: 11px; font-weight: 600;
+}
+
+/* Needs action warning chip — uuif-chip Warning */
+.status-action-chip {
+  display: inline-flex; align-items: center; gap: var(--uuif-sp-2);
+  background: var(--uuif-fill-yellow-xxx-lighter);
+  color: #c27900;
+  border: 1px solid var(--uuif-brand-yellow);
+  border-radius: var(--uuif-radius-4);
+  padding: 3px var(--uuif-sp-3);
+  font-size: 11px; font-weight: 600;
+}
+
+/* ── Card action bar ── */
+.card-actions {
+  border-top: 1px solid var(--uuif-border-transparent);
+  padding: var(--uuif-sp-3) var(--uuif-sp-4);
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--uuif-sp-2);
+  margin-top: auto;
+}
+/* uuif-btn Secondary small */
+.card-btn-sec {
+  background: var(--uuif-surface-container);
+  border: 1px solid var(--uuif-border-secondary);
+  border-radius: var(--uuif-radius-pill);
+  padding: var(--uuif-sp-2) var(--uuif-sp-4);
+  font-size: 12px; cursor: pointer; color: var(--uuif-text-secondary);
+  font-weight: 500; font-family: 'Nunito Sans', sans-serif;
+  transition: all .15s; white-space: nowrap;
+}
+.card-btn-sec:hover { border-color: var(--uuif-border-hover); color: var(--uuif-text-hover); }
+/* uuif-btn Primary small */
+.card-btn-pri {
+  background: var(--uuif-surface-primary); color: var(--uuif-text-contrast);
+  border: none; border-radius: var(--uuif-radius-pill);
+  padding: var(--uuif-sp-2) var(--uuif-sp-4);
+  font-size: 12px; cursor: pointer; font-weight: 600;
+  font-family: 'Nunito Sans', sans-serif; transition: background .15s;
+  white-space: nowrap;
+}
+.card-btn-pri:hover { background: var(--uuif-brand-navy); }
+
+/* ─── SLIDE-OVER OVERLAY ────────────────────────────────────────────────── */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.32);
+  z-index: 400;
+  opacity: 0; pointer-events: none;
+  transition: opacity .25s;
+}
+.overlay.open { opacity: 1; pointer-events: auto; }
+
+/* ─── SLIDE-OVER PANEL — 400px from right ───────────────────────────────── */
+.slideover {
+  position: fixed; top: 0; right: 0; bottom: 0;
+  width: 400px;
+  background: var(--uuif-surface-container);
+  z-index: 401;
+  display: flex; flex-direction: column;
+  box-shadow: -4px 0 24px rgba(0,0,0,0.18);
+  transform: translateX(100%);
+  transition: transform .28s cubic-bezier(.4,0,.2,1);
+  overflow: hidden;
+}
+.slideover.open { transform: translateX(0); }
+
+/* Slide-over close bar */
+.so-topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 var(--uuif-sp-5); height: 46px; flex-shrink: 0;
+  border-bottom: 1px solid var(--uuif-border-transparent);
+  background: var(--uuif-surface-container);
+}
+.so-close {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--uuif-text-tertiary);
+  background: none; border: none; transition: background .15s;
+}
+.so-close:hover { background: var(--uuif-surface-hover); }
+.so-breadcrumb { font-size: 12px; color: var(--uuif-text-secondary); }
+
+/* Slide-over scroll body */
+.so-scroll { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+
+/* Slide-over header */
+.so-header {
+  padding: var(--uuif-sp-5) var(--uuif-sp-6) var(--uuif-sp-4);
+  border-bottom: 1px solid var(--uuif-border-transparent);
+}
+.so-badge { margin-bottom: var(--uuif-sp-3); }
+.cve-tag {
+  font-size: 11px; font-weight: 700;
+  border-radius: var(--uuif-radius-4); padding: 3px var(--uuif-sp-3);
+  border: 1px solid; display: inline-block; letter-spacing: 0.01em;
+}
+.so-title {
+  font-size: 15px; font-weight: 700; color: var(--uuif-text-primary);
+  line-height: 1.4; margin-bottom: var(--uuif-sp-3);
+}
+.so-scope {
+  display: flex; gap: var(--uuif-sp-4); font-size: 12px;
+  color: var(--uuif-text-secondary); align-items: center; flex-wrap: wrap;
+}
+
+/* SAMI info banner — Info Status Banner pattern */
+.so-sami-note {
+  margin: var(--uuif-sp-4) var(--uuif-sp-5) 0;
+  background: var(--uuif-fill-blue-lightest);
+  border: 1px solid var(--uuif-border-secondary);
+  border-radius: var(--uuif-radius-6);
+  padding: var(--uuif-sp-3) var(--uuif-sp-4);
+  font-size: 12px; color: var(--uuif-text-primary); line-height: 1.6;
+  display: flex; align-items: flex-start; gap: var(--uuif-sp-3);
+}
+.ds-tag {
+  background: var(--uuif-brand-orange); color: var(--uuif-text-contrast);
+  font-size: 10px; font-weight: 700; border-radius: var(--uuif-radius-4);
+  padding: 2px var(--uuif-sp-2); flex-shrink: 0; margin-top: 2px;
+  letter-spacing: 0.03em;
+}
+
+/* Slide-over body */
+.so-body { padding: var(--uuif-sp-5) var(--uuif-sp-5); flex: 1; }
+.section-title {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.07em; color: var(--uuif-text-tertiary);
+  margin-bottom: var(--uuif-sp-3);
+}
+.evidence-item {
+  display: flex; align-items: center; gap: var(--uuif-sp-3);
+  padding: var(--uuif-sp-2) 0; font-size: 12px; color: var(--uuif-text-primary);
+  border-bottom: 1px solid var(--uuif-border-transparent);
+}
+.evidence-item:last-child { border-bottom: none; }
+.ev-icon {
+  width: 22px; height: 22px; border-radius: var(--uuif-radius-4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; flex-shrink: 0;
+}
+.ev-icon.shield  { background: var(--uuif-fill-blue-lightest); }
+.ev-icon.chart   { background: var(--uuif-surface-model); }
+.ev-icon.warning { background: var(--uuif-fill-yellow-xxx-lighter); }
+.ev-icon.check   { background: var(--uuif-fill-green-xxx-lighter); }
+.timeline-section { margin-top: var(--uuif-sp-5); }
+.timeline-item {
+  display: flex; gap: var(--uuif-sp-4); padding: var(--uuif-sp-2) 0;
+  font-size: 12px; border-bottom: 1px solid var(--uuif-border-transparent);
+  color: var(--uuif-text-primary);
+}
+.timeline-item:last-child { border-bottom: none; }
+.timeline-date {
+  color: var(--uuif-icon-primary); font-weight: 600;
+  min-width: 110px; flex-shrink: 0;
+}
+
+/* ─── SLIDE-OVER FOOTER + INLINE SCHEDULER ──────────────────────────────── */
+.so-footer-wrap {
+  border-top: 1px solid var(--uuif-border-transparent);
+  background: var(--uuif-surface-container);
+  flex-shrink: 0;
+}
+
+/* Default footer */
+.df-default {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--uuif-sp-3) var(--uuif-sp-5);
+  gap: var(--uuif-sp-3);
+}
+.df-view-link {
+  font-size: 12px; color: var(--uuif-icon-primary);
+  cursor: pointer; text-decoration: underline;
+  white-space: nowrap;
+}
+.footer-actions { display: flex; gap: var(--uuif-sp-3); flex-shrink: 0; }
+/* uuif-btn Secondary */
+.btn-sched {
+  background: var(--uuif-surface-container);
+  border: 1px solid var(--uuif-border-secondary);
+  border-radius: var(--uuif-radius-pill);
+  padding: var(--uuif-sp-2) var(--uuif-sp-4);
+  font-size: 12px; cursor: pointer; color: var(--uuif-text-secondary);
+  font-weight: 500; display: flex; align-items: center; gap: var(--uuif-sp-2);
+  font-family: 'Nunito Sans', sans-serif; transition: all .15s;
+  white-space: nowrap;
+}
+.btn-sched:hover { border-color: var(--uuif-border-hover); color: var(--uuif-text-hover); }
+/* uuif-btn Primary */
+.btn-primary {
+  background: var(--uuif-surface-primary); color: var(--uuif-text-contrast);
+  border: none; border-radius: var(--uuif-radius-pill);
+  padding: var(--uuif-sp-2) var(--uuif-sp-5);
+  font-size: 12px; cursor: pointer; font-weight: 600;
+  font-family: 'Nunito Sans', sans-serif; transition: background .15s;
+  white-space: nowrap;
+}
+.btn-primary:hover { background: var(--uuif-brand-navy); }
+
+/* Scheduled state footer */
+.df-scheduled {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--uuif-sp-3) var(--uuif-sp-5);
+  background: var(--uuif-fill-blue-lightest);
+  gap: var(--uuif-sp-3);
+}
+.df-sched-info { display: flex; align-items: center; gap: var(--uuif-sp-3); font-size: 12px; }
+.sched-icon { color: var(--uuif-surface-primary); font-size: 15px; }
+.sched-text { color: var(--uuif-text-primary); font-weight: 600; }
+.sched-sub  { font-size: 11px; color: var(--uuif-text-tertiary); margin-top: 1px; }
+.df-sched-links { display: flex; gap: var(--uuif-sp-1); align-items: center; flex-shrink: 0; }
+.df-sched-links button {
+  background: none; border: none; cursor: pointer;
+  font-size: 12px; padding: var(--uuif-sp-2) var(--uuif-sp-3);
+  border-radius: var(--uuif-radius-4); font-weight: 600;
+  font-family: 'Nunito Sans', sans-serif; transition: background .15s;
+  white-space: nowrap;
+}
+.btn-edit   { color: var(--uuif-icon-primary); }
+.btn-edit:hover   { background: var(--uuif-surface-secondary) !important; }
+.btn-cancel { color: var(--uuif-brand-red); }
+.btn-cancel:hover { background: var(--uuif-fill-red-lightest) !important; }
+.btn-dnow {
+  color: var(--uuif-brand-orange); font-weight: 700;
+  border: 1px solid var(--uuif-border-primary) !important;
+  border-radius: var(--uuif-radius-pill) !important;
+}
+.btn-dnow:hover { background: var(--uuif-surface-selected) !important; }
+
+/* In-progress state footer */
+.df-inprogress {
+  padding: var(--uuif-sp-3) var(--uuif-sp-5);
+  background: var(--uuif-fill-green-xxx-lighter);
+}
+.df-ip-top {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: var(--uuif-sp-2);
+}
+.df-ip-label {
+  font-size: 12px; font-weight: 700; color: var(--uuif-brand-green);
+  display: flex; align-items: center; gap: var(--uuif-sp-2);
+}
+.df-ip-eta { font-size: 11px; color: var(--uuif-text-tertiary); }
+.df-prog-bar {
+  height: 6px; background: var(--uuif-border-disabled);
+  border-radius: var(--uuif-radius-pill); overflow: hidden;
+}
+.df-prog-fill {
+  height: 100%; background: var(--uuif-brand-green);
+  border-radius: var(--uuif-radius-pill); transition: width 1s;
+}
+.df-ip-bottom {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: var(--uuif-sp-2);
+}
+.df-ip-status { font-size: 11px; color: var(--uuif-text-secondary); }
+.df-ip-links { display: flex; gap: var(--uuif-sp-2); }
+.df-ip-links button {
+  background: none; border: none; cursor: pointer;
+  font-size: 12px; padding: var(--uuif-sp-2) var(--uuif-sp-3);
+  border-radius: var(--uuif-radius-4); font-weight: 600;
+  font-family: 'Nunito Sans', sans-serif; transition: background .15s;
+}
+.btn-view  { color: var(--uuif-icon-primary); text-decoration: underline; cursor: pointer; }
+.btn-pause { color: var(--uuif-text-tertiary); border: 1px solid var(--uuif-border-tertiary) !important; }
+.btn-pause:hover { background: var(--uuif-surface-model) !important; }
+
+/* Scheduling state footer */
+.df-scheduling {
+  padding: var(--uuif-sp-4) var(--uuif-sp-5) var(--uuif-sp-5);
+  border-top: 2px solid var(--uuif-border-secondary);
+  background: var(--uuif-fill-blue-lightest);
+}
+.sched-expand-header {
+  font-size: 13px; font-weight: 700; color: var(--uuif-text-primary);
+  margin-bottom: var(--uuif-sp-3); display: flex; align-items: center; gap: var(--uuif-sp-2);
+}
+.seh-icon { color: var(--uuif-surface-primary); font-size: 15px; }
+.sched-time-row { display: flex; gap: var(--uuif-sp-2); margin-bottom: var(--uuif-sp-3); flex-wrap: wrap; }
+/* uuif-btn Secondary small */
+.sched-time-btn {
+  background: var(--uuif-surface-container);
+  border: 1.5px solid var(--uuif-border-tertiary);
+  border-radius: var(--uuif-radius-pill);
+  padding: var(--uuif-sp-2) var(--uuif-sp-4);
+  font-size: 12px; cursor: pointer; color: var(--uuif-text-secondary); font-weight: 500;
+  transition: all .15s; font-family: 'Nunito Sans', sans-serif;
+}
+.sched-time-btn:hover   { border-color: var(--uuif-border-hover); color: var(--uuif-text-hover); }
+.sched-time-btn.selected {
+  border-color: var(--uuif-border-secondary);
+  background: var(--uuif-surface-secondary);
+  color: var(--uuif-surface-primary); font-weight: 700;
+}
+/* SAMI reasoning — Warning banner pattern */
+.sched-sami-block {
+  background: var(--uuif-fill-yellow-xxx-lighter);
+  border: 1px solid var(--uuif-brand-yellow);
+  border-radius: var(--uuif-radius-6);
+  padding: var(--uuif-sp-3) var(--uuif-sp-4);
+  margin-bottom: var(--uuif-sp-3); font-size: 12px;
+  color: var(--uuif-text-primary); line-height: 1.6;
+  display: flex; gap: var(--uuif-sp-2); align-items: flex-start;
+}
+.ssb-tag {
+  background: var(--uuif-brand-orange); color: var(--uuif-text-contrast);
+  font-size: 9px; font-weight: 700; border-radius: var(--uuif-radius-4);
+  padding: 2px var(--uuif-sp-2); flex-shrink: 0; margin-top: 2px;
+}
+.sched-placeholder { color: var(--uuif-text-tertiary); font-style: italic; }
+.sched-actions-row { display: flex; align-items: center; justify-content: flex-end; gap: var(--uuif-sp-3); }
+.btn-sched-cancel {
+  background: none; border: none; cursor: pointer;
+  font-size: 13px; color: var(--uuif-text-tertiary);
+  padding: var(--uuif-sp-2) var(--uuif-sp-3); border-radius: var(--uuif-radius-4);
+  font-family: 'Nunito Sans', sans-serif; transition: background .15s;
+}
+.btn-sched-cancel:hover { background: var(--uuif-surface-model); }
+/* uuif-btn Primary */
+.btn-sched-confirm {
+  background: var(--uuif-surface-primary); color: var(--uuif-text-contrast);
+  border: none; border-radius: var(--uuif-radius-pill);
+  padding: var(--uuif-sp-2) var(--uuif-sp-6);
+  font-size: 13px; cursor: pointer; font-weight: 700;
+  font-family: 'Nunito Sans', sans-serif; transition: background .15s;
+}
+.btn-sched-confirm:hover    { background: var(--uuif-brand-navy); }
+.btn-sched-confirm:disabled {
+  background: var(--uuif-surface-disabled);
+  color: var(--uuif-text-disabled);
+  cursor: not-allowed;
+}
+
+/* ─── SPINNER ───────────────────────────────────────────────────────────── */
+.inprog-spinner {
+  width: 9px; height: 9px;
+  border: 1.5px solid currentColor; border-top-color: transparent;
+  border-radius: 50%; animation: spin .8s linear infinite; display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── TOAST ─────────────────────────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--uuif-surface-contrast); color: var(--uuif-text-contrast);
+  padding: var(--uuif-sp-3) var(--uuif-sp-5);
+  border-radius: var(--uuif-radius-8); font-size: 13px; font-weight: 600;
+  display: flex; align-items: center; gap: var(--uuif-sp-3); z-index: 999;
+  transform: translateY(10px); opacity: 0; transition: all .3s;
+  pointer-events: none; box-shadow: var(--uuif-shadow-md);
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast-icon { color: var(--uuif-brand-green); font-size: 16px; }
+</style>
+</head>
+<body>
+
+<!-- ─── PRIMARY NAV RAIL ─────────────────────────────────────────────────── -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <!-- SonicWall swoosh logomark — #FF5D00 per UUIF 9.2 brand token -->
+    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M16 3C10.477 3 6 7.477 6 13c0 3.6 1.84 6.77 4.64 8.66L10.5 26h11l-.14-4.34C24.16 19.77 26 16.6 26 13c0-5.523-4.477-10-10-10z" fill="#FF5D00"/>
+      <ellipse cx="16" cy="13" rx="5" ry="5" fill="#001b50"/>
+    </svg>
+  </div>
+  <div class="sidebar-icon active" title="Dashboard">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+  </div>
+  <div class="sidebar-icon" title="Alerts">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    <span class="badge">8</span>
+  </div>
+  <div class="sidebar-icon" title="Settings">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  </div>
+  <div class="sidebar-icon" title="Tenants">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+  </div>
+  <div class="sidebar-icon" title="Analytics">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+  </div>
+  <div class="sidebar-spacer"></div>
+  <div class="sidebar-icon" title="Messages">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <span class="badge">3</span>
+  </div>
+</nav>
+
+<!-- ─── TOP ACTION BAR ────────────────────────────────────────────────────── -->
+<header class="topbar">
+  <div class="breadcrumb">
+    <a href="#">Home</a><span>›</span>
+    <a href="#">Dashboard</a><span>›</span>
+    <span style="color: var(--uuif-text-primary); font-weight: 600;">SAMI Recommendation</span>
+  </div>
+  <div class="tenant-selector">
+    <div class="dot"></div>All Tenants (Global)
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+  </div>
+  <div class="topbar-icons">
+    <div class="icon-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <div class="notif-badge"></div>
+    </div>
+    <div class="avatar">HN</div>
+  </div>
+</header>
+
+<!-- ─── MAIN PAGE ─────────────────────────────────────────────────────────── -->
+<main class="page">
+  <div class="page-content">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="page-header-left">
+        <a class="back-btn" href="#" title="Back to Dashboard">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        </a>
+        <div>
+          <div class="page-title">SAMI Recommendation</div>
+          <div class="page-sub">5 items need your attention &nbsp;·&nbsp; Bento Card Grid &mdash; Variant 2 of 5</div>
+        </div>
+      </div>
+      <button class="export-btn" onclick="showToast('Generating export digest…')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export digest
+      </button>
+    </div>
+
+    <!-- Summary Strip -->
+    <div class="summary-strip">
+      <div class="summary-chip chip-deploying">
+        <span class="chip-dot green"></span>
+        1 deploying
+      </div>
+      <div class="summary-chip chip-scheduled">
+        <span class="chip-dot blue"></span>
+        2 scheduled
+      </div>
+      <div class="summary-chip chip-action">
+        <span class="chip-dot yellow"></span>
+        2 need action
+      </div>
+    </div>
+
+    <!-- 2-Column Bento Card Grid -->
+    <div class="card-grid" id="cardGrid">
+      <!-- Cards rendered by JavaScript -->
+    </div>
+
+  </div>
+</main>
+
+<!-- ─── DARK OVERLAY ─────────────────────────────────────────────────────── -->
+<div class="overlay" id="overlay" onclick="closeSlideOver()"></div>
+
+<!-- ─── SLIDE-OVER PANEL ──────────────────────────────────────────────────── -->
+<div class="slideover" id="slideover" role="dialog" aria-modal="true" aria-label="Recommendation Detail">
+  <div class="so-topbar">
+    <span class="so-breadcrumb">Recommendation Detail</span>
+    <button class="so-close" onclick="closeSlideOver()" title="Close">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="so-scroll" id="soScroll">
+    <!-- Rendered by JS -->
+  </div>
+  <div class="so-footer-wrap" id="soFooterWrap">
+    <!-- Rendered by JS -->
+  </div>
+</div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast">
+  <span class="toast-icon">✓</span>
+  <span id="toastMsg">Action confirmed</span>
+</div>
+
+<script>
+/* ─── SVG ICON SNIPPETS ─────────────────────────────────────────────────── */
+const ICON_TENANT = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>`;
+const ICON_FW     = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
+const ICON_USER   = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>`;
+const ICON_CAL    = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
+
+/* ─── ITEM STATES ───────────────────────────────────────────────────────── */
+/*
+  state: 'inprogress' | 'scheduled' | 'active'
+*/
+const ITEM_STATES = {
+  0: { state: 'inprogress', progress: 72, deployed: 7, total: 12, eta: '~28 min remaining', since: '1h 24m' },
+  1: { state: 'scheduled',  when: 'Tonight, 11:00 PM', whenShort: 'Tonight 11pm', notes: 'Off-hours BGP failover diagnosis' },
+  2: { state: 'active' },
+  3: { state: 'scheduled',  when: 'Monday, 2:00 AM', whenShort: 'Mon 2am', notes: 'Maintenance window policy push' },
+  4: { state: 'active' }
+};
+
+/* ─── SAMI SCHEDULING REASONING ────────────────────────────────────────── */
+const SAMI_SCHED_REASONING = {
+  'Tonight, 11:00 PM': 'Tonight at 11:00 PM falls within Acme Corp\'s maintenance window (10 PM–2 AM). SAMI will sequence tenant deployments — estimated total window: 38 minutes.',
+  'Tomorrow, 2:00 AM': 'Tomorrow 2:00 AM works for Westfield IT and Beta Networks. Note: Crown Logistics has no approved Friday maintenance window — their 2 devices will require separate confirmation.',
+  'Monday, 2:00 AM': 'Monday 2:00 AM is optimal — all 4 tenant maintenance windows align. No concurrent SAMI operations queued. However the active PoC will have been in circulation 9 days.',
+  'Custom': 'SAMI will validate against all 4 tenant maintenance windows and flag conflicts before confirming.'
+};
+
+/*
+  Category color tokens (hex values mirror CSS custom properties —
+  JS cannot read CSS vars from inline element styles).
+  CVE Vulnerability  → --cat-cve   = #ff5d00
+  Device Alert       → --cat-device = #c70f0f
+  Behavioral Anomaly → --cat-behav  = #5885cc
+  Policy Gap         → --cat-policy = #5b74a7  (GAP: no purple in UUIF 9.2; mapped to surface-primary)
+  Subscription Risk  → --cat-sub    = #59a02e
+*/
+const CAT_STYLES = {
+  cve:    { color: '#ff5d00', bg: 'rgba(255,72,26,0.09)', border: '#ff5d00' },
+  device: { color: '#c70f0f', bg: '#fff0f0',              border: '#c70f0f' },
+  behav:  { color: '#5885cc', bg: '#f6f8fe',              border: '#78a3e5' },
+  policy: { color: '#5b74a7', bg: '#f6f8fe',              border: '#78a3e5' },
+  sub:    { color: '#59a02e', bg: '#e3efdc',              border: '#59a02e' }
+};
+
+/* ─── RECOMMENDATION DATA ───────────────────────────────────────────────── */
+const ITEMS = [
+  {
+    cat: 'cve',
+    catLabel: 'CVE Vulnerability',
+    tag: 'CVE Vulnerability · Critical',
+    tagColor: '#ff5d00', tagBg: 'rgba(255,72,26,0.09)', tagBorder: '#ff5d00',
+    title: 'SSL VPN Auth Bypass CVE-2026-1142',
+    metric: '12 Firewalls · 4 Tenants',
+    metricIcon: ICON_FW,
+    viewLink: 'View deployment progress',
+    primaryLabel: 'View live deployment →',
+    schedLabel: 'Adjust schedule',
+    soTitle: 'SSL VPN Auth Bypass (CVE-2026-1142) — 12 Firewalls Across 4 Tenants',
+    scope: [
+      { icon: ICON_TENANT, text: 'Acme Corp, Beta Networks +2' },
+      { icon: ICON_FW,     text: '12 Firewalls' }
+    ],
+    samiNote: 'CVE-2026-1142 enables unauthenticated RCE on SSL VPN gateways running SonicOS below 7.1.2-1023. Patch deployment started 1h 24m ago — 7 of 12 devices are patched. FW-BETA-01 and FW-ACME-02 are currently in progress. 3 Crown Logistics devices are queued pending their change window.',
+    evidence: [
+      { icon: '🛡', cls: 'shield',  text: 'CVSS 9.8 (Critical) · NVD-confirmed · SonicWall PSIRT advisory published' },
+      { icon: '📊', cls: 'chart',   text: '12 firewalls across 4 tenants running vulnerable firmware ≤ 7.1.1-907' },
+      { icon: '⚠️', cls: 'warning', text: 'Active probe attempts on FW-ACME-03 and FW-BETA-01 in last 24h' },
+      { icon: '✅', cls: 'check',   text: '7/12 devices patched · 2 in-flight · 3 queued (Crown Logistics change window pending)' }
+    ],
+    timeline: [
+      { date: 'May 18, 07:00',  desc: 'Patch 7.1.2-1023 pre-staged · compatibility check passed' },
+      { date: 'May 18, 16:30',  desc: 'Deployment started — Acme Corp batch (4 devices) began' },
+      { date: 'May 18, 17:12',  desc: 'Acme Corp batch complete (4/4) · Beta Networks batch started' },
+      { date: 'May 18, 17:54',  desc: 'Beta batch in progress (2/3 done) · FW-BETA-01 draining sessions' },
+      { date: 'Pending',        desc: 'Crown Logistics batch (3 devices) — awaiting change window tonight' }
+    ]
+  },
+  {
+    cat: 'device',
+    catLabel: 'Device Alert',
+    tag: 'Device Alert · Offline',
+    tagColor: '#c70f0f', tagBg: '#fff0f0', tagBorder: '#c70f0f',
+    title: '3 Gateways Unreachable',
+    metric: 'Northgate Health · Delta Logistics',
+    metricIcon: ICON_FW,
+    viewLink: 'View offline devices',
+    primaryLabel: 'Run diagnosis now →',
+    schedLabel: 'Reschedule',
+    soTitle: '3 Gateways Unreachable — Northgate Health & Delta Logistics Branch Sites Unprotected',
+    scope: [
+      { icon: ICON_TENANT, text: 'Northgate Health · Delta Logistics' },
+      { icon: ICON_FW,     text: '3 Firewalls offline · 3h 24m' }
+    ],
+    samiNote: 'FW-NH-02, FW-NH-03, and FW-DL-01 stopped responding after a BGP route withdrawal. Scheduled for tonight at 11:00 PM: SAMI will attempt automated BGP path diagnosis and SD-WAN failover configuration on secondary WAN interfaces.',
+    evidence: [
+      { icon: '📡', cls: 'warning', text: 'Last heartbeat: FW-NH-02 at 14:32 UTC · FW-NH-03 at 14:33 · FW-DL-01 at 14:35' },
+      { icon: '🌐', cls: 'chart',   text: 'BGP route withdrawal on AS64512 upstream ISP link at 14:30 UTC' },
+      { icon: '⚠️', cls: 'warning', text: '847 endpoints at Northgate Health branch currently uninspected' },
+      { icon: '🔒', cls: 'shield',  text: 'No SD-WAN failover — secondary WAN unconfigured on FW-NH-02' }
+    ],
+    timeline: [
+      { date: 'May 18, 14:30',   desc: 'BGP route withdrawal detected on AS64512' },
+      { date: 'May 18, 14:35',   desc: 'All 3 gateways lose heartbeat · SAMI raises Device Alert' },
+      { date: 'May 18, 17:44',   desc: 'MSP schedules SAMI BGP diagnosis for Tonight, 11:00 PM' },
+      { date: 'Tonight 11:00 PM',desc: 'SAMI will attempt diagnosis and SD-WAN failover provisioning (scheduled)' }
+    ]
+  },
+  {
+    cat: 'behav',
+    catLabel: 'Behavioral Anomaly',
+    tag: 'Behavioral Anomaly · High',
+    tagColor: '#5885cc', tagBg: '#f6f8fe', tagBorder: '#78a3e5',
+    title: 'Credential Stuffing — Beta Networks & Crown',
+    metric: '2 Super-admin accounts',
+    metricIcon: ICON_USER,
+    viewLink: 'View login activity',
+    primaryLabel: 'Force MFA enrollment →',
+    schedLabel: 'Schedule for later',
+    soTitle: 'Credential Stuffing on Super-Admin Accounts — Beta Networks & Crown Logistics',
+    scope: [
+      { icon: ICON_TENANT, text: 'Beta Networks · Crown Logistics' },
+      { icon: ICON_USER,   text: '2 Super-admin accounts targeted' }
+    ],
+    samiNote: '18 failed login attempts from 3 geographies against admin@beta.local and sysadmin@crown.local. Both accounts have no MFA. Concurrent active sessions detected alongside the probe traffic — indicating possible compromise. Immediate action recommended — this alert should not be deferred.',
+    evidence: [
+      { icon: '🔐', cls: 'warning', text: '18 failed logins in 60 min · source IPs: RU (7), CN (6), anonymous proxy (5)' },
+      { icon: '⚠️', cls: 'warning', text: 'admin@beta.local — 4 active sessions + 11 failed probes simultaneously' },
+      { icon: '⚠️', cls: 'warning', text: 'sysadmin@crown.local — 1 active session + 7 failed probes simultaneously' },
+      { icon: '🔒', cls: 'shield',  text: 'Both accounts have no MFA — password-only auth violates baseline policy' }
+    ],
+    timeline: [
+      { date: 'May 18, 16:52', desc: 'First probe attempt on admin@beta.local from RU IP 185.220.101.x' },
+      { date: 'May 18, 17:04', desc: 'Stuffing pattern confirmed — 11 attempts from 3 source countries' },
+      { date: 'May 18, 17:31', desc: 'SAMI flagged concurrent active sessions alongside live probes' },
+      { date: 'May 18, 17:56', desc: 'Behavioral Anomaly raised · MFA enforcement recommended immediately' }
+    ]
+  },
+  {
+    cat: 'policy',
+    catLabel: 'Policy Gap',
+    tag: 'Policy Gap · Drift > 45d',
+    tagColor: '#5b74a7', tagBg: '#f6f8fe', tagBorder: '#78a3e5',
+    title: 'Permit-Any Outbound Bypassing DPI-SSL — 9 Firewalls',
+    metric: '9 Firewalls · 45+ day drift',
+    metricIcon: ICON_FW,
+    viewLink: 'View affected firewall rules',
+    primaryLabel: 'Apply policy now →',
+    schedLabel: 'Reschedule',
+    soTitle: 'Permit-Any Outbound Rules Bypassing DPI-SSL — Acme, Beta & Westfield WAN Edge',
+    scope: [
+      { icon: ICON_TENANT, text: 'Acme Corp · Beta Networks · Westfield IT' },
+      { icon: ICON_FW,     text: '9 Firewalls · 45+ day drift' }
+    ],
+    samiNote: 'Policy baseline push scheduled for Monday, 2:00 AM — aligned with all 3 tenant maintenance windows. SAMI has prepared the rule replacement set and will deploy zero-disruption in sequence: Acme (3 FW) → Beta (3 FW) → Westfield (3 FW), with rollback triggers between each batch.',
+    evidence: [
+      { icon: '🚨', cls: 'warning', text: '9 firewalls with permit-any outbound at WAN edge — DPI-SSL bypassed' },
+      { icon: '📊', cls: 'chart',   text: '2.3 TB outbound traffic uninspected in last 7 days' },
+      { icon: '📅', cls: 'chart',   text: 'Policy last reviewed 47 days ago — exceeds MSP baseline threshold' },
+      { icon: '✅', cls: 'check',   text: 'Replacement rule set prepared · zero-disruption deployment ready' }
+    ],
+    timeline: [
+      { date: 'Apr 03',       desc: 'Baseline drift first detected on Acme Corp FW-ACME-01' },
+      { date: 'May 18',       desc: 'MSP reviews rule changes and schedules Monday deployment' },
+      { date: 'Mon, 2:00 AM', desc: 'SAMI policy push begins — all 3 tenant batches (scheduled)' },
+      { date: 'Mon, ~2:40 AM',desc: 'Expected completion with compliance confirmation' }
+    ]
+  },
+  {
+    cat: 'sub',
+    catLabel: 'Subscription Risk',
+    tag: 'Subscription Risk · Expiring Soon',
+    tagColor: '#59a02e', tagBg: '#e3efdc', tagBorder: '#59a02e',
+    title: 'ATP & TZ Expiring <9 Days — $87K ARR',
+    metric: '21 Firewalls · $87K ARR at risk',
+    metricIcon: ICON_TENANT,
+    viewLink: 'View renewal quotes',
+    primaryLabel: 'Send renewal quotes →',
+    schedLabel: 'Schedule for later',
+    soTitle: 'ATP & TZ Subscriptions Expiring in <9 Days — 3 Tenants, 21 Firewalls, $87K ARR at Risk',
+    scope: [
+      { icon: ICON_TENANT, text: 'Acme Corp · Beta Networks · Delta Logistics' },
+      { icon: ICON_FW,     text: '21 Firewalls · $87K ARR' }
+    ],
+    samiNote: 'Three tenants have ATP and TotalSecure subscriptions expiring within 9 days. Renewal quotes have been pre-generated. SAMI recommends sending quotes today — Acme Corp\'s procurement lead typically needs 5 business days to process. Delaying past Friday creates a lapse risk.',
+    evidence: [
+      { icon: '📅', cls: 'warning', text: 'Acme Corp — 8 FW · ATP expires May 27 · $38K ARR' },
+      { icon: '📅', cls: 'warning', text: 'Beta Networks — 7 FW · ATP + TZ expires May 28 · $29K ARR' },
+      { icon: '📅', cls: 'warning', text: 'Delta Logistics — 6 FW · ATP expires May 29 · $20K ARR' },
+      { icon: '✅', cls: 'check',   text: 'Renewal quotes pre-generated · tenant contacts identified · ready to send' }
+    ],
+    timeline: [
+      { date: 'May 11',        desc: '15-day warning — SAMI escalated to MSP dashboard' },
+      { date: 'May 18, 08:14', desc: '9-day critical threshold breached · $87K ARR flagged at risk' },
+      { date: 'May 27–29',     desc: 'Expiry window if unrenewed — ATP, Gateway AV, IPS disabled' }
+    ]
+  }
+];
+
+/* ─── STATE ─────────────────────────────────────────────────────────────── */
+let currentItem   = null;
+let footerState   = 'default';
+let selectedTime  = null;
+
+/* ─── CARD RENDERING ────────────────────────────────────────────────────── */
+function buildStatusSection(idx) {
+  const is = ITEM_STATES[idx];
+  if (is.state === 'inprogress') {
+    return `
+      <div class="status-progress-wrap">
+        <div class="status-progress-label">
+          <span><span class="inprog-spinner" style="color:var(--uuif-brand-green);vertical-align:middle;"></span>&nbsp;Deploying — ${is.progress}%</span>
+          <span style="color:var(--uuif-text-tertiary);font-size:11px;">${is.deployed}/${is.total} devices</span>
+        </div>
+        <div class="status-prog-bar">
+          <div class="status-prog-fill" style="width:${is.progress}%"></div>
+        </div>
+      </div>`;
+  }
+  if (is.state === 'scheduled') {
+    return `
+      <span class="status-sched-pill">
+        ${ICON_CAL} ${is.when}
+      </span>`;
+  }
+  // needs action
+  return `<span class="status-action-chip">⚠ Needs action</span>`;
+}
+
+function buildCard(idx) {
+  const item = ITEMS[idx];
+  const cs   = CAT_STYLES[item.cat];
+  const is   = ITEM_STATES[idx];
+
+  // Determine secondary button label
+  const schedLabel = (is.state === 'inprogress') ? 'Adjust schedule' :
+                     (is.state === 'scheduled')   ? 'Reschedule'      :
+                                                     'Schedule for later';
+
+  // Primary button label
+  const priLabel = item.primaryLabel;
+
+  return `
+    <div class="rec-card" data-cat="${item.cat}" data-idx="${idx}"
+         tabindex="0" role="button"
+         aria-label="${item.catLabel}: ${item.title}"
+         onclick="openCard(${idx})"
+         onkeydown="if(event.key==='Enter'||event.key===' ')openCard(${idx})">
+      <!-- Card header: category badge + criticality indicator -->
+      <div class="card-head">
+        <span class="cat-chip"
+          style="color:${cs.color};background:${cs.bg};border-color:${cs.border};">
+          ${item.catLabel}
+        </span>
+        <div class="crit-badge" title="Critical severity">!</div>
+      </div>
+
+      <!-- Card body: title + metric row -->
+      <div class="card-body">
+        <div class="card-title">${item.title}</div>
+        <div class="card-metric">
+          ${item.metricIcon}
+          <span style="color:var(--uuif-text-secondary)">${item.metric}</span>
+        </div>
+
+        <!-- Status section -->
+        <div class="card-status">
+          ${buildStatusSection(idx)}
+        </div>
+      </div>
+
+      <!-- Card action bar -->
+      <div class="card-actions">
+        <button class="card-btn-sec"
+          onclick="event.stopPropagation(); openCardScheduler(${idx})">
+          ${ICON_CAL} ${schedLabel}
+        </button>
+        <button class="card-btn-pri"
+          onclick="event.stopPropagation(); handleCardPrimaryAction(${idx})">
+          ${(is.state === 'inprogress') ? 'View progress' :
+            (is.state === 'scheduled')  ? 'Details' : 'Take action'}
+        </button>
+      </div>
+    </div>`;
+}
+
+function renderCards() {
+  const grid = document.getElementById('cardGrid');
+  grid.innerHTML = ITEMS.map((_, i) => buildCard(i)).join('');
+}
+
+/* ─── SLIDE-OVER OPEN / CLOSE ───────────────────────────────────────────── */
+function openCard(idx) {
+  currentItem = idx;
+  const is = ITEM_STATES[idx];
+  footerState = is.state === 'inprogress' ? 'inprogress' :
+                is.state === 'scheduled'  ? 'scheduled'  : 'default';
+  selectedTime = is.state === 'scheduled' ? is.when : null;
+
+  renderSlideOver(idx);
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('slideover').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSlideOver() {
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('slideover').classList.remove('open');
+  document.body.style.overflow = '';
+  currentItem = null;
+}
+
+/* ─── SLIDE-OVER RENDERING ──────────────────────────────────────────────── */
+function renderSlideOver(idx) {
+  const d  = ITEMS[idx];
+  const is = ITEM_STATES[idx];
+
+  const scopeHTML = d.scope.map(s =>
+    `<span style="display:flex;align-items:center;gap:4px;">${s.icon} ${s.text}</span>`
+  ).join('');
+
+  const evidenceHTML = d.evidence.map(e =>
+    `<div class="evidence-item"><div class="ev-icon ${e.cls}">${e.icon}</div>${e.text}</div>`
+  ).join('');
+
+  const timelineHTML = d.timeline.map(t =>
+    `<div class="timeline-item"><div class="timeline-date">${t.date}</div><div>${t.desc}</div></div>`
+  ).join('');
+
+  document.getElementById('soScroll').innerHTML = `
+    <div class="so-header">
+      <div class="so-badge">
+        <span class="cve-tag"
+          style="color:${d.tagColor};background:${d.tagBg};border-color:${d.tagBorder};">
+          ${d.tag}
+        </span>
+      </div>
+      <div class="so-title">${d.soTitle}</div>
+      <div class="so-scope">${scopeHTML}</div>
+    </div>
+
+    <div class="so-sami-note">
+      <span class="ds-tag">SAMI</span>
+      <span>${d.samiNote}</span>
+    </div>
+
+    <div class="so-body">
+      <div class="section-title">Evidence</div>
+      ${evidenceHTML}
+
+      <div class="timeline-section">
+        <div class="section-title" style="margin-top:16px;">Timeline</div>
+        ${timelineHTML}
+      </div>
+    </div>`;
+
+  renderFooter(idx);
+}
+
+/* ─── FOOTER RENDERING ──────────────────────────────────────────────────── */
+function renderFooter(idx) {
+  const d  = ITEMS[idx];
+  const is = ITEM_STATES[idx];
+  const fw = document.getElementById('soFooterWrap');
+  if (!fw) return;
+
+  if (footerState === 'inprogress') {
+    fw.innerHTML = `
+      <div class="df-inprogress">
+        <div class="df-ip-top">
+          <div class="df-ip-label">
+            <span class="inprog-spinner"></span> Deployment in progress
+          </div>
+          <span class="df-ip-eta">${is.eta}</span>
+        </div>
+        <div class="df-prog-bar">
+          <div class="df-prog-fill" style="width:${is.progress}%"></div>
+        </div>
+        <div class="df-ip-bottom">
+          <span class="df-ip-status">${is.deployed} of ${is.total} devices patched · Running ${is.since}</span>
+          <div class="df-ip-links">
+            <button class="btn-view" onclick="showToast('Opening live deployment view…')">View live progress</button>
+            <button class="btn-pause" onclick="showToast('Deployment pause requested. Crown Logistics batch will complete first.')">Pause queue</button>
+          </div>
+        </div>
+      </div>`;
+    return;
+  }
+
+  if (footerState === 'scheduled') {
+    const when  = selectedTime || (is.state === 'scheduled' ? is.when : '—');
+    const notes = (is.state === 'scheduled') ? is.notes : 'Scheduled via SAMI';
+    fw.innerHTML = `
+      <div class="df-scheduled">
+        <div class="df-sched-info">
+          <span class="sched-icon">📅</span>
+          <div>
+            <div class="sched-text">Scheduled for ${when}</div>
+            <div class="sched-sub">${notes} · SAMI will execute automatically</div>
+          </div>
+        </div>
+        <div class="df-sched-links">
+          <button class="btn-edit" onclick="openScheduler(${idx})">Edit</button>
+          <button class="btn-cancel" onclick="cancelItemSchedule(${idx})">Cancel</button>
+          <button class="btn-dnow" onclick="deployNow(${idx})">Deploy now instead</button>
+        </div>
+      </div>`;
+    return;
+  }
+
+  if (footerState === 'scheduling') {
+    fw.innerHTML = `
+      <div class="df-scheduling">
+        <div class="sched-expand-header">
+          <span class="seh-icon">📅</span> Schedule for later
+        </div>
+        <div class="sched-time-row">
+          ${['Tonight, 11:00 PM','Tomorrow, 2:00 AM','Monday, 2:00 AM','Custom'].map(t =>
+            `<button class="sched-time-btn ${selectedTime===t?'selected':''}"
+               onclick="selectScheduleTime('${t}',${idx})">${t}</button>`
+          ).join('')}
+        </div>
+        <div class="sched-sami-block" id="samiReasonBlock">
+          <span class="ssb-tag">SAMI</span>
+          ${selectedTime && SAMI_SCHED_REASONING[selectedTime]
+            ? `<span>${SAMI_SCHED_REASONING[selectedTime]}</span>`
+            : `<span class="sched-placeholder">Select a time above — SAMI will show scheduling context and conflict analysis.</span>`
+          }
+        </div>
+        <div class="sched-actions-row">
+          <button class="btn-sched-cancel" onclick="cancelSchedulerOpen(${idx})">Cancel</button>
+          <button class="btn-sched-confirm"
+            onclick="confirmSchedule(${idx})"
+            ${!selectedTime || selectedTime==='Custom' ? 'disabled' : ''}>
+            Confirm schedule
+          </button>
+        </div>
+      </div>`;
+    return;
+  }
+
+  // default footer
+  fw.innerHTML = `
+    <div class="df-default">
+      <span class="df-view-link" onclick="showToast('Opening device list…')">${d.viewLink}</span>
+      <div class="footer-actions">
+        <button class="btn-sched" onclick="openScheduler(${idx})">
+          ${ICON_CAL} ${d.schedLabel}
+        </button>
+        <button class="btn-primary" onclick="handlePrimaryAction(${idx})">${d.primaryLabel}</button>
+      </div>
+    </div>`;
+}
+
+/* ─── SCHEDULER INTERACTIONS ────────────────────────────────────────────── */
+function openScheduler(idx) {
+  footerState  = 'scheduling';
+  selectedTime = null;
+  renderFooter(idx);
+}
+function openCardScheduler(idx) {
+  openCard(idx);
+  // allow slide-over to render then open scheduler
+  setTimeout(() => { footerState = 'scheduling'; selectedTime = null; renderFooter(idx); }, 60);
+}
+function handleCardPrimaryAction(idx) {
+  openCard(idx);
+}
+function handlePrimaryAction(idx) {
+  showToast('Initiating action…');
+}
+function cancelSchedulerOpen(idx) {
+  const is = ITEM_STATES[idx];
+  footerState  = is.state === 'inprogress' ? 'inprogress' :
+                 is.state === 'scheduled'  ? 'scheduled'  : 'default';
+  selectedTime = is.state === 'scheduled' ? is.when : null;
+  renderFooter(idx);
+}
+function selectScheduleTime(t, idx) {
+  selectedTime = t;
+  renderFooter(idx);
+}
+function confirmSchedule(idx) {
+  if (!selectedTime || selectedTime === 'Custom') return;
+  ITEM_STATES[idx] = {
+    state: 'scheduled',
+    when: selectedTime,
+    whenShort: selectedTime,
+    notes: 'Scheduled via SAMI'
+  };
+  footerState = 'scheduled';
+  renderFooter(idx);
+  showToast(`Scheduled for ${selectedTime}`);
+  // Update card in the grid
+  const cardEl = document.querySelector(`.rec-card[data-idx="${idx}"]`);
+  if (cardEl) {
+    cardEl.outerHTML = buildCard(idx);
+    // Re-bind since outerHTML swap removes the element — re-render all cards
+    renderCards();
+  }
+}
+function cancelItemSchedule(idx) {
+  ITEM_STATES[idx] = { state: 'active' };
+  footerState  = 'default';
+  selectedTime = null;
+  renderFooter(idx);
+  showToast('Schedule cancelled — item returned to active queue');
+  renderCards();
+}
+function deployNow(idx) {
+  ITEM_STATES[idx] = { state: 'active' };
+  footerState  = 'default';
+  selectedTime = null;
+  renderFooter(idx);
+  showToast('Deploying now — SAMI is initiating the action');
+  renderCards();
+}
+
+/* ─── TOAST ─────────────────────────────────────────────────────────────── */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+/* ─── KEYBOARD CLOSE ────────────────────────────────────────────────────── */
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeSlideOver();
+});
+
+/* ─── INIT ──────────────────────────────────────────────────────────────── */
+renderCards();
+</script>
+</body>
+</html>

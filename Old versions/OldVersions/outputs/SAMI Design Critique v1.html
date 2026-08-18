@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAMI Phase 2 — UX Design Critique</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #001b50;
+  --orange: #ff5d00;
+  --red: #c70f0f;
+  --green: #059669;
+  --amber: #d97706;
+  --blue: #2563eb;
+  --purple: #6b46c1;
+  --bg: #f4f6f9;
+  --white: #ffffff;
+  --border: #e2e8f0;
+  --text-1: #191c25;
+  --text-2: #4a618f;
+  --text-3: #64748b;
+  --font: 'Nunito Sans', sans-serif;
+
+  --sev-critical-bg: #fff0f0;
+  --sev-critical-color: #c70f0f;
+  --sev-critical-border: #fecaca;
+  --sev-moderate-bg: #fffbeb;
+  --sev-moderate-color: #b45309;
+  --sev-moderate-border: #fde68a;
+  --sev-minor-bg: #f0f9ff;
+  --sev-minor-color: #0369a1;
+  --sev-minor-border: #bae6fd;
+  --sev-positive-bg: #f0fdf4;
+  --sev-positive-color: #059669;
+  --sev-positive-border: #bbf7d0;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text-1);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── LAYOUT ── */
+.page-wrap { max-width: 1100px; margin: 0 auto; padding: 40px 32px 80px; }
+
+/* ── HEADER ── */
+.doc-header { margin-bottom: 40px; border-bottom: 3px solid var(--orange); padding-bottom: 24px; }
+.doc-meta { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: var(--text-3); text-transform: uppercase; margin-bottom: 8px; }
+.doc-title { font-size: 28px; font-weight: 800; color: var(--navy); letter-spacing: -0.02em; margin-bottom: 4px; }
+.doc-sub { font-size: 14px; color: var(--text-2); font-weight: 500; }
+.doc-scope { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+.scope-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 20px; padding: 3px 12px; font-size: 11px; font-weight: 600; color: var(--text-2);
+}
+.scope-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--orange); }
+
+/* ── OVERALL IMPRESSION ── */
+.impression-box {
+  background: var(--navy); color: white;
+  border-radius: 10px; padding: 24px 28px; margin-bottom: 32px;
+}
+.impression-label { font-size: 10px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #7b96c8; margin-bottom: 8px; }
+.impression-text { font-size: 15px; line-height: 1.65; color: #e2eaf8; font-weight: 500; }
+.impression-highlight { color: #ff8c5a; font-weight: 700; }
+
+/* ── SECTION ── */
+.section { margin-bottom: 36px; }
+.section-header {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px; padding-bottom: 10px;
+  border-bottom: 2px solid var(--border);
+}
+.section-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.section-title { font-size: 16px; font-weight: 800; color: var(--navy); }
+.section-count {
+  margin-left: auto; font-size: 11px; font-weight: 700;
+  background: #f1f5f9; color: var(--text-2);
+  border-radius: 12px; padding: 2px 10px;
+}
+
+/* ── FINDING TABLE ── */
+.finding-table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+.finding-table th {
+  text-align: left; font-size: 10px; font-weight: 800; letter-spacing: 0.07em;
+  text-transform: uppercase; color: var(--text-3);
+  padding: 8px 12px; background: #f8fafc;
+  border: 1px solid var(--border); border-bottom: 2px solid var(--border);
+}
+.finding-table td {
+  padding: 12px; border: 1px solid var(--border);
+  vertical-align: top; font-size: 13px; line-height: 1.55;
+}
+.finding-table tr:nth-child(even) td { background: #fafbfd; }
+
+/* ── SEVERITY BADGE ── */
+.sev {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 20px; white-space: nowrap;
+}
+.sev::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.sev-critical { background: var(--sev-critical-bg); color: var(--sev-critical-color); border: 1px solid var(--sev-critical-border); }
+.sev-moderate { background: var(--sev-moderate-bg); color: var(--sev-moderate-color); border: 1px solid var(--sev-moderate-border); }
+.sev-minor { background: var(--sev-minor-bg); color: var(--sev-minor-color); border: 1px solid var(--sev-minor-border); }
+
+/* ── WORKS WELL ── */
+.works-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.works-card {
+  background: var(--sev-positive-bg); border: 1px solid var(--sev-positive-border);
+  border-radius: 8px; padding: 12px 16px;
+}
+.works-title { font-size: 13px; font-weight: 700; color: #065f46; margin-bottom: 4px; }
+.works-body { font-size: 12px; color: #047857; line-height: 1.5; }
+
+/* ── PRIORITY RECS ── */
+.rec-list { display: flex; flex-direction: column; gap: 12px; }
+.rec-card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px 18px;
+  border-left: 4px solid var(--orange);
+}
+.rec-card.sec { border-left-color: var(--red); }
+.rec-card.mod { border-left-color: var(--amber); }
+.rec-num {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--text-3); margin-bottom: 4px;
+}
+.rec-title { font-size: 14px; font-weight: 800; color: var(--navy); margin-bottom: 6px; }
+.rec-body { font-size: 13px; color: var(--text-2); line-height: 1.55; margin-bottom: 8px; }
+.alt-box {
+  background: #f0f4ff; border: 1px solid #c7d2fe;
+  border-radius: 6px; padding: 10px 12px; margin-top: 8px;
+}
+.alt-label { font-size: 10px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #4338ca; margin-bottom: 4px; }
+.alt-text { font-size: 12px; color: #312e81; line-height: 1.5; }
+
+/* ── SUMMARY SCORECARD ── */
+.scorecard {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 12px; overflow: hidden; margin-bottom: 40px;
+}
+.scorecard-head {
+  background: var(--navy); color: white;
+  padding: 14px 20px; font-size: 12px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;
+}
+.scorecard-row {
+  display: flex; align-items: center; padding: 12px 20px;
+  border-bottom: 1px solid var(--border); gap: 12px;
+}
+.scorecard-row:last-child { border-bottom: none; }
+.scorecard-dim { flex: 1; font-size: 13px; font-weight: 700; color: var(--text-1); }
+.scorecard-note { font-size: 12px; color: var(--text-3); flex: 2; }
+.score-bar-wrap { width: 120px; height: 8px; background: #e2e8f0; border-radius: 4px; flex-shrink: 0; }
+.score-bar { height: 8px; border-radius: 4px; }
+.score-bar.good { background: var(--green); }
+.score-bar.fair { background: var(--amber); }
+.score-bar.poor { background: var(--red); }
+
+/* ── CALLOUT ── */
+.callout {
+  border-radius: 8px; padding: 14px 16px; margin-bottom: 12px;
+  border-left: 4px solid;
+}
+.callout.info { background: #eff6ff; border-color: var(--blue); }
+.callout.warn { background: #fffbeb; border-color: var(--amber); }
+.callout.danger { background: #fff0f0; border-color: var(--red); }
+.callout-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.callout.info .callout-label { color: var(--blue); }
+.callout.warn .callout-label { color: var(--amber); }
+.callout.danger .callout-label { color: var(--red); }
+.callout-text { font-size: 13px; line-height: 1.55; }
+
+/* ── FOOTER ── */
+.doc-footer { border-top: 1px solid var(--border); padding-top: 20px; margin-top: 60px; display: flex; justify-content: space-between; align-items: center; }
+.footer-brand { font-size: 11px; color: var(--text-3); font-weight: 600; }
+.footer-date { font-size: 11px; color: var(--text-3); }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <!-- HEADER -->
+  <div class="doc-header">
+    <div class="doc-meta">UX Design Critique · SAMI Phase 2 Mocks</div>
+    <div class="doc-title">SAMI Dashboard + Insights Page — Comprehensive UX Review</div>
+    <div class="doc-sub">Covers: UM Landing Page v7 → SAMI Insights Page v4 · Full flow critique</div>
+    <div class="doc-scope">
+      <span class="scope-pill"><span class="dot"></span> Information Architecture</span>
+      <span class="scope-pill"><span class="dot"></span> Visual Design</span>
+      <span class="scope-pill"><span class="dot"></span> Usability</span>
+      <span class="scope-pill"><span class="dot"></span> Clarity &amp; Content</span>
+      <span class="scope-pill"><span class="dot"></span> Navigation &amp; Wayfinding</span>
+      <span class="scope-pill"><span class="dot"></span> Accessibility</span>
+      <span class="scope-pill"><span class="dot"></span> Interaction Design</span>
+    </div>
+  </div>
+
+  <!-- OVERALL IMPRESSION -->
+  <div class="impression-box">
+    <div class="impression-label">First Impression · 2-Second Read</div>
+    <div class="impression-text">
+      The design is <span class="impression-highlight">architecturally sound and content-rich</span>, with a clear intent to surface AI-driven intelligence at two levels — operational triage and security posture. The landing page SAMI panel is the strongest element: it demonstrates the AI's reasoning transparently and provides actionable CTAs. However, the flow suffers from <span class="impression-highlight">two structural problems that compound</span>: (1) semantic collision — multiple surfaces use identical structural patterns (grouped lists, section headers, badges) for content that is categorically different in urgency and response type; (2) severity vocabulary fragmentation — "Emergency / Warning" on one page and "Critical / High" on the other creates a parallel classification system users must mentally reconcile. The product's AI intelligence is genuinely strong; the UX needs to elevate the architecture to match.
+    </div>
+  </div>
+
+  <!-- SCORECARD -->
+  <div class="scorecard">
+    <div class="scorecard-head">Dimension Scorecard — At a Glance</div>
+    <div class="scorecard-row">
+      <div class="scorecard-dim">Information Architecture</div>
+      <div class="scorecard-note">Two-level nav overlap; category/priority relationship unclear; content type mixing on landing page</div>
+      <div class="score-bar-wrap"><div class="score-bar fair" style="width:55%"></div></div>
+    </div>
+    <div class="scorecard-row">
+      <div class="scorecard-dim">Visual Design</div>
+      <div class="scorecard-note">Token system is strong; color overload from 6+ semantic hues; typography weights well-used</div>
+      <div class="score-bar-wrap"><div class="score-bar fair" style="width:65%"></div></div>
+    </div>
+    <div class="scorecard-row">
+      <div class="scorecard-dim">Usability</div>
+      <div class="scorecard-note">Good CTA clarity; icon-only sidebar; empty detail panel on load; low-affordance expand buttons</div>
+      <div class="score-bar-wrap"><div class="score-bar fair" style="width:60%"></div></div>
+    </div>
+    <div class="scorecard-row">
+      <div class="scorecard-dim">Clarity &amp; Content</div>
+      <div class="scorecard-note">Excellent AI rationale text; severity vocabulary split; stale count badges; ✦ glyph inconsistency</div>
+      <div class="score-bar-wrap"><div class="score-bar fair" style="width:70%"></div></div>
+    </div>
+    <div class="scorecard-row">
+      <div class="scorecard-dim">Navigation &amp; Wayfinding</div>
+      <div class="scorecard-note">No back path from insights to dashboard; broken "View all insights" link target; no view-state persistence</div>
+      <div class="score-bar-wrap"><div class="score-bar poor" style="width:40%"></div></div>
+    </div>
+    <div class="scorecard-row">
+      <div class="scorecard-dim">Accessibility</div>
+      <div class="scorecard-note">10px labels fail WCAG; orange-on-white badge contrast borderline; no aria-expanded on accordions</div>
+      <div class="score-bar-wrap"><div class="score-bar poor" style="width:38%"></div></div>
+    </div>
+    <div class="scorecard-row">
+      <div class="scorecard-dim">Interaction Design</div>
+      <div class="scorecard-note">Chat panel transition is smooth; abrupt view-mode switch; expand affordance weak; no loading states</div>
+      <div class="score-bar-wrap"><div class="score-bar fair" style="width:60%"></div></div>
+    </div>
+  </div>
+
+  <!-- 1. INFORMATION ARCHITECTURE -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#eff6ff;">🏛️</div>
+      <div class="section-title">1. Information Architecture</div>
+      <div class="section-count">5 findings</div>
+    </div>
+
+    <table class="finding-table">
+      <thead>
+        <tr>
+          <th style="width:32px;">#</th>
+          <th style="width:38%">Finding</th>
+          <th style="width:80px;">Severity</th>
+          <th>Recommendation + Alternate Ideas</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>IA-1</strong></td>
+          <td><strong>Two content types at equal visual weight on the landing page.</strong> "Active Incidents" (device-health, operational, SAMI-grouped from raw alerts) and "SAMI Recommendations" (security posture, strategic, analyst-generated) are rendered at 50/50 width with no visual hierarchy between them. A critical CVE sits at the same visual prominence as an interface flap.</td>
+          <td><span class="sev sev-critical">Critical</span></td>
+          <td>
+            Establish a clear visual hierarchy: give security posture items (CVE, MFA gap, credential stuffing) higher visual weight than operational device alerts. One model: <em>full-width Priority Actions above the fold → Active Incidents below in a compact list</em>. Or invert: left column = narrow Active Incidents strip + right column = wide Priority Actions panel. Avoid 50/50 — it implies equal importance.
+            <div class="alt-box">
+              <div class="alt-label">Alternate Idea</div>
+              <div class="alt-text">Use a severity-weighted "SAMI Brief" banner at the top — one sentence, most critical thing right now — then split into two labeled sections below. This gives SAMI a distinct authorial voice before the user hits the detail.</div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><strong>IA-2</strong></td>
+          <td><strong>Category navigation + Priority Actions relationship is architecturally undefined.</strong> The insights page sidebar shows "Priority Actions" at the top, then "By Category" below (CVE, Policy Gaps, Behavioral, Renewals). The relationship isn't stated: is Priority Actions a union of all category items marked as critical? A separate set? The same 5 items from the landing page? Users have to guess.</td>
+          <td><span class="sev sev-critical">Critical</span></td>
+          <td>
+            Make the relationship explicit in the UI: add a sub-label under "Priority Actions" — e.g., "5 critical items across all categories" — and within each category view, visually link items that appear in Priority Actions (e.g., a red flag icon). This makes the architecture legible without requiring docs.
+            <div class="alt-box">
+              <div class="alt-label">Alternate Idea</div>
+              <div class="alt-text">Rename the sidebar structure: instead of "By Category" as a section separator, use "All" (Priority Actions), then expandable category sub-nodes. This mirrors familiar nav patterns (inbox + folders) and makes the hierarchy immediately clear.</div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><strong>IA-3</strong></td>
+          <td><strong>SAMI Chat is architecturally homeless.</strong> The chat slide-out panel appears on both the landing page and the insights page. Its chat history belongs to neither — it floats without a conceptual home. Users don't know if SAMI is "about" the dashboard or "about" the insights page or both.</td>
+          <td><span class="sev sev-moderate">Moderate</span></td>
+          <td>Give SAMI Chat a persistent global scope, communicated explicitly: "I have access to all your tenants and SAMI data." Add a contextual tag when SAMI references a specific insight (e.g., "Based on Priority Actions · SSL VPN…") to make its situational awareness legible.</td>
+        </tr>
+        <tr>
+          <td><strong>IA-4</strong></td>
+          <td><strong>Label mismatch: landing page says "SAMI Recommendation," insights page now says "Priority Actions."</strong> After renaming the insights page section, the landing page right-column header still reads "SAMI Recommendation." Users following items from one surface to the other will encounter different section names for what appears to be the same data.</td>
+          <td><span class="sev sev-critical">Critical</span></td>
+          <td>Align the label. Options: (A) rename landing page "SAMI Recommendation" → "Priority Actions" with a sub-label "From SAMI security analysis," or (B) keep "SAMI Recommendations" as the parent concept on the landing page and use it on the insights page too, with "Priority Actions" as the filtered-view label. Pick one system.</td>
+        </tr>
+        <tr>
+          <td><strong>IA-5</strong></td>
+          <td><strong>The stat blocks (left column of landing page SAMI briefing) have no architectural connection to the content on the right.</strong> Three standalone numbers (active alerts, security score, open recommendations) float independently with no visual relationship to the "Active Incidents" and "SAMI Recommendations" panels they presumably summarize.</td>
+          <td><span class="sev sev-minor">Minor</span></td>
+          <td>Either (A) remove the stat blocks and embed the numbers as inline metadata within the section headers ("Active Incidents · 2 groups from 50 alerts"), or (B) make each stat block a filter/drill-down link so clicking the number filters the adjacent panel. Dead-end numbers that don't link anywhere waste real estate.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 2. VISUAL DESIGN -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#fdf4ff;">🎨</div>
+      <div class="section-title">2. Visual Design</div>
+      <div class="section-count">5 findings</div>
+    </div>
+
+    <table class="finding-table">
+      <thead>
+        <tr>
+          <th style="width:32px;">#</th>
+          <th style="width:38%">Finding</th>
+          <th style="width:80px;">Severity</th>
+          <th>Recommendation + Alternate Ideas</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>VD-1</strong></td>
+          <td><strong>Six competing semantic colors create attention overload.</strong> Orange (brand + alerts + CTAs), Red (critical), Blue (behavioral), Green (policy), Amber (renewals), Purple (SAMI analysis). All appear on the same screen. The eye cannot prioritize — everything is simultaneously urgent.</td>
+          <td><span class="sev sev-critical">Critical</span></td>
+          <td>
+            Reduce to a 3-tier color system: (1) <strong>Red</strong> = action required now; (2) <strong>Amber</strong> = action required soon; (3) <strong>Navy/Grey</strong> = informational. Use category colors only for labels/tags, never as background fills on cards. Orange should be reserved exclusively for brand/CTA — not for alerts.
+            <div class="alt-box">
+              <div class="alt-label">Alternate Idea</div>
+              <div class="alt-text">Adopt a monochrome-first card design where the left border stripe carries the severity color, and card backgrounds stay white. This way 90% of the visual field is neutral, and the severity signal is clear without competing with category colors.</div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><strong>VD-2</strong></td>
+          <td><strong>Orange brand color is doing double duty as an alert signal.</strong> The "Active Incidents" count pill uses an orange background. Orange is also used for the brand, the SAMI Recommendations severity label, and the SAMI icon box. When everything is orange, orange means nothing.</td>
+          <td><span class="sev sev-critical">Critical</span></td>
+          <td>Reserve orange strictly for brand/primary CTA actions. For count pills on alert sections, use Red (#c70f0f) or a red-tinted pill. Audit all orange usages: if it's not a brand element or a primary action, replace it.</td>
+        </tr>
+        <tr>
+          <td><strong>VD-3</strong></td>
+          <td><strong>The insights page three-panel layout wastes the detail panel on load.</strong> On arrival, the rightmost detail panel is blank ("Select an alert to view details"). For a 1200px+ screen, roughly 35% of the primary content area shows nothing. The first impression is an empty app.</td>
+          <td><span class="sev sev-critical">Critical</span></td>
+          <td>Auto-select the first Priority Actions item on page load and populate the detail panel. Alternatively, show a "SAMI Summary" state in the detail panel by default — a natural language overview of all Priority Actions combined, with a count breakdown by category.</td>
+        </tr>
+        <tr>
+          <td><strong>VD-4</strong></td>
+          <td><strong>Typography hierarchy is too flat in some areas.</strong> Section sub-labels (e.g., "SAMI AI · from 50 firewall alerts") are 11px weight-500 — visually identical to timestamps and metadata labels. High-value context gets lost in a sea of same-weight small text.</td>
+          <td><span class="sev sev-moderate">Moderate</span></td>
+          <td>Differentiate source attribution lines: make them 12px font-weight 700 with a small SAMI icon prefix. These are not metadata — they are the key trust signal that tells the user SAMI did real analysis. Treat them as first-class content, not footnotes.</td>
+        </tr>
+        <tr>
+          <td><strong>VD-5</strong></td>
+          <td><strong>The "✦ SAMI:" prefix in triage analysis blocks is a raw glyph, not a designed element.</strong> While the intent is good (marking AI-generated text), the ✦ character is typographically inconsistent with everything else in the UI and will render differently across OS/fonts.</td>
+          <td><span class="sev sev-minor">Minor</span></td>
+          <td>Replace ✦ with a consistent SAMI icon (the S-shaped AI mark or a small "SAMI" wordmark chip) to make AI attribution a branded, not typographic, element. This also improves trust — a designed indicator feels more intentional than a special character.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. USABILITY -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#f0fdf4;">🖱️</div>
+      <div class="section-title">3. Usability</div>
+      <div class="section-count">5 findings</div>
+    </div>
+
+    <table class="finding-table">
+      <thead>
+        <tr>
+          <th style="width:32px;">#</th>
+          <th style="width:38%">Finding</th>
+          <th style="width:80px;">Severity</th>
+          <th>Recommendation + Alternate Ideas</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>UX-1</strong></td>
+          <td><strong>Icon-only sidebar with tooltip-on-hover is the only label mechanism.</strong> Seven sidebar buttons have no persistent labels. First-time users and occasional users must hover each icon to discover its purpose. In a security operations context, hesitating to know where to click costs real time.</td>
+          <td><span class="sev sev-critical">Critical</span></td>
+          <td>
+            Add persistent text labels below icons in the sidebar, or expand the sidebar to 180px with labels. If 60px collapsed is non-negotiable for screen space, add a toggleable label mode that persists across sessions.
+            <div class="alt-box">
+              <div class="alt-label">Alternate Idea</div>
+              <div class="alt-text">Use a fly-out sidebar on hover: sidebar stays 60px at rest, expands to 180px with labels on hover over the sidebar rail. Common in enterprise dashboards (VSCode, Figma). No screen space lost, full label discovery on demand.</div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><strong>UX-2</strong></td>
+          <td><strong>Triage item expand buttons are visually buried.</strong> "View 9 alerts ↓" and "View tenants & devices" are rendered as ghost text buttons at the bottom of each triage card. They are low-contrast, small, and easy to miss. For a feature that reveals critical detail (9 Emergency-level failures), the trigger deserves more prominence.</td>
+          <td><span class="sev sev-critical">Critical</span></td>
+          <td>Redesign the expand affordance: use a bordered button or an outlined chip with a chevron icon. Include the count in the button label always (e.g., "Show 9 alerts ↓"). Add a subtle bottom-border or visual cue that more content exists below.</td>
+        </tr>
+        <tr>
+          <td><strong>UX-3</strong></td>
+          <td><strong>"Ignore" on SAMI Recommendations is at equal visual weight to the primary CTA.</strong> "Patch 8 firewalls" and "Ignore" sit side by side with similar sizing. For a critical CVE, dismissing the action is a consequential decision that should require more friction than a single tap adjacent to the primary button.</td>
+          <td><span class="sev sev-critical">Critical</span></td>
+          <td>Make "Ignore" a low-affordance text link (no border, smaller font, grey color). On click, show a confirmation with a reason field ("Why are you dismissing this? / Already patched / Not applicable / Snooze 7 days"). This creates an audit trail and prevents accidental dismissals.</td>
+        </tr>
+        <tr>
+          <td><strong>UX-4</strong></td>
+          <td><strong>View mode toggle (Sidebar+List / Smart Feed / Charts) has low discoverability.</strong> Three small toggle buttons above the content area. No visual affordance communicates what each mode contains until clicked. In "Charts" mode especially, users don't know what they'll see before switching.</td>
+          <td><span class="sev sev-moderate">Moderate</span></td>
+          <td>Add descriptive subtitles to each toggle button on hover (tooltip: "Detailed list with filter sidebar" / "Chronological threat feed" / "Trend charts by category"). Or add a persistent description line under the active mode name that states what's visible.</td>
+        </tr>
+        <tr>
+          <td><strong>UX-5</strong></td>
+          <td><strong>SAMI Quick Cards in the chat panel use emoji that breaks enterprise tone.</strong> 💰, 🛡️, ⚡, 📋 appear in the quick-prompt cards. While approachable, this conflicts with the data-dense, high-stakes security context of the rest of the UI.</td>
+          <td><span class="sev sev-minor">Minor</span></td>
+          <td>Replace emoji with monochrome icon SVGs that match the UUIF 9.2 token system. Alternatively, remove the icon column entirely and rely on the text — the prompts are self-explanatory ("Show renewals at risk this month" needs no 💰 to communicate its intent).</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4. CLARITY & CONTENT -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#fffbeb;">📝</div>
+      <div class="section-title">4. Clarity &amp; Content Strategy</div>
+      <div class="section-count">4 findings</div>
+    </div>
+
+    <table class="finding-table">
+      <thead>
+        <tr>
+          <th style="width:32px;">#</th>
+          <th style="width:38%">Finding</th>
+          <th style="width:80px;">Severity</th>
+          <th>Recommendation + Alternate Ideas</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>CC-1</strong></td>
+          <td><strong>Two parallel severity vocabularies on the same flow.</strong> Active Incidents uses "Emergency / Warning" (operational, device-health language). SAMI Recommendations and Priority Actions use "Critical / High" (security risk language). A user scanning both sections must mentally translate between two scales.</td>
+          <td><span class="sev sev-critical">Critical</span></td>
+          <td>
+            Adopt a single 4-tier severity vocabulary across both surfaces: <strong>Critical → High → Medium → Low</strong>. Map "Emergency" → Critical, "Warning" → High. These are industry-standard terms users already know from security frameworks (CVSS, NIST). Apply consistently to all badges, filters, and chart axes.
+            <div class="alt-box">
+              <div class="alt-label">Alternate Idea</div>
+              <div class="alt-text">Keep domain-specific severity internally but surface a unified "SAMI Impact Score" (1–10) as the primary sort/filter axis across both pages. This lets domain experts see underlying severity labels in detail, while the overall UI has one comparable signal.</div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><strong>CC-2</strong></td>
+          <td><strong>Count badges may go stale.</strong> The "5" badge on "SAMI Recommendation" on the landing page and the "5" on "Priority Actions" in the insights sidebar are static HTML. If a user resolves or patches an item, there is no mechanism shown that would update these counts in real time. A stale count on a security dashboard erodes trust instantly.</td>
+          <td><span class="sev sev-critical">Critical</span></td>
+          <td>Even in prototype, mark live-update intent with a small "● Live" indicator next to count badges, or add a timestamp ("as of 14:32") so users know when data was last refreshed. In production, these must be WebSocket-driven.</td>
+        </tr>
+        <tr>
+          <td><strong>CC-3</strong></td>
+          <td><strong>The "Linked to behav alert" tag on SAMI Recommendations is a raw internal label.</strong> It appears on the MFA recommendation item with no context about what it links to or how to navigate there. The connection between the MFA policy gap and the behavioral credential stuffing alert is important — but the current label obscures rather than reveals it.</td>
+          <td><span class="sev sev-moderate">Moderate</span></td>
+          <td>Replace with a clickable cross-link chip: "→ Related: Active credential stuffing on jsmith@beta.local." This makes the causal relationship explicit and actionable. The link should deep-link to the behavioral alert in the insights page.</td>
+        </tr>
+        <tr>
+          <td><strong>CC-4</strong></td>
+          <td><strong>The SAMI analysis text quality is excellent but inconsistently applied.</strong> Triage cards (Active Incidents) have rich natural language analysis ("cyclical failure pattern suggests upstream ISP instability"). SAMI Recommendations have detailed body text too. But the insights page list view shows only a 100-character truncated preview. The full analysis is hidden behind a click, reducing its impact.</td>
+          <td><span class="sev sev-minor">Minor</span></td>
+          <td>Increase the preview to 150–180 characters in the list view, or show the first SAMI conclusion sentence always (the most important part). The goal is to let the user know SAMI has a specific finding — not just that an alert exists.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 5. NAVIGATION & WAYFINDING -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#fff0f0;">🧭</div>
+      <div class="section-title">5. Navigation &amp; Wayfinding</div>
+      <div class="section-count">4 findings</div>
+    </div>
+
+    <table class="finding-table">
+      <thead>
+        <tr>
+          <th style="width:32px;">#</th>
+          <th style="width:38%">Finding</th>
+          <th style="width:80px;">Severity</th>
+          <th>Recommendation + Alternate Ideas</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>NV-1</strong></td>
+          <td><strong>Broken "View all insights →" link.</strong> The landing page's link to the insights page targets <code>SAMI insights page v2.html</code> — a previous version. After renaming to v4, the link points to a stale or non-existent file. This is a functional break in the prototype flow.</td>
+          <td><span class="sev sev-critical">Critical</span></td>
+          <td>Update the href to <code>SAMI insights page v4.html</code>. In production, this will be a route path, but for prototype review, the link must work correctly.</td>
+        </tr>
+        <tr>
+          <td><strong>NV-2</strong></td>
+          <td><strong>No back-navigation from the insights page to the dashboard.</strong> Once a user follows "View all insights →" or clicks the sidebar icon into the SAMI Insights page, there is no clear return path. The breadcrumb CSS exists but its behavior is not wired in the prototype.</td>
+          <td><span class="sev sev-critical">Critical</span></td>
+          <td>Wire the breadcrumb: "Unified Management &gt; SAMI Insights" where "Unified Management" is a clickable link back to the landing page. Also ensure the sidebar icon for the dashboard remains accessible and visually distinct as the home/back anchor.</td>
+        </tr>
+        <tr>
+          <td><strong>NV-3</strong></td>
+          <td><strong>View mode preference (Sidebar / Smart Feed / Charts) is not persistent.</strong> Navigating away and returning to the insights page resets to default. For an MSP who prefers the Smart Feed view daily, this is a repeat friction point.</td>
+          <td><span class="sev sev-moderate">Moderate</span></td>
+          <td>Store the user's preferred view mode in localStorage (prototype) or user preferences (production). Surface it as the default on return visits. Add a small "Saved view" indicator near the toggle so users know their preference was remembered.</td>
+        </tr>
+        <tr>
+          <td><strong>NV-4</strong></td>
+          <td><strong>The inner insights sidebar has no "collapse" or hide affordance.</strong> On smaller screens or when focused on a specific alert, the inner sidebar (Priority Actions / CVE / Policy…) cannot be hidden to give more room to the list or detail panel. The three-panel layout is fixed.</td>
+          <td><span class="sev sev-minor">Minor</span></td>
+          <td>Add a collapse toggle to the inner sidebar (a standard ‹ chevron at the bottom). This is standard in master-detail UIs and lets users who know the nav reclaim screen space for content.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 6. ACCESSIBILITY -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#f0f9ff;">♿</div>
+      <div class="section-title">6. Accessibility</div>
+      <div class="section-count">4 findings</div>
+    </div>
+
+    <div class="callout danger" style="margin-bottom:16px;">
+      <div class="callout-label">WCAG 2.1 AA — Multiple Failures</div>
+      <div class="callout-text">At least three accessibility violations are present that would fail a formal audit. These are not polish items — they are compliance requirements for enterprise security software sold to regulated industries (healthcare, financial services).</div>
+    </div>
+
+    <table class="finding-table">
+      <thead>
+        <tr>
+          <th style="width:32px;">#</th>
+          <th style="width:38%">Finding</th>
+          <th style="width:80px;">Severity</th>
+          <th>Recommendation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>A11-1</strong></td>
+          <td><strong>10px font size on multiple labels.</strong> Severity tags (.sev with 10px), stat labels (10px, 800 weight), attention pills (10px) — these all fall below the WCAG 2.1 recommended minimum of 12px for non-decorative text. At normal monitor distance, 10px text is illegible for users with moderate vision impairment.</td>
+          <td><span class="sev sev-critical">Critical</span></td>
+          <td>Raise all UI text to a minimum of 12px. For labels currently at 10px that are space-constrained, increase to 11px and accept the layout impact — do not solve a layout problem by making text inaccessible. Revisit font-weight 800 at 10px: heavy weight does not compensate for small size.</td>
+        </tr>
+        <tr>
+          <td><strong>A11-2</strong></td>
+          <td><strong>Orange (#ff5d00) on white for text may fail contrast.</strong> The orange "view all" links and count pill text on orange backgrounds need verification. At its pure value, #ff5d00 on white is approximately 3.0:1 — below the 4.5:1 AA requirement for normal text and below 3:1 for large text if the text is small.</td>
+          <td><span class="sev sev-critical">Critical</span></td>
+          <td>Run a contrast check on all orange-on-white text elements. Where contrast fails, darken the orange to #c24903 (the existing fill-orange-x-darker token) for text specifically. Never use the brand orange for text on white backgrounds — use it only for icons and large UI elements where AA large-text thresholds apply.</td>
+        </tr>
+        <tr>
+          <td><strong>A11-3</strong></td>
+          <td><strong>Expandable triage items have no ARIA attributes.</strong> The "View 9 alerts ↓" buttons control show/hide content but have no <code>aria-expanded</code> attribute. Screen readers cannot communicate the toggle state to visually impaired users.</td>
+          <td><span class="sev sev-critical">Critical</span></td>
+          <td>Add <code>aria-expanded="false"</code> to all expand-toggle buttons; update to <code>aria-expanded="true"</code> on click. Also add <code>aria-controls="[id-of-expanded-section]"</code> to associate the button with the content it controls.</td>
+        </tr>
+        <tr>
+          <td><strong>A11-4</strong></td>
+          <td><strong>Sidebar icon buttons have no persistent accessible name.</strong> The <code>&lt;img alt="Attention"&gt;</code> inside sidebar buttons provides an alt text, but tooltip-only labels are not a sufficient accessible name for interactive controls — tooltips are not read on keyboard focus by default.</td>
+          <td><span class="sev sev-moderate">Moderate</span></td>
+          <td>Add <code>aria-label="Priority Actions"</code> directly to each <code>.sb-btn</code> element. This ensures keyboard and screen-reader users get the label on focus, independent of hover state.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 7. INTERACTION DESIGN -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#f5f3ff;">⚡</div>
+      <div class="section-title">7. Interaction Design</div>
+      <div class="section-count">3 findings</div>
+    </div>
+
+    <table class="finding-table">
+      <thead>
+        <tr>
+          <th style="width:32px;">#</th>
+          <th style="width:38%">Finding</th>
+          <th style="width:80px;">Severity</th>
+          <th>Recommendation + Alternate Ideas</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>IX-1</strong></td>
+          <td><strong>Abrupt view-mode switch between Sidebar / Smart Feed / Charts.</strong> Clicking a view toggle swaps the entire content area instantly with no transition. For a content-heavy panel, this creates a jarring visual jump — especially switching to Charts where a Chart.js canvas must render.</td>
+          <td><span class="sev sev-moderate">Moderate</span></td>
+          <td>Add a 150ms opacity fade-out + fade-in transition between view modes (CSS <code>opacity: 0 → 1</code> on the content container). For the Charts view specifically, show a skeleton loader (grey placeholder bars) while Chart.js renders the canvas.</td>
+        </tr>
+        <tr>
+          <td><strong>IX-2</strong></td>
+          <td><strong>No loading or skeleton state for the insights list panel.</strong> When switching categories in the inner sidebar (e.g., CVE → Policy Gaps), the list re-renders from JS immediately. On real data with API latency, this will produce a blank-flash. No loading state is designed.</td>
+          <td><span class="sev sev-moderate">Moderate</span></td>
+          <td>Design 2–3 skeleton list-row cards (grey placeholder rectangles simulating the row shape) that display during any data fetch. Show them for a minimum of 150ms even if data arrives faster — prevents the flash-of-empty-state.</td>
+        </tr>
+        <tr>
+          <td><strong>IX-3</strong></td>
+          <td><strong>SAMI Chat quick cards disappear after first message sent.</strong> The 4 quick-prompt cards (qcards) likely hide after a user sends a first message. If the user wants to re-use a quick prompt mid-conversation, they have no way to resurface them without knowing the exact wording.</td>
+          <td><span class="sev sev-minor">Minor</span></td>
+          <td>Keep quick cards accessible in a collapsed state after first use — a small "Suggestions" chip at the bottom of the chat that expands them on click. This preserves the discoverability benefit without cluttering an active conversation.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- WHAT WORKS WELL -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#f0fdf4;">✅</div>
+      <div class="section-title">What Works Well</div>
+    </div>
+    <div class="works-grid">
+      <div class="works-card">
+        <div class="works-title">SAMI natural language analysis is exceptional</div>
+        <div class="works-body">The triage card analysis text ("9 Emergency-level connection failures — cyclical failure pattern suggests upstream ISP instability") does exactly what an AI briefing should: it reduces noise, names the pattern, and suggests the cause. This is the product's strongest differentiator and should be amplified, not hidden.</div>
+      </div>
+      <div class="works-card">
+        <div class="works-title">Source attribution on Active Incidents is a model to replicate</div>
+        <div class="works-body">"SAMI AI · from 50 firewall alerts" establishes trust immediately — users know the AI didn't fabricate a finding. This should be applied consistently to every AI-generated surface in the product.</div>
+      </div>
+      <div class="works-card">
+        <div class="works-title">Action-first SAMI Recommendations design</div>
+        <div class="works-body">Each recommendation leads with a specific CTA ("Patch 8 firewalls," "Enforce MFA now") rather than burying it at the bottom. This matches how security operators work — they need to know what to do, not just what's wrong.</div>
+      </div>
+      <div class="works-card">
+        <div class="works-title">Three-panel layout on insights page is professionally scaled</div>
+        <div class="works-body">The inner sidebar + list + detail arrangement is a proven enterprise pattern that scales with volume. It gives power users a fast scan → select → act workflow without forcing full-page navigation between items.</div>
+      </div>
+      <div class="works-card">
+        <div class="works-title">UUIF 9.2 token system is rigorously applied</div>
+        <div class="works-body">CSS variables are consistently used throughout both files. No hardcoded colors appear outside the token system. This will make a system-wide reskin straightforward and indicates strong design-system discipline.</div>
+      </div>
+      <div class="works-card">
+        <div class="works-title">SAMI Chat history is a genuine workflow feature</div>
+        <div class="works-body">Showing a prior "AI Policy Creation" conversation in the History tab demonstrates real-world usage patterns and immediately communicates SAMI's scope. This is better than showing an empty state or synthetic examples.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRIORITY RECOMMENDATIONS -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#fff0eb;">🎯</div>
+      <div class="section-title">Priority Recommendations — Ranked</div>
+    </div>
+
+    <div class="rec-list">
+
+      <div class="rec-card sec">
+        <div class="rec-num">P1 — Critical · Do First</div>
+        <div class="rec-title">Unify severity vocabulary across the entire flow</div>
+        <div class="rec-body">Replace "Emergency / Warning" with "Critical / High" to match the SAMI Recommendations scale. Both surfaces then speak the same language. This is a copy change with downstream CSS impact on the 2 severity tag classes — small effort, high impact.</div>
+        <div class="alt-box">
+          <div class="alt-label">If you want to keep domain language</div>
+          <div class="alt-text">Add a mapping key at the top of the Active Incidents section: "Emergency = Critical · Warning = High" styled as a footnote. Not ideal, but solves the disambiguation problem without a full rename.</div>
+        </div>
+      </div>
+
+      <div class="rec-card sec">
+        <div class="rec-num">P2 — Critical · Do First</div>
+        <div class="rec-title">Fix "View all insights" link + align landing page label to "Priority Actions"</div>
+        <div class="rec-body">Two changes, one PR: (1) Update the href to SAMI insights page v4.html. (2) Rename the landing page right column from "SAMI Recommendation" to "Priority Actions" with a sub-label "From SAMI security analysis." Both changes together close the label inconsistency that survives after the rename made in this session.</div>
+      </div>
+
+      <div class="rec-card sec">
+        <div class="rec-num">P3 — Critical · Do First</div>
+        <div class="rec-title">Raise all 10px text to 12px minimum + audit orange-on-white contrast</div>
+        <div class="rec-body">Accessibility fixes that affect real users. Every .sev badge, .attention-pill, .stat-label, and .org-label using 10px needs to move to 12px. The orange link text on white backgrounds needs a contrast check — switch to #c24903 for text where #ff5d00 fails 4.5:1.</div>
+      </div>
+
+      <div class="rec-card mod">
+        <div class="rec-num">P4 — High · Next Sprint</div>
+        <div class="rec-title">Auto-select first Priority Actions item on insights page load</div>
+        <div class="rec-body">On page load, call siSelectA() with the first item in the Priority Actions list. This eliminates the blank detail panel and immediately shows users SAMI's most critical finding — turning an empty page into an active briefing.</div>
+      </div>
+
+      <div class="rec-card mod">
+        <div class="rec-num">P5 — High · Next Sprint</div>
+        <div class="rec-title">Consolidate the semantic color palette to 3 tiers</div>
+        <div class="rec-body">Audit all colored elements: anything that uses blue, green, amber, or purple as card backgrounds or fill colors should move to white cards with left-border severity stripes. Category colors stay as tag labels only. This reduces visual noise dramatically and lets the red critical signal cut through.</div>
+        <div class="alt-box">
+          <div class="alt-label">Quick Win</div>
+          <div class="alt-text">Start by stripping the purple background from SAMI analysis blocks — change to a subtle left border only. Purple backgrounds compete with the red/orange alert signals and make the page feel busy.</div>
+        </div>
+      </div>
+
+      <div class="rec-card">
+        <div class="rec-num">P6 — Moderate · Backlog</div>
+        <div class="rec-title">Add aria-expanded + aria-label attributes to sidebar and expand buttons</div>
+        <div class="rec-body">Three targeted ARIA additions: (1) aria-label on each .sb-btn, (2) aria-expanded on all .triage-expand buttons, (3) aria-controls linking buttons to their panels. All three are single-attribute HTML changes requiring no CSS or JS work.</div>
+      </div>
+
+      <div class="rec-card">
+        <div class="rec-num">P7 — Moderate · Backlog</div>
+        <div class="rec-title">Make the "Ignore" action on SAMI Recommendations require confirmation</div>
+        <div class="rec-body">Demote the Ignore button to a low-affordance text link and add a confirmation popover with a reason selector ("Already patched / Not applicable / Snooze 7 days / Acknowledged"). This creates an audit trail for dismissed security recommendations — essential in regulated environments.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="doc-footer">
+    <div class="footer-brand">SonicWall · SAMI Phase 2 · Design Review</div>
+    <div class="footer-date">Generated 2026-05-18</div>
+  </div>
+
+</div>
+</body>
+</html>

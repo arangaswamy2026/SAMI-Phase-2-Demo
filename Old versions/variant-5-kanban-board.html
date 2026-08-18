@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+  Design reference: UUIF 9.2 — Kanban Workflow Board. Three-column state-driven layout. Variant 5 of 5.
+  Informed by: sami-rec-scheduling-v1-uuif.html (nav rail, topbar, token definitions, card patterns).
+  Gap: Kanban column layout is a custom SAMI pattern not defined in UUIF 9.2. Extrapolated from Dashboard Card panel pattern.
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAMI Recommendations — Kanban Workflow Board (UUIF 9.2)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
+<style>
+/* ─── TOKEN DEFINITIONS (UUIF 9.2 Light Mode) ─────────────────────────── */
+:root {
+  --uuif-text-primary:   #191c25;
+  --uuif-text-secondary: #4a618f;
+  --uuif-text-tertiary:  #888888;
+  --uuif-text-contrast:  #ffffff;
+  --uuif-text-disabled:  rgba(17,17,17,0.3);
+  --uuif-text-hover:     #ff5d00;
+  --uuif-text-highlight: #0c2b67;
+
+  --uuif-surface-container: #ffffff;
+  --uuif-surface-bg:        #f0f2f5;
+  --uuif-surface-primary:   #5b74a7;
+  --uuif-surface-secondary: #d2dff2;
+  --uuif-surface-tertiary:  #f6f8fe;
+  --uuif-surface-highlight: #ff5d00;
+  --uuif-surface-hover:     rgba(17,17,17,0.06);
+  --uuif-surface-selected:  rgba(255,72,26,0.09);
+  --uuif-surface-disabled:  #e8eff9;
+  --uuif-surface-contrast:  #111315;
+  --uuif-surface-model:     #f0f2f5;
+
+  --uuif-border-primary:     #ff5d00;
+  --uuif-border-secondary:   #78a3e5;
+  --uuif-border-tertiary:    #cccccc;
+  --uuif-border-transparent: rgba(17,17,17,0.09);
+  --uuif-border-disabled:    #d2dff2;
+  --uuif-border-hover:       #ff5d00;
+
+  --uuif-icon-primary:   #5885cc;
+  --uuif-icon-secondary: #9dafd3;
+  --uuif-icon-tertiary:  #62686d;
+  --uuif-icon-hover:     #ff5d00;
+
+  --uuif-brand-navy:   #001b50;
+  --uuif-brand-blue:   #1f3c73;
+  --uuif-brand-orange: #ff5d00;
+  --uuif-brand-green:  #59a02e;
+  --uuif-brand-red:    #c70f0f;
+  --uuif-brand-yellow: #f3ac3d;
+
+  --uuif-fill-blue-lightest:      #f6f8fe;
+  --uuif-fill-green-xxx-lighter:  #e3efdc;
+  --uuif-fill-yellow-xxx-lighter: #ffe9be;
+  --uuif-fill-red-lightest:       #fff0f0;
+  --uuif-fill-orange-xx-lighter:  #ffeee5;
+
+  --uuif-sp-1:  2px;
+  --uuif-sp-2:  4px;
+  --uuif-sp-3:  8px;
+  --uuif-sp-4:  12px;
+  --uuif-sp-5:  16px;
+  --uuif-sp-6:  20px;
+  --uuif-sp-7:  24px;
+  --uuif-sp-8:  32px;
+  --uuif-sp-9:  40px;
+  --uuif-sp-10: 48px;
+
+  --uuif-radius-4:    4px;
+  --uuif-radius-6:    6px;
+  --uuif-radius-8:    8px;
+  --uuif-radius-12:   12px;
+  --uuif-radius-pill: 88px;
+
+  --uuif-shadow-sm: 0px 1px 6px 2px rgba(0,0,0,0.10);
+  --uuif-shadow-md: 0px 4px 12px 0px rgba(0,0,0,0.14);
+}
+
+/* ─── RESET + BASE ─────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: 'Nunito Sans', sans-serif;
+  background: var(--uuif-surface-bg);
+  color: var(--uuif-text-primary);
+  font-size: 13px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* ─── SIDEBAR — Primary Nav Rail ─────────────────────────────────────── */
+.sidebar {
+  position: fixed; left: 0; top: 0; width: 60px; height: 100vh;
+  background: var(--uuif-brand-navy);
+  display: flex; flex-direction: column;
+  align-items: center; z-index: 300;
+}
+.sidebar-logo {
+  width: 60px; height: 52px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.sidebar-logo svg { width: 30px; height: 30px; }
+.sidebar-icon {
+  width: 60px; height: 48px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--uuif-icon-secondary);
+  cursor: pointer; position: relative;
+  border-left: 2px solid transparent;
+  transition: color .15s, background .15s;
+}
+.sidebar-icon:hover { color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.06); }
+.sidebar-icon.active {
+  background: rgba(255,255,255,0.10);
+  border-left-color: var(--uuif-brand-orange);
+  color: var(--uuif-brand-orange);
+}
+.sidebar-icon .badge {
+  position: absolute; top: 7px; right: 7px;
+  background: var(--uuif-brand-orange); color: #fff;
+  font-size: 9px; font-weight: 800;
+  border-radius: var(--uuif-radius-pill);
+  min-width: 16px; height: 16px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 3px; letter-spacing: 0;
+}
+.sidebar-spacer { flex: 1; }
+
+/* ─── TOPBAR ─────────────────────────────────────────────────────────── */
+.topbar {
+  position: fixed; left: 60px; right: 0; top: 0; height: 46px;
+  background: var(--uuif-surface-container);
+  border-bottom: 1px solid var(--uuif-border-transparent);
+  display: flex; align-items: center;
+  padding: 0 var(--uuif-sp-5); z-index: 250; gap: var(--uuif-sp-3);
+}
+.breadcrumb {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 12px; color: var(--uuif-text-secondary); flex: 1;
+}
+.breadcrumb a { color: var(--uuif-icon-primary); text-decoration: none; font-weight: 600; }
+.breadcrumb a:hover { color: var(--uuif-text-hover); }
+.breadcrumb .sep { color: var(--uuif-border-tertiary); }
+.breadcrumb .current { color: var(--uuif-text-primary); font-weight: 700; }
+.topbar-right { display: flex; align-items: center; gap: var(--uuif-sp-3); }
+.topbar-chip {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--uuif-surface-tertiary);
+  border: 1px solid var(--uuif-border-disabled);
+  border-radius: var(--uuif-radius-pill);
+  padding: 3px 10px; font-size: 11px;
+  color: var(--uuif-text-secondary); cursor: pointer;
+}
+.topbar-chip .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--uuif-brand-orange); }
+.icon-btn {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--uuif-icon-tertiary);
+  transition: background .15s; position: relative; border: none; background: transparent;
+}
+.icon-btn:hover { background: var(--uuif-surface-hover); }
+.notif-dot {
+  position: absolute; top: 5px; right: 5px; width: 7px; height: 7px;
+  background: var(--uuif-brand-orange); border-radius: 50%;
+  border: 1.5px solid #fff;
+}
+.avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--uuif-brand-blue); color: #fff;
+  font-size: 10px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  letter-spacing: 0.5px;
+}
+
+/* ─── LAYOUT SHELL ───────────────────────────────────────────────────── */
+.app-shell {
+  margin-left: 60px;
+  padding-top: 46px;
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+  transition: margin-right .3s ease;
+}
+.app-shell.panel-open { /* no layout shift; panel overlays */ }
+
+/* ─── PAGE CONTENT ───────────────────────────────────────────────────── */
+.page-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: width .3s;
+}
+
+/* ─── PAGE HEADER BAR ────────────────────────────────────────────────── */
+.page-header {
+  padding: 10px var(--uuif-sp-5) 8px;
+  background: var(--uuif-surface-container);
+  border-bottom: 1px solid var(--uuif-border-transparent);
+  display: flex; align-items: center; gap: var(--uuif-sp-3);
+  flex-shrink: 0;
+}
+.page-title {
+  font-size: 14px; font-weight: 800; color: var(--uuif-text-highlight);
+  letter-spacing: -0.1px;
+}
+.page-subtitle { font-size: 11px; color: var(--uuif-text-tertiary); margin-top: 1px; }
+.page-header-left { flex: 1; }
+.sami-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--uuif-brand-orange); color: #fff;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.5px;
+  border-radius: var(--uuif-radius-4); padding: 2px 6px;
+}
+.view-toggle {
+  display: flex; align-items: center;
+  border: 1px solid var(--uuif-border-disabled);
+  border-radius: var(--uuif-radius-6); overflow: hidden;
+}
+.view-toggle-btn {
+  padding: 4px 10px; font-size: 11px; font-weight: 600;
+  cursor: pointer; border: none; background: transparent;
+  color: var(--uuif-text-secondary); font-family: 'Nunito Sans', sans-serif;
+  transition: background .15s, color .15s; display: flex; align-items: center; gap: 4px;
+}
+.view-toggle-btn.active {
+  background: var(--uuif-brand-navy); color: #fff;
+}
+.view-toggle-btn:not(.active):hover { background: var(--uuif-surface-hover); }
+.header-btn {
+  display: flex; align-items: center; gap: 5px;
+  padding: 5px 12px; border-radius: var(--uuif-radius-6);
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  border: 1px solid; transition: all .15s; font-family: 'Nunito Sans', sans-serif;
+}
+.header-btn.secondary {
+  background: var(--uuif-surface-container);
+  border-color: var(--uuif-border-secondary);
+  color: var(--uuif-text-secondary);
+}
+.header-btn.secondary:hover { background: var(--uuif-fill-blue-lightest); }
+
+/* ─── KANBAN BOARD AREA ───────────────────────────────────────────────── */
+.kanban-board {
+  flex: 1;
+  display: flex;
+  gap: var(--uuif-sp-4);
+  padding: var(--uuif-sp-4) var(--uuif-sp-5);
+  overflow-x: auto;
+  overflow-y: hidden;
+  align-items: flex-start;
+}
+
+/* ─── KANBAN COLUMN ──────────────────────────────────────────────────── */
+.kanban-col {
+  flex: 1;
+  min-width: 280px;
+  max-width: 420px;
+  background: var(--uuif-surface-container);
+  border: 1px solid var(--uuif-border-transparent);
+  border-radius: var(--uuif-radius-8);
+  box-shadow: var(--uuif-shadow-sm);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: calc(100vh - 46px - 60px - 24px);
+}
+.col-header {
+  padding: 12px var(--uuif-sp-4) 10px;
+  border-bottom: 1px solid var(--uuif-border-transparent);
+  display: flex; align-items: center; gap: var(--uuif-sp-3);
+  flex-shrink: 0;
+  position: relative;
+}
+.col-header::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px; border-radius: 8px 0 0 0;
+}
+.col-needs-action .col-header::before { background: var(--uuif-brand-orange); }
+.col-scheduled .col-header::before { background: #2563eb; }
+.col-in-progress .col-header::before { background: var(--uuif-brand-green); }
+
+.col-title {
+  font-size: 12px; font-weight: 800; color: var(--uuif-text-highlight);
+  letter-spacing: 0.3px; flex: 1;
+}
+.col-count {
+  font-size: 11px; font-weight: 700;
+  padding: 2px 7px; border-radius: var(--uuif-radius-pill);
+  min-width: 22px; text-align: center;
+}
+.col-needs-action .col-count { background: var(--uuif-fill-orange-xx-lighter); color: #c24903; }
+.col-scheduled .col-count { background: #eff6ff; color: #2563eb; }
+.col-in-progress .col-count { background: var(--uuif-fill-green-xxx-lighter); color: #478234; }
+
+.col-cards {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--uuif-sp-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--uuif-sp-3);
+}
+.col-cards::-webkit-scrollbar { width: 4px; }
+.col-cards::-webkit-scrollbar-track { background: transparent; }
+.col-cards::-webkit-scrollbar-thumb { background: var(--uuif-border-disabled); border-radius: 2px; }
+
+/* ─── EMPTY STATE ────────────────────────────────────────────────────── */
+.empty-state {
+  display: none;
+  flex-direction: column; align-items: center;
+  padding: 32px 16px; text-align: center;
+  gap: 8px;
+}
+.empty-state-icon { font-size: 28px; opacity: 0.4; }
+.empty-state-text { font-size: 12px; color: var(--uuif-text-tertiary); font-weight: 600; }
+.empty-state-sub { font-size: 11px; color: var(--uuif-text-disabled); }
+.col-cards:empty .empty-state,
+.col-cards.is-empty .empty-state { display: flex; }
+
+/* ─── KANBAN CARD ────────────────────────────────────────────────────── */
+.k-card {
+  background: var(--uuif-surface-container);
+  border: 1px solid var(--uuif-border-transparent);
+  border-radius: var(--uuif-radius-8);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  padding: 11px 11px 10px 13px;
+  cursor: pointer;
+  position: relative;
+  transition: box-shadow .15s, border-color .15s, transform .15s;
+  overflow: hidden;
+}
+.k-card::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px;
+}
+.k-card.needs-action::before { background: var(--uuif-brand-orange); }
+.k-card.scheduled::before { background: #2563eb; }
+.k-card.in-progress::before { background: var(--uuif-brand-green); }
+.k-card:hover { box-shadow: var(--uuif-shadow-md); border-color: var(--uuif-border-disabled); transform: translateY(-1px); }
+
+/* Card header row */
+.k-card-top {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 5px;
+}
+.cat-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 7px; border-radius: var(--uuif-radius-pill);
+  font-size: 10px; font-weight: 700; letter-spacing: 0.2px;
+}
+.cat-chip .cdot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.chip-cve    { background: #fff4e5; color: #b45309; }
+.chip-cve    .cdot { background: var(--uuif-brand-orange); }
+.chip-device { background: var(--uuif-fill-blue-lightest); color: #1d4ed8; }
+.chip-device .cdot { background: #2563eb; }
+.chip-behav  { background: var(--uuif-fill-red-lightest); color: #991b1b; }
+.chip-behav  .cdot { background: var(--uuif-brand-red); }
+.chip-policy { background: #f3f0ff; color: #6d28d9; }
+.chip-policy .cdot { background: #7c3aed; }
+.chip-sub    { background: var(--uuif-fill-yellow-xxx-lighter); color: #92400e; }
+.chip-sub    .cdot { background: var(--uuif-brand-yellow); }
+
+.sev-badge {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--uuif-brand-red); color: #fff;
+  font-size: 11px; font-weight: 900;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-left: 4px;
+}
+
+/* Card title */
+.k-card-title {
+  font-size: 12px; font-weight: 800; color: var(--uuif-text-primary);
+  line-height: 1.35; margin-bottom: 4px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Tenant/device line */
+.k-card-tenants {
+  font-size: 11px; color: var(--uuif-text-tertiary);
+  margin-bottom: 7px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* Urgency line */
+.urgency-line {
+  font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; gap: 4px;
+  margin-bottom: 7px; color: var(--uuif-brand-red);
+}
+
+/* Scheduled time line */
+.sched-time {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 12px; font-weight: 700; color: #1d4ed8;
+  margin-bottom: 7px;
+}
+.sched-time .t-icon { font-size: 13px; }
+
+/* Progress bar */
+.k-progress-wrap { margin-bottom: 6px; }
+.k-progress-bar {
+  height: 6px; background: #e5f0da; border-radius: 3px; overflow: hidden;
+  margin-bottom: 4px;
+}
+.k-progress-fill {
+  height: 100%; background: var(--uuif-brand-green);
+  border-radius: 3px; transition: width .4s;
+}
+.k-progress-labels {
+  display: flex; justify-content: space-between;
+  font-size: 10px; color: var(--uuif-text-secondary); font-weight: 700;
+}
+.k-eta {
+  font-size: 10px; color: var(--uuif-text-tertiary); margin-bottom: 6px;
+}
+
+/* Card footer */
+.k-card-footer {
+  display: flex; align-items: center; gap: 6px;
+  padding-top: 8px;
+  border-top: 1px solid var(--uuif-border-transparent);
+}
+.k-card-footer.space-between { justify-content: space-between; }
+.btn-primary-sm {
+  padding: 4px 10px; border-radius: var(--uuif-radius-6);
+  background: var(--uuif-brand-orange); color: #fff;
+  font-size: 11px; font-weight: 700; border: none; cursor: pointer;
+  font-family: 'Nunito Sans', sans-serif;
+  transition: background .15s; white-space: nowrap;
+}
+.btn-primary-sm:hover { background: #e04e00; }
+.btn-primary-sm.blue { background: #2563eb; }
+.btn-primary-sm.blue:hover { background: #1d4ed8; }
+.btn-primary-sm.green { background: var(--uuif-brand-green); }
+.btn-primary-sm.green:hover { background: #478234; }
+.btn-secondary-sm {
+  padding: 4px 10px; border-radius: var(--uuif-radius-6);
+  background: transparent; color: var(--uuif-text-secondary);
+  font-size: 11px; font-weight: 700;
+  border: 1px solid var(--uuif-border-secondary); cursor: pointer;
+  font-family: 'Nunito Sans', sans-serif;
+  transition: background .15s, color .15s; white-space: nowrap;
+}
+.btn-secondary-sm:hover { background: var(--uuif-fill-blue-lightest); color: var(--uuif-text-highlight); }
+.link-sm {
+  font-size: 11px; color: var(--uuif-icon-primary); font-weight: 700;
+  text-decoration: none; cursor: pointer; white-space: nowrap;
+  transition: color .15s;
+}
+.link-sm:hover { color: var(--uuif-brand-orange); }
+.spacer-flex { flex: 1; }
+
+/* ─── SLIDE-OVER PANEL ────────────────────────────────────────────────── */
+.slideover {
+  position: fixed; right: 0; top: 46px; bottom: 0;
+  width: 420px;
+  background: var(--uuif-surface-container);
+  border-left: 1px solid var(--uuif-border-transparent);
+  box-shadow: -4px 0 20px rgba(0,0,0,0.12);
+  z-index: 400;
+  display: flex; flex-direction: column;
+  transform: translateX(100%);
+  transition: transform .28s cubic-bezier(.4,0,.2,1);
+  overflow: hidden;
+}
+.slideover.open { transform: translateX(0); }
+
+.so-header {
+  padding: 12px var(--uuif-sp-5) 10px;
+  border-bottom: 1px solid var(--uuif-border-transparent);
+  display: flex; align-items: flex-start; gap: var(--uuif-sp-3);
+  flex-shrink: 0;
+}
+.so-header-left { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.so-cat-row { display: flex; align-items: center; gap: 6px; }
+.so-title {
+  font-size: 15px; font-weight: 800; color: var(--uuif-text-highlight);
+  line-height: 1.3;
+}
+.so-close {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; border: none; background: transparent;
+  color: var(--uuif-text-tertiary); font-size: 16px;
+  transition: background .15s; flex-shrink: 0; margin-top: 2px;
+}
+.so-close:hover { background: var(--uuif-surface-hover); color: var(--uuif-text-primary); }
+
+.so-body {
+  flex: 1; overflow-y: auto; padding: var(--uuif-sp-4) var(--uuif-sp-5);
+  display: flex; flex-direction: column; gap: var(--uuif-sp-4);
+}
+.so-body::-webkit-scrollbar { width: 4px; }
+.so-body::-webkit-scrollbar-thumb { background: var(--uuif-border-disabled); border-radius: 2px; }
+
+.so-section-label {
+  font-size: 10px; font-weight: 800; color: var(--uuif-text-secondary);
+  letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 5px;
+}
+.so-scope {
+  font-size: 12px; color: var(--uuif-text-primary);
+  display: flex; flex-wrap: wrap; gap: 5px;
+}
+.scope-pill {
+  background: var(--uuif-surface-secondary); color: var(--uuif-text-highlight);
+  border-radius: var(--uuif-radius-pill); padding: 2px 8px;
+  font-size: 11px; font-weight: 700;
+}
+
+/* SAMI info banner */
+.sami-banner {
+  background: var(--uuif-fill-blue-lightest);
+  border: 1px solid var(--uuif-border-secondary);
+  border-radius: var(--uuif-radius-8);
+  padding: 10px 12px;
+  display: flex; gap: 8px;
+}
+.sami-banner-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+.sami-banner-text { font-size: 12px; color: var(--uuif-text-secondary); line-height: 1.5; flex: 1; }
+.sami-banner-tag {
+  display: inline-flex; align-items: center; gap: 3px;
+  background: var(--uuif-brand-orange); color: #fff;
+  font-size: 9px; font-weight: 800; letter-spacing: 0.5px;
+  border-radius: var(--uuif-radius-4); padding: 1px 5px;
+  vertical-align: middle; margin-right: 4px;
+}
+
+/* Evidence list */
+.evidence-list { display: flex; flex-direction: column; gap: 5px; }
+.evidence-item {
+  display: flex; align-items: flex-start; gap: 7px;
+  font-size: 12px; color: var(--uuif-text-primary); line-height: 1.4;
+}
+.evidence-icon { font-size: 12px; flex-shrink: 0; margin-top: 1px; color: var(--uuif-icon-primary); }
+
+/* Timeline */
+.timeline { display: flex; flex-direction: column; gap: 0; }
+.tl-item {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding-bottom: 10px; position: relative;
+}
+.tl-item:last-child { padding-bottom: 0; }
+.tl-item::before {
+  content: '';
+  position: absolute; left: 7px; top: 18px;
+  width: 2px; height: calc(100% - 14px);
+  background: var(--uuif-border-disabled);
+}
+.tl-item:last-child::before { display: none; }
+.tl-dot {
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--uuif-surface-container);
+  border: 2px solid var(--uuif-border-secondary);
+  flex-shrink: 0; margin-top: 1px; z-index: 1;
+  display: flex; align-items: center; justify-content: center;
+}
+.tl-dot.active { border-color: var(--uuif-brand-orange); background: var(--uuif-brand-orange); }
+.tl-dot.done { border-color: var(--uuif-brand-green); background: var(--uuif-brand-green); }
+.tl-dot.pending { border-color: var(--uuif-border-tertiary); }
+.tl-dot svg { width: 7px; height: 7px; }
+.tl-content { flex: 1; }
+.tl-date { font-size: 10px; font-weight: 700; color: var(--uuif-text-tertiary); margin-bottom: 1px; }
+.tl-desc { font-size: 12px; color: var(--uuif-text-primary); line-height: 1.4; }
+
+/* ─── SLIDE-OVER FOOTER ──────────────────────────────────────────────── */
+.so-footer {
+  border-top: 1px solid var(--uuif-border-transparent);
+  padding: 12px var(--uuif-sp-5);
+  flex-shrink: 0;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.so-footer-row { display: flex; align-items: center; gap: 8px; }
+.so-footer-row.space-between { justify-content: space-between; }
+.btn-primary-footer {
+  padding: 7px 16px; border-radius: var(--uuif-radius-6);
+  background: var(--uuif-brand-orange); color: #fff;
+  font-size: 12px; font-weight: 700; border: none; cursor: pointer;
+  font-family: 'Nunito Sans', sans-serif; transition: background .15s;
+}
+.btn-primary-footer:hover { background: #e04e00; }
+.btn-primary-footer.blue { background: #2563eb; }
+.btn-primary-footer.blue:hover { background: #1d4ed8; }
+.btn-secondary-footer {
+  padding: 6px 14px; border-radius: var(--uuif-radius-6);
+  background: transparent; color: var(--uuif-text-secondary);
+  font-size: 12px; font-weight: 700;
+  border: 1px solid var(--uuif-border-secondary); cursor: pointer;
+  font-family: 'Nunito Sans', sans-serif; transition: background .15s;
+}
+.btn-secondary-footer:hover { background: var(--uuif-fill-blue-lightest); }
+.btn-danger-footer {
+  padding: 6px 14px; border-radius: var(--uuif-radius-6);
+  background: transparent; color: var(--uuif-brand-red);
+  font-size: 12px; font-weight: 700;
+  border: 1px solid #fca5a5; cursor: pointer;
+  font-family: 'Nunito Sans', sans-serif; transition: background .15s;
+}
+.btn-danger-footer:hover { background: var(--uuif-fill-red-lightest); }
+.link-footer {
+  font-size: 12px; color: var(--uuif-icon-primary); font-weight: 700;
+  cursor: pointer; text-decoration: none; transition: color .15s;
+}
+.link-footer:hover { color: var(--uuif-brand-orange); }
+
+/* Scheduling footer panels */
+.footer-state { display: none; }
+.footer-state.active { display: flex; flex-direction: column; gap: 8px; }
+
+/* Time picker options */
+.time-options { display: flex; flex-direction: column; gap: 5px; }
+.time-option {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 8px 10px; border-radius: var(--uuif-radius-6);
+  border: 1.5px solid var(--uuif-border-disabled);
+  cursor: pointer; transition: border-color .15s, background .15s;
+  background: var(--uuif-surface-container);
+}
+.time-option:hover { border-color: var(--uuif-border-secondary); background: var(--uuif-fill-blue-lightest); }
+.time-option.selected { border-color: #2563eb; background: #eff6ff; }
+.time-option-radio {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 2px solid var(--uuif-border-tertiary);
+  margin-top: 1px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color .15s;
+}
+.time-option.selected .time-option-radio { border-color: #2563eb; }
+.time-option.selected .time-option-radio::after {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: #2563eb; display: block;
+}
+.time-option-text { flex: 1; }
+.time-option-label { font-size: 12px; font-weight: 700; color: var(--uuif-text-primary); }
+.time-option-sub { font-size: 11px; color: var(--uuif-text-tertiary); margin-top: 1px; }
+
+/* SAMI reasoning box */
+.sami-reasoning {
+  background: var(--uuif-fill-blue-lightest);
+  border: 1px solid var(--uuif-border-secondary);
+  border-radius: var(--uuif-radius-6);
+  padding: 8px 10px;
+  font-size: 11px; color: var(--uuif-text-secondary); line-height: 1.5;
+  display: flex; gap: 6px;
+}
+.sami-reasoning-icon { font-size: 12px; flex-shrink: 0; color: var(--uuif-icon-primary); }
+
+/* Scheduled confirmed state */
+.sched-confirmed {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-radius: var(--uuif-radius-6);
+  background: #eff6ff; border: 1px solid #bfdbfe;
+}
+.sched-confirmed-icon { font-size: 16px; }
+.sched-confirmed-text { flex: 1; }
+.sched-confirmed-label { font-size: 12px; font-weight: 800; color: #1d4ed8; }
+.sched-confirmed-sub { font-size: 11px; color: #3b82f6; }
+
+/* In-progress footer state */
+.ip-progress-wrap { background: var(--uuif-fill-green-xxx-lighter); border-radius: var(--uuif-radius-6); padding: 8px 10px; }
+.ip-progress-bar { height: 8px; background: #c1e0ab; border-radius: 4px; overflow: hidden; margin-bottom: 5px; }
+.ip-progress-fill { height: 100%; background: var(--uuif-brand-green); border-radius: 4px; }
+.ip-progress-labels { display: flex; justify-content: space-between; font-size: 11px; color: #478234; font-weight: 700; }
+.ip-eta { font-size: 11px; color: var(--uuif-text-tertiary); margin-top: 3px; }
+
+/* ─── TOAST ──────────────────────────────────────────────────────────── */
+.toast-container {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  z-index: 600; display: flex; flex-direction: column; align-items: center; gap: 6px;
+  pointer-events: none;
+}
+.toast {
+  background: var(--uuif-surface-contrast); color: #fff;
+  padding: 9px 18px; border-radius: var(--uuif-radius-pill);
+  font-size: 12px; font-weight: 600;
+  box-shadow: var(--uuif-shadow-md);
+  animation: toastIn .25s ease, toastOut .25s ease 2.5s forwards;
+  display: flex; align-items: center; gap: 7px;
+  max-width: 380px; text-align: center; pointer-events: auto;
+}
+.toast.success { background: #166534; }
+.toast.warn { background: #854d0e; }
+.toast.info { background: var(--uuif-brand-blue); }
+@keyframes toastIn  { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
+@keyframes toastOut { from { opacity:1; transform: translateY(0); } to { opacity:0; transform: translateY(8px); } }
+
+/* ─── UTILS ─────────────────────────────────────────────────────────── */
+.hidden { display: none !important; }
+.divider { height: 1px; background: var(--uuif-border-transparent); margin: 2px 0; }
+
+/* Scrollbar global */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--uuif-border-disabled); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SIDEBAR — Primary Nav Rail
+═══════════════════════════════════════════════════════════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M15 2L27 8.5V21.5L15 28L3 21.5V8.5L15 2Z" fill="#ff5d00" opacity="0.9"/>
+      <path d="M15 7L22 11V19L15 23L8 19V11L15 7Z" fill="white" opacity="0.15"/>
+      <text x="15" y="18.5" text-anchor="middle" font-family="Nunito Sans,sans-serif" font-size="8" font-weight="800" fill="white">SW</text>
+    </svg>
+  </div>
+  <div class="sidebar-icon" title="Dashboard">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="1.5" fill="currentColor" opacity="0.7"/><rect x="13" y="3" width="8" height="8" rx="1.5" fill="currentColor" opacity="0.4"/><rect x="3" y="13" width="8" height="8" rx="1.5" fill="currentColor" opacity="0.4"/><rect x="13" y="13" width="8" height="8" rx="1.5" fill="currentColor" opacity="0.4"/></svg>
+  </div>
+  <div class="sidebar-icon active" title="SAMI Recommendations">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v6l3.5 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <span class="badge">5</span>
+  </div>
+  <div class="sidebar-icon" title="Tenants">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+  </div>
+  <div class="sidebar-icon" title="Devices">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 20h8M12 18v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+  </div>
+  <div class="sidebar-icon" title="Licenses">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="9" y="3" width="6" height="4" rx="1" stroke="currentColor" stroke-width="1.8"/></svg>
+  </div>
+  <div class="sidebar-spacer"></div>
+  <div class="sidebar-icon" title="Settings">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="1.8"/></svg>
+  </div>
+  <div style="height:12px;"></div>
+</aside>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     TOPBAR
+═══════════════════════════════════════════════════════════════════ -->
+<header class="topbar">
+  <div class="breadcrumb">
+    <a href="#">NSM</a>
+    <span class="sep">›</span>
+    <a href="#">SAMI</a>
+    <span class="sep">›</span>
+    <span class="current">Recommendations</span>
+  </div>
+  <div class="topbar-right">
+    <div class="topbar-chip">
+      <span class="dot"></span>
+      All tenants (4)
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </div>
+    <button class="icon-btn" title="Refresh">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M1 4v6h6M23 20v-6h-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <button class="icon-btn" title="Notifications">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.73 21a2 2 0 01-3.46 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span class="notif-dot"></span>
+    </button>
+    <div class="avatar">AR</div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     APP SHELL
+═══════════════════════════════════════════════════════════════════ -->
+<div class="app-shell" id="appShell">
+  <div class="page-content">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="page-title">SAMI Recommendations <span class="sami-tag">SAMI</span></div>
+        <div class="page-subtitle">5 recommendations · 2 need immediate action · Last updated just now</div>
+      </div>
+      <div class="view-toggle">
+        <button class="view-toggle-btn" onclick="window.location.href='sami-ai-list-view.html'" title="List view">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+          List
+        </button>
+        <button class="view-toggle-btn active" title="Kanban view">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="5" height="18" rx="1" fill="currentColor"/><rect x="10" y="3" width="5" height="13" rx="1" fill="currentColor"/><rect x="17" y="3" width="5" height="10" rx="1" fill="currentColor"/></svg>
+          Board
+        </button>
+      </div>
+      <button class="header-btn secondary" onclick="showToast('Filtering options — coming soon', 'info')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Filter
+      </button>
+    </div>
+
+    <!-- Kanban Board -->
+    <div class="kanban-board" id="kanbanBoard">
+
+      <!-- ─── COLUMN 1: Needs Action ──────────────────────────────── -->
+      <div class="kanban-col col-needs-action" id="col-needs-action">
+        <div class="col-header">
+          <div class="col-title">Needs Action</div>
+          <span class="col-count" id="badge-needs-action">2</span>
+        </div>
+        <div class="col-cards" id="cards-needs-action">
+
+          <!-- Card: Item 2 — Behavioral Anomaly -->
+          <div class="k-card needs-action" id="card-2" onclick="openPanel(2)" data-item="2">
+            <div class="k-card-top">
+              <span class="cat-chip chip-behav"><span class="cdot"></span>Behavioral Anomaly</span>
+              <span class="sev-badge" title="Critical severity">!</span>
+            </div>
+            <div class="k-card-title">Credential Stuffing Attack — Admin Accounts Actively Targeted</div>
+            <div class="k-card-tenants">Beta Networks · Crown Logistics · 2 admins targeted</div>
+            <div class="urgency-line">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+              Active attack — immediate action required
+            </div>
+            <div class="k-card-footer">
+              <button class="btn-secondary-sm" onclick="event.stopPropagation(); openScheduleFlow(2)" title="Schedule for later">Schedule →</button>
+              <span class="spacer-flex"></span>
+              <button class="btn-primary-sm" onclick="event.stopPropagation(); actNow(2)" title="Act now">Act now</button>
+            </div>
+          </div>
+
+          <!-- Card: Item 4 — Subscription Expiry -->
+          <div class="k-card needs-action" id="card-4" onclick="openPanel(4)" data-item="4">
+            <div class="k-card-top">
+              <span class="cat-chip chip-sub"><span class="cdot"></span>Subscription Expiry</span>
+              <span class="sev-badge" title="High severity">!</span>
+            </div>
+            <div class="k-card-title">ATP Subscriptions Expiring — 3 Tenants at Risk</div>
+            <div class="k-card-tenants">Acme Corp · Beta Networks · Delta Financial · 21 firewalls</div>
+            <div class="urgency-line">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+              9 days to expiry · $87K ARR at risk
+            </div>
+            <div class="k-card-footer">
+              <button class="btn-secondary-sm" onclick="event.stopPropagation(); openScheduleFlow(4)" title="Schedule for later">Schedule →</button>
+              <span class="spacer-flex"></span>
+              <button class="btn-primary-sm" onclick="event.stopPropagation(); actNow(4)" title="Act now">Act now</button>
+            </div>
+          </div>
+
+          <!-- Empty state (hidden by default) -->
+          <div class="empty-state" id="empty-needs-action" style="display:none;">
+            <div class="empty-state-icon">✅</div>
+            <div class="empty-state-text">No actions needed</div>
+            <div class="empty-state-sub">All items have been scheduled or actioned.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ─── COLUMN 2: Scheduled ───────────────────────────────── -->
+      <div class="kanban-col col-scheduled" id="col-scheduled">
+        <div class="col-header">
+          <div class="col-title">Scheduled</div>
+          <span class="col-count" id="badge-scheduled">2</span>
+        </div>
+        <div class="col-cards" id="cards-scheduled">
+
+          <!-- Card: Item 1 — Device / BGP -->
+          <div class="k-card scheduled" id="card-1" onclick="openPanel(1)" data-item="1">
+            <div class="k-card-top">
+              <span class="cat-chip chip-device"><span class="cdot"></span>Device Connectivity</span>
+            </div>
+            <div class="k-card-title">3 Gateways Offline After BGP Route Withdrawal</div>
+            <div class="k-card-tenants">New Haven Medical · Dallas Logistics · 847 endpoints</div>
+            <div class="sched-time">
+              <span class="t-icon">📅</span>
+              Tonight, 11:00 PM
+            </div>
+            <div class="k-card-footer space-between">
+              <a class="link-sm" onclick="event.stopPropagation(); openReschedule(1)" title="Reschedule">Reschedule</a>
+              <button class="btn-primary-sm blue" onclick="event.stopPropagation(); deployNow(1)">Deploy now</button>
+            </div>
+          </div>
+
+          <!-- Card: Item 3 — Policy Gap -->
+          <div class="k-card scheduled" id="card-3" onclick="openPanel(3)" data-item="3">
+            <div class="k-card-top">
+              <span class="cat-chip chip-policy"><span class="cdot"></span>Policy Gap</span>
+            </div>
+            <div class="k-card-title">9 Firewalls with Permit-Any Outbound — Policy Baseline Push</div>
+            <div class="k-card-tenants">Acme Corp · Beta Networks · Westfield IT · 9 firewalls</div>
+            <div class="sched-time">
+              <span class="t-icon">📅</span>
+              Monday, 2:00 AM
+            </div>
+            <div class="k-card-footer space-between">
+              <a class="link-sm" onclick="event.stopPropagation(); openReschedule(3)" title="Reschedule">Reschedule</a>
+              <button class="btn-primary-sm blue" onclick="event.stopPropagation(); deployNow(3)">Deploy now</button>
+            </div>
+          </div>
+
+          <!-- Empty state -->
+          <div class="empty-state" id="empty-scheduled" style="display:none;">
+            <div class="empty-state-icon">📅</div>
+            <div class="empty-state-text">Nothing scheduled</div>
+            <div class="empty-state-sub">Move items here by scheduling from Needs Action.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ─── COLUMN 3: In Progress ─────────────────────────────── -->
+      <div class="kanban-col col-in-progress" id="col-in-progress">
+        <div class="col-header">
+          <div class="col-title">In Progress</div>
+          <span class="col-count" id="badge-in-progress">1</span>
+        </div>
+        <div class="col-cards" id="cards-in-progress">
+
+          <!-- Card: Item 0 — CVE -->
+          <div class="k-card in-progress" id="card-0" onclick="openPanel(0)" data-item="0">
+            <div class="k-card-top">
+              <span class="cat-chip chip-cve"><span class="cdot"></span>CVE Vulnerability</span>
+            </div>
+            <div class="k-card-title">CVE-2026-1142: Critical RCE Patch — SonicOS SSL VPN Gateway</div>
+            <div class="k-card-tenants">Acme Corp · Beta Networks · Crown Logistics · 12 firewalls</div>
+            <div class="k-progress-wrap">
+              <div class="k-progress-bar">
+                <div class="k-progress-fill" style="width:72%;"></div>
+              </div>
+              <div class="k-progress-labels">
+                <span>72% complete</span>
+                <span>7 / 12 devices</span>
+              </div>
+            </div>
+            <div class="k-eta">⏱ ~28 min remaining</div>
+            <div class="k-card-footer space-between">
+              <a class="link-sm" onclick="event.stopPropagation(); openPanel(0)" title="View live progress">View live progress</a>
+              <button class="btn-secondary-sm" onclick="event.stopPropagation(); pauseDeployment(0)">Pause</button>
+            </div>
+          </div>
+
+          <!-- Empty state -->
+          <div class="empty-state" id="empty-in-progress" style="display:none;">
+            <div class="empty-state-icon">⚙️</div>
+            <div class="empty-state-text">No active deployments</div>
+            <div class="empty-state-sub">Deployments in progress will appear here.</div>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /kanban-board -->
+  </div><!-- /page-content -->
+</div><!-- /app-shell -->
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SLIDE-OVER DETAIL PANEL
+═══════════════════════════════════════════════════════════════════ -->
+<div class="slideover" id="slideover">
+
+  <!-- SO Header -->
+  <div class="so-header">
+    <div class="so-header-left">
+      <div class="so-cat-row" id="so-cat-row"></div>
+      <div class="so-title" id="so-title"></div>
+    </div>
+    <button class="so-close" onclick="closePanel()" title="Close">×</button>
+  </div>
+
+  <!-- SO Body -->
+  <div class="so-body" id="so-body">
+
+    <!-- Scope -->
+    <div>
+      <div class="so-section-label">Scope</div>
+      <div class="so-scope" id="so-scope"></div>
+    </div>
+
+    <!-- SAMI Note Banner -->
+    <div class="sami-banner" id="so-sami-banner">
+      <div class="sami-banner-icon">🤖</div>
+      <div class="sami-banner-text" id="so-sami-text"></div>
+    </div>
+
+    <!-- Evidence -->
+    <div>
+      <div class="so-section-label">Evidence</div>
+      <div class="evidence-list" id="so-evidence"></div>
+    </div>
+
+    <!-- Timeline -->
+    <div>
+      <div class="so-section-label">Timeline</div>
+      <div class="timeline" id="so-timeline"></div>
+    </div>
+
+  </div>
+
+  <!-- SO Footer -->
+  <div class="so-footer" id="so-footer">
+
+    <!-- State 0: Default -->
+    <div class="footer-state active" id="fs-default">
+      <div class="so-footer-row space-between">
+        <a class="link-footer" onclick="showToast('Opening device list…', 'info')">View devices</a>
+        <div style="display:flex;gap:7px;">
+          <button class="btn-secondary-footer" id="fs-default-sched-btn" onclick="switchFooterState('scheduling')">Schedule for later</button>
+          <button class="btn-primary-footer" id="fs-default-action-btn" onclick="footerPrimaryAction()">Deploy patch</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- State 1: Scheduling -->
+    <div class="footer-state" id="fs-scheduling">
+      <div style="font-size:12px;font-weight:800;color:var(--uuif-text-highlight);">Choose deployment time</div>
+      <div class="time-options" id="time-options">
+        <div class="time-option selected" id="to-0" onclick="selectTime(0)">
+          <div class="time-option-radio"></div>
+          <div class="time-option-text">
+            <div class="time-option-label">Tonight, 11:00 PM</div>
+            <div class="time-option-sub">Within maintenance window (10 PM–2 AM)</div>
+          </div>
+        </div>
+        <div class="time-option" id="to-1" onclick="selectTime(1)">
+          <div class="time-option-radio"></div>
+          <div class="time-option-text">
+            <div class="time-option-label">Tomorrow, 2:00 AM</div>
+            <div class="time-option-sub">Partial overlap — Crown Logistics needs confirmation</div>
+          </div>
+        </div>
+        <div class="time-option" id="to-2" onclick="selectTime(2)">
+          <div class="time-option-radio"></div>
+          <div class="time-option-text">
+            <div class="time-option-label">Monday, 2:00 AM</div>
+            <div class="time-option-sub">Optimal — all maintenance windows align</div>
+          </div>
+        </div>
+        <div class="time-option" id="to-3" onclick="selectTime(3)">
+          <div class="time-option-radio"></div>
+          <div class="time-option-text">
+            <div class="time-option-label">Custom time…</div>
+            <div class="time-option-sub">SAMI will validate against all windows</div>
+          </div>
+        </div>
+      </div>
+      <div class="sami-reasoning" id="sami-reasoning">
+        <span class="sami-reasoning-icon">💡</span>
+        <span id="sami-reasoning-text">Tonight at 11:00 PM falls within Acme Corp's maintenance window (10 PM–2 AM). SAMI will sequence tenant deployments — estimated total window: 38 minutes.</span>
+      </div>
+      <div class="so-footer-row" style="justify-content:flex-end;gap:7px;">
+        <button class="btn-secondary-footer" onclick="switchFooterState('default')">Cancel</button>
+        <button class="btn-primary-footer blue" onclick="confirmSchedule()">Confirm schedule</button>
+      </div>
+    </div>
+
+    <!-- State 2: Scheduled confirmed -->
+    <div class="footer-state" id="fs-scheduled">
+      <div class="sched-confirmed">
+        <span class="sched-confirmed-icon">📅</span>
+        <div class="sched-confirmed-text">
+          <div class="sched-confirmed-label" id="sched-confirmed-label">Scheduled: Tonight, 11:00 PM</div>
+          <div class="sched-confirmed-sub">SAMI will begin automated deployment at the scheduled time.</div>
+        </div>
+      </div>
+      <div class="so-footer-row space-between">
+        <div style="display:flex;gap:7px;">
+          <button class="btn-secondary-footer" onclick="switchFooterState('scheduling')">Edit</button>
+          <button class="btn-danger-footer" onclick="cancelSchedule()">Cancel</button>
+        </div>
+        <button class="btn-primary-footer blue" onclick="deployNowFromPanel()">Deploy now</button>
+      </div>
+    </div>
+
+    <!-- State 3: In Progress -->
+    <div class="footer-state" id="fs-inprogress">
+      <div class="ip-progress-wrap">
+        <div class="ip-progress-bar">
+          <div class="ip-progress-fill" id="ip-fill" style="width:72%;"></div>
+        </div>
+        <div class="ip-progress-labels">
+          <span id="ip-pct">72% · 7/12 devices patched</span>
+          <span id="ip-eta">~28 min remaining</span>
+        </div>
+      </div>
+      <div class="so-footer-row space-between">
+        <a class="link-footer" onclick="showToast('Opening live deployment monitor…', 'info')">View live progress</a>
+        <div style="display:flex;gap:7px;">
+          <button class="btn-secondary-footer" onclick="pauseDeployment(currentItemId)">Pause deployment</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toastContainer"></div>
+
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+//  DATA — Recommendation items
+// ═══════════════════════════════════════════════════════════════════
+const ITEMS = {
+  0: {
+    id: 0,
+    col: 'in-progress',
+    category: 'CVE Vulnerability',
+    chipClass: 'chip-cve',
+    title: 'CVE-2026-1142: Critical RCE Patch — SonicOS SSL VPN Gateway',
+    scope: ['Acme Corp', 'Beta Networks', 'Crown Logistics', '12 firewalls'],
+    samiNote: '<span class="sami-banner-tag">SAMI</span>CVE-2026-1142 enables unauthenticated RCE on SSL VPN gateways running SonicOS below 7.1.2-1023. Patch deployment started 1h 24m ago — 7 of 12 devices are patched. 3 Crown Logistics devices queued pending change window.',
+    evidence: [
+      { icon: '🔴', text: 'CVSS 9.8 — NVD confirmed critical; CVSS vector: AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H' },
+      { icon: '🖥', text: '12 firewalls running vulnerable firmware (SonicOS < 7.1.2-1023) across 3 tenants' },
+      { icon: '⚡', text: 'Active probe detected on FW-ACME-03 and FW-BETA-01 at 17:32 today' },
+      { icon: '✅', text: '7/12 devices patched, 2 in-flight, 3 Crown Logistics queued pending change window' }
+    ],
+    timeline: [
+      { date: 'May 18, 07:00', desc: 'Patch pre-staged across all 12 target firewalls', state: 'done' },
+      { date: 'May 18, 16:30', desc: 'Deployment started — Acme Corp batch (5 FW) completed', state: 'done' },
+      { date: 'May 18, 17:54', desc: 'Beta Networks batch in progress — 2/3 FW patched', state: 'active' },
+      { date: 'Pending', desc: 'Crown Logistics batch (3 FW) — awaiting change window confirmation', state: 'pending' }
+    ],
+    footerState: 'inprogress',
+    defaultPrimaryLabel: 'View progress',
+    scheduleLabel: null
+  },
+  1: {
+    id: 1,
+    col: 'scheduled',
+    category: 'Device Connectivity',
+    chipClass: 'chip-device',
+    title: '3 Gateways Offline After BGP Route Withdrawal — Automated Diagnosis',
+    scope: ['New Haven Medical', 'Dallas Logistics', '3 offline gateways', '847 uninspected endpoints'],
+    samiNote: '<span class="sami-banner-tag">SAMI</span>FW-NH-02, FW-NH-03, and FW-DL-01 stopped responding after BGP route withdrawal from AS64512. Scheduled for tonight at 11:00 PM: SAMI will attempt automated BGP path diagnosis and SD-WAN failover configuration.',
+    evidence: [
+      { icon: '📡', text: 'Last heartbeats: FW-NH-02 at 14:34, FW-NH-03 at 14:35, FW-DL-01 at 14:36 today' },
+      { icon: '🔀', text: 'BGP route withdrawal detected from AS64512 at 14:30 — upstream ISP change' },
+      { icon: '⚠', text: '847 endpoints currently uninspected — traffic bypassing inspection' },
+      { icon: '🔧', text: 'No SD-WAN failover triggered — failover policy not configured for BGP events' }
+    ],
+    timeline: [
+      { date: 'May 18, 14:30', desc: 'BGP route withdrawal detected from AS64512', state: 'done' },
+      { date: 'May 18, 14:35', desc: 'All 3 gateways lose heartbeat — SAMI anomaly raised', state: 'done' },
+      { date: 'Tonight, 11:00 PM', desc: 'SAMI automated BGP path diagnosis and SD-WAN failover scheduled', state: 'active' }
+    ],
+    footerState: 'scheduled',
+    scheduledTime: 'Tonight, 11:00 PM',
+    defaultPrimaryLabel: 'Deploy now',
+    scheduleLabel: 'Reschedule'
+  },
+  2: {
+    id: 2,
+    col: 'needs-action',
+    category: 'Behavioral Anomaly',
+    chipClass: 'chip-behav',
+    title: 'Credential Stuffing Attack — Admin Accounts Actively Targeted',
+    scope: ['Beta Networks', 'Crown Logistics', '2 admin accounts', '18 failed login attempts'],
+    samiNote: '<span class="sami-banner-tag">SAMI</span>18 failed login attempts from 3 geographies against admin@beta.local and sysadmin@crown.local. Both accounts have no MFA. Concurrent active sessions detected — indicating possible compromise. Immediate action recommended.',
+    evidence: [
+      { icon: '🔐', text: '18 failed login attempts in 64 minutes from IPs in US/RU/UA' },
+      { icon: '👤', text: 'admin@beta.local: 4 concurrent active sessions + 11 probe attempts detected' },
+      { icon: '👤', text: 'sysadmin@crown.local: 1 active session + 7 probe attempts from foreign IP' },
+      { icon: '🚫', text: 'Neither account has MFA configured — immediate lockdown recommended' }
+    ],
+    timeline: [
+      { date: 'May 18, 16:52', desc: 'First probe attempt against admin@beta.local from IP 45.142.212.x', state: 'done' },
+      { date: 'May 18, 17:04', desc: 'Credential stuffing pattern confirmed — 3 source geographies', state: 'done' },
+      { date: 'May 18, 17:56', desc: 'Anomaly raised — concurrent sessions on both accounts flagged', state: 'active' }
+    ],
+    footerState: 'default',
+    defaultPrimaryLabel: 'Lock accounts',
+    scheduleLabel: 'Schedule for later'
+  },
+  3: {
+    id: 3,
+    col: 'scheduled',
+    category: 'Policy Gap',
+    chipClass: 'chip-policy',
+    title: '9 Firewalls with Permit-Any Outbound — Policy Baseline Push',
+    scope: ['Acme Corp (3 FW)', 'Beta Networks (3 FW)', 'Westfield IT (3 FW)', '2.3 TB uninspected traffic/day'],
+    samiNote: '<span class="sami-banner-tag">SAMI</span>Policy baseline push scheduled for Monday, 2:00 AM — aligned with all 3 tenant maintenance windows. SAMI will deploy zero-disruption: Acme (3 FW) → Beta (3 FW) → Westfield (3 FW), with rollback triggers at each stage.',
+    evidence: [
+      { icon: '📋', text: '9 firewalls have permit-any outbound rule — full egress traffic uninspected' },
+      { icon: '📊', text: '2.3 TB of daily outbound traffic bypassing DPI across all 3 tenants' },
+      { icon: '📅', text: '47 days since last policy review — policy drift from baseline confirmed' },
+      { icon: '✅', text: 'Replacement rule set staged and tested — ready for zero-disruption push' }
+    ],
+    timeline: [
+      { date: 'Apr 03', desc: 'Policy drift first detected — permit-any rule introduced post-migration', state: 'done' },
+      { date: 'May 18', desc: 'SAMI analysis complete — replacement rule set validated', state: 'done' },
+      { date: 'Mon, 2:00 AM', desc: 'SAMI baseline push begins — sequential tenant deployment', state: 'active' },
+      { date: 'Mon, 2:40 AM', desc: 'Expected completion — all 9 firewalls updated with rollback verification', state: 'pending' }
+    ],
+    footerState: 'scheduled',
+    scheduledTime: 'Monday, 2:00 AM',
+    defaultPrimaryLabel: 'Deploy now',
+    scheduleLabel: 'Reschedule'
+  },
+  4: {
+    id: 4,
+    col: 'needs-action',
+    category: 'Subscription Expiry',
+    chipClass: 'chip-sub',
+    title: 'ATP Subscriptions Expiring — 3 Tenants at Risk of Coverage Lapse',
+    scope: ['Acme Corp (8 FW)', 'Beta Networks (7 FW)', 'Delta Financial (6 FW)', '$87K ARR'],
+    samiNote: '<span class="sami-banner-tag">SAMI</span>Three tenants have ATP subscriptions expiring within 9 days. Renewal quotes pre-generated. SAMI recommends sending quotes today — Acme Corp procurement needs 5 business days. Delaying past Friday creates a lapse risk for all three tenants.',
+    evidence: [
+      { icon: '🛡', text: 'Acme Corp: 8 FW ATP expiring May 27 — renewal quote $38,400 ready' },
+      { icon: '🛡', text: 'Beta Networks: 7 FW ATP + TZ expiring May 28 — renewal quote $29,200 ready' },
+      { icon: '🛡', text: 'Delta Financial: 6 FW expiring May 29 — renewal quote $19,900 ready' },
+      { icon: '📨', text: 'All 3 renewal quotes generated and staged — ready for immediate send' }
+    ],
+    timeline: [
+      { date: 'May 11', desc: '15-day warning generated — quotes auto-drafted by SAMI', state: 'done' },
+      { date: 'May 18, 08:14', desc: '9-day threshold crossed — escalated to Needs Action', state: 'active' },
+      { date: 'May 27–29', desc: 'ATP expiry window opens — 3 tenants go unprotected if not renewed', state: 'pending' }
+    ],
+    footerState: 'default',
+    defaultPrimaryLabel: 'Send renewal quotes',
+    scheduleLabel: 'Schedule for later'
+  }
+};
+
+const SAMI_REASONS = [
+  "Tonight at 11:00 PM falls within Acme Corp's maintenance window (10 PM–2 AM). SAMI will sequence tenant deployments — estimated total window: 38 minutes.",
+  "Tomorrow 2:00 AM works for Westfield IT and Beta Networks. Crown Logistics has no approved Friday window — their 2 devices require separate confirmation.",
+  "Monday 2:00 AM is optimal — all 4 tenant maintenance windows align. No concurrent SAMI operations queued.",
+  "SAMI will validate against all 4 tenant maintenance windows and flag any conflicts before confirming."
+];
+
+const TIME_LABELS = [
+  "Tonight, 11:00 PM",
+  "Tomorrow, 2:00 AM",
+  "Monday, 2:00 AM",
+  "Custom time…"
+];
+
+// ═══════════════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════════════
+let currentItemId = null;
+let selectedTimeIndex = 0;
+let panelOpen = false;
+let colCounts = { 'needs-action': 2, 'scheduled': 2, 'in-progress': 1 };
+
+// ═══════════════════════════════════════════════════════════════════
+//  PANEL — open / close
+// ═══════════════════════════════════════════════════════════════════
+function openPanel(itemId) {
+  currentItemId = itemId;
+  const item = ITEMS[itemId];
+
+  // Header
+  document.getElementById('so-cat-row').innerHTML =
+    `<span class="cat-chip ${item.chipClass}"><span class="cdot"></span>${item.category}</span>`;
+  document.getElementById('so-title').textContent = item.title;
+
+  // Scope
+  const scopeEl = document.getElementById('so-scope');
+  scopeEl.innerHTML = item.scope.map(s => `<span class="scope-pill">${s}</span>`).join('');
+
+  // SAMI note
+  document.getElementById('so-sami-text').innerHTML = item.samiNote;
+
+  // Evidence
+  const evEl = document.getElementById('so-evidence');
+  evEl.innerHTML = item.evidence.map(e =>
+    `<div class="evidence-item"><span class="evidence-icon">${e.icon}</span><span>${e.text}</span></div>`
+  ).join('');
+
+  // Timeline
+  const tlEl = document.getElementById('so-timeline');
+  tlEl.innerHTML = item.timeline.map(t => {
+    let dotClass = 'tl-dot';
+    let dotInner = '';
+    if (t.state === 'done') {
+      dotClass += ' done';
+      dotInner = `<svg viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 5l2.5 2.5L8 3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    } else if (t.state === 'active') {
+      dotClass += ' active';
+    } else {
+      dotClass += ' pending';
+    }
+    return `<div class="tl-item">
+      <div class="${dotClass}">${dotInner}</div>
+      <div class="tl-content">
+        <div class="tl-date">${t.date}</div>
+        <div class="tl-desc">${t.desc}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Footer
+  showFooterForItem(item);
+
+  // Open panel
+  document.getElementById('slideover').classList.add('open');
+  panelOpen = true;
+}
+
+function closePanel() {
+  document.getElementById('slideover').classList.remove('open');
+  panelOpen = false;
+  currentItemId = null;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  FOOTER STATE MANAGEMENT
+// ═══════════════════════════════════════════════════════════════════
+function showFooterForItem(item) {
+  resetFooterStates();
+
+  const defaultActionBtn = document.getElementById('fs-default-action-btn');
+  const defaultSchedBtn = document.getElementById('fs-default-sched-btn');
+
+  defaultActionBtn.textContent = item.defaultPrimaryLabel || 'Deploy';
+
+  if (item.footerState === 'inprogress') {
+    switchFooterState('inprogress');
+  } else if (item.footerState === 'scheduled') {
+    document.getElementById('sched-confirmed-label').textContent = 'Scheduled: ' + (item.scheduledTime || 'Tonight, 11:00 PM');
+    switchFooterState('scheduled');
+  } else {
+    if (item.scheduleLabel) {
+      defaultSchedBtn.textContent = item.scheduleLabel;
+    } else {
+      defaultSchedBtn.textContent = 'Schedule for later';
+    }
+    switchFooterState('default');
+  }
+}
+
+function resetFooterStates() {
+  ['fs-default','fs-scheduling','fs-scheduled','fs-inprogress'].forEach(id => {
+    document.getElementById(id).classList.remove('active');
+  });
+}
+
+function switchFooterState(state) {
+  resetFooterStates();
+  document.getElementById('fs-' + state).classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  TIME PICKER
+// ═══════════════════════════════════════════════════════════════════
+function selectTime(idx) {
+  selectedTimeIndex = idx;
+  for (let i = 0; i < 4; i++) {
+    const el = document.getElementById('to-' + i);
+    el.classList.toggle('selected', i === idx);
+  }
+  document.getElementById('sami-reasoning-text').textContent = SAMI_REASONS[idx];
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  ACTIONS
+// ═══════════════════════════════════════════════════════════════════
+function footerPrimaryAction() {
+  if (!currentItemId && currentItemId !== 0) return;
+  const item = ITEMS[currentItemId];
+  showToast(`${item.defaultPrimaryLabel} initiated for "${item.title.substring(0, 48)}…"`, 'success');
+}
+
+function confirmSchedule() {
+  if (!currentItemId && currentItemId !== 0) return;
+  const timeLabel = TIME_LABELS[selectedTimeIndex];
+  const item = ITEMS[currentItemId];
+
+  // Update data
+  item.footerState = 'scheduled';
+  item.scheduledTime = timeLabel;
+
+  // Move card from needs-action to scheduled
+  if (item.col === 'needs-action') {
+    moveCardToColumn(currentItemId, 'scheduled');
+    item.col = 'scheduled';
+  }
+
+  // Update panel footer
+  document.getElementById('sched-confirmed-label').textContent = 'Scheduled: ' + timeLabel;
+  switchFooterState('scheduled');
+
+  showToast(`Scheduled for ${timeLabel}. SAMI will begin deployment automatically.`, 'success');
+}
+
+function cancelSchedule() {
+  switchFooterState('default');
+  showToast('Schedule cancelled. Item moved back to Needs Action.', 'warn');
+}
+
+function deployNowFromPanel() {
+  if (!currentItemId && currentItemId !== 0) return;
+  showToast('Deployment initiated immediately. Monitoring live progress…', 'success');
+  switchFooterState('inprogress');
+}
+
+function openScheduleFlow(itemId) {
+  if (!panelOpen || currentItemId !== itemId) {
+    openPanel(itemId);
+  }
+  setTimeout(() => switchFooterState('scheduling'), 80);
+}
+
+function openReschedule(itemId) {
+  if (!panelOpen || currentItemId !== itemId) {
+    openPanel(itemId);
+  }
+  setTimeout(() => switchFooterState('scheduling'), 80);
+}
+
+function actNow(itemId) {
+  const item = ITEMS[itemId];
+  showToast(`Immediate action triggered for: ${item.category}`, 'success');
+}
+
+function deployNow(itemId) {
+  const item = ITEMS[itemId];
+  showToast(`Deploying now: "${item.title.substring(0, 50)}…"`, 'success');
+  if (panelOpen && currentItemId === itemId) {
+    switchFooterState('inprogress');
+  }
+}
+
+function pauseDeployment(itemId) {
+  if (itemId === null || itemId === undefined) return;
+  showToast('Deployment paused. SAMI will hold at current checkpoint.', 'warn');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  KANBAN COLUMN MANAGEMENT
+// ═══════════════════════════════════════════════════════════════════
+function moveCardToColumn(itemId, targetCol) {
+  const cardEl = document.getElementById('card-' + itemId);
+  if (!cardEl) return;
+
+  const sourceCol = cardEl.closest('.col-cards');
+  if (!sourceCol) return;
+  const sourceColId = sourceCol.id.replace('cards-', '');
+
+  // Update card accent
+  cardEl.classList.remove('needs-action', 'scheduled', 'in-progress');
+  if (targetCol === 'needs-action') cardEl.classList.add('needs-action');
+  else if (targetCol === 'scheduled') cardEl.classList.add('scheduled');
+  else if (targetCol === 'in-progress') cardEl.classList.add('in-progress');
+
+  // Move DOM
+  const targetCardsEl = document.getElementById('cards-' + targetCol);
+  targetCardsEl.insertBefore(cardEl, targetCardsEl.firstChild);
+
+  // Update counts
+  colCounts[sourceColId] = Math.max(0, (colCounts[sourceColId] || 1) - 1);
+  colCounts[targetCol] = (colCounts[targetCol] || 0) + 1;
+
+  updateColumnBadges();
+  checkEmptyStates();
+}
+
+function updateColumnBadges() {
+  const cols = ['needs-action', 'scheduled', 'in-progress'];
+  cols.forEach(c => {
+    const badge = document.getElementById('badge-' + c);
+    if (badge) badge.textContent = colCounts[c] || 0;
+  });
+}
+
+function checkEmptyStates() {
+  const cols = ['needs-action', 'scheduled', 'in-progress'];
+  cols.forEach(c => {
+    const count = colCounts[c] || 0;
+    const emptyEl = document.getElementById('empty-' + c);
+    if (emptyEl) emptyEl.style.display = count === 0 ? 'flex' : 'none';
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  TOAST NOTIFICATIONS
+// ═══════════════════════════════════════════════════════════════════
+function showToast(message, type) {
+  const container = document.getElementById('toastContainer');
+  const icons = { success: '✓', warn: '⚠', info: 'ℹ', error: '✕' };
+  const toast = document.createElement('div');
+  toast.className = `toast ${type || ''}`;
+  toast.innerHTML = `<span>${icons[type] || 'ℹ'}</span><span>${message}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => {
+    if (toast.parentNode) toast.parentNode.removeChild(toast);
+  }, 2800);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  KEYBOARD — close on Escape
+// ═══════════════════════════════════════════════════════════════════
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && panelOpen) closePanel();
+});
+
+// Init
+checkEmptyStates();
+</script>
+</body>
+</html>

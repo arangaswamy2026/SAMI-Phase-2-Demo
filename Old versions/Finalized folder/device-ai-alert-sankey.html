@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SAMI – Device AI Alert Flow</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:      #f4f6f9;
+  --surface: #ffffff;
+  --border:  #dde1e8;
+  --dim:     #8a93a2;
+  --text:    #3d4450;
+  --hi:      #1a1f2b;
+  --accent:  #f5a623;
+  --crit:    #d9253a;
+  --high:    #e8631f;
+  --med:     #c9941a;
+  --low:     #3d7a35;
+  --blue:    #2f5fce;
+  --green:   #2a9d72;
+  --purple:  #7c4dba;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  background: var(--bg);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  overflow: hidden;
+  display: flex; flex-direction: column;
+}
+
+/* TOP BAR */
+.topbar {
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px; height: 44px;
+  background: var(--surface); border-bottom: 1px solid var(--border);
+}
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.logo {
+  width: 26px; height: 26px; background: var(--accent); border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 12px; color: #fff;
+}
+.nav-btn { background: none; border: none; color: var(--dim); cursor: pointer; font-size: 16px; }
+.nav-btn:hover { color: var(--hi); }
+.page-title { font-size: 12px; font-weight: 700; color: var(--hi); letter-spacing: .5px; }
+.dot-nav { display: flex; gap: 4px; }
+.dot { width: 5px; height: 5px; border-radius: 50%; background: var(--border); }
+.dot.active { background: var(--accent); }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.live-badge { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--dim); }
+.live-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--green);
+  animation: pulse 1.8s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100%{ opacity:1; box-shadow:0 0 0 0 rgba(42,157,114,.4); }
+  50%    { opacity:.7; box-shadow:0 0 0 4px rgba(42,157,114,0); }
+}
+.range-sel {
+  background: var(--bg); border: 1px solid var(--border);
+  color: var(--text); border-radius: 5px; padding: 3px 8px; font-size: 11px;
+}
+
+/* SANKEY AREA */
+.sankey-wrap { flex: 1; min-height: 0; position: relative; }
+#sankey-svg  { width: 100%; height: 100%; display: block; }
+
+/* CARDS ROW */
+.cards-row {
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  padding: 10px 16px 8px;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+}
+
+.alert-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px 10px;
+  display: flex; flex-direction: column; gap: 6px;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+  transition: box-shadow .2s, border-color .2s;
+}
+.alert-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,.09);
+  border-color: #c4cad4;
+}
+.alert-card::before {
+  content:'';
+  position: absolute; top:0; left:0; right:0; height:3px;
+  border-radius: 10px 10px 0 0;
+}
+.card-device::before    { background: var(--crit); }
+.card-behavioral::before{ background: var(--high); }
+.card-policy::before    { background: var(--med);  }
+.card-renewal::before   { background: var(--green);}
+.card-compliance::before{ background: var(--purple);}
+
+.card-header { display: flex; justify-content: space-between; align-items: flex-start; }
+.card-name { font-size: 9px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--dim); }
+.sev-pill {
+  font-size: 7px; font-weight: 700; padding: 1px 5px;
+  border-radius: 3px; letter-spacing: .4px;
+}
+.sev-crit  { background:rgba(217,37,58,.12);  color:var(--crit);   }
+.sev-high  { background:rgba(232,99,31,.12);  color:var(--high);   }
+.sev-med   { background:rgba(201,148,26,.12); color:var(--med);    }
+.sev-low   { background:rgba(42,157,114,.12); color:var(--green);  }
+.sev-pur   { background:rgba(124,77,186,.12); color:var(--purple); }
+
+.card-count { font-size: 26px; font-weight: 700; color: var(--hi); line-height: 1; }
+.card-delta { font-size: 9px; margin-left: 4px; }
+.delta-up   { color: var(--crit); }
+.delta-dn   { color: var(--green); }
+.card-sub   { font-size: 9px; color: var(--dim); margin-top: -2px; }
+
+.card-chart { height: 36px; width: 100%; }
+
+/* LEGEND */
+.legend {
+  flex-shrink: 0;
+  display: flex; align-items: center; gap: 20px;
+  padding: 0 20px; height: 30px;
+  background: var(--surface); border-top: 1px solid var(--border);
+}
+.leg-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--dim); }
+.leg-line  { width: 18px; height: 3px; border-radius: 2px; }
+
+/* SVG text helpers */
+.src-n  { font:700 18px 'Segoe UI',sans-serif; fill:#1a1f2b; }
+.src-lbl{ font:700 8px 'Segoe UI',sans-serif;  fill:#8a93a2; letter-spacing:.6px; }
+.src-sub{ font:400 8px 'Segoe UI',sans-serif;  fill:#8a93a2; }
+.mid-h  { font:600 10px 'Segoe UI',sans-serif; fill:#1a1f2b; }
+.mid-s  { font:400 8px  'Segoe UI',sans-serif; fill:#8a93a2; }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="logo">S</div>
+    <button class="nav-btn">‹</button>
+    <span class="page-title">AI DEVICE INTELLIGENCE</span>
+    <button class="nav-btn">›</button>
+    <div class="dot-nav">
+      <div class="dot active"></div>
+      <div class="dot"></div><div class="dot"></div>
+      <div class="dot"></div><div class="dot"></div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="live-badge">
+      <div class="live-dot"></div>
+      <span>LIVE &nbsp;Last Updated <span id="ts">--:--:--</span></span>
+    </div>
+    <select class="range-sel">
+      <option>Past 7 Days</option><option>Past 24 Hours</option><option>Past 30 Days</option>
+    </select>
+  </div>
+</div>
+
+<!-- SANKEY SVG -->
+<div class="sankey-wrap">
+  <svg id="sankey-svg"></svg>
+</div>
+
+<!-- ALERT CARDS -->
+<div class="cards-row" id="cards-row">
+
+  <div class="alert-card card-device" id="c0">
+    <div class="card-header">
+      <span class="card-name">Device Alerts</span>
+      <span class="sev-pill sev-crit">CRITICAL</span>
+    </div>
+    <div>
+      <span class="card-count" id="cv0">487</span>
+      <span class="card-delta delta-up" id="cd0">↑ 6%</span>
+    </div>
+    <div class="card-sub">Malware · C2 Beaconing · Rootkits</div>
+    <svg class="card-chart" id="cc0"></svg>
+  </div>
+
+  <div class="alert-card card-behavioral" id="c1">
+    <div class="card-header">
+      <span class="card-name">Behavioral Alerts</span>
+      <span class="sev-pill sev-high">HIGH</span>
+    </div>
+    <div>
+      <span class="card-count" id="cv1">312</span>
+      <span class="card-delta delta-up" id="cd1">↑ 4%</span>
+    </div>
+    <div class="card-sub">Lateral Movement · Insider Risk</div>
+    <svg class="card-chart" id="cc1"></svg>
+  </div>
+
+  <div class="alert-card card-policy" id="c2">
+    <div class="card-header">
+      <span class="card-name">Policy Gaps</span>
+      <span class="sev-pill sev-med">MEDIUM</span>
+    </div>
+    <div>
+      <span class="card-count" id="cv2">198</span>
+      <span class="card-delta delta-dn" id="cd2">↓ 2%</span>
+    </div>
+    <div class="card-sub">Unencrypted Traffic · Unpatched CVE</div>
+    <svg class="card-chart" id="cc2"></svg>
+  </div>
+
+  <div class="alert-card card-renewal" id="c3">
+    <div class="card-header">
+      <span class="card-name">Renewal Risk</span>
+      <span class="sev-pill sev-low">LOW</span>
+    </div>
+    <div>
+      <span class="card-count" id="cv3">54</span>
+      <span class="card-delta delta-dn" id="cd3">↓ 1%</span>
+    </div>
+    <div class="card-sub">License Expiry · EOL Firmware</div>
+    <svg class="card-chart" id="cc3"></svg>
+  </div>
+
+  <div class="alert-card card-compliance" id="c4">
+    <div class="card-header">
+      <span class="card-name">Compliance Risk</span>
+      <span class="sev-pill sev-pur">REVIEW</span>
+    </div>
+    <div>
+      <span class="card-count" id="cv4">89</span>
+      <span class="card-delta delta-up" id="cd4">↑ 3%</span>
+    </div>
+    <div class="card-sub">HIPAA Gap · GDPR Exposure</div>
+    <svg class="card-chart" id="cc4"></svg>
+  </div>
+
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="leg-item"><div class="leg-line" style="background:#d9253a"></div>Critical</div>
+  <div class="leg-item"><div class="leg-line" style="background:#e8631f"></div>High</div>
+  <div class="leg-item"><div class="leg-line" style="background:#c9941a"></div>Medium</div>
+  <div class="leg-item"><div class="leg-line" style="background:#3d7a35"></div>Low</div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const SOURCES = [
+  { label:'MANAGED ENDPOINTS', sub:'via SonicWall Agent',        count:1247, icon:'🖥' },
+  { label:'NETWORK DEVICES',   sub:'via Deep Packet Inspection',  count:342,  icon:'🖧' },
+  { label:'IoT / OT DEVICES',  sub:'via Passive Discovery',       count:89,   icon:'📡' },
+];
+const MIDS = [
+  { lines:['AI Behavioral','Analysis'],     s1:'1.2K Alerts Active', s2:'834 Resolved' },
+  { lines:['Policy &','Compliance Scan'],   s1:'641 Gaps Detected',  s2:'412 Exposed'  },
+];
+// flows: s=source idx, m=mid idx, t=target idx, risk 0=crit 1=high 2=med 3=low
+const FLOWS = [
+  { s:0, m:0, t:0, risk:0, w:130 },
+  { s:0, m:0, t:1, risk:1, w: 85 },
+  { s:0, m:0, t:3, risk:3, w: 28 },
+  { s:0, m:1, t:2, risk:1, w: 65 },
+  { s:0, m:1, t:4, risk:2, w: 42 },
+  { s:1, m:0, t:0, risk:1, w: 72 },
+  { s:1, m:0, t:1, risk:2, w: 48 },
+  { s:1, m:1, t:2, risk:1, w: 52 },
+  { s:1, m:1, t:4, risk:2, w: 28 },
+  { s:2, m:0, t:1, risk:0, w: 42 },
+  { s:2, m:1, t:2, risk:1, w: 30 },
+  { s:2, m:1, t:4, risk:2, w: 18 },
+];
+const RISK_COLORS = ['#d9253a','#e8631f','#c9941a','#3d7a35'];
+const CARD_COLORS = ['#d9253a','#e8631f','#c9941a','#2a9d72','#7c4dba'];
+
+// ── CLOCK ─────────────────────────────────────────────────────────────────────
+setInterval(() => {
+  document.getElementById('ts').textContent = new Date().toTimeString().slice(0,8);
+}, 1000);
+
+// ── MINI CHARTS ──────────────────────────────────────────────────────────────
+function randSeries(n, base, amp) {
+  return Array.from({length:n}, (_,i) => base + Math.sin(i*.8 + Math.random())*amp + Math.random()*amp*.5);
+}
+
+function drawLineChart(svgId, color, data) {
+  const el = document.getElementById(svgId);
+  if (!el) return;
+  const w = el.clientWidth || 120, h = el.clientHeight || 36;
+  const svg = d3.select(el);
+  svg.selectAll('*').remove();
+
+  const x = d3.scaleLinear().domain([0, data.length-1]).range([0, w]);
+  const y = d3.scaleLinear().domain([d3.min(data)*.92, d3.max(data)*1.05]).range([h-2, 2]);
+
+  const area = d3.area().x((_,i)=>x(i)).y0(h).y1(d=>y(d)).curve(d3.curveCatmullRom);
+  const line = d3.line().x((_,i)=>x(i)).y(d=>y(d)).curve(d3.curveCatmullRom);
+
+  const defs = svg.append('defs');
+  const gid = 'ag_' + svgId;
+  const g = defs.append('linearGradient').attr('id',gid).attr('x1','0').attr('y1','0').attr('x2','0').attr('y2','1');
+  g.append('stop').attr('offset','0%').attr('stop-color',color).attr('stop-opacity',.25);
+  g.append('stop').attr('offset','100%').attr('stop-color',color).attr('stop-opacity',.02);
+
+  svg.append('path').datum(data).attr('d',area).attr('fill',`url(#${gid})`);
+  svg.append('path').datum(data).attr('d',line).attr('fill','none').attr('stroke',color).attr('stroke-width',1.8);
+
+  const last = data[data.length-1];
+  svg.append('circle').attr('cx',x(data.length-1)).attr('cy',y(last)).attr('r',2.5).attr('fill',color);
+}
+
+function drawBarChart(svgId, color, data) {
+  const el = document.getElementById(svgId);
+  if (!el) return;
+  const w = el.clientWidth || 120, h = el.clientHeight || 36;
+  const svg = d3.select(el);
+  svg.selectAll('*').remove();
+
+  const bw = Math.max(2, w / data.length - 2);
+  const y = d3.scaleLinear().domain([0, d3.max(data)]).range([0, h-2]);
+  const x = d3.scaleLinear().domain([0, data.length-1]).range([0, w - bw]);
+
+  svg.selectAll('rect').data(data).enter()
+    .append('rect')
+    .attr('x', (_,i) => x(i))
+    .attr('y', d => (h-2) - y(d))
+    .attr('width', bw)
+    .attr('height', d => y(d))
+    .attr('fill', (_,i) => i === data.length-1 ? color : color + '70')
+    .attr('rx', 2);
+}
+
+function buildCharts() {
+  drawBarChart('cc0',  '#d9253a', randSeries(14, 65, 25));
+  drawLineChart('cc1', '#e8631f', randSeries(14, 45, 15));
+  drawBarChart('cc2',  '#c9941a', randSeries(14, 28, 10));
+  drawLineChart('cc3', '#2a9d72', randSeries(14, 8, 4));
+  drawBarChart('cc4',  '#7c4dba', randSeries(14, 12, 6));
+}
+
+// ── SANKEY ────────────────────────────────────────────────────────────────────
+function buildSankey() {
+  const svgEl = document.getElementById('sankey-svg');
+  const W = svgEl.clientWidth, H = svgEl.clientHeight;
+  if (!W || !H) return;
+
+  const svg = d3.select('#sankey-svg');
+  svg.selectAll('*').remove();
+
+  const PAD_H = 48; // horizontal padding
+  const PAD_T = 16; // top padding
+  const PAD_B = 16; // bottom padding (flows reach card top edges)
+
+  const N_SRC = SOURCES.length;  // 3
+  const N_MID = MIDS.length;     // 2
+  const N_TGT = 5;               // 5
+
+  // Y positions — source circle sits near top; labels go BELOW the circle
+  const yS = PAD_T + 22;         // source row
+  const yM = H * 0.58;           // mid row
+  const yT = H - PAD_B;          // target connection row (top of cards)
+
+  // X positions — evenly spaced
+  const srcXs = Array.from({length:N_SRC}, (_,i) => PAD_H + (W - 2*PAD_H) / (N_SRC-1) * i);
+  const midXs = Array.from({length:N_MID}, (_,i) => W/2 - (N_MID-1)*80 + i*160);
+  // Target X — align with card centres
+  const cardRow = document.getElementById('cards-row');
+  const cards   = cardRow ? cardRow.querySelectorAll('.alert-card') : [];
+  let tgtXs = Array.from({length:N_TGT}, (_,i) => PAD_H + (W - 2*PAD_H) / (N_TGT-1) * i);
+  if (cards.length === N_TGT) {
+    const rowRect = cardRow.getBoundingClientRect();
+    const wrapRect = svgEl.getBoundingClientRect();
+    tgtXs = Array.from(cards).map(c => {
+      const r = c.getBoundingClientRect();
+      return r.left + r.width/2 - wrapRect.left;
+    });
+  }
+
+  const defs = svg.append('defs');
+
+  // Shadow filter
+  const filt = defs.append('filter').attr('id','sh').attr('x','-30%').attr('y','-30%').attr('width','160%').attr('height','160%');
+  filt.append('feDropShadow').attr('dx',0).attr('dy',2).attr('stdDeviation',4).attr('flood-color','rgba(0,0,0,.08)');
+
+  // Subtle default gradients (very low opacity — hint of color only)
+  RISK_COLORS.forEach((c,i) => {
+    const g = defs.append('linearGradient').attr('id',`vg${i}`)
+      .attr('x1','0%').attr('y1','0%').attr('x2','0%').attr('y2','100%');
+    g.append('stop').attr('offset','0%').attr('stop-color',c).attr('stop-opacity',.18);
+    g.append('stop').attr('offset','50%').attr('stop-color',c).attr('stop-opacity',.08);
+    g.append('stop').attr('offset','100%').attr('stop-color',c).attr('stop-opacity',.18);
+  });
+
+  // Hover-state gradients (vivid, for the active glow)
+  RISK_COLORS.forEach((c,i) => {
+    const g = defs.append('linearGradient').attr('id',`vgh${i}`)
+      .attr('x1','0%').attr('y1','0%').attr('x2','0%').attr('y2','100%');
+    g.append('stop').attr('offset','0%').attr('stop-color',c).attr('stop-opacity',.65);
+    g.append('stop').attr('offset','50%').attr('stop-color',c).attr('stop-opacity',.35);
+    g.append('stop').attr('offset','100%').attr('stop-color',c).attr('stop-opacity',.65);
+  });
+
+  // Card-end fade gradients
+  CARD_COLORS.forEach((c,i) => {
+    const g = defs.append('linearGradient').attr('id',`cg${i}`)
+      .attr('x1','0%').attr('y1','0%').attr('x2','0%').attr('y2','100%');
+    g.append('stop').attr('offset','60%').attr('stop-color',c).attr('stop-opacity',.12);
+    g.append('stop').attr('offset','100%').attr('stop-color',c).attr('stop-opacity',.0);
+  });
+  CARD_COLORS.forEach((c,i) => {
+    const g = defs.append('linearGradient').attr('id',`cgh${i}`)
+      .attr('x1','0%').attr('y1','0%').attr('x2','0%').attr('y2','100%');
+    g.append('stop').attr('offset','40%').attr('stop-color',c).attr('stop-opacity',.55);
+    g.append('stop').attr('offset','100%').attr('stop-color',c).attr('stop-opacity',.0);
+  });
+
+  // Glow filter for hover
+  const glow = defs.append('filter').attr('id','glow').attr('x','-40%').attr('y','-40%').attr('width','180%').attr('height','180%');
+  glow.append('feGaussianBlur').attr('in','SourceGraphic').attr('stdDeviation','3').attr('result','blur');
+  const merge = glow.append('feMerge');
+  merge.append('feMergeNode').attr('in','blur');
+  merge.append('feMergeNode').attr('in','SourceGraphic');
+
+  const maxW = d3.max(FLOWS, d => d.w);
+  const sw   = d3.scaleLinear().domain([0, maxW]).range([3, 28]);
+
+  // ── DRAW FLOWS ──
+  // Each flow = pair of paths (src→mid, mid→tgt) that share a group for hover
+  const flowG = svg.append('g');
+
+  FLOWS.forEach((f, fi) => {
+    const sx = srcXs[f.s], sy = yS + 70;
+    const mx = midXs[f.m], my_top = yM - 30, my_bot = yM + 30;
+    const tx = tgtXs[f.t], ty = yT;
+    const thickness = sw(f.w);
+    const cy1 = (sy + my_top) / 2;
+    const cy2 = (my_bot + ty) / 2;
+
+    const p1 = `M${sx},${sy} C${sx},${cy1} ${mx},${cy1} ${mx},${my_top}`;
+    const p2 = `M${mx},${my_bot} C${mx},${cy2} ${tx},${cy2} ${tx},${ty}`;
+
+    const grp = flowG.append('g').attr('class','flow-grp').attr('data-risk', f.risk).attr('data-tgt', f.t);
+
+    // Invisible fat hit area for easy hovering
+    [p1, p2].forEach(p => {
+      grp.append('path').attr('d',p)
+        .attr('fill','none').attr('stroke','transparent')
+        .attr('stroke-width', Math.max(thickness + 12, 18))
+        .attr('stroke-linecap','round')
+        .style('cursor','pointer');
+    });
+
+    // Visible paths
+    const vis = [
+      grp.append('path').attr('d',p1).attr('fill','none')
+        .attr('stroke', `url(#vg${f.risk})`).attr('stroke-width', thickness).attr('stroke-linecap','round'),
+      grp.append('path').attr('d',p2).attr('fill','none')
+        .attr('stroke', `url(#cg${f.t})`).attr('stroke-width', thickness).attr('stroke-linecap','round'),
+    ];
+
+    // Animate in
+    vis.forEach((v, pi) => {
+      v.attr('opacity',0)
+       .transition().delay(fi*50 + pi*60).duration(700).ease(d3.easeCubicOut)
+       .attr('opacity',1);
+    });
+
+    // Hover
+    grp
+      .on('mouseenter', function() {
+        // Dim all other flows
+        flowG.selectAll('.flow-grp').filter(function() { return this !== grp.node(); })
+          .transition().duration(180).attr('opacity', 0.2);
+        // Highlight this flow
+        vis[0].raise().transition().duration(180)
+          .attr('stroke', `url(#vgh${f.risk})`)
+          .attr('stroke-width', thickness + 4)
+          .attr('filter','url(#glow)');
+        vis[1].raise().transition().duration(180)
+          .attr('stroke', `url(#cgh${f.t})`)
+          .attr('stroke-width', thickness + 4)
+          .attr('filter','url(#glow)');
+      })
+      .on('mouseleave', function() {
+        flowG.selectAll('.flow-grp')
+          .transition().duration(280).attr('opacity', 1);
+        vis[0].transition().duration(280)
+          .attr('stroke', `url(#vg${f.risk})`)
+          .attr('stroke-width', thickness)
+          .attr('filter', null);
+        vis[1].transition().duration(280)
+          .attr('stroke', `url(#cg${f.t})`)
+          .attr('stroke-width', thickness)
+          .attr('filter', null);
+      });
+
+  });
+
+  // ── SOURCE NODES ──
+  SOURCES.forEach((s, i) => {
+    const x = srcXs[i], y = yS;
+    const g = svg.append('g').attr('transform',`translate(${x},${y})`);
+
+    g.append('circle').attr('r',22).attr('fill','#fff').attr('stroke','#dde1e8').attr('stroke-width',1.5).attr('filter','url(#sh)');
+    g.append('text').attr('text-anchor','middle').attr('dominant-baseline','central').attr('font-size','14').text(s.icon);
+
+    // Labels below the circle so nothing clips at the top edge
+    g.append('text').attr('class','src-n').attr('text-anchor','middle').attr('dy','38px').text(s.count.toLocaleString());
+    g.append('text').attr('class','src-lbl').attr('text-anchor','middle').attr('dy','52px').text(s.label);
+    g.append('text').attr('class','src-sub').attr('text-anchor','middle').attr('dy','63px').text(s.sub);
+  });
+
+  // ── MID NODES ──
+  MIDS.forEach((m, i) => {
+    const x = midXs[i], y = yM;
+    const g = svg.append('g').attr('transform',`translate(${x},${y})`);
+
+    // Glow ring
+    g.append('circle').attr('r',38).attr('fill','none')
+      .attr('stroke','rgba(245,166,35,.15)').attr('stroke-width',16)
+      .attr('class','mid-ring');
+
+    g.append('circle').attr('r',28).attr('fill','#fff').attr('stroke','#dde1e8').attr('stroke-width',1.5).attr('filter','url(#sh)');
+
+    m.lines.forEach((line, li) => {
+      g.append('text').attr('class','mid-h').attr('text-anchor','middle')
+        .attr('dy', `${(li - (m.lines.length-1)/2) * 13}px`).text(line);
+    });
+
+    [m.s1, m.s2].forEach((s, si) => {
+      g.append('text').attr('class','mid-s').attr('text-anchor','middle')
+        .attr('dy', `${44 + si*12}px`).text(s);
+    });
+  });
+
+  // Pulse mid rings
+  svg.selectAll('.mid-ring').each(function() { pulseMid(this); });
+}
+
+function pulseMid(el) {
+  d3.select(el)
+    .transition().duration(2000).ease(d3.easeSinInOut).attr('stroke-opacity',.6)
+    .on('end', function() {
+      d3.select(this).transition().duration(2000).ease(d3.easeSinInOut).attr('stroke-opacity',.08)
+        .on('end', function() { pulseMid(this); });
+    });
+}
+
+// ── LIVE UPDATE ───────────────────────────────────────────────────────────────
+const BASE_COUNTS = [487, 312, 198, 54, 89];
+function liveUpdate() {
+  BASE_COUNTS.forEach((b, i) => {
+    const v = Math.round(b * (1 + (Math.random()-.5)*.04));
+    document.getElementById(`cv${i}`).textContent = v.toLocaleString();
+  });
+  buildCharts();
+}
+setInterval(liveUpdate, 4500);
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+function init() {
+  buildSankey();
+  buildCharts();
+}
+
+window.addEventListener('resize', () => { clearTimeout(window._rt); window._rt = setTimeout(init, 120); });
+// Wait for layout to settle (cards need to be rendered first for x alignment)
+setTimeout(init, 80);
+</script>
+</body>
+</html>

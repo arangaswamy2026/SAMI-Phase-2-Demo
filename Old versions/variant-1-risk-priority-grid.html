@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<!--
+  Design reference: UUIF 9.2 — Risk Priority Grid layout.
+  KPI tiles + two-column card list + detail panel. Variant 1 of 5.
+  Informed by: sami-rec-scheduling-v1-uuif.html (token layer, sidebar/topbar chrome, scheduling footer states)
+  Layout deviation: Three-panel → Two-column (420px fixed list + flex detail). Custom SAMI pattern.
+  Category "Policy Gap" maps to --uuif-surface-primary (no purple token in UUIF 9.2).
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAMI Recommendations — Risk Priority Grid (Variant 1 of 5)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
+<style>
+/* ─── UUIF 9.2 TOKEN DEFINITIONS ──────────────────────────────────────────── */
+:root {
+  /* Text */
+  --uuif-text-primary:   #191c25;
+  --uuif-text-secondary: #4a618f;
+  --uuif-text-tertiary:  #888888;
+  --uuif-text-contrast:  #ffffff;
+  --uuif-text-disabled:  rgba(17,17,17,0.3);
+  --uuif-text-hover:     #ff5d00;
+  --uuif-text-selected:  #ffffff;
+  --uuif-text-highlight: #0c2b67;
+
+  /* Surface */
+  --uuif-surface-container: #ffffff;
+  --uuif-surface-bg:        #f4f6f9;
+  --uuif-surface-primary:   #5b74a7;
+  --uuif-surface-secondary: #d2dff2;
+  --uuif-surface-tertiary:  #f6f8fe;
+  --uuif-surface-highlight: #ff5d00;
+  --uuif-surface-hover:     rgba(17,17,17,0.04);
+  --uuif-surface-selected:  rgba(255,93,0,0.06);
+  --uuif-surface-disabled:  #e8eff9;
+  --uuif-surface-contrast:  #111315;
+  --uuif-surface-model:     #f0f2f5;
+
+  /* Border */
+  --uuif-border-primary:     #ff5d00;
+  --uuif-border-secondary:   #78a3e5;
+  --uuif-border-tertiary:    #cccccc;
+  --uuif-border-transparent: rgba(17,17,17,0.09);
+  --uuif-border-disabled:    #d2dff2;
+  --uuif-border-hover:       #ff5d00;
+  --uuif-border-selected:    #ffffff;
+
+  /* Icon */
+  --uuif-icon-primary:   #5885cc;
+  --uuif-icon-secondary: #9dafd3;
+  --uuif-icon-tertiary:  #62686d;
+  --uuif-icon-hover:     #ff5d00;
+
+  /* Brand */
+  --uuif-brand-navy:   #001b50;
+  --uuif-brand-blue:   #1f3c73;
+  --uuif-brand-orange: #ff5d00;
+  --uuif-brand-green:  #59a02e;
+  --uuif-brand-red:    #c70f0f;
+  --uuif-brand-yellow: #f3ac3d;
+
+  /* Fill */
+  --uuif-fill-blue-lightest:      #f6f8fe;
+  --uuif-fill-green-xxx-lighter:  #e3efdc;
+  --uuif-fill-yellow-xxx-lighter: #ffe9be;
+  --uuif-fill-red-lightest:       #fff0f0;
+  --uuif-fill-orange-lightest:    #fff3ec;
+
+  /* Spacing */
+  --uuif-sp-1:  2px;
+  --uuif-sp-2:  4px;
+  --uuif-sp-3:  8px;
+  --uuif-sp-4:  12px;
+  --uuif-sp-5:  16px;
+  --uuif-sp-6:  20px;
+  --uuif-sp-7:  24px;
+  --uuif-sp-8:  32px;
+  --uuif-sp-9:  40px;
+  --uuif-sp-10: 48px;
+
+  /* Radius */
+  --uuif-radius-4:    4px;
+  --uuif-radius-6:    6px;
+  --uuif-radius-8:    8px;
+  --uuif-radius-12:   12px;
+  --uuif-radius-pill: 88px;
+
+  /* Shadow */
+  --uuif-shadow-sm: 0 1px 6px 2px rgba(0,0,0,0.08);
+  --uuif-shadow-md: 0 4px 12px 0 rgba(0,0,0,0.12);
+}
+
+/* ─── RESET + BASE ─────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Nunito Sans', sans-serif;
+  background: var(--uuif-surface-bg);
+  color: var(--uuif-text-primary);
+  font-size: 13px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* ─── LAYOUT SHELL ──────────────────────────────────────────────────────────── */
+.app-shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ─── SIDEBAR — Primary Nav Rail ───────────────────────────────────────────── */
+.sidebar {
+  width: 60px;
+  height: 100vh;
+  background: var(--uuif-brand-navy);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  z-index: 200;
+}
+.sidebar-logo {
+  width: 60px; height: 52px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.sidebar-logo svg { width: 30px; height: 30px; }
+.sidebar-icon {
+  width: 60px; height: 50px;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.45);
+  cursor: pointer; position: relative;
+  transition: color .15s, background .15s;
+  border-left: 2px solid transparent;
+}
+.sidebar-icon:hover { color: rgba(255,255,255,0.8); }
+.sidebar-icon.active {
+  background: rgba(255,255,255,0.1);
+  border-left-color: var(--uuif-brand-orange);
+  color: #fff;
+}
+.sidebar-icon .badge {
+  position: absolute; top: 8px; right: 8px;
+  background: var(--uuif-brand-orange); color: #fff;
+  font-size: 9px; font-weight: 700;
+  border-radius: var(--uuif-radius-pill);
+  min-width: 16px; height: 16px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 3px;
+}
+.sidebar-spacer { flex: 1; }
+
+/* ─── MAIN AREA (topbar + content) ─────────────────────────────────────────── */
+.main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* ─── TOPBAR ────────────────────────────────────────────────────────────────── */
+.topbar {
+  height: 46px;
+  background: var(--uuif-surface-container);
+  border-bottom: 1px solid var(--uuif-border-transparent);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--uuif-sp-5);
+  flex-shrink: 0;
+  gap: var(--uuif-sp-3);
+  z-index: 100;
+}
+.breadcrumb {
+  display: flex; align-items: center; gap: var(--uuif-sp-2);
+  font-size: 12px; color: var(--uuif-text-secondary); flex: 1;
+}
+.breadcrumb a { color: var(--uuif-icon-primary); text-decoration: none; }
+.breadcrumb a:hover { color: var(--uuif-text-hover); text-decoration: underline; }
+.breadcrumb .sep { color: var(--uuif-text-tertiary); }
+.breadcrumb .current { color: var(--uuif-text-primary); font-weight: 600; }
+.topbar-actions { display: flex; align-items: center; gap: var(--uuif-sp-3); }
+.topbar-avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--uuif-brand-blue);
+  color: #fff; font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.topbar-icon {
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--uuif-icon-tertiary); cursor: pointer; border-radius: var(--uuif-radius-4);
+  transition: background .15s, color .15s;
+}
+.topbar-icon:hover { background: var(--uuif-surface-hover); color: var(--uuif-text-hover); }
+
+/* ─── PAGE CONTENT ──────────────────────────────────────────────────────────── */
+.page-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: var(--uuif-sp-5);
+  gap: var(--uuif-sp-4);
+  min-height: 0;
+}
+
+/* ─── PAGE HEADER ───────────────────────────────────────────────────────────── */
+.page-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  flex-shrink: 0;
+}
+.page-title-block {}
+.page-title {
+  font-size: 18px; font-weight: 700;
+  color: var(--uuif-brand-navy); letter-spacing: -0.2px;
+  display: flex; align-items: center; gap: var(--uuif-sp-3);
+}
+.page-title .sami-badge {
+  background: var(--uuif-brand-orange);
+  color: #fff; font-size: 10px; font-weight: 800;
+  padding: 2px 7px; border-radius: var(--uuif-radius-4);
+  letter-spacing: 0.5px;
+}
+.page-subtitle {
+  font-size: 12px; color: var(--uuif-text-secondary); margin-top: 2px;
+}
+.page-header-actions { display: flex; gap: var(--uuif-sp-3); align-items: center; }
+
+/* ─── KPI TILES ─────────────────────────────────────────────────────────────── */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--uuif-sp-4);
+  flex-shrink: 0;
+}
+.kpi-tile {
+  background: var(--uuif-surface-container);
+  border-radius: var(--uuif-radius-8);
+  box-shadow: var(--uuif-shadow-sm);
+  padding: var(--uuif-sp-5) var(--uuif-sp-5) var(--uuif-sp-4);
+  display: flex; flex-direction: column; gap: 4px;
+  border-top: 3px solid transparent;
+  transition: box-shadow .15s;
+  cursor: default;
+}
+.kpi-tile:hover { box-shadow: var(--uuif-shadow-md); }
+.kpi-tile.kpi-critical { border-top-color: var(--uuif-brand-red); }
+.kpi-tile.kpi-progress { border-top-color: var(--uuif-brand-orange); }
+.kpi-tile.kpi-scheduled { border-top-color: var(--uuif-brand-yellow); }
+.kpi-tile.kpi-arr { border-top-color: var(--uuif-brand-green); }
+.kpi-label {
+  font-size: 11px; font-weight: 600; color: var(--uuif-text-tertiary);
+  text-transform: uppercase; letter-spacing: 0.4px;
+}
+.kpi-value {
+  font-size: 28px; font-weight: 800; line-height: 1.1;
+}
+.kpi-tile.kpi-critical .kpi-value { color: var(--uuif-brand-red); }
+.kpi-tile.kpi-progress .kpi-value  { color: var(--uuif-brand-orange); }
+.kpi-tile.kpi-scheduled .kpi-value { color: var(--uuif-brand-yellow); }
+.kpi-tile.kpi-arr .kpi-value       { color: var(--uuif-brand-green); }
+.kpi-sub {
+  font-size: 11px; color: var(--uuif-text-secondary);
+  display: flex; align-items: center; gap: 4px;
+}
+
+/* ─── TWO-COLUMN BODY ───────────────────────────────────────────────────────── */
+.two-col-body {
+  flex: 1;
+  display: flex;
+  gap: var(--uuif-sp-4);
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ─── LEFT COLUMN — Priority Card List ─────────────────────────────────────── */
+.card-list-col {
+  width: 420px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: var(--uuif-surface-container);
+  border-radius: var(--uuif-radius-8);
+  box-shadow: var(--uuif-shadow-sm);
+  overflow: hidden;
+}
+.card-list-header {
+  padding: var(--uuif-sp-4) var(--uuif-sp-5);
+  border-bottom: 1px solid var(--uuif-border-transparent);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.card-list-header-title {
+  font-size: 12px; font-weight: 700; color: var(--uuif-text-secondary);
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.card-list-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--uuif-sp-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--uuif-sp-3);
+}
+.card-list-body::-webkit-scrollbar { width: 4px; }
+.card-list-body::-webkit-scrollbar-track { background: transparent; }
+.card-list-body::-webkit-scrollbar-thumb { background: var(--uuif-border-disabled); border-radius: 4px; }
+
+/* ─── PRIORITY CARD ─────────────────────────────────────────────────────────── */
+.priority-card {
+  background: var(--uuif-surface-container);
+  border-radius: var(--uuif-radius-8);
+  box-shadow: var(--uuif-shadow-sm);
+  border: 1px solid var(--uuif-border-transparent);
+  border-left: 3px solid var(--uuif-border-tertiary);
+  padding: var(--uuif-sp-4) var(--uuif-sp-5);
+  cursor: pointer;
+  transition: box-shadow .15s, border-color .15s, background .15s;
+  display: flex; flex-direction: column; gap: var(--uuif-sp-3);
+  position: relative;
+}
+.priority-card:hover {
+  box-shadow: var(--uuif-shadow-md);
+  background: var(--uuif-surface-hover);
+}
+.priority-card.selected {
+  background: var(--uuif-surface-selected);
+  box-shadow: var(--uuif-shadow-md);
+  border-color: var(--uuif-border-transparent);
+}
+/* Border stripe colors per category */
+.priority-card.cat-cve       { border-left-color: var(--uuif-brand-red); }
+.priority-card.cat-device    { border-left-color: var(--uuif-brand-orange); }
+.priority-card.cat-behavioral{ border-left-color: var(--uuif-brand-yellow); }
+.priority-card.cat-policy    { border-left-color: var(--uuif-surface-primary); }
+.priority-card.cat-sub       { border-left-color: var(--uuif-brand-green); }
+
+.card-top-row {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: var(--uuif-sp-3);
+}
+.card-category-chip {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.3px;
+  padding: 2px 8px; border-radius: var(--uuif-radius-4);
+  text-transform: uppercase; white-space: nowrap; flex-shrink: 0;
+}
+.chip-cve        { background: var(--uuif-fill-red-lightest);       color: var(--uuif-brand-red); }
+.chip-device     { background: var(--uuif-fill-orange-lightest);    color: var(--uuif-brand-orange); }
+.chip-behavioral { background: var(--uuif-fill-yellow-xxx-lighter); color: #9a6800; }
+.chip-policy     { background: var(--uuif-fill-blue-lightest);      color: var(--uuif-surface-primary); }
+.chip-sub        { background: var(--uuif-fill-green-xxx-lighter);  color: #3b6d1e; }
+
+.card-status-chip {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.2px;
+  padding: 2px 9px; border-radius: var(--uuif-radius-pill);
+  display: flex; align-items: center; gap: 4px; white-space: nowrap; flex-shrink: 0;
+}
+.status-in-progress { background: rgba(255,93,0,0.10); color: var(--uuif-brand-orange); }
+.status-scheduled   { background: var(--uuif-fill-blue-lightest);       color: var(--uuif-brand-blue); }
+.status-needs-action { background: var(--uuif-fill-red-lightest);       color: var(--uuif-brand-red); }
+.status-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: currentColor; flex-shrink: 0;
+}
+
+.card-title {
+  font-size: 13px; font-weight: 700;
+  color: var(--uuif-text-primary); line-height: 1.35;
+  margin-top: 2px;
+}
+.card-meta-row {
+  display: flex; align-items: center; gap: var(--uuif-sp-5); flex-wrap: wrap;
+}
+.card-meta-item {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 11px; color: var(--uuif-text-secondary);
+}
+.card-meta-item svg { color: var(--uuif-icon-secondary); flex-shrink: 0; }
+.card-meta-divider {
+  width: 1px; height: 12px;
+  background: var(--uuif-border-transparent); flex-shrink: 0;
+}
+.card-inline-indicator {
+  font-size: 11px; font-weight: 600;
+  display: flex; align-items: center; gap: 4px;
+}
+.indicator-act-now  { color: var(--uuif-brand-red); }
+.indicator-scheduled { color: var(--uuif-brand-blue); }
+.indicator-in-progress { color: var(--uuif-brand-orange); }
+
+/* Mini progress bar */
+.mini-progress-wrap {
+  display: flex; flex-direction: column; gap: 3px;
+}
+.mini-progress-bar-track {
+  height: 5px; border-radius: 3px;
+  background: var(--uuif-surface-disabled); overflow: hidden;
+}
+.mini-progress-bar-fill {
+  height: 100%; border-radius: 3px;
+  background: var(--uuif-brand-orange);
+  transition: width .4s ease;
+}
+.mini-progress-label {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 10px; color: var(--uuif-text-tertiary);
+}
+
+/* ─── RIGHT COLUMN — Detail Panel ──────────────────────────────────────────── */
+.detail-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--uuif-surface-container);
+  border-radius: var(--uuif-radius-8);
+  box-shadow: var(--uuif-shadow-sm);
+  overflow: hidden;
+}
+.detail-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--uuif-sp-6) var(--uuif-sp-7);
+  display: flex; flex-direction: column; gap: var(--uuif-sp-6);
+}
+.detail-body::-webkit-scrollbar { width: 4px; }
+.detail-body::-webkit-scrollbar-track { background: transparent; }
+.detail-body::-webkit-scrollbar-thumb { background: var(--uuif-border-disabled); border-radius: 4px; }
+
+/* Detail header */
+.detail-header { display: flex; flex-direction: column; gap: var(--uuif-sp-3); }
+.detail-header-top {
+  display: flex; align-items: center; gap: var(--uuif-sp-3);
+}
+.detail-category-badge {
+  font-size: 10px; font-weight: 800;
+  padding: 3px 10px; border-radius: var(--uuif-radius-4);
+  letter-spacing: 0.4px; text-transform: uppercase;
+}
+.detail-title {
+  font-size: 16px; font-weight: 800;
+  color: var(--uuif-brand-navy); line-height: 1.3;
+}
+.detail-scope-row {
+  display: flex; align-items: center; gap: var(--uuif-sp-5); flex-wrap: wrap;
+}
+.detail-scope-item {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 12px; color: var(--uuif-text-secondary);
+}
+
+/* SAMI note banner */
+.sami-note-banner {
+  background: var(--uuif-fill-blue-lightest);
+  border: 1px solid var(--uuif-border-secondary);
+  border-radius: var(--uuif-radius-8);
+  padding: var(--uuif-sp-4) var(--uuif-sp-5);
+  display: flex; gap: var(--uuif-sp-4);
+}
+.sami-note-tag {
+  background: var(--uuif-brand-orange); color: #fff;
+  font-size: 9px; font-weight: 900; letter-spacing: 0.8px;
+  padding: 2px 6px; border-radius: var(--uuif-radius-4);
+  height: fit-content; flex-shrink: 0; margin-top: 1px;
+}
+.sami-note-text {
+  font-size: 12px; color: var(--uuif-text-highlight); line-height: 1.55;
+}
+
+/* Evidence list */
+.section-label {
+  font-size: 11px; font-weight: 700;
+  color: var(--uuif-text-tertiary); text-transform: uppercase; letter-spacing: 0.5px;
+  margin-bottom: var(--uuif-sp-3);
+}
+.evidence-list { display: flex; flex-direction: column; gap: var(--uuif-sp-3); }
+.evidence-item {
+  display: flex; align-items: flex-start; gap: var(--uuif-sp-3);
+  font-size: 12px; color: var(--uuif-text-primary);
+  padding: var(--uuif-sp-3) var(--uuif-sp-4);
+  background: var(--uuif-surface-tertiary);
+  border-radius: var(--uuif-radius-6);
+}
+.evidence-icon {
+  width: 18px; height: 18px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--uuif-icon-primary);
+}
+.evidence-text { flex: 1; line-height: 1.45; }
+
+/* Timeline */
+.timeline-list { display: flex; flex-direction: column; gap: 0; }
+.timeline-item {
+  display: flex; gap: var(--uuif-sp-4);
+  padding-bottom: var(--uuif-sp-5); position: relative;
+}
+.timeline-item:last-child { padding-bottom: 0; }
+.timeline-left {
+  display: flex; flex-direction: column; align-items: center; width: 20px; flex-shrink: 0;
+}
+.timeline-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--uuif-icon-primary); flex-shrink: 0; margin-top: 3px; z-index: 1;
+}
+.timeline-line {
+  width: 1px; flex: 1; background: var(--uuif-border-disabled); margin-top: 3px;
+}
+.timeline-item:last-child .timeline-line { display: none; }
+.timeline-date {
+  font-size: 10px; font-weight: 700; color: var(--uuif-text-tertiary);
+  white-space: nowrap; padding-top: 1px; min-width: 90px;
+}
+.timeline-desc { font-size: 12px; color: var(--uuif-text-primary); line-height: 1.45; }
+
+/* ─── DETAIL FOOTER ─────────────────────────────────────────────────────────── */
+.detail-footer {
+  flex-shrink: 0;
+  border-top: 1px solid var(--uuif-border-transparent);
+  background: var(--uuif-surface-container);
+}
+
+/* Footer states */
+.footer-state { display: none; padding: var(--uuif-sp-4) var(--uuif-sp-6); }
+.footer-state.active { display: flex; }
+
+/* Default state */
+.footer-default {
+  align-items: center; justify-content: space-between; gap: var(--uuif-sp-4);
+}
+.footer-default-left {
+  display: flex; align-items: center; gap: var(--uuif-sp-5);
+}
+.footer-link {
+  font-size: 12px; font-weight: 600; color: var(--uuif-icon-primary);
+  text-decoration: none; cursor: pointer;
+  display: flex; align-items: center; gap: 3px;
+  transition: color .15s;
+}
+.footer-link:hover { color: var(--uuif-text-hover); }
+.footer-default-right { display: flex; align-items: center; gap: var(--uuif-sp-3); }
+
+/* Scheduling state */
+.footer-scheduling { flex-direction: column; gap: var(--uuif-sp-4); }
+.sched-time-row {
+  display: flex; gap: var(--uuif-sp-3); flex-wrap: wrap;
+}
+.sched-time-btn {
+  padding: 7px var(--uuif-sp-5);
+  border-radius: var(--uuif-radius-pill);
+  border: 1.5px solid var(--uuif-border-tertiary);
+  background: #fff; font-family: 'Nunito Sans', sans-serif;
+  font-size: 12px; font-weight: 600; color: var(--uuif-text-secondary);
+  cursor: pointer; transition: all .15s; white-space: nowrap;
+}
+.sched-time-btn:hover {
+  border-color: var(--uuif-icon-primary);
+  color: var(--uuif-icon-primary);
+  background: var(--uuif-fill-blue-lightest);
+}
+.sched-time-btn.selected {
+  border-color: var(--uuif-brand-orange);
+  background: var(--uuif-fill-orange-lightest);
+  color: var(--uuif-brand-orange);
+}
+.sched-reasoning {
+  background: var(--uuif-surface-tertiary);
+  border: 1px solid var(--uuif-border-disabled);
+  border-radius: var(--uuif-radius-6);
+  padding: var(--uuif-sp-3) var(--uuif-sp-4);
+  display: flex; gap: var(--uuif-sp-3);
+  font-size: 12px; color: var(--uuif-text-secondary); line-height: 1.5;
+}
+.sched-reasoning-icon { color: var(--uuif-icon-primary); flex-shrink: 0; margin-top: 1px; }
+.sched-reasoning-text { flex: 1; }
+.sched-action-row {
+  display: flex; align-items: center; justify-content: flex-end; gap: var(--uuif-sp-3);
+}
+
+/* Scheduled state */
+.footer-scheduled {
+  align-items: center; justify-content: space-between; gap: var(--uuif-sp-4);
+}
+.scheduled-info {
+  display: flex; align-items: center; gap: var(--uuif-sp-4);
+}
+.scheduled-icon-wrap {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--uuif-fill-blue-lightest);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--uuif-icon-primary); flex-shrink: 0;
+}
+.scheduled-label { font-size: 11px; color: var(--uuif-text-tertiary); }
+.scheduled-time  { font-size: 13px; font-weight: 700; color: var(--uuif-text-highlight); }
+.scheduled-actions { display: flex; align-items: center; gap: var(--uuif-sp-5); }
+
+/* In-progress state */
+.footer-inprogress { flex-direction: column; gap: var(--uuif-sp-3); }
+.inprogress-top {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.inprogress-label {
+  display: flex; align-items: center; gap: var(--uuif-sp-3);
+  font-size: 12px; font-weight: 700; color: var(--uuif-brand-orange);
+}
+.inprogress-label::before {
+  content: '';
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--uuif-brand-orange);
+  animation: pulse 1.5s infinite;
+  flex-shrink: 0;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(1.25); }
+}
+.inprogress-eta { font-size: 11px; color: var(--uuif-text-secondary); }
+.inprogress-bar-track {
+  height: 7px; border-radius: 4px;
+  background: var(--uuif-surface-disabled); overflow: hidden;
+}
+.inprogress-bar-fill {
+  height: 100%; border-radius: 4px;
+  background: linear-gradient(90deg, var(--uuif-brand-orange) 0%, #ff8c40 100%);
+  transition: width .4s ease;
+}
+.inprogress-actions {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.inprogress-devices { font-size: 11px; color: var(--uuif-text-tertiary); }
+
+/* ─── BUTTONS ───────────────────────────────────────────────────────────────── */
+.btn {
+  font-family: 'Nunito Sans', sans-serif;
+  font-weight: 700; font-size: 12px;
+  padding: 7px 16px; border-radius: var(--uuif-radius-4);
+  border: none; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 5px;
+  transition: all .15s; white-space: nowrap;
+  text-decoration: none;
+}
+.btn-primary {
+  background: var(--uuif-brand-orange);
+  color: #fff;
+}
+.btn-primary:hover { background: #e05200; }
+.btn-secondary {
+  background: transparent;
+  color: var(--uuif-text-secondary);
+  border: 1.5px solid var(--uuif-border-secondary);
+}
+.btn-secondary:hover {
+  border-color: var(--uuif-icon-primary);
+  color: var(--uuif-icon-primary);
+  background: var(--uuif-fill-blue-lightest);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--uuif-icon-primary);
+  padding: 7px 10px;
+}
+.btn-ghost:hover { background: var(--uuif-fill-blue-lightest); }
+.btn-danger-ghost {
+  background: transparent;
+  color: var(--uuif-brand-red);
+  padding: 7px 10px;
+}
+.btn-danger-ghost:hover { background: var(--uuif-fill-red-lightest); }
+
+/* ─── EMPTY STATE ───────────────────────────────────────────────────────────── */
+.detail-empty {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: var(--uuif-sp-5); color: var(--uuif-text-tertiary);
+  padding: var(--uuif-sp-8);
+}
+.detail-empty svg { opacity: 0.25; }
+.detail-empty-text { font-size: 13px; text-align: center; }
+
+/* ─── TOAST ─────────────────────────────────────────────────────────────────── */
+#toast-container {
+  position: fixed; bottom: 24px; right: 24px;
+  display: flex; flex-direction: column; gap: var(--uuif-sp-3);
+  z-index: 9999; pointer-events: none;
+}
+.toast {
+  background: var(--uuif-surface-contrast);
+  color: var(--uuif-text-contrast);
+  font-size: 12px; font-weight: 600;
+  padding: 10px 18px; border-radius: var(--uuif-radius-8);
+  box-shadow: var(--uuif-shadow-md);
+  display: flex; align-items: center; gap: var(--uuif-sp-3);
+  opacity: 0; transform: translateY(8px);
+  animation: toastIn .2s ease forwards, toastOut .25s ease 2.8s forwards;
+  pointer-events: none;
+}
+.toast-icon { flex-shrink: 0; }
+.toast-success .toast-icon { color: #6dd16d; }
+.toast-info .toast-icon    { color: #78b4f5; }
+@keyframes toastIn  { to { opacity: 1; transform: translateY(0); } }
+@keyframes toastOut { to { opacity: 0; transform: translateY(8px); } }
+
+/* ─── DIVIDER ────────────────────────────────────────────────────────────────── */
+.section-divider {
+  height: 1px; background: var(--uuif-border-transparent); margin: 0;
+}
+
+/* ─── NO ITEMS PLACEHOLDER ───────────────────────────────────────────────────── */
+.detail-no-selection {
+  flex: 1;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: var(--uuif-sp-4); color: var(--uuif-text-tertiary);
+  text-align: center; padding: var(--uuif-sp-8);
+}
+.detail-no-selection-icon { opacity: 0.2; }
+.detail-no-selection-text { font-size: 13px; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <nav class="sidebar" aria-label="Primary navigation">
+    <!-- Logo -->
+    <div class="sidebar-logo" title="SonicWall NSM">
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect width="32" height="32" rx="6" fill="#ff5d00"/>
+        <path d="M6 22L13 10L19 18L23 13L27 22H6Z" fill="white" opacity="0.95"/>
+      </svg>
+    </div>
+    <!-- Nav icons -->
+    <div class="sidebar-icon" title="Dashboard">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    </div>
+    <div class="sidebar-icon active" title="SAMI Recommendations">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      <span class="badge">5</span>
+    </div>
+    <div class="sidebar-icon" title="Tenants">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    </div>
+    <div class="sidebar-icon" title="Inventory">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+    </div>
+    <div class="sidebar-icon" title="Licenses">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    </div>
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-icon" title="Settings">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </div>
+    <div class="sidebar-icon" title="User profile" style="margin-bottom:4px;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    </div>
+  </nav>
+
+  <!-- ═══ MAIN AREA ═══ -->
+  <div class="main-area">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="breadcrumb">
+        <a href="#">NSM</a>
+        <span class="sep">›</span>
+        <a href="#">SAMI</a>
+        <span class="sep">›</span>
+        <span class="current">Recommendations</span>
+      </div>
+      <div class="topbar-actions">
+        <div class="topbar-icon" title="Refresh">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        </div>
+        <div class="topbar-icon" title="Notifications">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        </div>
+        <div class="topbar-icon" title="Help">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div class="topbar-avatar" title="arangaswamy@sonicwall.com">AR</div>
+      </div>
+    </header>
+
+    <!-- PAGE CONTENT -->
+    <main class="page-content">
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-title-block">
+          <div class="page-title">
+            Recommendations
+            <span class="sami-badge">SAMI</span>
+          </div>
+          <div class="page-subtitle">AI-prioritized actions ranked by risk impact — updated 3 minutes ago</div>
+        </div>
+        <div class="page-header-actions">
+          <button class="btn btn-secondary">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="14" y2="12"/><line x1="4" y1="18" x2="18" y2="18"/></svg>
+            Filter
+          </button>
+          <button class="btn btn-primary">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Re-analyze
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI TILES -->
+      <div class="kpi-row">
+        <div class="kpi-tile kpi-critical">
+          <div class="kpi-label">Critical Items</div>
+          <div class="kpi-value">5</div>
+          <div class="kpi-sub">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Require immediate attention
+          </div>
+        </div>
+        <div class="kpi-tile kpi-progress">
+          <div class="kpi-label">In Progress</div>
+          <div class="kpi-value">1</div>
+          <div class="kpi-sub">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Deploying now · 72% complete
+          </div>
+        </div>
+        <div class="kpi-tile kpi-scheduled">
+          <div class="kpi-label">Scheduled</div>
+          <div class="kpi-value">2</div>
+          <div class="kpi-sub">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Tonight & Monday
+          </div>
+        </div>
+        <div class="kpi-tile kpi-arr">
+          <div class="kpi-label">ARR at Risk</div>
+          <div class="kpi-value">$87K</div>
+          <div class="kpi-sub">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            ATP &amp; TZ subscriptions expiring
+          </div>
+        </div>
+      </div>
+
+      <!-- TWO-COLUMN BODY -->
+      <div class="two-col-body">
+
+        <!-- LEFT COLUMN — Priority Cards -->
+        <div class="card-list-col">
+          <div class="card-list-header">
+            <div class="card-list-header-title">Priority Queue</div>
+            <div style="font-size:11px; color:var(--uuif-text-tertiary);">5 items</div>
+          </div>
+          <div class="card-list-body" id="cardListBody">
+            <!-- Cards rendered by JS -->
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN — Detail Panel -->
+        <div class="detail-col" id="detailCol">
+          <div class="detail-no-selection" id="noSelectionState">
+            <div class="detail-no-selection-icon">
+              <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            </div>
+            <div class="detail-no-selection-text">Select a recommendation from the list<br>to view details and take action.</div>
+          </div>
+          <div id="detailContent" style="display:none; flex:1; display:none; flex-direction:column; overflow:hidden;">
+            <div class="detail-body" id="detailBody"></div>
+            <div class="detail-footer" id="detailFooter"></div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div id="toast-container"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   DATA MODEL
+═══════════════════════════════════════════════════════════════════════════ */
+const ITEMS = [
+  {
+    id: 0,
+    category: 'CVE Vulnerability',
+    categoryKey: 'cve',
+    title: 'SSL VPN Auth Bypass CVE-2026-1142',
+    firewalls: 12,
+    tenants: 4,
+    tenantNames: ['Acme Corp', 'Westfield IT', 'Beta Networks', 'Crown Logistics'],
+    state: 'in-progress',
+    progress: 72,
+    devicesComplete: 7,
+    devicesTotal: 12,
+    etaMinutes: 28,
+    scheduledTime: null,
+    samiNote: 'CVE-2026-1142 exploits a buffer overflow in the SSL VPN authentication handler. A public PoC exploit was published 2 days ago and active scanning activity is confirmed across 3 of your 4 affected tenants. SAMI has validated firmware patch availability for all 12 affected devices and pre-staged deployment packages.',
+    evidence: [
+      { icon: 'alert', text: 'CVSS 9.8 — Critical. Remote code execution without authentication on port 443.' },
+      { icon: 'scan',  text: 'Active PoC scanning detected from 14 external IPs targeting your tenants — confirmed by SAMI threat intel.' },
+      { icon: 'device',text: '12 TZ470/TZ570 devices confirmed unpatched (firmware 7.0.1-5095 and below).' },
+      { icon: 'clock', text: 'Vendor advisory issued 5 days ago. SonicWall PSIRT recommends immediate patching.' },
+    ],
+    timeline: [
+      { date: 'May 21, 2026', desc: 'CVE-2026-1142 published. SAMI flagged 12 affected devices within 4 minutes of advisory.' },
+      { date: 'May 23, 2026', desc: 'Public PoC exploit released. SAMI elevated severity from High to Critical.' },
+      { date: 'May 25, 2026', desc: 'Active scan traffic detected targeting Acme Corp and Westfield IT SSL VPN endpoints.' },
+      { date: 'May 26, 2026', desc: 'Patch deployment initiated by operator. 7 of 12 devices updated successfully.' },
+    ],
+  },
+  {
+    id: 1,
+    category: 'Device Alert',
+    categoryKey: 'device',
+    title: '3 Gateways Unreachable',
+    firewalls: 3,
+    tenants: 2,
+    tenantNames: ['Northgate Health', 'Delta Logistics'],
+    state: 'scheduled',
+    progress: null,
+    devicesComplete: null,
+    devicesTotal: 3,
+    etaMinutes: null,
+    scheduledTime: 'Tonight 11:00 PM',
+    samiNote: 'Three gateway devices stopped reporting heartbeats within a 4-minute window, suggesting a common upstream cause rather than individual failures. SAMI cross-referenced circuit monitoring data and identified a likely ISP maintenance event affecting both tenants. Scheduled diagnostic reboot during tonight\'s maintenance window.',
+    evidence: [
+      { icon: 'alert',  text: 'NSM00341-B, NSM00344-A (Northgate Health) and DL-GW-03 (Delta Logistics) last seen 47 minutes ago.' },
+      { icon: 'network',text: 'BGP session drops logged at 10:14 PM UTC on upstream provider AS7922 — correlates with outage onset.' },
+      { icon: 'device', text: 'Redundant failover paths are active. No traffic interruption reported by tenants.' },
+      { icon: 'scan',   text: 'No security indicators — SAMI classifies as connectivity/infrastructure incident, not a compromise.' },
+    ],
+    timeline: [
+      { date: '10:14 PM UTC', desc: 'BGP session drop detected on upstream AS7922. SAMI correlates with device loss.' },
+      { date: '10:18 PM UTC', desc: 'All 3 gateways stop heartbeat. SAMI opens incident and begins triage.' },
+      { date: '10:31 PM UTC', desc: 'SAMI confirms redundant failover paths active. No tenant-facing outage.' },
+      { date: 'Tonight 11:00 PM', desc: 'Diagnostic reboot scheduled within maintenance window to restore primary path.' },
+    ],
+  },
+  {
+    id: 2,
+    category: 'Behavioral Anomaly',
+    categoryKey: 'behavioral',
+    title: 'Credential Stuffing Detected',
+    firewalls: 6,
+    tenants: 2,
+    tenantNames: ['Beta Networks', 'Crown Logistics'],
+    state: 'needs-action',
+    progress: null,
+    devicesComplete: null,
+    devicesTotal: 6,
+    etaMinutes: null,
+    scheduledTime: null,
+    samiNote: 'SAMI\'s behavioral engine detected a sustained credential stuffing campaign targeting SSL VPN login endpoints across both tenants. Attack signature matches a known threat actor (TA-2891) observed in 3 other MSP environments this week. Geo-distribution of source IPs suggests automated botnet activity. Immediate IP block list deployment is recommended.',
+    evidence: [
+      { icon: 'alert',  text: '18,400 failed VPN auth attempts in 6 hours — 340× above daily baseline.' },
+      { icon: 'scan',   text: 'Source IPs distributed across 47 countries. Signature matches TA-2891 botnet infrastructure.' },
+      { icon: 'clock',  text: 'Attack began 6:22 AM UTC. Peak rate: 3,200 attempts/minute at 9:15 AM.' },
+      { icon: 'network',text: '2 accounts locked out (Beta Networks). No confirmed successful authentications detected.' },
+    ],
+    timeline: [
+      { date: '6:22 AM UTC', desc: 'First anomalous auth spike detected by SAMI behavioral engine. Alert threshold crossed at 6:24 AM.' },
+      { date: '7:10 AM UTC', desc: 'SAMI identifies TA-2891 botnet signature. Escalates to Critical.' },
+      { date: '9:15 AM UTC', desc: 'Peak attack volume: 3,200 attempts/min. Two accounts locked out at Beta Networks.' },
+      { date: 'Now — Active', desc: 'Attack ongoing. SAMI awaiting operator authorization to deploy IP block list across 6 devices.' },
+    ],
+  },
+  {
+    id: 3,
+    category: 'Policy Gap',
+    categoryKey: 'policy',
+    title: 'Permit-Any Outbound Bypassing DPI-SSL',
+    firewalls: 9,
+    tenants: 3,
+    tenantNames: ['Acme Corp', 'Delta Logistics', 'Northgate Health'],
+    state: 'scheduled',
+    progress: null,
+    devicesComplete: null,
+    devicesTotal: 9,
+    etaMinutes: null,
+    scheduledTime: 'Monday 2:00 AM',
+    samiNote: 'SAMI identified a policy misconfiguration where outbound Permit-Any rules are ordered before the DPI-SSL inspection policy on 9 firewalls. This allows encrypted C2 traffic and data exfiltration to bypass full inspection. The fix involves reordering existing policy rules — no new policies required. SAMI has pre-validated the change will not disrupt approved traffic flows.',
+    evidence: [
+      { icon: 'alert',  text: 'Permit-Any outbound rule at priority 3 evaluated before DPI-SSL rule at priority 12 — 9 affected devices.' },
+      { icon: 'scan',   text: 'Outbound TLS 1.3 traffic to 4 uncategorized domains bypassed inspection in the past 24 hours.' },
+      { icon: 'device', text: 'SAMI simulation confirms rule reorder eliminates bypass without blocking any approved application traffic.' },
+      { icon: 'clock',  text: 'Policy gap has existed for an estimated 34 days, introduced during a bulk policy import on April 22.' },
+    ],
+    timeline: [
+      { date: 'April 22, 2026', desc: 'Bulk policy import at Acme Corp introduced rule ordering conflict. Gap undetected at import time.' },
+      { date: 'May 20, 2026', desc: 'SAMI policy audit identifies DPI-SSL bypass condition across 9 devices in 3 tenants.' },
+      { date: 'May 24, 2026', desc: 'SAMI validates fix in simulation. No traffic disruption expected from rule reorder.' },
+      { date: 'Monday 2:00 AM', desc: 'Policy correction scheduled for Monday maintenance window. All 3 tenant windows align.' },
+    ],
+  },
+  {
+    id: 4,
+    category: 'Subscription Risk',
+    categoryKey: 'sub',
+    title: 'ATP & TZ Subscriptions Expiring <9 Days',
+    firewalls: 14,
+    tenants: 3,
+    tenantNames: ['Westfield IT', 'Crown Logistics', 'Delta Logistics'],
+    state: 'needs-action',
+    progress: null,
+    devicesComplete: null,
+    devicesTotal: 14,
+    etaMinutes: null,
+    scheduledTime: null,
+    samiNote: 'Advanced Threat Protection (ATP) and Capture ATP subscriptions are expiring within 9 days for 14 devices across 3 tenants — representing $87K in ARR. Expiration will disable sandboxing and block-until-verdict enforcement. SAMI recommends initiating renewal via the portal now to prevent a protection gap. Crown Logistics has a hard compliance deadline of June 1.',
+    evidence: [
+      { icon: 'clock',  text: '$87K ARR at risk. Crown Logistics (6 devices) expires June 1 — 5 days. Compliance deadline enforced.' },
+      { icon: 'alert',  text: 'Westfield IT (5 devices) expires June 3. Delta Logistics (3 devices) expires June 4.' },
+      { icon: 'device', text: 'Expiration disables ATP sandbox, block-until-verdict, and Capture ATP — active threat vectors during gap.' },
+      { icon: 'scan',   text: 'SAMI confirms no auto-renew configured on 12 of 14 devices. Manual renewal required.' },
+    ],
+    timeline: [
+      { date: 'May 10, 2026', desc: 'SAMI detects upcoming expiration horizon. First 30-day advisory sent to tenant contacts.' },
+      { date: 'May 19, 2026', desc: 'Second advisory sent. No renewal action taken. SAMI escalates to MSP dashboard.' },
+      { date: 'May 26, 2026', desc: 'SAMI flags as critical — 5 days to Crown Logistics deadline. ARR at risk: $87K.' },
+      { date: 'June 1, 2026',  desc: 'Crown Logistics compliance deadline. ATP protection gap begins if no renewal.' },
+    ],
+  },
+];
+
+const SAMI_REASONS = {
+  'tonight':  'Tonight at 11:00 PM falls within Acme Corp\'s maintenance window (10 PM–2 AM). SAMI will sequence tenant deployments to avoid concurrent restarts — estimated total window: 38 minutes.',
+  'tomorrow': 'Tomorrow 2:00 AM works for Westfield IT and Beta Networks. Note: Crown Logistics has no approved Friday maintenance window — SAMI will exclude their 2 devices and require separate confirmation.',
+  'monday':   'Monday 2:00 AM is optimal — all 4 tenant maintenance windows align. No concurrent SAMI operations queued. However: the active PoC exploit will have been in circulation 9 days by then. Risk exposure increases with delay.',
+  'custom':   'Select a custom date and time. SAMI will validate against all 4 tenant maintenance windows and flag any conflicts before confirming.',
+};
+
+const SCHED_LABELS = {
+  'tonight':  'Tonight 11:00 PM',
+  'tomorrow': 'Tomorrow 2:00 AM',
+  'monday':   'Monday 2:00 AM',
+  'custom':   'Custom',
+};
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════════════════════════ */
+let selectedId = null;
+let footerStateMap = {}; // id -> 'default' | 'scheduling' | 'scheduled' | 'in-progress'
+let scheduledTimeMap = {}; // id -> slot key
+let selectedSlotMap = {}; // id -> slot key (during scheduling)
+
+ITEMS.forEach(item => {
+  if (item.state === 'in-progress') {
+    footerStateMap[item.id] = 'in-progress';
+  } else if (item.state === 'scheduled') {
+    footerStateMap[item.id] = 'scheduled';
+  } else {
+    footerStateMap[item.id] = 'default';
+  }
+  if (item.scheduledTime) {
+    // map display time to slot key
+    if (item.scheduledTime.includes('11:00 PM')) scheduledTimeMap[item.id] = 'tonight';
+    else if (item.scheduledTime.includes('Monday')) scheduledTimeMap[item.id] = 'monday';
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ICON HELPERS
+═══════════════════════════════════════════════════════════════════════════ */
+function iconSVG(type, size = 14) {
+  const s = size;
+  const icons = {
+    alert:   `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
+    scan:    `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
+    device:  `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
+    clock:   `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+    network: `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="6"/><rect x="16" y="16" width="6" height="6"/><rect x="2" y="16" width="6" height="6"/><line x1="12" y1="8" x2="12" y2="12"/><polyline points="5 16 5 12 19 12 19 16"/></svg>`,
+    calendar:`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+    check:   `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+    info:    `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`,
+    play:    `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>`,
+    pause:   `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`,
+    users:   `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+    shield:  `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+    edit:    `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`,
+    x:       `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+    external:`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`,
+  };
+  return icons[type] || icons.alert;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════════════════════════════ */
+function showToast(message, type = 'success') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  const iconType = type === 'success' ? 'check' : 'info';
+  toast.innerHTML = `<span class="toast-icon">${iconSVG(iconType, 14)}</span><span>${message}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3200);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RENDER LEFT COLUMN CARDS
+═══════════════════════════════════════════════════════════════════════════ */
+function renderCards() {
+  const container = document.getElementById('cardListBody');
+  container.innerHTML = '';
+  ITEMS.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = `priority-card cat-${item.categoryKey}${selectedId === item.id ? ' selected' : ''}`;
+    card.dataset.id = item.id;
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('aria-label', item.title);
+
+    // Category chip
+    const chipClass = {
+      cve: 'chip-cve', device: 'chip-device',
+      behavioral: 'chip-behavioral', policy: 'chip-policy', sub: 'chip-sub'
+    }[item.categoryKey];
+
+    // Status chip
+    let statusHtml = '';
+    const fs = footerStateMap[item.id];
+    if (fs === 'in-progress') {
+      statusHtml = `<span class="card-status-chip status-in-progress"><span class="status-dot"></span>In Progress</span>`;
+    } else if (fs === 'scheduled') {
+      statusHtml = `<span class="card-status-chip status-scheduled">${iconSVG('calendar', 10)}Scheduled</span>`;
+    } else if (item.state === 'needs-action') {
+      statusHtml = `<span class="card-status-chip status-needs-action"><span class="status-dot"></span>Act Now</span>`;
+    }
+
+    // Inline indicator
+    let indicatorHtml = '';
+    if (fs === 'in-progress') {
+      indicatorHtml = `<span class="card-inline-indicator indicator-in-progress">${iconSVG('play', 11)} Deploying · ${item.etaMinutes} min left</span>`;
+    } else if (fs === 'scheduled') {
+      const st = scheduledTimeMap[item.id] ? SCHED_LABELS[scheduledTimeMap[item.id]] : item.scheduledTime;
+      indicatorHtml = `<span class="card-inline-indicator indicator-scheduled">${iconSVG('calendar', 11)} ${st}</span>`;
+    } else if (item.state === 'needs-action') {
+      indicatorHtml = `<span class="card-inline-indicator indicator-act-now">${iconSVG('alert', 11)} Act now</span>`;
+    }
+
+    // Progress bar (only for in-progress)
+    let progressHtml = '';
+    if (fs === 'in-progress') {
+      progressHtml = `
+        <div class="mini-progress-wrap">
+          <div class="mini-progress-bar-track">
+            <div class="mini-progress-bar-fill" style="width:${item.progress}%;"></div>
+          </div>
+          <div class="mini-progress-label">
+            <span>${item.devicesComplete}/${item.devicesTotal} devices</span>
+            <span>${item.progress}%</span>
+          </div>
+        </div>`;
+    }
+
+    card.innerHTML = `
+      <div class="card-top-row">
+        <div style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:0;">
+          <span class="card-category-chip ${chipClass}">${item.category}</span>
+          <div class="card-title">${item.title}</div>
+        </div>
+        ${statusHtml}
+      </div>
+      <div class="card-meta-row">
+        <div class="card-meta-item">
+          ${iconSVG('device', 12)}
+          <span>${item.firewalls} firewall${item.firewalls !== 1 ? 's' : ''}</span>
+        </div>
+        <div class="card-meta-divider"></div>
+        <div class="card-meta-item">
+          ${iconSVG('users', 12)}
+          <span>${item.tenants} tenant${item.tenants !== 1 ? 's' : ''}</span>
+        </div>
+        <div class="card-meta-divider"></div>
+        ${indicatorHtml}
+      </div>
+      ${progressHtml}
+    `;
+
+    card.addEventListener('click', () => selectItem(item.id));
+    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectItem(item.id); } });
+    container.appendChild(card);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SELECT ITEM → RENDER DETAIL
+═══════════════════════════════════════════════════════════════════════════ */
+function selectItem(id) {
+  selectedId = id;
+  renderCards();
+  renderDetail();
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RENDER DETAIL PANEL
+═══════════════════════════════════════════════════════════════════════════ */
+function renderDetail() {
+  const noSel = document.getElementById('noSelectionState');
+  const detContent = document.getElementById('detailContent');
+
+  if (selectedId === null) {
+    noSel.style.display = 'flex';
+    detContent.style.display = 'none';
+    return;
+  }
+
+  noSel.style.display = 'none';
+  detContent.style.display = 'flex';
+
+  const item = ITEMS.find(i => i.id === selectedId);
+  renderDetailBody(item);
+  renderDetailFooter(item);
+}
+
+function renderDetailBody(item) {
+  const body = document.getElementById('detailBody');
+
+  const chipClass = {
+    cve: 'chip-cve', device: 'chip-device',
+    behavioral: 'chip-behavioral', policy: 'chip-policy', sub: 'chip-sub'
+  }[item.categoryKey];
+
+  const catColor = {
+    cve: 'var(--uuif-brand-red)', device: 'var(--uuif-brand-orange)',
+    behavioral: '#9a6800', policy: 'var(--uuif-surface-primary)', sub: '#3b6d1e'
+  }[item.categoryKey];
+
+  // Evidence items
+  const evidenceHtml = item.evidence.map(ev => `
+    <div class="evidence-item">
+      <span class="evidence-icon">${iconSVG(ev.icon, 14)}</span>
+      <span class="evidence-text">${ev.text}</span>
+    </div>
+  `).join('');
+
+  // Timeline items
+  const timelineHtml = item.timeline.map((tl, idx) => `
+    <div class="timeline-item">
+      <div class="timeline-left">
+        <div class="timeline-dot" style="background:${idx === item.timeline.length - 1 ? catColor : 'var(--uuif-icon-primary)'};"></div>
+        <div class="timeline-line"></div>
+      </div>
+      <div class="timeline-date">${tl.date}</div>
+      <div class="timeline-desc">${tl.desc}</div>
+    </div>
+  `).join('');
+
+  body.innerHTML = `
+    <div class="detail-header">
+      <div class="detail-header-top">
+        <span class="detail-category-badge ${chipClass}">${item.category}</span>
+      </div>
+      <div class="detail-title">${item.title}</div>
+      <div class="detail-scope-row">
+        <div class="detail-scope-item">
+          ${iconSVG('device', 13)}
+          <span>${item.firewalls} affected firewall${item.firewalls !== 1 ? 's' : ''}</span>
+        </div>
+        <div style="width:1px;height:14px;background:var(--uuif-border-transparent);"></div>
+        <div class="detail-scope-item">
+          ${iconSVG('users', 13)}
+          <span>${item.tenants} tenant${item.tenants !== 1 ? 's' : ''}: ${item.tenantNames.join(', ')}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sami-note-banner">
+      <span class="sami-note-tag">SAMI</span>
+      <div class="sami-note-text">${item.samiNote}</div>
+    </div>
+
+    <div>
+      <div class="section-label">Evidence</div>
+      <div class="evidence-list">${evidenceHtml}</div>
+    </div>
+
+    <div>
+      <div class="section-label">Timeline</div>
+      <div class="timeline-list">${timelineHtml}</div>
+    </div>
+  `;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RENDER DETAIL FOOTER
+═══════════════════════════════════════════════════════════════════════════ */
+function renderDetailFooter(item) {
+  const footer = document.getElementById('detailFooter');
+  const fs = footerStateMap[item.id];
+
+  // Determine primary action label per category
+  const primaryLabel = {
+    cve: 'Deploy Patch', device: 'Run Diagnostic', behavioral: 'Deploy Block List',
+    policy: 'Apply Fix', sub: 'Renew Now'
+  }[item.categoryKey] || 'Take Action';
+
+  if (fs === 'default') {
+    footer.innerHTML = `
+      <div class="footer-state footer-default active" id="footer-default">
+        <div class="footer-default-left">
+          <a class="footer-link" href="#" onclick="handleViewDevices(event,${item.id})">
+            ${iconSVG('external', 12)} View devices
+          </a>
+        </div>
+        <div class="footer-default-right">
+          <button class="btn btn-secondary" onclick="openScheduler(${item.id})">
+            ${iconSVG('calendar', 12)} Schedule for later
+          </button>
+          <button class="btn btn-primary" onclick="handleDeploy(${item.id})">
+            ${iconSVG('play', 12)} ${primaryLabel}
+          </button>
+        </div>
+      </div>
+    `;
+  } else if (fs === 'scheduling') {
+    const selectedSlot = selectedSlotMap[item.id] || null;
+    const reason = selectedSlot ? SAMI_REASONS[selectedSlot] : null;
+
+    footer.innerHTML = `
+      <div class="footer-state footer-scheduling active" id="footer-scheduling">
+        <div class="sched-time-row">
+          ${['tonight','tomorrow','monday','custom'].map(slot => `
+            <button class="sched-time-btn${selectedSlot === slot ? ' selected' : ''}"
+              onclick="selectSlot(${item.id},'${slot}')">
+              ${SCHED_LABELS[slot]}
+            </button>
+          `).join('')}
+        </div>
+        ${reason ? `
+          <div class="sched-reasoning">
+            <span class="sched-reasoning-icon">${iconSVG('info', 14)}</span>
+            <span class="sched-reasoning-text">${reason}</span>
+          </div>
+        ` : `
+          <div class="sched-reasoning" style="color:var(--uuif-text-tertiary);">
+            <span class="sched-reasoning-icon">${iconSVG('calendar', 14)}</span>
+            <span class="sched-reasoning-text">Select a time slot above. SAMI will analyze maintenance windows and surface any conflicts.</span>
+          </div>
+        `}
+        <div class="sched-action-row">
+          <button class="btn btn-secondary" onclick="cancelScheduler(${item.id})">Cancel</button>
+          <button class="btn btn-primary" ${!selectedSlot ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}
+            onclick="confirmSchedule(${item.id})">
+            ${iconSVG('check', 12)} Confirm Schedule
+          </button>
+        </div>
+      </div>
+    `;
+  } else if (fs === 'scheduled') {
+    const slotKey = scheduledTimeMap[item.id];
+    const timeLabel = slotKey ? SCHED_LABELS[slotKey] : (item.scheduledTime || 'Scheduled');
+    footer.innerHTML = `
+      <div class="footer-state footer-scheduled active" id="footer-scheduled">
+        <div class="scheduled-info">
+          <div class="scheduled-icon-wrap">${iconSVG('calendar', 16)}</div>
+          <div>
+            <div class="scheduled-label">Scheduled for</div>
+            <div class="scheduled-time">${timeLabel}</div>
+          </div>
+        </div>
+        <div class="scheduled-actions">
+          <a class="footer-link" href="#" onclick="openScheduler(${item.id},event)">
+            ${iconSVG('edit', 12)} Edit
+          </a>
+          <a class="footer-link" style="color:var(--uuif-brand-red);" href="#" onclick="cancelSchedule(${item.id},event)">
+            ${iconSVG('x', 12)} Cancel
+          </a>
+          <button class="btn btn-primary" onclick="handleDeployNow(${item.id})">
+            ${iconSVG('play', 12)} Deploy now
+          </button>
+        </div>
+      </div>
+    `;
+  } else if (fs === 'in-progress') {
+    footer.innerHTML = `
+      <div class="footer-state footer-inprogress active" id="footer-inprogress">
+        <div class="inprogress-top">
+          <span class="inprogress-label">Deployment In Progress</span>
+          <span class="inprogress-eta">ETA: ~${item.etaMinutes} minutes remaining</span>
+        </div>
+        <div class="inprogress-bar-track">
+          <div class="inprogress-bar-fill" style="width:${item.progress}%;"></div>
+        </div>
+        <div class="inprogress-actions">
+          <span class="inprogress-devices">${item.devicesComplete} of ${item.devicesTotal} devices updated · ${item.progress}% complete</span>
+          <div style="display:flex;gap:var(--uuif-sp-4);align-items:center;">
+            <a class="footer-link" href="#" onclick="handleViewLog(event,${item.id})">
+              ${iconSVG('external', 12)} View log
+            </a>
+            <a class="footer-link" style="color:var(--uuif-text-secondary);" href="#" onclick="handlePause(event,${item.id})">
+              ${iconSVG('pause', 12)} Pause
+            </a>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FOOTER INTERACTIONS
+═══════════════════════════════════════════════════════════════════════════ */
+function openScheduler(id, evt) {
+  if (evt) evt.preventDefault();
+  footerStateMap[id] = 'scheduling';
+  if (!selectedSlotMap[id]) selectedSlotMap[id] = null;
+  renderDetailFooter(ITEMS.find(i => i.id === id));
+}
+
+function cancelScheduler(id) {
+  // Restore previous state
+  const item = ITEMS.find(i => i.id === id);
+  if (item.state === 'scheduled') {
+    footerStateMap[id] = 'scheduled';
+  } else {
+    footerStateMap[id] = 'default';
+  }
+  delete selectedSlotMap[id];
+  renderDetailFooter(item);
+}
+
+function selectSlot(id, slot) {
+  selectedSlotMap[id] = slot;
+  renderDetailFooter(ITEMS.find(i => i.id === id));
+}
+
+function confirmSchedule(id) {
+  const item = ITEMS.find(i => i.id === id);
+  const slot = selectedSlotMap[id];
+  if (!slot) return;
+  scheduledTimeMap[id] = slot;
+  footerStateMap[id] = 'scheduled';
+  delete selectedSlotMap[id];
+  showToast(`Deployment scheduled for ${SCHED_LABELS[slot]}`, 'success');
+  renderDetailFooter(item);
+  renderCards();
+}
+
+function cancelSchedule(id, evt) {
+  if (evt) evt.preventDefault();
+  const item = ITEMS.find(i => i.id === id);
+  delete scheduledTimeMap[id];
+  footerStateMap[id] = 'default';
+  showToast('Schedule cancelled', 'info');
+  renderDetailFooter(item);
+  renderCards();
+}
+
+function handleDeploy(id) {
+  const item = ITEMS.find(i => i.id === id);
+  // Simulate moving to in-progress
+  item.state = 'in-progress';
+  item.progress = item.progress || 0;
+  item.devicesComplete = item.devicesComplete || 0;
+  item.etaMinutes = item.etaMinutes || 30;
+  footerStateMap[id] = 'in-progress';
+  showToast(`Deployment initiated — ${item.title}`, 'success');
+  renderDetailFooter(item);
+  renderCards();
+}
+
+function handleDeployNow(id) {
+  const item = ITEMS.find(i => i.id === id);
+  delete scheduledTimeMap[id];
+  item.state = 'in-progress';
+  item.progress = item.progress || 5;
+  item.devicesComplete = item.devicesComplete || 0;
+  item.etaMinutes = item.etaMinutes || 35;
+  footerStateMap[id] = 'in-progress';
+  showToast(`Immediate deployment started — ${item.title}`, 'success');
+  renderDetailFooter(item);
+  renderCards();
+}
+
+function handleViewDevices(evt, id) {
+  evt.preventDefault();
+  showToast('Opening device inventory…', 'info');
+}
+
+function handleViewLog(evt, id) {
+  evt.preventDefault();
+  showToast('Opening deployment log…', 'info');
+}
+
+function handlePause(evt, id) {
+  evt.preventDefault();
+  showToast('Deployment paused. Resume at any time.', 'info');
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════════════════════════ */
+renderCards();
+// Pre-select first item
+selectItem(0);
+</script>
+</body>
+</html>

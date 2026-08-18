@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SAMI — AI Event List</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f0f2f5;
+    color: #1a1f36;
+    font-size: 13px;
+    min-height: 100vh;
+    color-scheme: light;
+  }
+
+  /* ── TOP NAV ── */
+  .topnav {
+    height: 52px;
+    background: #ffffff;
+    border-bottom: 1px solid #e4e7ec;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 32px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 15px;
+    color: #1a1f36;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+  .logo-icon {
+    width: 28px; height: 28px;
+    background: linear-gradient(135deg, #0056b3 0%, #0091d9 100%);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo-icon svg { width: 16px; height: 16px; fill: white; }
+  .nav-links {
+    display: flex;
+    gap: 4px;
+    list-style: none;
+    flex: 1;
+  }
+  .nav-links a {
+    text-decoration: none;
+    color: #6b7280;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: background .15s, color .15s;
+  }
+  .nav-links a:hover { background: #f3f4f6; color: #1a1f36; }
+  .nav-links a.active { background: #eff6ff; color: #1d4ed8; font-weight: 600; }
+  .topnav-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: auto;
+  }
+  .search-bar {
+    display: flex;
+    align-items: center;
+    background: #f3f4f6;
+    border: 1px solid #e4e7ec;
+    border-radius: 8px;
+    padding: 0 10px;
+    gap: 6px;
+    height: 32px;
+    width: 220px;
+  }
+  .search-bar input {
+    background: none;
+    border: none;
+    outline: none;
+    font-size: 12px;
+    color: #6b7280;
+    width: 100%;
+  }
+  .search-bar svg { flex-shrink: 0; }
+  .user-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+  .avatar {
+    width: 28px; height: 28px;
+    background: linear-gradient(135deg, #0056b3, #0091d9);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .user-info { line-height: 1.3; }
+  .user-info .name { font-size: 12px; font-weight: 600; color: #1a1f36; }
+  .user-info .sub  { font-size: 10px; color: #9ca3af; }
+
+  /* ── LAYOUT ── */
+  .layout {
+    display: flex;
+    height: calc(100vh - 52px);
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 210px;
+    min-width: 210px;
+    background: #ffffff;
+    border-right: 1px solid #e4e7ec;
+    overflow-y: auto;
+    padding: 16px 0;
+  }
+  .sidebar-section { margin-bottom: 20px; padding: 0 16px; }
+  .sidebar-section-title {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .7px;
+    color: #9ca3af;
+    margin-bottom: 8px;
+  }
+  .filter-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 4px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background .12s;
+  }
+  .filter-item:hover { background: #f3f4f6; }
+  .filter-item input[type=checkbox] {
+    width: 13px; height: 13px;
+    accent-color: #1d4ed8;
+    cursor: pointer;
+  }
+  .filter-item label {
+    font-size: 12px;
+    color: #374151;
+    cursor: pointer;
+    user-select: none;
+  }
+  .filter-count {
+    margin-left: auto;
+    font-size: 10px;
+    background: #f3f4f6;
+    color: #6b7280;
+    border-radius: 10px;
+    padding: 1px 6px;
+  }
+  .sidebar-search {
+    display: flex;
+    align-items: center;
+    background: #f9fafb;
+    border: 1px solid #e4e7ec;
+    border-radius: 6px;
+    padding: 0 8px;
+    height: 28px;
+    gap: 5px;
+    margin-bottom: 8px;
+  }
+  .sidebar-search input {
+    background: none; border: none; outline: none;
+    font-size: 11px; color: #6b7280; width: 100%;
+  }
+  .severity-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ── MAIN ── */
+  .main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 28px;
+  }
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .page-title { font-size: 22px; font-weight: 700; color: #1a1f36; }
+  .page-title-sub { font-size: 12px; color: #6b7280; margin-top: 2px; }
+  .header-actions { display: flex; gap: 8px; }
+  .btn {
+    display: flex; align-items: center; gap: 5px;
+    padding: 6px 14px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all .15s;
+  }
+  .btn-ghost { background: white; border: 1px solid #e4e7ec; color: #374151; }
+  .btn-ghost:hover { background: #f9fafb; }
+  .btn-primary { background: #1d4ed8; color: white; }
+  .btn-primary:hover { background: #1e40af; }
+
+  /* ── TOOLBAR ── */
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .toolbar-search {
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 1px solid #e4e7ec;
+    border-radius: 8px;
+    padding: 0 10px;
+    gap: 6px;
+    height: 34px;
+    width: 280px;
+  }
+  .toolbar-search input {
+    background: none; border: none; outline: none;
+    font-size: 12px; color: #374151; width: 100%;
+  }
+  .sort-select {
+    display: flex; align-items: center; gap: 5px;
+    background: white; border: 1px solid #e4e7ec;
+    border-radius: 8px; padding: 0 10px; height: 34px;
+    font-size: 12px; color: #374151; cursor: pointer;
+  }
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 14px;
+    border-bottom: 2px solid #e4e7ec;
+  }
+  .tab {
+    padding: 7px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #6b7280;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    cursor: pointer;
+    transition: all .12s;
+    border-radius: 4px 4px 0 0;
+  }
+  .tab:hover { color: #1a1f36; }
+  .tab.active { color: #1d4ed8; border-bottom-color: #1d4ed8; font-weight: 600; }
+  .tab-count {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: #e0e7ff; color: #1d4ed8;
+    border-radius: 10px; font-size: 10px; font-weight: 700;
+    padding: 1px 6px; margin-left: 5px;
+  }
+  .tab.active .tab-count { background: #1d4ed8; color: white; }
+
+  /* ── CARDS ── */
+  .cards { display: flex; flex-direction: column; gap: 10px; }
+
+  .card {
+    background: white;
+    border: 1px solid #e4e7ec;
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: grid;
+    grid-template-columns: 260px 1fr 180px;
+    gap: 16px;
+    align-items: start;
+    transition: box-shadow .15s, border-color .15s;
+    cursor: pointer;
+  }
+  .card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,.07);
+    border-color: #bfdbfe;
+  }
+
+  /* Card Left */
+  .card-left {}
+  .card-type-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .type-icon {
+    width: 20px; height: 20px;
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .type-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: #6b7280;
+  }
+  .card-id {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1f36;
+    margin-bottom: 6px;
+  }
+  .card-meta {
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .card-meta-row {
+    font-size: 11px;
+    color: #6b7280;
+    display: flex; gap: 4px;
+  }
+  .card-meta-row span:first-child { color: #9ca3af; min-width: 60px; }
+  .card-meta-row .val { color: #374151; font-weight: 500; }
+  .card-desc {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #f3f4f6;
+    font-size: 11px;
+    color: #6b7280;
+    display: flex; gap: 4px; flex-wrap: wrap;
+  }
+  .card-desc .label { color: #9ca3af; }
+
+  /* Card Center — pipeline */
+  .card-center { padding-top: 2px; }
+  .pipeline {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .pipe-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .pipe-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    border: 2px solid #d1d5db;
+    background: white;
+    position: relative;
+    z-index: 1;
+  }
+  .pipe-dot.done   { border-color: #1d4ed8; background: #1d4ed8; }
+  .pipe-dot.active { border-color: #1d4ed8; background: white; box-shadow: 0 0 0 3px #dbeafe; }
+  .pipe-dot.warn   { border-color: #f59e0b; background: #f59e0b; }
+  .pipe-dot.crit   { border-color: #ef4444; background: #ef4444; }
+  .pipe-line {
+    flex: 1;
+    height: 2px;
+    background: #e4e7ec;
+    position: relative;
+  }
+  .pipe-line.done { background: #1d4ed8; }
+  .pipe-label-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+  }
+  .pipe-label {
+    font-size: 9.5px;
+    color: #9ca3af;
+    text-align: center;
+    width: 62px;
+    line-height: 1.3;
+  }
+  .pipe-label.active-lbl { color: #1d4ed8; font-weight: 600; }
+  .pipe-ts {
+    font-size: 10px; color: #9ca3af; margin-top: 1px;
+    text-align: center;
+  }
+  .card-target {
+    margin-top: 10px;
+    font-size: 11px;
+    color: #6b7280;
+    display: flex; gap: 4px;
+  }
+  .card-target .label { color: #9ca3af; }
+  .card-target .val   { color: #374151; font-weight: 500; }
+
+  /* Card Right */
+  .card-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge-resolved   { background: #dcfce7; color: #15803d; }
+  .badge-critical   { background: #fee2e2; color: #b91c1c; }
+  .badge-high       { background: #fff7ed; color: #c2410c; }
+  .badge-medium     { background: #fefce8; color: #a16207; }
+  .badge-low        { background: #f0f9ff; color: #0369a1; }
+  .badge-reviewing  { background: #ede9fe; color: #7c3aed; }
+  .badge-new        { background: #e0e7ff; color: #3730a3; }
+  .badge-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: currentColor;
+  }
+  .card-updated { font-size: 10px; color: #9ca3af; }
+  .card-action-menu {
+    width: 20px; height: 20px;
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    color: #9ca3af;
+    cursor: pointer;
+    transition: background .12s;
+  }
+  .card-action-menu:hover { background: #f3f4f6; color: #374151; }
+
+  /* Severity strip on left edge */
+  .card { position: relative; overflow: hidden; }
+  .card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    border-radius: 10px 0 0 10px;
+  }
+  .card[data-sev="critical"]::before  { background: #ef4444; }
+  .card[data-sev="high"]::before      { background: #f97316; }
+  .card[data-sev="medium"]::before    { background: #eab308; }
+  .card[data-sev="low"]::before       { background: #3b82f6; }
+  .card[data-sev="resolved"]::before  { background: #22c55e; }
+
+  /* Empty state */
+  .empty { text-align: center; padding: 60px 20px; color: #9ca3af; }
+  .empty svg { margin-bottom: 12px; opacity: .4; }
+  .empty p { font-size: 13px; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <a class="logo" href="#">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    </div>
+    SAMI
+  </a>
+
+  <ul class="nav-links">
+    <li><a href="#">Dashboard</a></li>
+    <li><a href="#" class="active">AI Events</a></li>
+    <li><a href="#">Recommendations</a></li>
+    <li><a href="#">Policies</a></li>
+    <li><a href="#">Reports</a></li>
+    <li><a href="#">Help</a></li>
+  </ul>
+
+  <div class="topnav-right">
+    <div class="search-bar">
+      <svg width="13" height="13" fill="none" stroke="#9ca3af" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" placeholder="Search events, policies…" />
+    </div>
+    <div class="user-chip">
+      <div class="avatar">AR</div>
+      <div class="user-info">
+        <div class="name">Aravind R.</div>
+        <div class="sub">Last login: today</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Event Type</div>
+      <div class="filter-item"><input type="checkbox" id="t1" checked /><label for="t1">Threat Detection</label><span class="filter-count">14</span></div>
+      <div class="filter-item"><input type="checkbox" id="t2" /><label for="t2">Policy Violation</label><span class="filter-count">8</span></div>
+      <div class="filter-item"><input type="checkbox" id="t3" /><label for="t3">Anomaly</label><span class="filter-count">5</span></div>
+      <div class="filter-item"><input type="checkbox" id="t4" /><label for="t4">Compliance</label><span class="filter-count">3</span></div>
+      <div class="filter-item"><input type="checkbox" id="t5" /><label for="t5">AI Recommendation</label><span class="filter-count">11</span></div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Severity</div>
+      <div class="filter-item"><input type="checkbox" id="s1" checked /><label for="s1"><span class="severity-dot" style="background:#ef4444"></span>Critical</label><span class="filter-count">6</span></div>
+      <div class="filter-item"><input type="checkbox" id="s2" checked /><label for="s2"><span class="severity-dot" style="background:#f97316"></span>High</label><span class="filter-count">12</span></div>
+      <div class="filter-item"><input type="checkbox" id="s3" /><label for="s3"><span class="severity-dot" style="background:#eab308"></span>Medium</label><span class="filter-count">9</span></div>
+      <div class="filter-item"><input type="checkbox" id="s4" /><label for="s4"><span class="severity-dot" style="background:#3b82f6"></span>Low</label><span class="filter-count">14</span></div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Status</div>
+      <div class="filter-item"><input type="checkbox" id="st1" /><label for="st1">New</label><span class="filter-count">8</span></div>
+      <div class="filter-item"><input type="checkbox" id="st2" checked /><label for="st2">In Review</label><span class="filter-count">15</span></div>
+      <div class="filter-item"><input type="checkbox" id="st3" /><label for="st3">Resolved</label><span class="filter-count">31</span></div>
+      <div class="filter-item"><input type="checkbox" id="st4" /><label for="st4">Dismissed</label><span class="filter-count">7</span></div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Tenant / Device</div>
+      <div class="sidebar-search">
+        <svg width="10" height="10" fill="none" stroke="#9ca3af" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" placeholder="Search tenant…" />
+      </div>
+      <div class="filter-item"><input type="checkbox" id="c1" checked /><label for="c1">Acme Corp — FW-01</label></div>
+      <div class="filter-item"><input type="checkbox" id="c2" /><label for="c2">Globex — Edge-03</label></div>
+      <div class="filter-item"><input type="checkbox" id="c3" /><label for="c3">Initech — VPN-07</label></div>
+      <div class="filter-item"><input type="checkbox" id="c4" /><label for="c4">Umbrella Co.</label></div>
+      <div class="filter-item"><input type="checkbox" id="c5" /><label for="c5">Hooli Security</label></div>
+    </div>
+
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <div class="page-header">
+      <div>
+        <div class="page-title">AI Events</div>
+        <div class="page-title-sub">SAMI autonomous monitoring · 41 active events across 12 tenants</div>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-ghost">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          Export
+        </button>
+        <button class="btn btn-primary">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          New Rule
+        </button>
+      </div>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <div class="toolbar-search">
+        <svg width="13" height="13" fill="none" stroke="#9ca3af" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" placeholder="Search by event ID, tenant, policy…" />
+      </div>
+      <div class="sort-select">
+        Sort by: <strong>Severity ↓</strong>
+        <svg width="10" height="10" fill="none" stroke="#6b7280" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <div class="tab">All <span class="tab-count">41</span></div>
+      <div class="tab active">In Review <span class="tab-count">15</span></div>
+      <div class="tab">New <span class="tab-count">8</span></div>
+      <div class="tab">Resolved <span class="tab-count">31</span></div>
+      <div class="tab">Dismissed <span class="tab-count">7</span></div>
+    </div>
+
+    <!-- CARDS -->
+    <div class="cards">
+
+      <!-- CARD 1 — Critical -->
+      <div class="card" data-sev="critical">
+        <!-- Left -->
+        <div class="card-left">
+          <div class="card-type-row">
+            <div class="type-icon" style="background:#fee2e2">
+              <svg width="11" height="11" fill="none" stroke="#ef4444" stroke-width="2.5" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <span class="type-label">Threat Detection</span>
+          </div>
+          <div class="card-id">EVT-20241</div>
+          <div class="card-meta">
+            <div class="card-meta-row"><span>Tenant</span><span class="val">Acme Corp</span></div>
+            <div class="card-meta-row"><span>Device</span><span class="val">NSa 3700 · FW-01</span></div>
+            <div class="card-meta-row"><span>Policy</span><span class="val">IPS-Block-Lateral</span></div>
+          </div>
+          <div class="card-desc">
+            <span class="label">Finding:</span>
+            <span>Lateral movement attempt — C2 beacon on port 4444, process injection to lsass.exe</span>
+          </div>
+        </div>
+
+        <!-- Center pipeline -->
+        <div class="card-center">
+          <div class="pipeline">
+            <div class="pipe-step"><div class="pipe-dot done"></div></div>
+            <div class="pipe-line done"></div>
+            <div class="pipe-step"><div class="pipe-dot done"></div></div>
+            <div class="pipe-line done"></div>
+            <div class="pipe-step"><div class="pipe-dot active"></div></div>
+            <div class="pipe-line"></div>
+            <div class="pipe-step"><div class="pipe-dot"></div></div>
+          </div>
+          <div class="pipe-label-row">
+            <div class="pipe-label">Detected<div class="pipe-ts">26 May 08:11</div></div>
+            <div class="pipe-label">Triaged<div class="pipe-ts">26 May 08:13</div></div>
+            <div class="pipe-label active-lbl">Analyzing<div class="pipe-ts">In progress</div></div>
+            <div class="pipe-label">Resolved<div class="pipe-ts">—</div></div>
+          </div>
+          <div class="card-target">
+            <span class="label">Source IP:</span>
+            <span class="val">10.4.22.88 → 192.168.1.15 (internal)</span>
+          </div>
+        </div>
+
+        <!-- Right -->
+        <div class="card-right">
+          <div style="display:flex; align-items:center; gap:6px">
+            <span class="badge badge-critical"><span class="badge-dot"></span>Critical</span>
+            <div class="card-action-menu">
+              <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+            </div>
+          </div>
+          <div class="card-updated">Updated: 26.05.2026 08:14</div>
+          <div class="card-updated" style="color:#1d4ed8; font-weight:600; font-size:11px">Analyst: Sarah K.</div>
+        </div>
+      </div>
+
+      <!-- CARD 2 — High -->
+      <div class="card" data-sev="high">
+        <div class="card-left">
+          <div class="card-type-row">
+            <div class="type-icon" style="background:#fff7ed">
+              <svg width="11" height="11" fill="none" stroke="#f97316" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            </div>
+            <span class="type-label">Policy Violation</span>
+          </div>
+          <div class="card-id">EVT-20238</div>
+          <div class="card-meta">
+            <div class="card-meta-row"><span>Tenant</span><span class="val">Globex Inc.</span></div>
+            <div class="card-meta-row"><span>Device</span><span class="val">TZ 670 · Edge-03</span></div>
+            <div class="card-meta-row"><span>Policy</span><span class="val">GEO-Block-CN-RU</span></div>
+          </div>
+          <div class="card-desc">
+            <span class="label">Finding:</span>
+            <span>Geo-fenced traffic bypass — repeated connections to blocked region via TOR exit node</span>
+          </div>
+        </div>
+        <div class="card-center">
+          <div class="pipeline">
+            <div class="pipe-step"><div class="pipe-dot done"></div></div>
+            <div class="pipe-line done"></div>
+            <div class="pipe-step"><div class="pipe-dot done"></div></div>
+            <div class="pipe-line done"></div>
+            <div class="pipe-step"><div class="pipe-dot done"></div></div>
+            <div class="pipe-line done"></div>
+            <div class="pipe-step"><div class="pipe-dot active"></div></div>
+          </div>
+          <div class="pipe-label-row">
+            <div class="pipe-label">Detected<div class="pipe-ts">25 May 22:47</div></div>
+            <div class="pipe-label">Triaged<div class="pipe-ts">25 May 22:49</div></div>
+            <div class="pipe-label">Analyzed<div class="pipe-ts">25 May 23:02</div></div>
+            <div class="pipe-label active-lbl">Resolving<div class="pipe-ts">In progress</div></div>
+          </div>
+          <div class="card-target">
+            <span class="label">Dest:</span>
+            <span class="val">185.220.101.47 (TOR) · 43 connections</span>
+          </div>
+        </div>
+        <div class="card-right">
+          <div style="display:flex; align-items:center; gap:6px">
+            <span class="badge badge-high"><span class="badge-dot"></span>High</span>
+            <div class="card-action-menu">
+              <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+            </div>
+          </div>
+          <div class="card-updated">Updated: 26.05.2026 01:15</div>
+          <div class="card-updated" style="color:#1d4ed8; font-weight:600; font-size:11px">Analyst: Marcus T.</div>
+        </div>
+      </div>
+
+      <!-- CARD 3 — Medium -->
+      <div class="card" data-sev="medium">
+        <div class="card-left">
+          <div class="card-type-row">
+            <div class="type-icon" style="background:#fefce8">
+              <svg width="11" height="11" fill="none" stroke="#eab308" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <span class="type-label">Anomaly</span>
+          </div>
+          <div class="card-id">EVT-20235</div>
+          <div class="card-meta">
+            <div class="card-meta-row"><span>Tenant</span><span class="val">Initech LLC</span></div>
+            <div class="card-meta-row"><span>Device</span><span class="val">NSv 470 · VPN-07</span></div>
+            <div class="card-meta-row"><span>Policy</span><span class="val">DLP-Data-Exfil</span></div>
+          </div>
+          <div class="card-desc">
+            <span class="label">Finding:</span>
+            <span>Unusual outbound data volume — 4.2 GB transferred outside business hours to unclassified host</span>
+          </div>
+        </div>
+        <div class="card-center">
+          <div class="pipeline">
+            <div class="pipe-step"><div class="pipe-dot done"></div></div>
+            <div class="pipe-line done"></div>
+            <div class="pipe-step"><div class="pipe-dot active"></div></div>
+            <div class="pipe-line"></div>
+            <div class="pipe-step"><div class="pipe-dot"></div></div>
+            <div class="pipe-line"></div>
+            <div class="pipe-step"><div class="pipe-dot"></div></div>
+          </div>
+          <div class="pipe-label-row">
+            <div class="pipe-label">Detected<div class="pipe-ts">26 May 03:18</div></div>
+            <div class="pipe-label active-lbl">Triaging<div class="pipe-ts">In progress</div></div>
+            <div class="pipe-label">Analyze<div class="pipe-ts">—</div></div>
+            <div class="pipe-label">Resolve<div class="pipe-ts">—</div></div>
+          </div>
+          <div class="card-target">
+            <span class="label">Dest:</span>
+            <span class="val">203.0.113.55 (AS54113) · 4.2 GB</span>
+          </div>
+        </div>
+        <div class="card-right">
+          <div style="display:flex; align-items:center; gap:6px">
+            <span class="badge badge-medium"><span class="badge-dot"></span>Medium</span>
+            <div class="card-action-menu">
+              <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+            </div>
+          </div>
+          <div class="card-updated">Updated: 26.05.2026 03:21</div>
+          <div class="card-updated" style="color:#9ca3af; font-size:11px">Unassigned</div>
+        </div>
+      </div>
+
+      <!-- CARD 4 — High / AI Recommendation -->
+      <div class="card" data-sev="high">
+        <div class="card-left">
+          <div class="card-type-row">
+            <div class="type-icon" style="background:#ede9fe">
+              <svg width="11" height="11" fill="none" stroke="#7c3aed" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <span class="type-label">AI Recommendation</span>
+          </div>
+          <div class="card-id">EVT-20231</div>
+          <div class="card-meta">
+            <div class="card-meta-row"><span>Tenant</span><span class="val">Umbrella Co.</span></div>
+            <div class="card-meta-row"><span>Device</span><span class="val">NSsp 13700 · Core</span></div>
+            <div class="card-meta-row"><span>Policy</span><span class="val">Zero-Trust-Segment</span></div>
+          </div>
+          <div class="card-desc">
+            <span class="label">Finding:</span>
+            <span>SAMI recommends tightening east-west segmentation — 3 uncontrolled server-to-server flows detected</span>
+          </div>
+        </div>
+        <div class="card-center">
+          <div class="pipeline">
+            <div class="pipe-step"><div class="pipe-dot done"></div></div>
+            <div class="pipe-line done"></div>
+            <div class="pipe-step"><div class="pipe-dot done"></div></div>
+            <div class="pipe-line done"></div>
+            <div class="pipe-step"><div class="pipe-dot active"></div></div>
+            <div class="pipe-line"></div>
+            <div class="pipe-step"><div class="pipe-dot"></div></div>
+          </div>
+          <div class="pipe-label-row">
+            <div class="pipe-label">Detected<div class="pipe-ts">25 May 14:05</div></div>
+            <div class="pipe-label">Triaged<div class="pipe-ts">25 May 14:08</div></div>
+            <div class="pipe-label active-lbl">Analyzing<div class="pipe-ts">In progress</div></div>
+            <div class="pipe-label">Resolved<div class="pipe-ts">—</div></div>
+          </div>
+          <div class="card-target">
+            <span class="label">Scope:</span>
+            <span class="val">Segment 10.20.x.x ↔ 10.30.x.x · 3 flows</span>
+          </div>
+        </div>
+        <div class="card-right">
+          <div style="display:flex; align-items:center; gap:6px">
+            <span class="badge badge-reviewing"><span class="badge-dot"></span>In Review</span>
+            <div class="card-action-menu">
+              <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+            </div>
+          </div>
+          <div class="card-updated">Updated: 25.05.2026 14:09</div>
+          <div class="card-updated" style="color:#1d4ed8; font-weight:600; font-size:11px">Analyst: Priya M.</div>
+        </div>
+      </div>
+
+      <!-- CARD 5 — Resolved -->
+      <div class="card" data-sev="resolved">
+        <div class="card-left">
+          <div class="card-type-row">
+            <div class="type-icon" style="background:#dcfce7">
+              <svg width="11" height="11" fill="none" stroke="#16a34a" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <span class="type-label">Threat Detection</span>
+          </div>
+          <div class="card-id">EVT-20228</div>
+          <div class="card-meta">
+            <div class="card-meta-row"><span>Tenant</span><span class="val">Hooli Security</span></div>
+            <div class="card-meta-row"><span>Device</span><span class="val">TZ 570 · Branch-11</span></div>
+            <div class="card-meta-row"><span>Policy</span><span class="val">Ransomware-Detect</span></div>
+          </div>
+          <div class="card-desc">
+            <span class="label">Finding:</span>
+            <span>Ransomware pre-cursor activity — mass SMB enumeration blocked and quarantined by SAMI auto-response</span>
+          </div>
+        </div>
+        <div class="card-center">
+          <div class="pipeline">
+            <div class="pipe-step"><div class="pipe-dot done"></div></div>
+            <div class="pipe-line done"></div>
+            <div class="pipe-step"><div class="pipe-dot done"></div></div>
+            <div class="pipe-line done"></div>
+            <div class="pipe-step"><div class="pipe-dot done"></div></div>
+            <div class="pipe-line done"></div>
+            <div class="pipe-step"><div class="pipe-dot done"></div></div>
+          </div>
+          <div class="pipe-label-row">
+            <div class="pipe-label">Detected<div class="pipe-ts">24 May 19:55</div></div>
+            <div class="pipe-label">Triaged<div class="pipe-ts">24 May 19:57</div></div>
+            <div class="pipe-label">Analyzed<div class="pipe-ts">24 May 20:04</div></div>
+            <div class="pipe-label">Resolved<div class="pipe-ts">24 May 20:11</div></div>
+          </div>
+          <div class="card-target">
+            <span class="label">Action:</span>
+            <span class="val">Auto-quarantine · 7 min MTTR</span>
+          </div>
+        </div>
+        <div class="card-right">
+          <div style="display:flex; align-items:center; gap:6px">
+            <span class="badge badge-resolved"><span class="badge-dot"></span>Resolved</span>
+            <div class="card-action-menu">
+              <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+            </div>
+          </div>
+          <div class="card-updated">Updated: 24.05.2026 20:11</div>
+          <div class="card-updated" style="color:#15803d; font-weight:600; font-size:11px">Auto-resolved by SAMI</div>
+        </div>
+      </div>
+
+    </div><!-- /cards -->
+  </main>
+</div>
+
+</body>
+</html>

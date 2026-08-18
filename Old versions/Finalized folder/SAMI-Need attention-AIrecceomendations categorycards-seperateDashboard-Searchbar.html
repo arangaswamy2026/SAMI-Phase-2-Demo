@@ -123,7 +123,7 @@ body{font-family:'Nunito Sans',sans-serif;background:var(--uuif-surface-bg);colo
 .avatar{width:28px;height:28px;border-radius:50%;background:var(--uuif-surface-primary);color:var(--uuif-text-contrast);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer}
 
 /* ── PAGE ─────────────────────────────────────────────────────────────────── */
-.page{margin-left:326px;padding-top:46px;min-height:100vh;background:var(--uuif-surface-bg)}
+.page{margin-left:326px;padding-top:46px;min-height:100vh;background:linear-gradient(145deg,#eef2fb 0%,#f3f0fa 40%,#faf0ea 100%)}
 .inner{padding:var(--uuif-sp-5)}
 
 /* ── UUIF CARD ────────────────────────────────────────────────────────────── */
@@ -163,8 +163,15 @@ body{font-family:'Nunito Sans',sans-serif;background:var(--uuif-surface-bg);colo
 .uuif-tab.active{font-weight:700;color:var(--uuif-text-hover);border-color:var(--uuif-border-primary);background:var(--uuif-surface-container)}
 
 /* ── ASK SAMI (gap — extrapolated from Input + brand tokens) ──────────────── */
+@keyframes sami-shimmer {
+  0%   { box-shadow: 0 0 0 3px rgba(255,93,0,.08), 0 0 10px rgba(255,93,0,.12); border-color: rgba(255,93,0,.6); }
+  25%  { box-shadow: 0 0 0 5px rgba(255,93,0,.14), 0 0 22px rgba(255,93,0,.30); border-color: rgba(255,93,0,1); }
+  50%  { box-shadow: 0 0 0 6px rgba(255,140,0,.18), 0 0 32px rgba(255,140,0,.40); border-color: rgba(255,140,0,1); }
+  75%  { box-shadow: 0 0 0 5px rgba(255,93,0,.14), 0 0 22px rgba(255,93,0,.28); border-color: rgba(255,93,0,1); }
+  100% { box-shadow: 0 0 0 3px rgba(255,93,0,.08), 0 0 10px rgba(255,93,0,.12); border-color: rgba(255,93,0,.6); }
+}
 .sami-wrap{display:flex;justify-content:center;margin-bottom:var(--uuif-sp-5)}
-.sami-bar{display:flex;align-items:center;gap:var(--uuif-sp-3);border:1.5px solid var(--uuif-brand-orange);border-radius:var(--uuif-radius-pill);padding:var(--uuif-sp-3) var(--uuif-sp-5);width:560px;background:var(--uuif-surface-container);box-shadow:0 0 0 3px rgba(255,93,0,.08)}
+.sami-bar{display:flex;align-items:center;gap:var(--uuif-sp-3);border:1.5px solid var(--uuif-brand-orange);border-radius:var(--uuif-radius-pill);padding:var(--uuif-sp-3) var(--uuif-sp-5);width:560px;background:rgba(255,255,255,0.85);animation:sami-shimmer 2.8s ease-in-out infinite;}
 .sami-spark{color:var(--uuif-brand-orange);font-size:15px}
 .sami-bar input{border:none;outline:none;flex:1;font-family:'Nunito Sans',sans-serif;font-size:13px;color:var(--uuif-text-secondary);background:transparent}
 .kbd{font-size:10px;color:var(--uuif-text-tertiary);background:var(--uuif-surface-model);border-radius:var(--uuif-radius-4);padding:2px 5px;font-family:monospace}
@@ -172,6 +179,8 @@ body{font-family:'Nunito Sans',sans-serif;background:var(--uuif-surface-bg);colo
 /* ── CHIP ─────────────────────────────────────────────────────────────────── */
 .uuif-chip{display:inline-flex;align-items:center;gap:5px;height:22px;padding:2px 8px;border-radius:var(--uuif-radius-4);font-size:10.5px;font-weight:600;white-space:nowrap}
 .uuif-chip::before{content:'';width:6px;height:6px;border-radius:50%}
+.chip-default{background:var(--uuif-surface-tertiary);border:1px solid var(--uuif-border-secondary);color:var(--uuif-text-secondary)}
+.chip-default::before{display:none}
 .chip-err{background:var(--uuif-fill-red-lightest);border:1px solid var(--uuif-brand-red);color:var(--uuif-brand-red)}
 .chip-err::before{background:var(--uuif-brand-red)}
 .chip-warn{background:var(--uuif-fill-yellow-xxx-lighter);border:1px solid var(--uuif-brand-yellow);color:var(--uuif-brand-yellow)}
@@ -179,9 +188,10 @@ body{font-family:'Nunito Sans',sans-serif;background:var(--uuif-surface-bg);colo
 .chip-info{background:var(--uuif-fill-blue-lightest);border:1px solid var(--uuif-border-secondary);color:var(--uuif-text-secondary)}
 .chip-info::before{background:var(--uuif-border-secondary)}
 
-/* ── SAMI CALLOUT (gap — extrapolated from info fill + brand-orange) ─────── */
-.sami-callout{display:flex;align-items:flex-start;gap:var(--uuif-sp-3);background:var(--uuif-fill-orange-lighter);border-left:3px solid var(--uuif-brand-orange);border-radius:0 var(--uuif-radius-4) var(--uuif-radius-4) 0;padding:var(--uuif-sp-3);font-size:11.5px;color:var(--uuif-text-primary);line-height:1.5;margin-bottom:var(--uuif-sp-3)}
-.sami-tag{background:var(--uuif-brand-orange);color:var(--uuif-text-contrast);font-size:9px;font-weight:700;border-radius:var(--uuif-radius-4);padding:1px 5px;letter-spacing:.03em;flex-shrink:0;margin-top:2px}
+/* ── SAMI INLINE AI INSIGHT ───────────────────────────────────────────────── */
+.sami-callout{display:flex;align-items:flex-start;gap:var(--uuif-sp-2);font-size:11.5px;color:var(--uuif-text-secondary);line-height:1.5;margin-bottom:var(--uuif-sp-3)}
+.sami-ai-icon{color:var(--uuif-brand-orange);font-size:13px;flex-shrink:0;line-height:1.5}
+.sami-tag{display:none}
 
 /* ── ITEM CARDS ───────────────────────────────────────────────────────────── */
 .item-card{background:var(--uuif-surface-container);border:1px solid var(--uuif-border-tertiary);border-radius:var(--uuif-radius-6);padding:var(--uuif-sp-4) var(--uuif-sp-5);margin-bottom:var(--uuif-sp-4);transition:box-shadow .15s}
@@ -195,7 +205,7 @@ body{font-family:'Nunito Sans',sans-serif;background:var(--uuif-surface-bg);colo
 .item-scope svg{color:var(--uuif-icon-secondary)}
 .item-actions{display:flex;gap:var(--uuif-sp-2)}
 
-/* ── COUNT BLOCKS ─────────────────────────────────────────────────────────── */
+/* ── COUNT BLOCKS (legacy, kept for compat) ──────────────────────────────── */
 .count-blocks{display:flex;gap:var(--uuif-sp-3);margin-bottom:var(--uuif-sp-5)}
 .count-block{flex:1;background:var(--uuif-surface-container);border:1px solid var(--uuif-border-secondary);border-radius:var(--uuif-radius-8);padding:var(--uuif-sp-4);display:flex;align-items:center;gap:var(--uuif-sp-3)}
 .cb-icon{width:36px;height:36px;border-radius:var(--uuif-radius-6);display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -203,14 +213,101 @@ body{font-family:'Nunito Sans',sans-serif;background:var(--uuif-surface-bg);colo
 .cb-val{font-size:20px;font-weight:700;line-height:1;color:var(--uuif-text-primary)}
 .cb-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--uuif-text-secondary);margin-top:3px}
 
+/* ── AI REC WIDGETS ───────────────────────────────────────────────────────── */
+.rec-widgets{display:grid;grid-template-columns:1fr 1fr;gap:var(--uuif-sp-4);margin-bottom:var(--uuif-sp-5)}
+.rec-widget{background:var(--uuif-surface-container);border:1px solid var(--uuif-border-tertiary);border-radius:var(--uuif-radius-8);padding:var(--uuif-sp-5);display:flex;flex-direction:column;gap:var(--uuif-sp-3);transition:box-shadow .15s,border-color .15s}
+.rec-widget:hover{box-shadow:var(--uuif-shadow-sm);border-color:var(--uuif-border-secondary)}
+.rw-top{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--uuif-sp-2)}
+.rw-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--uuif-text-secondary);line-height:1.3}
+.rw-icon{width:28px;height:28px;border-radius:var(--uuif-radius-6);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rw-icon svg{width:14px;height:14px}
+.rw-total{font-size:32px;font-weight:800;line-height:1;color:var(--uuif-text-primary);letter-spacing:-.02em}
+.rw-total.money{font-size:24px;letter-spacing:-.02em}
+.rw-counts{display:flex;align-items:center;gap:var(--uuif-sp-3)}
+.rw-crit-badge{display:inline-flex;align-items:center;gap:4px;background:var(--uuif-fill-red-lightest);border:1px solid var(--uuif-brand-red);color:var(--uuif-brand-red);font-size:10px;font-weight:700;padding:2px 7px;border-radius:var(--uuif-radius-pill);white-space:nowrap}
+.rw-crit-badge::before{content:'';width:5px;height:5px;background:var(--uuif-brand-red);border-radius:50%;flex-shrink:0}
+.rw-other{font-size:11px;color:var(--uuif-text-tertiary)}
+.rw-chart{flex:1;display:flex;align-items:flex-end;min-height:36px}
+.rw-chart svg{width:100%;overflow:visible}
+.rw-footer{display:flex;align-items:center;justify-content:flex-end;padding-top:var(--uuif-sp-2);border-top:1px solid var(--uuif-border-transparent)}
+
+/* ── SAMI ALERTS GLASS PANEL ──────────────────────────────────────────────── */
+#sami-alerts-content{
+  background:rgba(255,255,255,0.45);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  border:1px solid rgba(255,255,255,0.7);
+  border-radius:var(--uuif-radius-8);
+  box-shadow:0 4px 24px rgba(91,116,167,0.10), inset 0 1px 0 rgba(255,255,255,0.8);
+  padding:var(--uuif-sp-6) var(--uuif-sp-8);
+  margin:0 0 var(--uuif-sp-5);
+}
+
 /* ── TWO COL ──────────────────────────────────────────────────────────────── */
-.two-col{display:flex;gap:var(--uuif-sp-4);align-items:flex-start}
-.col{flex:1;min-width:0}
-.col-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--uuif-sp-4)}
+.two-col{display:flex;gap:var(--uuif-sp-4);align-items:stretch;min-height:0}
+.col{flex:1;min-width:0;display:flex;flex-direction:column}
+.col-scroll{flex:1;overflow-y:auto;padding-right:4px;max-height:calc(100vh - 420px);scrollbar-width:thin;scrollbar-color:var(--uuif-border-tertiary) transparent}
+.col-scroll::-webkit-scrollbar{width:4px}
+.col-scroll::-webkit-scrollbar-track{background:transparent}
+.col-scroll::-webkit-scrollbar-thumb{background:var(--uuif-border-tertiary);border-radius:4px}
+.col-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--uuif-sp-4);flex-shrink:0}
 .col-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--uuif-text-highlight)}
 .view-all{font-size:12px;color:var(--uuif-text-secondary);text-decoration:none}
 .view-all:hover{color:var(--uuif-text-hover)}
 
+/* ── NOTIFICATIONS TABLE ──────────────────────────────────────────────────── */
+.notif-panel{display:none}
+.notif-panel.visible{display:block}
+.notif-header{padding:var(--uuif-sp-4) 0 var(--uuif-sp-3)}
+.notif-title{font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--uuif-text-highlight)}
+.notif-subtitle{font-size:11px;color:var(--uuif-text-tertiary);margin-top:2px}
+.notif-toolbar{display:flex;align-items:center;gap:var(--uuif-sp-3);margin-bottom:var(--uuif-sp-4);flex-wrap:wrap}
+.notif-search{display:flex;align-items:center;gap:var(--uuif-sp-2);border:1px solid var(--uuif-border-tertiary);border-radius:var(--uuif-radius-pill);padding:4px 12px;background:var(--uuif-surface-container);flex:1;min-width:220px;max-width:340px}
+.notif-search input{border:none;outline:none;font-family:'Nunito Sans',sans-serif;font-size:12px;color:var(--uuif-text-primary);background:transparent;width:100%}
+.notif-search input::placeholder{color:var(--uuif-text-tertiary)}
+.notif-counts{display:flex;align-items:baseline;gap:var(--uuif-sp-5)}
+.notif-count-item{display:flex;flex-direction:column;align-items:center}
+.notif-count-val{font-size:17px;font-weight:700;line-height:1}
+.notif-count-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--uuif-text-secondary);margin-top:2px}
+.notif-count-val.total{color:var(--uuif-brand-orange)}
+.notif-count-val.security{color:var(--uuif-brand-red)}
+.notif-count-val.system{color:var(--uuif-surface-primary)}
+.notif-count-val.license{color:var(--uuif-text-secondary)}
+.notif-time-filter{display:flex;align-items:center;gap:var(--uuif-sp-3);margin-left:auto}
+.notif-radio-group{display:flex;align-items:center;gap:var(--uuif-sp-4)}
+.notif-radio{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--uuif-text-secondary);cursor:pointer}
+.time-pill{display:flex;align-items:center;gap:var(--uuif-sp-2);background:var(--uuif-brand-navy);color:#fff;border-radius:var(--uuif-radius-pill);padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer}
+.notif-actions{display:flex;align-items:center;gap:var(--uuif-sp-3);font-size:12px;color:var(--uuif-text-secondary)}
+.notif-action-btn{display:flex;align-items:center;gap:4px;cursor:pointer;padding:4px 8px;border-radius:var(--uuif-radius-4)}
+.notif-action-btn:hover{background:var(--uuif-surface-hover);color:var(--uuif-text-hover)}
+.notif-action-btn.active-view{background:var(--uuif-brand-navy);color:#fff;border-radius:var(--uuif-radius-4);padding:4px 8px}
+.notif-subtabs{display:flex;border-bottom:1px solid var(--uuif-border-tertiary);margin-bottom:0;gap:0}
+.notif-subtab{padding:8px 16px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--uuif-text-secondary);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.notif-subtab:hover{color:var(--uuif-text-hover)}
+.notif-subtab.active{color:var(--uuif-brand-orange);border-bottom-color:var(--uuif-brand-orange)}
+.notif-table-wrap{background:var(--uuif-surface-container);border:1px solid var(--uuif-border-tertiary);border-radius:var(--uuif-radius-6);overflow:hidden}
+.notif-table{width:100%;border-collapse:collapse;font-size:12px}
+.notif-table thead tr{background:var(--uuif-surface-model);border-bottom:1px solid var(--uuif-border-transparent)}
+.notif-table th{padding:8px 12px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--uuif-text-secondary);white-space:nowrap}
+.notif-table th.sortable{cursor:pointer}
+.notif-table th.sortable:hover{color:var(--uuif-text-hover)}
+.notif-table tbody tr{border-bottom:1px solid var(--uuif-border-transparent);transition:background .1s}
+.notif-table tbody tr:last-child{border-bottom:none}
+.notif-table tbody tr:hover{background:var(--uuif-surface-hover)}
+.notif-table td{padding:9px 12px;color:var(--uuif-text-primary);vertical-align:middle}
+.notif-td-time{font-size:11px;color:var(--uuif-text-secondary);white-space:nowrap}
+.notif-td-time .date{font-weight:600;color:var(--uuif-text-primary)}
+.notif-priority{font-size:11px;font-weight:600}
+.notif-priority.emergency{color:var(--uuif-brand-red)}
+.notif-priority.warning{color:var(--uuif-brand-yellow)}
+.notif-priority.notice{color:var(--uuif-surface-primary)}
+.notif-priority.info{color:var(--uuif-text-secondary)}
+.notif-tenant{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--uuif-text-secondary);white-space:nowrap}
+.notif-tenant svg{color:var(--uuif-icon-secondary)}
+.alert-state-sel{border:1px solid var(--uuif-border-tertiary);border-radius:var(--uuif-radius-4);padding:3px 8px;font-size:11px;font-family:'Nunito Sans',sans-serif;color:var(--uuif-text-primary);background:var(--uuif-surface-container);cursor:pointer;appearance:none;-webkit-appearance:none;padding-right:20px;background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 6px center}
+.notif-type{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--uuif-text-secondary)}
+.notif-type svg{color:var(--uuif-icon-primary)}
+.notif-cb{width:14px;height:14px;border:1px solid var(--uuif-border-tertiary);border-radius:3px;cursor:pointer;accent-color:var(--uuif-brand-orange)}
 /* ── MASTER-DETAIL VIEW ───────────────────────────────────────────────────── */
 .md-view{display:none;height:calc(100vh - 46px);overflow:hidden}
 .md-view.visible{display:flex}
@@ -431,6 +528,199 @@ body{font-family:'Nunito Sans',sans-serif;background:var(--uuif-surface-bg);colo
       <div class="uuif-tab">Notifications</div>
     </div>
 
+    <!-- NOTIFICATIONS PANEL -->
+    <div class="notif-panel" id="notif-panel">
+      <div class="notif-header">
+        <div class="notif-title">Notifications</div>
+        <div class="notif-subtitle">Notifications for Product Alerts</div>
+      </div>
+      <div class="notif-toolbar">
+        <div class="notif-search">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--uuif-icon-secondary);flex-shrink:0"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" placeholder="Search friendly name / issue type / priority / tenant etc.">
+        </div>
+        <div class="notif-counts">
+          <div class="notif-count-item"><span class="notif-count-val total">14</span><span class="notif-count-lbl">Total</span></div>
+          <div class="notif-count-item"><span class="notif-count-val security">3</span><span class="notif-count-lbl">Security</span></div>
+          <div class="notif-count-item"><span class="notif-count-val system">11</span><span class="notif-count-lbl">System</span></div>
+          <div class="notif-count-item"><span class="notif-count-val license">0</span><span class="notif-count-lbl">License</span></div>
+        </div>
+        <div class="notif-radio-group">
+          <label class="notif-radio"><input type="radio" name="notif-time" style="accent-color:var(--uuif-brand-orange)"> <span class="time-pill">24 Hours <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span></label>
+          <label class="notif-radio"><input type="radio" name="notif-time" style="accent-color:var(--uuif-brand-orange)"> Custom</label>
+        </div>
+        <div class="notif-actions">
+          <div class="notif-action-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export</div>
+          <div class="notif-action-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Refresh</div>
+          <div class="notif-action-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg> Map</div>
+          <div class="notif-action-btn active-view"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> List</div>
+        </div>
+      </div>
+
+      <div class="notif-subtabs">
+        <div class="notif-subtab active">Firewalls</div>
+        <div class="notif-subtab">Access Points</div>
+        <div class="notif-subtab">Switches</div>
+        <div class="notif-subtab">Capture Client</div>
+        <div class="notif-subtab">Capture Client MDR</div>
+      </div>
+
+      <div class="notif-table-wrap">
+        <table class="notif-table">
+          <thead>
+            <tr>
+              <th style="width:32px"><input type="checkbox" class="notif-cb"></th>
+              <th class="sortable">Local Time ↓</th>
+              <th>Message</th>
+              <th>Priority</th>
+              <th>Tenant</th>
+              <th>Alert State</th>
+              <th>Source IP</th>
+              <th>Type</th>
+              <th>Friendly Name</th>
+              <th>Category</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="checkbox" class="notif-cb"></td>
+              <td class="notif-td-time"><div class="date">01 Jun 2026</div>09:27:58</td>
+              <td>Connection to Device fw_15may (2CB8ED6D8288) is successful</td>
+              <td><span class="notif-priority notice">Notice</span></td>
+              <td><div class="notif-tenant"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>A-DEMO-TENANT</div></td>
+              <td><select class="alert-state-sel"><option>New</option><option>Acknowledged</option><option>Resolved</option></select></td>
+              <td style="font-size:11px;color:var(--uuif-text-secondary)">49.249.49.243:9</td>
+              <td><div class="notif-type"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Health Status</div></td>
+              <td style="font-size:11px">fw_15may</td>
+              <td style="font-size:11px;color:var(--uuif-text-secondary)">SYSTEM</td>
+              <td style="font-size:11px;color:var(--uuif-text-tertiary)">–</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="notif-cb"></td>
+              <td class="notif-td-time"><div class="date">01 Jun 2026</div>09:12:06</td>
+              <td>Connection to Device fw_15may (2CB8ED6D8288) failed</td>
+              <td><span class="notif-priority warning">Warning</span></td>
+              <td><div class="notif-tenant"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>A-DEMO-TENANT</div></td>
+              <td><select class="alert-state-sel"><option>New</option><option>Acknowledged</option><option>Resolved</option></select></td>
+              <td style="font-size:11px;color:var(--uuif-text-secondary)">49.249.49.243:9</td>
+              <td><div class="notif-type"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Health Status</div></td>
+              <td style="font-size:11px">fw_15may</td>
+              <td style="font-size:11px;color:var(--uuif-text-secondary)">SYSTEM</td>
+              <td style="font-size:11px;color:var(--uuif-text-tertiary)">–</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="notif-cb"></td>
+              <td class="notif-td-time"><div class="date">01 Jun 2026</div>04:08:34</td>
+              <td>Device Remote Branch 2 (2CB8EDB53448) interface X2 up</td>
+              <td><span class="notif-priority info">Info</span></td>
+              <td><div class="notif-tenant"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3H6a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h4M16 17l5-5-5-5M21 12H9"/></svg>Acme Tenant 1</div></td>
+              <td><select class="alert-state-sel"><option>New</option><option>Acknowledged</option><option>Resolved</option></select></td>
+              <td style="font-size:11px;color:var(--uuif-text-secondary)">122.171.22.234</td>
+              <td><div class="notif-type"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>Interfaces</div></td>
+              <td style="font-size:11px">Remote Branch 2</td>
+              <td style="font-size:11px;color:var(--uuif-text-secondary)">SYSTEM</td>
+              <td style="font-size:11px;color:var(--uuif-text-tertiary)">–</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="notif-cb"></td>
+              <td class="notif-td-time"><div class="date">01 Jun 2026</div>01:56:18</td>
+              <td>Device Remote Branch 2 (2CB8EDB53448) interface X2 down</td>
+              <td><span class="notif-priority warning">Warning</span></td>
+              <td><div class="notif-tenant"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3H6a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h4M16 17l5-5-5-5M21 12H9"/></svg>Acme Tenant 1</div></td>
+              <td><select class="alert-state-sel"><option>New</option><option>Acknowledged</option><option>Resolved</option></select></td>
+              <td style="font-size:11px;color:var(--uuif-text-secondary)">122.171.22.234</td>
+              <td><div class="notif-type"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>Interfaces</div></td>
+              <td style="font-size:11px">Remote Branch 2</td>
+              <td style="font-size:11px;color:var(--uuif-text-secondary)">SYSTEM</td>
+              <td style="font-size:11px;color:var(--uuif-text-tertiary)">–</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="notif-cb"></td>
+              <td class="notif-td-time"><div class="date">01 Jun 2026</div>01:56:18</td>
+              <td>Connection to Device Remote Branch 2 (2CB8EDB53448) is successful</td>
+              <td><span class="notif-priority notice">Notice</span></td>
+              <td><div class="notif-tenant"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3H6a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h4M16 17l5-5-5-5M21 12H9"/></svg>Acme Tenant 1</div></td>
+              <td><select class="alert-state-sel"><option>New</option><option>Acknowledged</option><option>Resolved</option></select></td>
+              <td style="font-size:11px;color:var(--uuif-text-secondary)">122.171.22.234</td>
+              <td><div class="notif-type"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Health Status</div></td>
+              <td style="font-size:11px">Remote Branch 2</td>
+              <td style="font-size:11px;color:var(--uuif-text-secondary)">SYSTEM</td>
+              <td style="font-size:11px;color:var(--uuif-text-tertiary)">–</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="notif-cb"></td>
+              <td class="notif-td-time"><div class="date">01 Jun 2026</div>01:41:38</td>
+              <td>Connection to Device Remote Branch 2 (2CB8EDB53448) failed</td>
+              <td><span class="notif-priority emergency">Emergency</span></td>
+              <td><div class="notif-tenant"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3H6a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h4M16 17l5-5-5-5M21 12H9"/></svg>Acme Tenant 1</div></td>
+              <td><select class="alert-state-sel"><option>New</option><option>Acknowledged</option><option>Resolved</option></select></td>
+              <td style="font-size:11px;color:var(--uuif-text-secondary)">122.171.19.58</td>
+              <td><div class="notif-type"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Health Status</div></td>
+              <td style="font-size:11px">Remote Branch 2</td>
+              <td style="font-size:11px;color:var(--uuif-text-secondary)">SYSTEM</td>
+              <td style="font-size:11px;color:var(--uuif-text-tertiary)">–</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="notif-cb"></td>
+              <td class="notif-td-time"><div class="date">31 May 2026</div>20:26:17</td>
+              <td>Device Remote Branch 2 (2CB8EDB53448) interface X3 up</td>
+              <td><span class="notif-priority info">Info</span></td>
+              <td><div class="notif-tenant"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3H6a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h4M16 17l5-5-5-5M21 12H9"/></svg>Acme Tenant 1</div></td>
+              <td><select class="alert-state-sel"><option>New</option><option>Acknowledged</option><option>Resolved</option></select></td>
+              <td style="font-size:11px;color:var(--uuif-text-secondary)">122.171.19.58</td>
+              <td><div class="notif-type"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>Interfaces</div></td>
+              <td style="font-size:11px">Remote Branch 2</td>
+              <td style="font-size:11px;color:var(--uuif-text-secondary)">SYSTEM</td>
+              <td style="font-size:11px;color:var(--uuif-text-tertiary)">–</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="notif-cb"></td>
+              <td class="notif-td-time"><div class="date">31 May 2026</div>20:25:06</td>
+              <td>Device Remote Branch 2 (2CB8EDB53448) interface X3 down</td>
+              <td><span class="notif-priority warning">Warning</span></td>
+              <td><div class="notif-tenant"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3H6a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h4M16 17l5-5-5-5M21 12H9"/></svg>Acme Tenant 1</div></td>
+              <td><select class="alert-state-sel"><option>New</option><option>Acknowledged</option><option>Resolved</option></select></td>
+              <td style="font-size:11px;color:var(--uuif-text-secondary)">122.171.19.58</td>
+              <td><div class="notif-type"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>Interfaces</div></td>
+              <td style="font-size:11px">Remote Branch 2</td>
+              <td style="font-size:11px;color:var(--uuif-text-secondary)">SYSTEM</td>
+              <td style="font-size:11px;color:var(--uuif-text-tertiary)">–</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="notif-cb"></td>
+              <td class="notif-td-time"><div class="date">31 May 2026</div>20:23:14</td>
+              <td>Device Remote Branch 2 (2CB8EDB53448) interface X3 up</td>
+              <td><span class="notif-priority info">Info</span></td>
+              <td><div class="notif-tenant"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3H6a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h4M16 17l5-5-5-5M21 12H9"/></svg>Acme Tenant 1</div></td>
+              <td><select class="alert-state-sel"><option>New</option><option>Acknowledged</option><option>Resolved</option></select></td>
+              <td style="font-size:11px;color:var(--uuif-text-secondary)">122.171.19.58</td>
+              <td><div class="notif-type"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>Interfaces</div></td>
+              <td style="font-size:11px">Remote Branch 2</td>
+              <td style="font-size:11px;color:var(--uuif-text-secondary)">SYSTEM</td>
+              <td style="font-size:11px;color:var(--uuif-text-tertiary)">–</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="notif-cb"></td>
+              <td class="notif-td-time"><div class="date">31 May 2026</div>20:22:03</td>
+              <td>Device Remote Branch 2 (2CB8EDB53448) interface X3 down</td>
+              <td><span class="notif-priority warning">Warning</span></td>
+              <td><div class="notif-tenant"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3H6a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h4M16 17l5-5-5-5M21 12H9"/></svg>Acme Tenant 1</div></td>
+              <td><select class="alert-state-sel"><option>New</option><option>Acknowledged</option><option>Resolved</option></select></td>
+              <td style="font-size:11px;color:var(--uuif-text-secondary)">122.171.19.58</td>
+              <td><div class="notif-type"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>Interfaces</div></td>
+              <td style="font-size:11px">Remote Branch 2</td>
+              <td style="font-size:11px;color:var(--uuif-text-secondary)">SYSTEM</td>
+              <td style="font-size:11px;color:var(--uuif-text-tertiary)">–</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SAMI Alerts content wrapper -->
+    <div id="sami-alerts-content">
+
     <!-- Ask SAMI -->
     <div class="sami-wrap">
       <div class="sami-bar">
@@ -446,15 +736,16 @@ body{font-family:'Nunito Sans',sans-serif;background:var(--uuif-surface-bg);colo
       <!-- LEFT: Need Attention -->
       <div class="col">
         <div class="col-hdr"><div class="col-title">Need Attention</div></div>
+        <div class="col-scroll">
 
         <div class="item-card">
           <div class="item-meta">
-            <span class="uuif-chip chip-err">CVE Vulnerability</span>
+            <span class="uuif-chip chip-default">CVE Vulnerability</span>
             <span class="item-time">2 hrs ago</span>
           </div>
           <div class="item-title">SSL VPN Auth Bypass (CVE-2026-1142) — 12 Firewalls Across 4 Tenants</div>
           <div class="sami-callout">
-            <span class="sami-tag">SAMI</span>
+            <span class="sami-ai-icon">✦</span>
             <span>CVSS 9.8 critical. Unauthenticated RCE possible on SonicOS &lt; 7.1.2-1023. Active PoC exploit observed in the wild. Acme Corp, Beta Networks, Westfield IT, and Crown Logistics are exposed. Patch pre-staged and compatibility-verified across all 12 devices.</span>
           </div>
           <div class="item-footer">
@@ -463,20 +754,19 @@ body{font-family:'Nunito Sans',sans-serif;background:var(--uuif-surface-bg);colo
               <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>12 Firewalls</span>
             </div>
             <div class="item-actions">
-              <button class="uuif-btn uuif-btn-primary">Deploy patch</button>
-              <button class="uuif-btn uuif-btn-secondary">Schedule</button>
+              <button class="uuif-btn uuif-btn-secondary">Deploy patch</button>
             </div>
           </div>
         </div>
 
         <div class="item-card">
           <div class="item-meta">
-            <span class="uuif-chip chip-warn">Device Alert</span>
+            <span class="uuif-chip chip-default">Device Alert</span>
             <span class="item-time">3 hrs ago</span>
           </div>
           <div class="item-title">3 Gateways Unreachable — Northgate Health &amp; Delta Logistics</div>
           <div class="sami-callout">
-            <span class="sami-tag">SAMI</span>
+            <span class="sami-ai-icon">✦</span>
             <span>FW-NH-02, FW-NH-03 (Northgate Health) and FW-DL-01 (Delta Logistics) have been unreachable for 3+ hours. Last heartbeat lost after a BGP route change. Branch sites are currently without perimeter inspection.</span>
           </div>
           <div class="item-footer">
@@ -485,20 +775,19 @@ body{font-family:'Nunito Sans',sans-serif;background:var(--uuif-surface-bg);colo
               <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>3 Firewalls offline</span>
             </div>
             <div class="item-actions">
-              <button class="uuif-btn uuif-btn-primary">Diagnose</button>
-              <button class="uuif-btn uuif-btn-secondary">Notify tenant</button>
+              <button class="uuif-btn uuif-btn-secondary">Diagnose</button>
             </div>
           </div>
         </div>
 
         <div class="item-card">
           <div class="item-meta">
-            <span class="uuif-chip chip-info">Subscription Risk</span>
+            <span class="uuif-chip chip-default">Subscription Risk</span>
             <span class="item-time">Today · 08:14 AM</span>
           </div>
           <div class="item-title">ATP &amp; TZ Subscriptions Expiring in &lt;9 Days — 3 Tenants, 21 Firewalls</div>
           <div class="sami-callout">
-            <span class="sami-tag">SAMI</span>
+            <span class="sami-ai-icon">✦</span>
             <span>Acme Corp (8 FW), Beta Networks (7 FW), and Delta Logistics (6 FW) ATP subscriptions lapse before the next QBR. $87K ARR at risk. Renewal quotes are ready.</span>
           </div>
           <div class="item-footer">
@@ -507,95 +796,183 @@ body{font-family:'Nunito Sans',sans-serif;background:var(--uuif-surface-bg);colo
               <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>21 Firewalls at risk</span>
             </div>
             <div class="item-actions">
-              <button class="uuif-btn uuif-btn-primary">Initiate renewal</button>
-              <button class="uuif-btn uuif-btn-secondary">Snooze</button>
+              <button class="uuif-btn uuif-btn-secondary">Initiate renewal</button>
             </div>
           </div>
         </div>
+        </div><!-- /col-scroll -->
       </div>
 
-      <!-- RIGHT: SAMI Recommendations -->
+      <!-- RIGHT: AI Recommendations — widget view -->
       <div class="col">
         <div class="col-hdr">
-          <div class="col-title">SAMI Recommendations</div>
+          <div class="col-title">AI Recommendations</div>
           <a class="view-all" href="#">View all</a>
         </div>
 
-        <!-- Count blocks -->
-        <div class="count-blocks">
-          <div class="count-block">
-            <div class="cb-icon" style="background:var(--uuif-fill-red-lightest)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="var(--uuif-brand-red)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            </div>
-            <div><div class="cb-val" style="color:var(--uuif-brand-red)">8</div><div class="cb-lbl">CVE Vulnerabilities</div></div>
-          </div>
-          <div class="count-block">
-            <div class="cb-icon" style="background:var(--uuif-fill-blue-lightest)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="var(--uuif-surface-primary)" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-            </div>
-            <div><div class="cb-val" style="color:var(--uuif-surface-primary)">5</div><div class="cb-lbl">Behavioral Anomalies</div></div>
-          </div>
-          <div class="count-block">
-            <div class="cb-icon" style="background:var(--uuif-surface-model)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="var(--uuif-text-secondary)" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-            </div>
-            <div><div class="cb-val">5</div><div class="cb-lbl">Policy Gaps Found</div></div>
-          </div>
-          <div class="count-block">
-            <div class="cb-icon" style="background:var(--uuif-fill-green-xxx-lighter)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="var(--uuif-brand-green)" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-            </div>
-            <div><div class="cb-val" style="color:var(--uuif-brand-green);font-size:17px">$287K</div><div class="cb-lbl">ARR Renewal Risk</div></div>
-          </div>
-        </div>
+        <div class="rec-widgets">
 
-        <div class="item-card">
-          <div class="item-meta">
-            <span class="uuif-chip chip-info">Behavioral Anomaly</span>
-            <span class="item-time">1 hr ago</span>
-          </div>
-          <div class="item-title">Credential Stuffing Against Super-Admin Accounts — Beta Networks &amp; Crown Logistics</div>
-          <div class="sami-callout">
-            <span class="sami-tag">SAMI</span>
-            <span>18 failed login attempts from 3 new geographies against admin@beta.local and sysadmin@crown.local. Both accounts lack MFA. SAMI flagged concurrent active sessions from known IP alongside the probe attempts.</span>
-          </div>
-          <div class="item-footer">
-            <div class="item-scope">
-              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>2 Tenants</span>
-              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>2 Admin accounts</span>
+          <!-- Widget 1: CVE Vulnerabilities -->
+          <div class="rec-widget">
+            <div class="rw-top">
+              <div class="rw-title">CVE Vulnerabilities</div>
+              <div class="rw-icon" style="background:var(--uuif-fill-red-lightest)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--uuif-brand-red)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
             </div>
-            <div class="item-actions">
-              <button class="uuif-btn uuif-btn-primary">Force MFA now</button>
-              <button class="uuif-btn uuif-btn-secondary">Snooze</button>
+            <div class="rw-total" style="color:var(--uuif-brand-red)">8</div>
+            <div class="rw-counts">
+              <span class="rw-crit-badge">3 Critical</span>
+              <span class="rw-other">5 Others</span>
+            </div>
+            <!-- Column chart: 7 days, values [2,3,1,4,5,6,8] critical bars overlaid -->
+            <div class="rw-chart">
+              <svg viewBox="0 0 120 36" preserveAspectRatio="none" style="height:36px">
+                <defs>
+                  <linearGradient id="cve-grad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#c70f0f" stop-opacity="0.25"/>
+                    <stop offset="100%" stop-color="#c70f0f" stop-opacity="0.06"/>
+                  </linearGradient>
+                </defs>
+                <!-- Total bars (light) -->
+                <rect x="2"   y="22" width="12" height="14" rx="2" fill="#c70f0f" opacity="0.15"/>
+                <rect x="19"  y="18" width="12" height="18" rx="2" fill="#c70f0f" opacity="0.15"/>
+                <rect x="36"  y="26" width="12" height="10" rx="2" fill="#c70f0f" opacity="0.15"/>
+                <rect x="53"  y="12" width="12" height="24" rx="2" fill="#c70f0f" opacity="0.15"/>
+                <rect x="70"  y="8"  width="12" height="28" rx="2" fill="#c70f0f" opacity="0.15"/>
+                <rect x="87"  y="4"  width="12" height="32" rx="2" fill="#c70f0f" opacity="0.15"/>
+                <rect x="104" y="0"  width="12" height="36" rx="2" fill="#c70f0f" opacity="0.15"/>
+                <!-- Critical overlay bars (solid red) -->
+                <rect x="2"   y="29" width="12" height="7"  rx="2" fill="#c70f0f" opacity="0.55"/>
+                <rect x="19"  y="25" width="12" height="11" rx="2" fill="#c70f0f" opacity="0.55"/>
+                <rect x="36"  y="31" width="12" height="5"  rx="2" fill="#c70f0f" opacity="0.55"/>
+                <rect x="53"  y="20" width="12" height="16" rx="2" fill="#c70f0f" opacity="0.55"/>
+                <rect x="70"  y="18" width="12" height="18" rx="2" fill="#c70f0f" opacity="0.55"/>
+                <rect x="87"  y="14" width="12" height="22" rx="2" fill="#c70f0f" opacity="0.55"/>
+                <rect x="104" y="9"  width="12" height="27" rx="2" fill="#c70f0f" opacity="0.9"/>
+              </svg>
+            </div>
+            <div class="rw-footer">
+              <button class="uuif-btn uuif-btn-secondary" style="font-size:11px">Review CVEs</button>
             </div>
           </div>
-        </div>
 
-        <div class="item-card">
-          <div class="item-meta">
-            <span class="uuif-chip chip-warn">Policy Gap</span>
-            <span class="item-time" style="color:var(--uuif-brand-yellow)">Drift &gt; 45d</span>
-          </div>
-          <div class="item-title">Permit-Any Outbound on WAN Edge — Defeats DPI-SSL Across 3 Tenants</div>
-          <div class="sami-callout">
-            <span class="sami-tag">SAMI</span>
-            <span>Acme Corp, Beta Networks, and Westfield IT have default-allow outbound rules at the WAN interface, bypassing DPI-SSL inspection. Malicious C2 traffic can exfiltrate data uninspected. Policy last reviewed 45+ days ago.</span>
-          </div>
-          <div class="item-footer">
-            <div class="item-scope">
-              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>3 Tenants</span>
-              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>9 Firewalls</span>
+          <!-- Widget 2: Behavioral Anomalies -->
+          <div class="rec-widget">
+            <div class="rw-top">
+              <div class="rw-title">Behavioral Anomalies</div>
+              <div class="rw-icon" style="background:var(--uuif-fill-blue-lightest)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--uuif-surface-primary)" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              </div>
             </div>
-            <div class="item-actions">
-              <button class="uuif-btn uuif-btn-primary">Apply baseline</button>
-              <button class="uuif-btn uuif-btn-secondary">Review rules</button>
+            <div class="rw-total" style="color:var(--uuif-surface-primary)">5</div>
+            <div class="rw-counts">
+              <span class="rw-crit-badge">2 Critical</span>
+              <span class="rw-other">3 Others</span>
+            </div>
+            <!-- Sparkline trend -->
+            <div class="rw-chart">
+              <svg viewBox="0 0 120 36" preserveAspectRatio="none" style="height:36px">
+                <defs>
+                  <linearGradient id="beh-fill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#5b74a7" stop-opacity="0.18"/>
+                    <stop offset="100%" stop-color="#5b74a7" stop-opacity="0.02"/>
+                  </linearGradient>
+                </defs>
+                <!-- area fill -->
+                <path d="M0 28 L17 24 L34 30 L51 18 L68 22 L85 12 L102 8 L120 0 L120 36 L0 36Z" fill="url(#beh-fill)"/>
+                <!-- total line -->
+                <polyline points="0,28 17,24 34,30 51,18 68,22 85,12 102,8 120,0"
+                  fill="none" stroke="#5b74a7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.45"/>
+                <!-- critical line (above, darker) -->
+                <polyline points="0,34 17,33 34,34 51,28 68,30 85,22 102,18 120,14"
+                  fill="none" stroke="#c70f0f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.75"/>
+                <!-- latest dot -->
+                <circle cx="120" cy="0" r="3" fill="#5b74a7" opacity="0.7"/>
+                <circle cx="120" cy="14" r="2.5" fill="#c70f0f" opacity="0.8"/>
+              </svg>
+            </div>
+            <div class="rw-footer">
+              <button class="uuif-btn uuif-btn-secondary" style="font-size:11px">Investigate</button>
             </div>
           </div>
-        </div>
+
+          <!-- Widget 3: Policy Gaps -->
+          <div class="rec-widget">
+            <div class="rw-top">
+              <div class="rw-title">Policy Gaps</div>
+              <div class="rw-icon" style="background:var(--uuif-surface-model)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--uuif-text-secondary)" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              </div>
+            </div>
+            <div class="rw-total">5</div>
+            <div class="rw-counts">
+              <span class="rw-crit-badge">1 Critical</span>
+              <span class="rw-other">4 Others</span>
+            </div>
+            <!-- Column chart -->
+            <div class="rw-chart">
+              <svg viewBox="0 0 120 36" preserveAspectRatio="none" style="height:36px">
+                <!-- Total bars (light slate) -->
+                <rect x="2"   y="10" width="12" height="26" rx="2" fill="#5b74a7" opacity="0.14"/>
+                <rect x="19"  y="18" width="12" height="18" rx="2" fill="#5b74a7" opacity="0.14"/>
+                <rect x="36"  y="6"  width="12" height="30" rx="2" fill="#5b74a7" opacity="0.14"/>
+                <rect x="53"  y="14" width="12" height="22" rx="2" fill="#5b74a7" opacity="0.14"/>
+                <rect x="70"  y="20" width="12" height="16" rx="2" fill="#5b74a7" opacity="0.14"/>
+                <rect x="87"  y="10" width="12" height="26" rx="2" fill="#5b74a7" opacity="0.14"/>
+                <rect x="104" y="4"  width="12" height="32" rx="2" fill="#5b74a7" opacity="0.14"/>
+                <!-- Critical overlay (red) — only today column has 1 critical -->
+                <rect x="104" y="25" width="12" height="11" rx="2" fill="#c70f0f" opacity="0.75"/>
+              </svg>
+            </div>
+            <div class="rw-footer">
+              <button class="uuif-btn uuif-btn-secondary" style="font-size:11px">Remediate</button>
+            </div>
+          </div>
+
+          <!-- Widget 4: ARR Renewal Risk -->
+          <div class="rec-widget">
+            <div class="rw-top">
+              <div class="rw-title">ARR Renewal Risk</div>
+              <div class="rw-icon" style="background:var(--uuif-fill-green-xxx-lighter)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--uuif-brand-green)" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              </div>
+            </div>
+            <div class="rw-total money" style="color:var(--uuif-brand-green)">$287K</div>
+            <div class="rw-counts">
+              <span class="rw-crit-badge">$87K Critical</span>
+              <span class="rw-other">$200K Other</span>
+            </div>
+            <!-- Sparkline — ARR at risk trending up -->
+            <div class="rw-chart">
+              <svg viewBox="0 0 120 36" preserveAspectRatio="none" style="height:36px">
+                <defs>
+                  <linearGradient id="arr-fill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#59a02e" stop-opacity="0.18"/>
+                    <stop offset="100%" stop-color="#59a02e" stop-opacity="0.02"/>
+                  </linearGradient>
+                </defs>
+                <path d="M0 34 L17 32 L34 28 L51 26 L68 20 L85 16 L102 10 L120 2 L120 36 L0 36Z" fill="url(#arr-fill)"/>
+                <polyline points="0,34 17,32 34,28 51,26 68,20 85,16 102,10 120,2"
+                  fill="none" stroke="#59a02e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+                <!-- Critical portion line -->
+                <polyline points="0,36 17,36 34,36 51,35 68,33 85,30 102,26 120,20"
+                  fill="none" stroke="#c70f0f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+                <circle cx="120" cy="2"  r="3"   fill="#59a02e" opacity="0.7"/>
+                <circle cx="120" cy="20" r="2.5" fill="#c70f0f" opacity="0.8"/>
+              </svg>
+            </div>
+            <div class="rw-footer">
+              <button class="uuif-btn uuif-btn-secondary" style="font-size:11px">Initiate Renewals</button>
+            </div>
+          </div>
+
+        </div><!-- /rec-widgets -->
 
       </div>
     </div>
 
+    </div><!-- /sami-alerts-content -->
   </div>
 </main>
 
@@ -604,8 +981,21 @@ body{font-family:'Nunito Sans',sans-serif;background:var(--uuif-surface-bg);colo
 const row = document.getElementById('prod-row');
 document.getElementById('prev-btn').addEventListener('click', () => row.scrollBy({left:-160,behavior:'smooth'}));
 document.getElementById('next-btn').addEventListener('click', () => row.scrollBy({left:160,behavior:'smooth'}));
+const samiContent = document.getElementById('sami-alerts-content');
+const notifPanel  = document.getElementById('notif-panel');
 document.querySelectorAll('.uuif-tab').forEach(t => t.addEventListener('click', function(){
   document.querySelectorAll('.uuif-tab').forEach(x=>x.classList.remove('active'));
+  this.classList.add('active');
+  if (this.textContent.trim() === 'Notifications') {
+    samiContent.style.display = 'none';
+    notifPanel.classList.add('visible');
+  } else {
+    samiContent.style.display = '';
+    notifPanel.classList.remove('visible');
+  }
+}));
+document.querySelectorAll('.notif-subtab').forEach(t => t.addEventListener('click', function(){
+  document.querySelectorAll('.notif-subtab').forEach(x=>x.classList.remove('active'));
   this.classList.add('active');
 }));
 

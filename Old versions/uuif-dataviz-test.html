@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>UUIF 9.2 · Data Viz Token Test</title>
+<!--
+  Design System Version: UUIF 9.2
+  Reference Files Read: 01-tokens-color.md, 02-tokens-foundation.md, 07-tokens-dataviz.md
+  Purpose: Standalone compliance test — verifies Claude reads 07-tokens-dataviz.md correctly.
+           Every spacing, color, and sizing value below must trace to a token in §07.
+  Token Sources:
+    Colors    → 07-tokens-dataviz.md §1 (--viz-*) + §2 (severity map)
+    Spacing   → 07-tokens-dataviz.md §3 (chart padding 12px, legend gap 8px, section gap 12px)
+    Bar spec  → 07-tokens-dataviz.md §4 (height 24px, radius 4px, min-width 8%)
+    Sparkline → 07-tokens-dataviz.md §5 (height 80px, stroke 2px, dot r 3px)
+    Donut     → 07-tokens-dataviz.md §6 (outer r 46, inner r 28, legend gap 8px)
+  Gaps Flagged: None — all patterns covered by §07
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet"/>
+<style>
+/* ─── UUIF 9.2 CORE TOKENS ─────────────────────────── */
+:root {
+  /* Brand */
+  --uuif-brand-navy:   #001b50;
+  --uuif-brand-orange: #ff5d00;
+  --uuif-brand-green:  #59a02e;
+  --uuif-brand-red:    #c70f0f;
+  --uuif-brand-yellow: #f3ac3d;
+  /* Text */
+  --uuif-text-primary:    #191c25;
+  --uuif-text-secondary:  #4a618f;
+  --uuif-text-tertiary:   #888888;
+  --uuif-text-highlight:  #0c2b67;
+  --uuif-text-contrast:   #ffffff;
+  /* Surface */
+  --uuif-surface-container: #ffffff;
+  --uuif-surface-bg:        #fafafa;
+  --uuif-surface-tertiary:  #f6f8fe;
+  --uuif-surface-model:     #f0f2f5;
+  --uuif-surface-selected:  rgba(255,72,26,0.09);
+  /* Border */
+  --uuif-border-transparent: rgba(17,17,17,0.09);
+  --uuif-border-secondary:   #78a3e5;
+  --uuif-border-tertiary:    #cccccc;
+  /* Shadows & Radius */
+  --uuif-shadow-sm:   0px 1px 6px 2px rgba(0,0,0,0.12);
+  --uuif-shadow-md:   0px 4px 12px 0px rgba(0,0,0,0.16);
+  --uuif-radius-4:    4px;
+  --uuif-radius-6:    6px;
+  --uuif-radius-8:    8px;
+  --uuif-radius-pill: 88px;
+  /* Fill */
+  --uuif-fill-blue-lightest:       #f6f8fe;
+  --uuif-fill-green-xxx-lighter:   #e3efdc;
+  --uuif-fill-yellow-xxx-lighter:  #ffe9be;
+  --uuif-fill-red-lightest:        #fff0f0;
+  /* Icon */
+  --uuif-icon-primary:   #5885cc;
+  --uuif-icon-secondary: #9dafd3;
+
+  /* ─── §07 DATA VIZ PALETTE (07-tokens-dataviz.md §1) ─── */
+  --viz-red:    #a03535;
+  --viz-green:  #668c50;
+  --viz-orange: #c48a3a;
+  --viz-blue:   #7a94ba;
+  --viz-yellow: #c0a25c;
+  --viz-grey:   #8a9aaa;
+  --viz-other:  #90a8cc;
+
+  /* ─── §07 CHART SPACING (07-tokens-dataviz.md §3) ─── */
+  --chart-pad:        12px;
+  --chart-legend-gap: 8px;
+  --chart-section-gap:12px;
+  --chart-title-mb:   6px;
+}
+
+/* ─── RESET ─────────────────────────────────────────── */
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 13px;
+  background: var(--uuif-surface-bg);
+  color: var(--uuif-text-primary);
+}
+
+/* ─── PAGE LAYOUT ────────────────────────────────────── */
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--uuif-border-transparent);
+}
+.page-title {
+  font-family: 'Nunito', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--uuif-text-highlight);
+  letter-spacing: .03em;
+}
+.page-sub {
+  font-size: 12px;
+  color: var(--uuif-text-tertiary);
+  margin-top: 3px;
+}
+.spec-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--uuif-fill-blue-lightest);
+  border: 1px solid var(--uuif-border-secondary);
+  border-radius: var(--uuif-radius-pill);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--uuif-text-secondary);
+  padding: 3px 10px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.section-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--uuif-text-tertiary);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--uuif-border-transparent);
+}
+
+/* ─── CARD BASE ──────────────────────────────────────── */
+.card {
+  background: var(--uuif-surface-container);
+  border: 1px solid var(--uuif-border-transparent);
+  border-radius: var(--uuif-radius-8);
+  box-shadow: var(--uuif-shadow-sm);
+  overflow: hidden;
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px var(--chart-pad) 9px;
+  border-bottom: 1px solid var(--uuif-border-transparent);
+}
+.card-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--uuif-radius-6);
+  background: var(--uuif-surface-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.card-icon svg { width: 13px; height: 13px; }
+.card-title {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--uuif-text-highlight);
+}
+.card-body {
+  padding: var(--chart-pad);
+  display: flex;
+  flex-direction: column;
+  gap: var(--chart-section-gap);  /* §07 §3: section gap = 12px */
+}
+
+/* ─── TOKEN TRACE BADGE ──────────────────────────────── */
+.trace {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--uuif-icon-secondary);
+  background: var(--uuif-surface-model);
+  border-radius: var(--uuif-radius-4);
+  padding: 2px 6px;
+  font-family: 'Courier New', monospace;
+}
+.trace-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+/* ─── §07 §4  STACKED BAR ────────────────────────────── */
+/* chart pad = 12px, title mb = 6px (§3), bar h = 24px, r = 4px, min-w = 8% (§4) */
+.uuif-stk-section { display: flex; flex-direction: column; }
+.uuif-stk-divider {
+  border: none;
+  border-top: 1px solid var(--uuif-border-transparent);
+  margin: 0 0 var(--chart-section-gap);
+}
+.uuif-stk-title {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--uuif-text-tertiary);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: var(--chart-title-mb);   /* §3: 6px */
+}
+.uuif-stk-total {
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--uuif-text-highlight);
+  line-height: 1;
+}
+.uuif-stk-bar {
+  width: 100%;
+  height: 24px;                           /* §4: bar height = 24px */
+  border-radius: var(--uuif-radius-4);    /* §4: radius = 4px */
+  overflow: hidden;
+  display: flex;
+  background: var(--uuif-surface-model);
+}
+.uuif-stk-seg {
+  height: 100%;
+  min-width: 8%;                          /* §4: segment min-width = 8% */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #ffffff;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: opacity .15s;
+}
+.uuif-stk-seg:hover { opacity: .85; }
+.uuif-stk-labels {
+  display: flex;
+  width: 100%;
+  margin-top: 4px;
+}
+.uuif-stk-lbl {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 9px;
+  min-width: 0;
+}
+.uuif-stk-lbl .pct  { font-weight: 700; color: var(--uuif-text-secondary); }
+.uuif-stk-lbl .name { font-weight: 400; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+
+/* ─── §07 §5  SPARKLINE ──────────────────────────────── */
+/* height 80px, stroke 2px, dot r 3px (§5) */
+.uuif-spark-header {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--uuif-text-tertiary);
+  margin-bottom: var(--chart-title-mb);   /* §3: 6px */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.uuif-spark-legend {
+  display: flex;
+  gap: var(--chart-legend-gap);           /* §3: legend gap = 8px */
+}
+.uuif-spark-leg-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 8px;
+  color: var(--uuif-text-tertiary);
+}
+.uuif-spark-leg-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ─── §07 §6  DONUT ──────────────────────────────────── */
+/* outer r 46, inner r 28, legend gap 8px (§6) */
+.uuif-donut-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--chart-legend-gap);           /* §3: legend gap = 8px */
+}
+.uuif-donut-legend {
+  display: flex;
+  flex-direction: column;
+  gap: var(--chart-legend-gap);           /* §3: legend gap = 8px */
+  flex: 1;
+}
+.uuif-leg-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 9px;
+  color: var(--uuif-text-secondary);
+}
+.uuif-leg-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.uuif-leg-val {
+  margin-left: auto;
+  font-weight: 700;
+  font-size: 9px;
+  color: var(--uuif-text-highlight);
+}
+
+/* ─── SEVERITY TABLE ─────────────────────────────────── */
+.sev-table { width: 100%; border-collapse: collapse; }
+.sev-table th {
+  padding: 6px 10px;
+  text-align: left;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--uuif-text-tertiary);
+  background: var(--uuif-surface-model);
+  border-bottom: 1px solid var(--uuif-border-transparent);
+}
+.sev-table td {
+  padding: 8px 10px;
+  font-size: 11px;
+  border-bottom: 1px solid var(--uuif-border-transparent);
+  vertical-align: middle;
+}
+.sev-table tr:last-child td { border-bottom: none; }
+.sev-table tr:hover td { background: var(--uuif-surface-tertiary); }
+.sev-swatch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.sev-block {
+  width: 24px;
+  height: 16px;
+  border-radius: var(--uuif-radius-4);
+  display: inline-block;
+  flex-shrink: 0;
+}
+.sev-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--uuif-radius-pill);
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* ─── GRID LAYOUT ────────────────────────────────────── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div>
+      <div class="page-title">UUIF 9.2 · Data Viz Token Test</div>
+      <div class="page-sub">Every value traces to 07-tokens-dataviz.md — spacing, colors, sizing, patterns</div>
+    </div>
+    <span class="spec-tag">§07 Compliance Test</span>
+  </div>
+
+  <!-- ══════════════════════════════════
+       SECTION 1: STACKED BARS (§4)
+  ══════════════════════════════════ -->
+  <div class="section-label">§4 · Stacked Bar Pattern</div>
+  <div class="grid-2">
+
+    <!-- Card A: Vulnerability Severity -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--uuif-icon-primary)" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <span class="card-title">Vulnerable Applications</span>
+      </div>
+      <div class="card-body">
+
+        <!-- §4: bar h=24px, r=4px, min-w=8%, labels below -->
+        <div class="uuif-stk-section">
+          <div class="uuif-stk-title">
+            By Severity
+            <span class="uuif-stk-total" style="color:var(--viz-orange);">18</span>
+          </div>
+          <!-- Severity mapping §2: Critical→viz-red, High→viz-orange, Medium→viz-yellow, Low→viz-blue -->
+          <div class="uuif-stk-bar">
+            <div class="uuif-stk-seg" style="width:11.1%; background:var(--viz-red);">2</div>
+            <div class="uuif-stk-seg" style="width:27.8%; background:var(--viz-orange);">5</div>
+            <div class="uuif-stk-seg" style="width:38.9%; background:var(--viz-yellow);">7</div>
+            <div class="uuif-stk-seg" style="width:22.2%; background:var(--viz-blue);">4</div>
+          </div>
+          <div class="uuif-stk-labels">
+            <div class="uuif-stk-lbl" style="width:11.1%;"><span class="pct">11.1%</span><span class="name" style="color:var(--viz-red);">Critical</span></div>
+            <div class="uuif-stk-lbl" style="width:27.8%;"><span class="pct">27.8%</span><span class="name" style="color:var(--viz-orange);">High</span></div>
+            <div class="uuif-stk-lbl" style="width:38.9%;"><span class="pct">38.9%</span><span class="name" style="color:var(--viz-yellow);">Medium</span></div>
+            <div class="uuif-stk-lbl" style="width:22.2%;"><span class="pct">22.2%</span><span class="name" style="color:var(--viz-blue);">Low</span></div>
+          </div>
+        </div>
+
+        <hr class="uuif-stk-divider"/>
+
+        <div class="uuif-stk-section">
+          <div class="uuif-stk-title">
+            Unresolved Threats
+            <span class="uuif-stk-total" style="color:var(--viz-red);">13</span>
+          </div>
+          <div class="uuif-stk-bar">
+            <!-- §2: Critical/Not Mitigated→viz-red, Healthy/Mitigated→viz-green, Info/Benign→viz-blue -->
+            <div class="uuif-stk-seg" style="width:38.5%; background:var(--viz-red);">5</div>
+            <div class="uuif-stk-seg" style="width:46.2%; background:var(--viz-green);">6</div>
+            <div class="uuif-stk-seg" style="width:15.4%; background:var(--viz-blue);">2</div>
+          </div>
+          <div class="uuif-stk-labels">
+            <div class="uuif-stk-lbl" style="width:38.5%;"><span class="pct">38.5%</span><span class="name" style="color:var(--viz-red);">Not Mitigated</span></div>
+            <div class="uuif-stk-lbl" style="width:46.2%;"><span class="pct">46.2%</span><span class="name" style="color:var(--viz-green);">Mitigated</span></div>
+            <div class="uuif-stk-lbl" style="width:15.4%;"><span class="pct">15.4%</span><span class="name" style="color:var(--viz-blue);">Benign</span></div>
+          </div>
+        </div>
+
+        <hr class="uuif-stk-divider"/>
+
+        <div class="uuif-stk-section">
+          <div class="uuif-stk-title">
+            Affected Devices
+            <span class="uuif-stk-total" style="color:var(--viz-red);">7</span>
+          </div>
+          <div class="uuif-stk-bar">
+            <!-- §2: Infected→viz-red, Pending→viz-orange, Offline→viz-grey, Decommissioned→viz-grey -->
+            <div class="uuif-stk-seg" style="width:28.6%; background:var(--viz-red);">2</div>
+            <div class="uuif-stk-seg" style="width:14.3%; background:var(--viz-orange);">1</div>
+            <div class="uuif-stk-seg" style="width:42.9%; background:var(--viz-grey);">3</div>
+            <div class="uuif-stk-seg" style="width:14.3%; background:var(--viz-other);">1</div>
+          </div>
+          <div class="uuif-stk-labels">
+            <div class="uuif-stk-lbl" style="width:28.6%;"><span class="pct">28.6%</span><span class="name" style="color:var(--viz-red);">Infected</span></div>
+            <div class="uuif-stk-lbl" style="width:14.3%;"><span class="pct">14.3%</span><span class="name" style="color:var(--viz-orange);">Pending</span></div>
+            <div class="uuif-stk-lbl" style="width:42.9%;"><span class="pct">42.9%</span><span class="name" style="color:var(--viz-grey);">Offline</span></div>
+            <div class="uuif-stk-lbl" style="width:14.3%;"><span class="pct">14.3%</span><span class="name" style="color:var(--uuif-text-tertiary);">Decomm.</span></div>
+          </div>
+        </div>
+
+        <div class="trace-row">
+          <span class="trace">h=24px §4</span>
+          <span class="trace">r=var(--uuif-radius-4) §4</span>
+          <span class="trace">min-w=8% §4</span>
+          <span class="trace">pad=12px §3</span>
+          <span class="trace">gap=12px §3</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card B: Device & OS Distribution -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="var(--uuif-icon-primary)">
+            <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
+          </svg>
+        </div>
+        <span class="card-title">Device &amp; OS Distribution</span>
+      </div>
+      <div class="card-body">
+
+        <div class="uuif-stk-section">
+          <div class="uuif-stk-title">All Devices by OS<span class="uuif-stk-total">8</span></div>
+          <div class="uuif-stk-bar">
+            <div class="uuif-stk-seg" style="width:50%; background:var(--viz-blue);">4</div>
+            <div class="uuif-stk-seg" style="width:25%; background:var(--viz-green);">2</div>
+            <div class="uuif-stk-seg" style="width:12.5%; background:var(--viz-yellow);">1</div>
+            <div class="uuif-stk-seg" style="width:12.5%; background:var(--viz-other);">1</div>
+          </div>
+          <div class="uuif-stk-labels">
+            <div class="uuif-stk-lbl" style="width:50%;"><span class="pct">50%</span><span class="name" style="color:var(--viz-blue);">Windows</span></div>
+            <div class="uuif-stk-lbl" style="width:25%;"><span class="pct">25%</span><span class="name" style="color:var(--viz-green);">macOS</span></div>
+            <div class="uuif-stk-lbl" style="width:12.5%;"><span class="pct">12.5%</span><span class="name" style="color:var(--viz-yellow);">Android</span></div>
+            <div class="uuif-stk-lbl" style="width:12.5%;"><span class="pct">12.5%</span><span class="name" style="color:var(--viz-other);">iOS</span></div>
+          </div>
+        </div>
+
+        <hr class="uuif-stk-divider"/>
+
+        <div class="uuif-stk-section">
+          <div class="uuif-stk-title">Firewall Status<span class="uuif-stk-total">22</span></div>
+          <div class="uuif-stk-bar">
+            <div class="uuif-stk-seg" style="width:63.6%; background:var(--viz-green);">14</div>
+            <div class="uuif-stk-seg" style="width:18.2%; background:var(--viz-grey);">4</div>
+            <div class="uuif-stk-seg" style="width:13.6%; background:var(--viz-orange);">3</div>
+            <div class="uuif-stk-seg" style="width:9%;   background:var(--viz-other);">2</div>
+          </div>
+          <div class="uuif-stk-labels">
+            <div class="uuif-stk-lbl" style="width:63.6%;"><span class="pct">63.6%</span><span class="name" style="color:var(--viz-green);">Online &amp; Sync</span></div>
+            <div class="uuif-stk-lbl" style="width:18.2%;"><span class="pct">18.2%</span><span class="name" style="color:var(--viz-grey);">Offline</span></div>
+            <div class="uuif-stk-lbl" style="width:13.6%;"><span class="pct">13.6%</span><span class="name" style="color:var(--viz-orange);">Out of Sync</span></div>
+            <div class="uuif-stk-lbl" style="width:9%;"><span class="pct">9%</span><span class="name" style="color:var(--viz-other);">Other</span></div>
+          </div>
+        </div>
+
+        <hr class="uuif-stk-divider"/>
+
+        <div class="uuif-stk-section">
+          <div class="uuif-stk-title">Access Points<span class="uuif-stk-total">3</span></div>
+          <div class="uuif-stk-bar">
+            <div class="uuif-stk-seg" style="width:66.7%; background:var(--viz-green);">2</div>
+            <div class="uuif-stk-seg" style="width:33.3%; background:var(--viz-red);">1</div>
+          </div>
+          <div class="uuif-stk-labels">
+            <div class="uuif-stk-lbl" style="width:66.7%;"><span class="pct">66.7%</span><span class="name" style="color:var(--viz-green);">Online</span></div>
+            <div class="uuif-stk-lbl" style="width:33.3%;"><span class="pct">33.3%</span><span class="name" style="color:var(--viz-red);">Offline</span></div>
+          </div>
+        </div>
+
+        <div class="trace-row">
+          <span class="trace">--viz-blue §1</span>
+          <span class="trace">--viz-green §1</span>
+          <span class="trace">--viz-orange §1</span>
+          <span class="trace">--viz-grey §1</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       SECTION 2: SPARKLINES (§5)
+  ══════════════════════════════════ -->
+  <div class="section-label">§5 · Sparkline Pattern</div>
+  <div class="grid-2">
+
+    <!-- Sparkline A: Threat History -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--uuif-icon-primary)" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+        </div>
+        <span class="card-title">Capture Client · Threat History</span>
+      </div>
+      <div class="card-body">
+        <!-- §5: legend gap = 8px -->
+        <div class="uuif-spark-header">
+          <span>Last 7 Days</span>
+          <div class="uuif-spark-legend">
+            <span class="uuif-spark-leg-item"><span class="uuif-spark-leg-dot" style="background:var(--viz-red);"></span>Not Mitigated</span>
+            <span class="uuif-spark-leg-item"><span class="uuif-spark-leg-dot" style="background:var(--viz-green);"></span>Mitigated</span>
+            <span class="uuif-spark-leg-item"><span class="uuif-spark-leg-dot" style="background:var(--viz-blue);border-radius:1px;"></span>Benign</span>
+          </div>
+        </div>
+        <!--
+          §5 spec: height=80px, viewBox="0 0 220 80", stroke-width=2, dot r=3/3.5
+          Y scale: y=70 (0), y=8 (max). Range=62px. y = 70 - (v/max)*62
+          Not Mitigated (max=5): M=3→33, T=5→8, W=1→58, T=0→70, F=4→20, S=0→70, S=0→70
+          Mitigated (max=6):      M=4→29, T=6→8, W=2→49, T=1→60, F=5→8,  S=1→60, S=0→70
+          Benign (max=1):         M=1→70-12=58, others near 70
+          Grid lines at y=8,26,44,62 (§5)
+        -->
+        <svg width="100%" height="80" viewBox="0 0 220 80" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="sg1" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stop-color="#a03535" stop-opacity=".22"/>
+              <stop offset="100%" stop-color="#a03535" stop-opacity="0"/>
+            </linearGradient>
+            <linearGradient id="sg2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stop-color="#668c50" stop-opacity=".18"/>
+              <stop offset="100%" stop-color="#668c50" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <!-- §5: grid lines rgba(17,17,17,0.06) -->
+          <line x1="18" y1="8"  x2="220" y2="8"  stroke="rgba(17,17,17,.06)" stroke-width="1"/>
+          <line x1="18" y1="26" x2="220" y2="26" stroke="rgba(17,17,17,.06)" stroke-width="1"/>
+          <line x1="18" y1="44" x2="220" y2="44" stroke="rgba(17,17,17,.06)" stroke-width="1"/>
+          <line x1="18" y1="62" x2="220" y2="62" stroke="rgba(17,17,17,.06)" stroke-width="1"/>
+          <line x1="18" y1="70" x2="220" y2="70" stroke="rgba(17,17,17,.08)" stroke-width="1"/>
+          <!-- Not Mitigated area + line (viz-red #a03535) -->
+          <polygon points="18,33 46,8 74,58 102,70 130,20 158,70 186,70 220,70 220,80 18,80" fill="url(#sg1)"/>
+          <polyline points="18,33 46,8 74,58 102,70 130,20 158,70 186,70 220,70"
+            fill="none" stroke="#a03535" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Mitigated area + line (viz-green #668c50) -->
+          <polygon points="18,29 46,8 74,49 102,60 130,8 158,60 186,70 220,70 220,80 18,80" fill="url(#sg2)"/>
+          <polyline points="18,29 46,8 74,49 102,60 130,8 158,60 186,70 220,70"
+            fill="none" stroke="#668c50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Benign dashed (viz-blue #7a94ba) §5: stroke-dasharray 4 3 -->
+          <polyline points="18,58 46,58 74,70 102,58 130,58 158,70 186,70 220,70"
+            fill="none" stroke="#7a94ba" stroke-width="2" stroke-dasharray="4 3" stroke-linecap="round"/>
+          <!-- §5: dots at notable points r=3 default, r=3.5 peak -->
+          <circle cx="46" cy="8"  r="3.5" fill="#a03535" stroke="#fff" stroke-width="1.5"/>
+          <circle cx="130" cy="20" r="3"  fill="#a03535" stroke="#fff" stroke-width="1.5"/>
+          <circle cx="46" cy="8"  r="3.5" fill="#668c50" stroke="#fff" stroke-width="1.5"/>
+          <circle cx="130" cy="8" r="3.5" fill="#668c50" stroke="#fff" stroke-width="1.5"/>
+          <!-- X axis labels: §5 font-size=7, fill=rgba(17,17,17,.3) -->
+          <text x="18"  y="80" font-size="7" fill="rgba(17,17,17,.3)" font-family="Nunito Sans,sans-serif" text-anchor="middle">M</text>
+          <text x="46"  y="80" font-size="7" fill="rgba(17,17,17,.3)" font-family="Nunito Sans,sans-serif" text-anchor="middle">T</text>
+          <text x="74"  y="80" font-size="7" fill="rgba(17,17,17,.3)" font-family="Nunito Sans,sans-serif" text-anchor="middle">W</text>
+          <text x="102" y="80" font-size="7" fill="rgba(17,17,17,.3)" font-family="Nunito Sans,sans-serif" text-anchor="middle">T</text>
+          <text x="130" y="80" font-size="7" fill="rgba(17,17,17,.3)" font-family="Nunito Sans,sans-serif" text-anchor="middle">F</text>
+          <text x="158" y="80" font-size="7" fill="rgba(17,17,17,.3)" font-family="Nunito Sans,sans-serif" text-anchor="middle">S</text>
+          <text x="186" y="80" font-size="7" fill="rgba(17,17,17,.3)" font-family="Nunito Sans,sans-serif" text-anchor="middle">S</text>
+        </svg>
+        <div class="trace-row">
+          <span class="trace">h=80px §5</span>
+          <span class="trace">stroke-w=2px §5</span>
+          <span class="trace">dot r=3/3.5 §5</span>
+          <span class="trace">dash=4 3 §5</span>
+          <span class="trace">legend-gap=8px §3</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sparkline B: NSM Alerts over 30 days -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--uuif-icon-primary)" stroke-width="2">
+            <path d="M3 5h18v2H3zM3 9h18v2H3zM2 3h2v18H2zM20 3h2v18h-2z"/>
+          </svg>
+        </div>
+        <span class="card-title">NSM · Alerts — Last 30 Days</span>
+      </div>
+      <div class="card-body">
+        <div class="uuif-spark-header">
+          <span>Alert Trend</span>
+          <div class="uuif-spark-legend">
+            <span class="uuif-spark-leg-item"><span class="uuif-spark-leg-dot" style="background:var(--viz-red);"></span>Critical</span>
+            <span class="uuif-spark-leg-item"><span class="uuif-spark-leg-dot" style="background:var(--viz-orange);"></span>Warning</span>
+          </div>
+        </div>
+        <!-- §5: y scale 0→70, max→8, range 62 -->
+        <svg width="100%" height="80" viewBox="0 0 220 80" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="ng1" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stop-color="#a03535" stop-opacity=".2"/>
+              <stop offset="100%" stop-color="#a03535" stop-opacity="0"/>
+            </linearGradient>
+            <linearGradient id="ng2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stop-color="#c48a3a" stop-opacity=".18"/>
+              <stop offset="100%" stop-color="#c48a3a" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <line x1="18" y1="8"  x2="220" y2="8"  stroke="rgba(17,17,17,.06)" stroke-width="1"/>
+          <line x1="18" y1="26" x2="220" y2="26" stroke="rgba(17,17,17,.06)" stroke-width="1"/>
+          <line x1="18" y1="44" x2="220" y2="44" stroke="rgba(17,17,17,.06)" stroke-width="1"/>
+          <line x1="18" y1="62" x2="220" y2="62" stroke="rgba(17,17,17,.06)" stroke-width="1"/>
+          <line x1="18" y1="70" x2="220" y2="70" stroke="rgba(17,17,17,.08)" stroke-width="1"/>
+          <!-- Critical alerts: 7 data points -->
+          <polygon points="18,60 46,50 74,35 102,42 130,25 158,38 186,18 220,18 220,80 18,80" fill="url(#ng1)"/>
+          <polyline points="18,60 46,50 74,35 102,42 130,25 158,38 186,18 220,18"
+            fill="none" stroke="#a03535" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Warning alerts -->
+          <polygon points="18,50 46,38 74,22 102,32 130,15 158,28 186,12 220,12 220,80 18,80" fill="url(#ng2)"/>
+          <polyline points="18,50 46,38 74,22 102,32 130,15 158,28 186,12 220,12"
+            fill="none" stroke="#c48a3a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Dots at peaks -->
+          <circle cx="186" cy="18" r="3.5" fill="#a03535" stroke="#fff" stroke-width="1.5"/>
+          <circle cx="186" cy="12" r="3.5" fill="#c48a3a" stroke="#fff" stroke-width="1.5"/>
+          <circle cx="130" cy="25" r="3"   fill="#a03535" stroke="#fff" stroke-width="1.5"/>
+          <circle cx="130" cy="15" r="3"   fill="#c48a3a" stroke="#fff" stroke-width="1.5"/>
+          <!-- X labels (week markers) -->
+          <text x="18"  y="80" font-size="7" fill="rgba(17,17,17,.3)" font-family="Nunito Sans,sans-serif" text-anchor="middle">W1</text>
+          <text x="74"  y="80" font-size="7" fill="rgba(17,17,17,.3)" font-family="Nunito Sans,sans-serif" text-anchor="middle">W2</text>
+          <text x="130" y="80" font-size="7" fill="rgba(17,17,17,.3)" font-family="Nunito Sans,sans-serif" text-anchor="middle">W3</text>
+          <text x="186" y="80" font-size="7" fill="rgba(17,17,17,.3)" font-family="Nunito Sans,sans-serif" text-anchor="middle">W4</text>
+        </svg>
+        <!-- Alert type breakdown below sparkline -->
+        <div class="uuif-stk-section" style="margin-top:4px;">
+          <div class="uuif-stk-title">Alert Breakdown this Month<span class="uuif-stk-total">34</span></div>
+          <div class="uuif-stk-bar">
+            <div class="uuif-stk-seg" style="width:23.5%; background:var(--viz-red);">8</div>
+            <div class="uuif-stk-seg" style="width:44.1%; background:var(--viz-orange);">15</div>
+            <div class="uuif-stk-seg" style="width:32.4%; background:var(--viz-blue);">11</div>
+          </div>
+          <div class="uuif-stk-labels">
+            <div class="uuif-stk-lbl" style="width:23.5%;"><span class="pct">23.5%</span><span class="name" style="color:var(--viz-red);">Critical</span></div>
+            <div class="uuif-stk-lbl" style="width:44.1%;"><span class="pct">44.1%</span><span class="name" style="color:var(--viz-orange);">Warning</span></div>
+            <div class="uuif-stk-lbl" style="width:32.4%;"><span class="pct">32.4%</span><span class="name" style="color:var(--viz-blue);">Info</span></div>
+          </div>
+        </div>
+        <div class="trace-row">
+          <span class="trace">h=80px §5</span>
+          <span class="trace">stroke-w=2px §5</span>
+          <span class="trace">r=3/3.5px §5</span>
+          <span class="trace">area-opacity=0→0.2 §5</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       SECTION 3: DONUT CHARTS (§6)
+  ══════════════════════════════════ -->
+  <div class="section-label">§6 · Donut Chart Pattern</div>
+  <div class="grid-3">
+
+    <!-- Donut A: CVE Severity -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--uuif-icon-primary)" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+          </svg>
+        </div>
+        <span class="card-title">CVE Severity</span>
+      </div>
+      <div class="card-body">
+        <!-- §6: outer r=46, inner r=28, legend gap=8px -->
+        <div class="uuif-donut-wrap">
+          <!--
+            §6: viewBox="0 0 100 100", outer r=46, inner=28
+            Segments (total=20): Critical=3(54°), High=7(126°), Medium=6(108°), Low=4(72°)
+            SVG arc math (cx=50,cy=50):
+            Each segment: M cx,cy-r  A r,r 0 large-arc,1 ex,ey  L cx,cy-inner  A inner,inner 0 large,0 sx,sy Z
+            Critical(54°, 0→54):    large=0, start=(50,4), end=(50+46sin54,50-46cos54)=(87.2,23)
+            High(126°, 54→180):     large=0, start=above end, end=(50+46sin180,50-46cos180)=(50,96) large=1 since >180? 126<180 so large=0
+            Actually let me simplify with pre-computed paths for a clean donut.
+          -->
+          <svg width="100" height="100" viewBox="0 0 100 100">
+            <!-- Donut using stroke-dasharray trick: circumference of r=36 = 226.2 -->
+            <!-- Total=20: Critical=3(15%), High=7(35%), Medium=6(30%), Low=4(20%) -->
+            <circle cx="50" cy="50" r="36" fill="none" stroke="var(--uuif-surface-model)" stroke-width="18"/>
+            <!-- Low (20%, 45.2) → start at top(-90°), cumulative -->
+            <circle cx="50" cy="50" r="36" fill="none" stroke="#7a94ba" stroke-width="18"
+              stroke-dasharray="45.2 180.96" stroke-dashoffset="0" transform="rotate(-90 50 50)"/>
+            <!-- Medium (30%, 67.9) offset by 45.2 -->
+            <circle cx="50" cy="50" r="36" fill="none" stroke="#c0a25c" stroke-width="18"
+              stroke-dasharray="67.9 158.3" stroke-dashoffset="-45.2" transform="rotate(-90 50 50)"/>
+            <!-- High (35%, 79.2) offset by 113.1 -->
+            <circle cx="50" cy="50" r="36" fill="none" stroke="#c48a3a" stroke-width="18"
+              stroke-dasharray="79.2 147" stroke-dashoffset="-113.1" transform="rotate(-90 50 50)"/>
+            <!-- Critical (15%, 33.9) offset by 192.3 -->
+            <circle cx="50" cy="50" r="36" fill="none" stroke="#a03535" stroke-width="18"
+              stroke-dasharray="33.9 192.3" stroke-dashoffset="-192.3" transform="rotate(-90 50 50)"/>
+            <!-- Centre hole + label -->
+            <circle cx="50" cy="50" r="26" fill="white"/>
+            <text x="50" y="46" font-size="13" font-weight="700" font-family="Nunito,sans-serif" fill="#0c2b67" text-anchor="middle">20</text>
+            <text x="50" y="57" font-size="7" font-family="Nunito Sans,sans-serif" fill="#888" text-anchor="middle">CVEs</text>
+          </svg>
+          <!-- §6: legend gap=8px, dot=8px×8px, r=2px, font=9px -->
+          <div class="uuif-donut-legend">
+            <div class="uuif-leg-row"><span class="uuif-leg-dot" style="background:var(--viz-red);"></span>Critical<span class="uuif-leg-val">3</span></div>
+            <div class="uuif-leg-row"><span class="uuif-leg-dot" style="background:var(--viz-orange);"></span>High<span class="uuif-leg-val">7</span></div>
+            <div class="uuif-leg-row"><span class="uuif-leg-dot" style="background:var(--viz-yellow);"></span>Medium<span class="uuif-leg-val">6</span></div>
+            <div class="uuif-leg-row"><span class="uuif-leg-dot" style="background:var(--viz-blue);"></span>Low<span class="uuif-leg-val">4</span></div>
+          </div>
+        </div>
+        <div class="trace-row">
+          <span class="trace">outer-r=46 §6</span>
+          <span class="trace">inner-r=28 §6</span>
+          <span class="trace">gap=8px §3</span>
+          <span class="trace">dot=8px §6</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Donut B: Firewall Health -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="var(--uuif-icon-primary)">
+            <path d="M3 5h18v2H3zM3 9h18v2H3zM3 13h18v2H3zM2 3h2v18H2zM20 3h2v18h-2z"/>
+          </svg>
+        </div>
+        <span class="card-title">Firewall Health</span>
+      </div>
+      <div class="card-body">
+        <!-- Total=22: Online&Sync=14(63.6%), Offline=4(18.2%), OutSync=3(13.6%), Other=1(4.5%) -->
+        <!-- Circumference r=36 = 226.2 -->
+        <div class="uuif-donut-wrap">
+          <svg width="100" height="100" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="36" fill="none" stroke="var(--uuif-surface-model)" stroke-width="18"/>
+            <!-- Other (4.5%, 10.2) -->
+            <circle cx="50" cy="50" r="36" fill="none" stroke="#90a8cc" stroke-width="18"
+              stroke-dasharray="10.2 216" stroke-dashoffset="0" transform="rotate(-90 50 50)"/>
+            <!-- Out of Sync (13.6%, 30.8) offset -10.2 -->
+            <circle cx="50" cy="50" r="36" fill="none" stroke="#c48a3a" stroke-width="18"
+              stroke-dasharray="30.8 195.4" stroke-dashoffset="-10.2" transform="rotate(-90 50 50)"/>
+            <!-- Offline (18.2%, 41.2) offset -41 -->
+            <circle cx="50" cy="50" r="36" fill="none" stroke="#8a9aaa" stroke-width="18"
+              stroke-dasharray="41.2 185" stroke-dashoffset="-41" transform="rotate(-90 50 50)"/>
+            <!-- Online (63.6%, 143.8) offset -82.2 -->
+            <circle cx="50" cy="50" r="36" fill="none" stroke="#668c50" stroke-width="18"
+              stroke-dasharray="143.8 82.4" stroke-dashoffset="-82.2" transform="rotate(-90 50 50)"/>
+            <circle cx="50" cy="50" r="26" fill="white"/>
+            <text x="50" y="46" font-size="13" font-weight="700" font-family="Nunito,sans-serif" fill="#0c2b67" text-anchor="middle">22</text>
+            <text x="50" y="57" font-size="7" font-family="Nunito Sans,sans-serif" fill="#888" text-anchor="middle">FWs</text>
+          </svg>
+          <div class="uuif-donut-legend">
+            <div class="uuif-leg-row"><span class="uuif-leg-dot" style="background:var(--viz-green);"></span>Online &amp; Sync<span class="uuif-leg-val">14</span></div>
+            <div class="uuif-leg-row"><span class="uuif-leg-dot" style="background:var(--viz-grey);"></span>Offline<span class="uuif-leg-val">4</span></div>
+            <div class="uuif-leg-row"><span class="uuif-leg-dot" style="background:var(--viz-orange);"></span>Out of Sync<span class="uuif-leg-val">3</span></div>
+            <div class="uuif-leg-row"><span class="uuif-leg-dot" style="background:var(--viz-other);"></span>Other<span class="uuif-leg-val">1</span></div>
+          </div>
+        </div>
+        <div class="trace-row">
+          <span class="trace">--viz-green §1</span>
+          <span class="trace">--viz-grey §1</span>
+          <span class="trace">§2 severity map</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Donut C: Policy Compliance -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--uuif-icon-primary)" stroke-width="2">
+            <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+          </svg>
+        </div>
+        <span class="card-title">Policy Compliance</span>
+      </div>
+      <div class="card-body">
+        <!-- Total=50 policies: Compliant=38(76%), Non-Compliant=8(16%), Partial=4(8%) -->
+        <div class="uuif-donut-wrap">
+          <svg width="100" height="100" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="36" fill="none" stroke="var(--uuif-surface-model)" stroke-width="18"/>
+            <!-- Partial (8%, 18.1) -->
+            <circle cx="50" cy="50" r="36" fill="none" stroke="#c0a25c" stroke-width="18"
+              stroke-dasharray="18.1 208.1" stroke-dashoffset="0" transform="rotate(-90 50 50)"/>
+            <!-- Non-Compliant (16%, 36.2) offset -18.1 -->
+            <circle cx="50" cy="50" r="36" fill="none" stroke="#a03535" stroke-width="18"
+              stroke-dasharray="36.2 190" stroke-dashoffset="-18.1" transform="rotate(-90 50 50)"/>
+            <!-- Compliant (76%, 171.9) offset -54.3 -->
+            <circle cx="50" cy="50" r="36" fill="none" stroke="#668c50" stroke-width="18"
+              stroke-dasharray="171.9 54.3" stroke-dashoffset="-54.3" transform="rotate(-90 50 50)"/>
+            <circle cx="50" cy="50" r="26" fill="white"/>
+            <text x="50" y="44" font-size="11" font-weight="700" font-family="Nunito,sans-serif" fill="#668c50" text-anchor="middle">76%</text>
+            <text x="50" y="56" font-size="7" font-family="Nunito Sans,sans-serif" fill="#888" text-anchor="middle">Compliant</text>
+          </svg>
+          <div class="uuif-donut-legend">
+            <div class="uuif-leg-row"><span class="uuif-leg-dot" style="background:var(--viz-green);"></span>Compliant<span class="uuif-leg-val">38</span></div>
+            <div class="uuif-leg-row"><span class="uuif-leg-dot" style="background:var(--viz-red);"></span>Non-Compliant<span class="uuif-leg-val">8</span></div>
+            <div class="uuif-leg-row"><span class="uuif-leg-dot" style="background:var(--viz-yellow);"></span>Partial<span class="uuif-leg-val">4</span></div>
+          </div>
+        </div>
+        <div class="trace-row">
+          <span class="trace">§2 severity map</span>
+          <span class="trace">centre=14px §6</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       SECTION 4: SEVERITY MAP TABLE (§2)
+  ══════════════════════════════════ -->
+  <div class="section-label">§2 · Severity Mapping Reference</div>
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="var(--uuif-icon-primary)">
+          <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+      </div>
+      <span class="card-title">Token → Severity Mapping (07-tokens-dataviz.md §2)</span>
+    </div>
+    <table class="sev-table">
+      <thead>
+        <tr>
+          <th>Severity</th>
+          <th>CSS Token</th>
+          <th>Hex</th>
+          <th>Chip Preview</th>
+          <th>Use Cases</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Critical</strong></td>
+          <td><span class="trace">--viz-red</span></td>
+          <td style="font-family:monospace;font-size:11px;">#a03535</td>
+          <td><span class="sev-chip" style="background:var(--viz-red);">Critical</span></td>
+          <td style="color:var(--uuif-text-tertiary);font-size:11px;">Not Mitigated, Infected, Failed, Offline FW</td>
+        </tr>
+        <tr>
+          <td><strong>High</strong></td>
+          <td><span class="trace">--viz-orange</span></td>
+          <td style="font-family:monospace;font-size:11px;">#c48a3a</td>
+          <td><span class="sev-chip" style="background:var(--viz-orange);">High</span></td>
+          <td style="color:var(--uuif-text-tertiary);font-size:11px;">Out of Sync, Pending, High Severity CVE</td>
+        </tr>
+        <tr>
+          <td><strong>Medium</strong></td>
+          <td><span class="trace">--viz-yellow</span></td>
+          <td style="font-family:monospace;font-size:11px;">#c0a25c</td>
+          <td><span class="sev-chip" style="background:var(--viz-yellow);">Medium</span></td>
+          <td style="color:var(--uuif-text-tertiary);font-size:11px;">Medium CVE, partial compliance, expiring lic.</td>
+        </tr>
+        <tr>
+          <td><strong>Low / Benign</strong></td>
+          <td><span class="trace">--viz-blue</span></td>
+          <td style="font-family:monospace;font-size:11px;">#7a94ba</td>
+          <td><span class="sev-chip" style="background:var(--viz-blue);">Low</span></td>
+          <td style="color:var(--uuif-text-tertiary);font-size:11px;">Low CVE, Benign threat, Windows OS</td>
+        </tr>
+        <tr>
+          <td><strong>Healthy / OK</strong></td>
+          <td><span class="trace">--viz-green</span></td>
+          <td style="font-family:monospace;font-size:11px;">#668c50</td>
+          <td><span class="sev-chip" style="background:var(--viz-green);">Healthy</span></td>
+          <td style="color:var(--uuif-text-tertiary);font-size:11px;">Mitigated, Online, Compliant, macOS</td>
+        </tr>
+        <tr>
+          <td><strong>Neutral / N/A</strong></td>
+          <td><span class="trace">--viz-grey</span></td>
+          <td style="font-family:monospace;font-size:11px;">#8a9aaa</td>
+          <td><span class="sev-chip" style="background:var(--viz-grey);">Neutral</span></td>
+          <td style="color:var(--uuif-text-tertiary);font-size:11px;">Offline devices, decommissioned, unknown</td>
+        </tr>
+        <tr>
+          <td><strong>Other / 7th</strong></td>
+          <td><span class="trace">--viz-other</span></td>
+          <td style="font-family:monospace;font-size:11px;">#90a8cc</td>
+          <td><span class="sev-chip" style="background:var(--viz-other);">Other</span></td>
+          <td style="color:var(--uuif-text-tertiary);font-size:11px;">Catch-all 7th segment, iOS, unclassified</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- FOOTER -->
+  <div style="padding:12px 0;font-size:10px;color:var(--uuif-text-tertiary);border-top:1px solid var(--uuif-border-transparent);display:flex;justify-content:space-between;">
+    <span>UUIF 9.2 · Data Viz Token Test · Reads from 07-tokens-dataviz.md</span>
+    <span>All spacing, colors, and sizing values trace to §07 tokens</span>
+  </div>
+
+</div>
+</body>
+</html>

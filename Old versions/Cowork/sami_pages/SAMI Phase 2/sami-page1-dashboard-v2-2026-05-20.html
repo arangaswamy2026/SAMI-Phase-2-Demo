@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NSM Dashboard — Overview</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; color: #1a2332; font-size: 13px; }
+
+  .sidebar {
+    position: fixed; left: 0; top: 0; width: 48px; height: 100vh;
+    background: #0d1526; display: flex; flex-direction: column;
+    align-items: center; padding: 0; z-index: 100;
+  }
+  .sidebar-logo {
+    width: 48px; height: 48px; background: #E85D1A;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .sidebar-logo svg { width: 26px; height: 26px; fill: white; }
+  .sidebar-icon {
+    width: 48px; height: 44px; display: flex; align-items: center; justify-content: center;
+    color: #7a8ba0; cursor: pointer; position: relative; transition: color 0.2s;
+  }
+  .sidebar-icon:hover { color: #fff; }
+  .sidebar-icon.active { color: #fff; border-left: 2px solid #E85D1A; }
+  .sidebar-icon .badge {
+    position: absolute; top: 7px; right: 7px;
+    background: #E85D1A; color: white; font-size: 9px; font-weight: 700;
+    border-radius: 8px; min-width: 16px; height: 16px;
+    display: flex; align-items: center; justify-content: center; padding: 0 3px;
+  }
+  .sidebar-spacer { flex: 1; }
+
+  .topbar {
+    position: fixed; left: 48px; right: 0; top: 0; height: 44px;
+    background: #fff; border-bottom: 1px solid #e2e6ea;
+    display: flex; align-items: center; padding: 0 16px; z-index: 99; gap: 8px;
+  }
+  .breadcrumb { display: flex; align-items: center; gap: 4px; font-size: 12.5px; color: #555; flex: 1; }
+  .breadcrumb a { color: #3b7dd8; text-decoration: none; }
+  .breadcrumb a:hover { text-decoration: underline; }
+  .breadcrumb span { color: #999; }
+  .tenant-selector {
+    display: flex; align-items: center; gap: 6px;
+    border: 1px solid #d0d7de; border-radius: 20px;
+    padding: 4px 12px; font-size: 12.5px; cursor: pointer;
+    background: #fff; color: #333;
+  }
+  .tenant-selector .dot { width: 8px; height: 8px; background: #E85D1A; border-radius: 50%; }
+  .topbar-icons { display: flex; align-items: center; gap: 10px; }
+  .topbar-icons .icon-btn {
+    width: 30px; height: 30px; border-radius: 50%; display: flex;
+    align-items: center; justify-content: center; cursor: pointer;
+    color: #555; transition: background 0.2s; position: relative;
+  }
+  .topbar-icons .icon-btn:hover { background: #f0f2f5; }
+  .topbar-icons .notif-badge {
+    position: absolute; top: 2px; right: 2px;
+    width: 8px; height: 8px; background: #E85D1A; border-radius: 50%;
+  }
+  .avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: #1a3a5c; color: #fff; font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+
+  .page { margin-left: 48px; padding-top: 44px; min-height: 100vh; }
+  .p1-content { padding: 16px; }
+
+  .product-row-wrap { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+  .product-row { display: flex; gap: 10px; flex: 1; overflow: hidden; }
+  .product-card {
+    background: #fff; border-radius: 6px; border: 1px solid #e2e6ea;
+    padding: 12px 14px; min-width: 148px; flex-shrink: 0;
+  }
+  .product-card .pc-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    color: #555; letter-spacing: 0.5px; margin-bottom: 6px;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .product-card .pc-count { font-size: 26px; font-weight: 700; color: #1a2332; line-height: 1; margin-bottom: 4px; }
+  .product-card .pc-sublabel { font-size: 11px; color: #888; margin-bottom: 6px; }
+  .product-card .pc-attention { font-size: 11px; color: #666; }
+  .product-card .pc-attention .warn { color: #E85D1A; }
+  .product-card .pc-attention .eol { color: #888; }
+  .product-card .learn-btn {
+    display: inline-block; border: 1px solid #d0d7de; border-radius: 4px;
+    padding: 4px 10px; font-size: 11px; color: #333; cursor: pointer;
+    background: #fff; margin-top: 4px;
+  }
+  .product-card .coming-soon { color: #E85D1A; font-size: 11px; font-weight: 600; }
+  .arrow-btn {
+    width: 26px; height: 26px; border: 1px solid #d0d7de; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; background: #fff; color: #555; flex-shrink: 0;
+  }
+  .org-summary {
+    background: #1a2f4e; color: #fff; border-radius: 6px;
+    padding: 14px 16px; min-width: 180px;
+  }
+  .org-summary .os-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #8ba3be; margin-bottom: 12px; }
+  .org-summary .os-stat-label { font-size: 10px; color: #8ba3be; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 2px; }
+  .org-summary .os-stat-val { font-size: 28px; font-weight: 700; line-height: 1; margin-bottom: 10px; }
+  .org-summary .os-btn {
+    background: #2a4a6e; border: none; color: #fff; font-size: 12px;
+    padding: 7px 14px; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 4px;
+  }
+  .dashboard-row { display: flex; gap: 12px; margin-bottom: 16px; align-items: flex-start; }
+  .dashboard-row .product-section { flex: 1; background: #fff; border-radius: 6px; border: 1px solid #e2e6ea; padding: 12px 14px; }
+  .product-section .ps-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #888; margin-bottom: 2px; letter-spacing: 0.5px; }
+  .product-section .ps-sub { font-size: 11px; color: #aaa; margin-bottom: 10px; }
+
+  .sami-tabs { display: flex; gap: 0; border-bottom: 1px solid #e2e6ea; margin-bottom: 14px; }
+  .sami-tab {
+    padding: 9px 16px; font-size: 13px; cursor: pointer; color: #666;
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+  }
+  .sami-tab.active { color: #E85D1A; border-bottom-color: #E85D1A; font-weight: 600; }
+
+  .ask-sami-wrap { display: flex; justify-content: center; margin-bottom: 18px; }
+  .ask-sami {
+    display: flex; align-items: center; gap: 8px;
+    border: 1.5px solid #3b7dd8; border-radius: 24px;
+    padding: 9px 16px; width: 560px; background: #fff;
+    box-shadow: 0 0 0 3px rgba(59,125,216,0.08);
+  }
+  .ask-sami .sami-spark { color: #E85D1A; font-size: 15px; }
+  .ask-sami input {
+    border: none; outline: none; flex: 1; font-size: 13px; color: #555; background: transparent;
+  }
+  .ask-sami .kbd {
+    font-size: 10px; color: #999; background: #f0f2f5;
+    border-radius: 3px; padding: 2px 5px; font-family: monospace;
+  }
+
+  .alert-grid { display: flex; gap: 12px; }
+  .alert-col { flex: 1; }
+  .rec-col { flex: 1; }
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .section-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: #1a2332; }
+  .view-all { font-size: 12px; color: #3b7dd8; text-decoration: none; }
+  .view-all:hover { text-decoration: underline; }
+
+  .alert-card {
+    background: #fff; border-radius: 6px; border: 1px solid #e2e6ea;
+    padding: 12px 14px; margin-bottom: 10px;
+  }
+  .alert-card .ac-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .alert-card .ac-type {
+    font-size: 10.5px; color: #E85D1A; font-weight: 600;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .alert-card .ac-type::before { content: ''; width: 6px; height: 6px; background: #E85D1A; border-radius: 50%; display: inline-block; }
+  .alert-card .ac-time { font-size: 11px; color: #999; }
+  .alert-card .ac-title { font-size: 13px; font-weight: 700; color: #1a2332; margin-bottom: 8px; }
+  .sami-badge {
+    display: inline-flex; align-items: flex-start; gap: 4px;
+    background: #FFF3ED; border-radius: 4px; padding: 5px 8px;
+    font-size: 11.5px; color: #555; margin-bottom: 8px; line-height: 1.4; width: 100%;
+  }
+  .sami-badge .sb-tag {
+    background: #E85D1A; color: #fff; font-size: 9px; font-weight: 700;
+    border-radius: 3px; padding: 1px 5px; letter-spacing: 0.3px; flex-shrink: 0; margin-top: 1px;
+  }
+  .sami-badge .sb-icon { color: #E85D1A; font-size: 11px; flex-shrink: 0; }
+  .alert-card .ac-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+  .alert-card .ac-scope { display: flex; gap: 12px; font-size: 11px; color: #666; align-items: center; }
+  .alert-card .ac-scope span { display: flex; align-items: center; gap: 4px; }
+  .alert-card .ac-actions { display: flex; gap: 6px; }
+  .btn-primary {
+    background: #E85D1A; color: #fff; border: none; border-radius: 4px;
+    padding: 5px 11px; font-size: 11.5px; cursor: pointer; font-weight: 600;
+  }
+  .btn-secondary {
+    background: #fff; color: #555; border: 1px solid #d0d7de; border-radius: 4px;
+    padding: 5px 11px; font-size: 11.5px; cursor: pointer;
+  }
+
+  .rec-stats { display: flex; gap: 8px; margin-bottom: 12px; }
+  .rec-stat {
+    flex: 1; background: #fff; border-radius: 6px; border: 1px solid #e2e6ea;
+    padding: 10px 12px;
+  }
+  .rec-stat .rs-val { font-size: 22px; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+  .rec-stat .rs-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; color: #888; }
+  .rec-stat.cve .rs-val { color: #E85D1A; }
+  .rec-stat.behavioral .rs-val { color: #3b7dd8; }
+  .rec-stat.policy .rs-val { color: #1a2332; }
+  .rec-stat.arr .rs-val { color: #1a6b3c; font-size: 18px; }
+
+  .rec-card {
+    background: #fff; border-radius: 6px; border: 1px solid #e2e6ea;
+    padding: 12px 14px; margin-bottom: 10px;
+  }
+  .rec-card .rc-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .rc-type { font-size: 10.5px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+  .rc-type.behavioral { color: #3b7dd8; }
+  .rc-type.behavioral::before { content: ''; width: 6px; height: 6px; background: #3b7dd8; border-radius: 50%; }
+  .rc-type.policy { color: #6b3bcc; }
+  .rc-type.policy::before { content: ''; width: 6px; height: 6px; background: #6b3bcc; border-radius: 50%; }
+  .rec-card .rc-title { font-size: 13px; font-weight: 700; color: #1a2332; margin-bottom: 8px; }
+  .rec-card .rc-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+  .rec-card .rc-scope { display: flex; gap: 12px; font-size: 11px; color: #666; align-items: center; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <svg viewBox="0 0 24 24"><path d="M12 2 C8 2 4 6 4 10 C4 14 6 17 9 19 L9 22 L15 22 L15 19 C18 17 20 14 20 10 C20 6 16 2 12 2Z"/></svg>
+  </div>
+  <div class="sidebar-icon active">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    <span class="badge">8</span>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 2v4M22 12h-4"/></svg>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+  </div>
+  <div class="sidebar-spacer"></div>
+  <div class="sidebar-icon">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <span class="badge">3</span>
+  </div>
+</nav>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="breadcrumb">
+    <a href="#">Home</a><span>›</span>
+    <a href="#">Dashboard</a><span>›</span>
+    <span style="color:#333; font-weight:600">Overview</span>
+  </div>
+  <div class="tenant-selector">
+    <div class="dot"></div>
+    All Tenants (Global)
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+  </div>
+  <div class="topbar-icons">
+    <div class="icon-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <div class="notif-badge"></div>
+    </div>
+    <div class="icon-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </div>
+    <div class="avatar">HN</div>
+  </div>
+</header>
+
+<!-- PAGE 1 MAIN -->
+<main class="page">
+  <div class="p1-content">
+
+    <!-- Product Cards + Org Summary -->
+    <div class="dashboard-row">
+      <div class="product-section">
+        <div class="ps-title">Overview</div>
+        <div class="ps-sub">Active Product</div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div class="arrow-btn">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          </div>
+          <div class="product-row">
+            <div class="product-card">
+              <div class="pc-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Firewall
+              </div>
+              <div class="pc-count">110</div>
+              <div class="pc-sublabel">Total Devices</div>
+              <div class="pc-attention">Need Attention</div>
+              <div class="pc-attention"><span class="warn">⚠ 2</span> &nbsp;<span class="eol">EOL 6</span></div>
+            </div>
+            <div class="product-card">
+              <div class="pc-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+                Cloud Secure Edge
+              </div>
+              <div class="pc-count">2</div>
+              <div class="pc-sublabel">Total Active Licenses</div>
+              <button class="learn-btn">Learn More</button>
+            </div>
+            <div class="product-card">
+              <div class="pc-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+                Access Point
+              </div>
+              <div class="pc-count">10</div>
+              <div class="pc-sublabel">Total Devices</div>
+              <div class="pc-attention">Need Attention</div>
+              <div class="pc-attention">0</div>
+            </div>
+            <div class="product-card">
+              <div class="pc-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                Switch
+              </div>
+              <div class="pc-count">9</div>
+              <div class="pc-sublabel">Total Devices</div>
+              <div class="pc-attention">Need Attention</div>
+              <div class="pc-attention">0</div>
+            </div>
+            <div class="product-card">
+              <div class="pc-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Capture Client
+              </div>
+              <div class="pc-count">2</div>
+              <div class="pc-sublabel">Total Endpoints</div>
+              <div class="pc-attention">Need Attention</div>
+              <div class="pc-attention">0</div>
+            </div>
+            <div class="product-card">
+              <div class="pc-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Capture Client MDR
+              </div>
+              <div class="pc-count">2</div>
+              <div class="pc-sublabel">Total Endpoints</div>
+              <div class="pc-attention">Need Attention</div>
+              <div class="pc-attention">0</div>
+            </div>
+            <div class="product-card">
+              <div class="pc-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                SMA 1000
+              </div>
+              <div class="pc-count">6</div>
+              <div class="pc-sublabel">Total Devices</div>
+              <div class="pc-attention">Need Attention</div>
+              <div class="pc-attention"><span class="coming-soon">Coming Soon ⊙</span></div>
+            </div>
+          </div>
+          <div class="arrow-btn">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+      </div>
+      <div class="org-summary">
+        <div class="os-title">Org Summary</div>
+        <div class="os-stat-label">Tenants</div>
+        <div class="os-stat-val">98</div>
+        <div class="os-stat-label">Need Attention</div>
+        <div class="os-stat-val" style="font-size:22px;">2</div>
+        <button class="os-btn">Create Tenant</button>
+      </div>
+    </div>
+
+    <!-- SAMI Tabs -->
+    <div class="sami-tabs">
+      <div class="sami-tab active">SAMI Alerts</div>
+      <div class="sami-tab">Notifications</div>
+    </div>
+
+    <!-- Ask SAMI -->
+    <div class="ask-sami-wrap">
+      <div class="ask-sami">
+        <span class="sami-spark">✦</span>
+        <input type="text" placeholder='Ask SAMI anything — e.g. "Show renewals at risk this month"'>
+        <span class="kbd">⌘</span>
+        <span class="kbd">K</span>
+      </div>
+    </div>
+
+    <!-- Two-column -->
+    <div class="alert-grid">
+      <!-- Left: Need Attention -->
+      <div class="alert-col">
+        <div class="section-header">
+          <div class="section-title">Need Attention</div>
+        </div>
+
+        <!-- Alert 1: Critical CVE across tenants -->
+        <div class="alert-card">
+          <div class="ac-meta">
+            <div class="ac-type">CVE Vulnerability</div>
+            <div class="ac-time">2 hrs ago</div>
+          </div>
+          <div class="ac-title">SSL VPN Auth Bypass (CVE-2026-1142) — 12 Firewalls Across 4 Tenants</div>
+          <div class="sami-badge">
+            <span class="sb-tag">SAMI</span>
+            <span class="sb-icon">▲</span>
+            <span>CVSS 9.8 critical. Unauthenticated RCE possible on SonicOS &lt; 7.1.2-1023. Active PoC exploit observed in the wild. Acme Corp, Beta Networks, Westfield IT, and Crown Logistics are exposed. Patch pre-staged and compatibility-verified across all 12 devices.</span>
+          </div>
+          <div class="ac-footer">
+            <div class="ac-scope">
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> 4 Tenants</span>
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> 12 Firewalls</span>
+            </div>
+            <div class="ac-actions">
+              <button class="btn-primary">Deploy patch</button>
+              <button class="btn-secondary">Schedule</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alert 2: Gateway offline -->
+        <div class="alert-card">
+          <div class="ac-meta">
+            <div class="ac-type">Device Alert</div>
+            <div class="ac-time">3 hrs ago</div>
+          </div>
+          <div class="ac-title">3 Gateways Unreachable — Northgate Health &amp; Delta Logistics</div>
+          <div class="sami-badge">
+            <span class="sb-tag">SAMI</span>
+            <span class="sb-icon">▲</span>
+            <span>FW-NH-02, FW-NH-03 (Northgate Health) and FW-DL-01 (Delta Logistics) have been unreachable for 3+ hours. Last heartbeat lost after a BGP route change. Branch sites at these tenants are currently without perimeter inspection.</span>
+          </div>
+          <div class="ac-footer">
+            <div class="ac-scope">
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> 2 Tenants</span>
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> 3 Firewalls offline</span>
+            </div>
+            <div class="ac-actions">
+              <button class="btn-primary">Diagnose</button>
+              <button class="btn-secondary">Notify tenant</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alert 3: ATP renewal lapse -->
+        <div class="alert-card">
+          <div class="ac-meta">
+            <div class="ac-type">Subscription Risk</div>
+            <div class="ac-time">Today · 08:14 AM</div>
+          </div>
+          <div class="ac-title">ATP &amp; TZ Subscriptions Expiring in &lt;9 Days — 3 Tenants, 21 Firewalls</div>
+          <div class="sami-badge">
+            <span class="sb-tag">SAMI</span>
+            <span class="sb-icon">▲</span>
+            <span>Acme Corp (8 FW), Beta Networks (7 FW), and Delta Logistics (6 FW) ATP subscriptions lapse before the next QBR. Expiry will disable Capture ATP sandboxing and Gateway AV. $87K ARR at risk. Renewal quotes are ready.</span>
+          </div>
+          <div class="ac-footer">
+            <div class="ac-scope">
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> 3 Tenants</span>
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> 21 Firewalls at risk</span>
+            </div>
+            <div class="ac-actions">
+              <button class="btn-primary">Initiate renewal</button>
+              <button class="btn-secondary">Snooze</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: SAMI Recommendations -->
+      <div class="rec-col">
+        <div class="section-header">
+          <div class="section-title">SAMI Recommendations</div>
+          <a class="view-all" href="sami-page2-recommendation-v2-2026-05-20.html">View all</a>
+        </div>
+
+        <div class="rec-stats">
+          <div class="rec-stat cve">
+            <div class="rs-val">8</div>
+            <div class="rs-label">CVE Vulnerabilities</div>
+          </div>
+          <div class="rec-stat behavioral">
+            <div class="rs-val">5</div>
+            <div class="rs-label">Behavioral Anomalies</div>
+          </div>
+          <div class="rec-stat policy">
+            <div class="rs-val">5</div>
+            <div class="rs-label">Policy Gaps Found</div>
+          </div>
+          <div class="rec-stat arr">
+            <div class="rs-val">$287K</div>
+            <div class="rs-label">ARR at Renewal Risk</div>
+          </div>
+        </div>
+
+        <div class="rec-card">
+          <div class="rc-meta">
+            <div class="rc-type behavioral">Behavioral Anomaly</div>
+            <div class="ac-time">1 hr ago</div>
+          </div>
+          <div class="rc-title">Credential Stuffing Against Super-Admin Accounts — Beta Networks &amp; Crown Logistics</div>
+          <div class="sami-badge">
+            <span class="sb-tag">SAMI</span>
+            <span class="sb-icon">▲</span>
+            <span>18 failed login attempts from 3 new geographies against admin@beta.local and sysadmin@crown.local in the last 60 minutes. Both accounts lack MFA. SAMI flagged concurrent active sessions from known IP alongside the probe attempts.</span>
+          </div>
+          <div class="rc-footer">
+            <div class="rc-scope">
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> 2 Tenants</span>
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> 2 Admin accounts</span>
+            </div>
+            <div class="ac-actions">
+              <button class="btn-primary">Force MFA now</button>
+              <button class="btn-secondary">Snooze</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="rec-card">
+          <div class="rc-meta">
+            <div class="rc-type policy">Policy Gap</div>
+            <div class="ac-time" style="color:#f5a623;">Drift &gt; 45d</div>
+          </div>
+          <div class="rc-title">Permit-Any Outbound on WAN Edge — Defeats DPI-SSL Across 3 Tenants</div>
+          <div class="sami-badge">
+            <span class="sb-tag">SAMI</span>
+            <span class="sb-icon">▲</span>
+            <span>Acme Corp, Beta Networks, and Westfield IT have default-allow outbound rules at the WAN interface, bypassing DPI-SSL inspection. Malicious C2 traffic can exfiltrate data uninspected. Policy last reviewed 45+ days ago across all three.</span>
+          </div>
+          <div class="rc-footer">
+            <div class="rc-scope">
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> 3 Tenants</span>
+              <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> 9 Firewalls</span>
+            </div>
+            <div class="ac-actions">
+              <button class="btn-primary">Apply baseline</button>
+              <button class="btn-secondary">Review rules</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+</body>
+</html>

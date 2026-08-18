@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+  Design reference: UUIF 9.2 — Compact Table + Inspector. Gmail/Outlook master-detail. Variant 3 of 5.
+  Informed by: sami-rec-scheduling-v1-uuif.html (UUIF 9.2 token layer, sidebar, topbar, footer scheduling states, SAMI reasoning)
+  Layout deviation flagged: Compact Table + Inspector is a custom SAMI pattern not defined in UUIF 9.2.
+  Color gap flagged: "Policy Gap" uses purple in original — no purple token in UUIF 9.2; mapped to --uuif-surface-primary (#5b74a7).
+-->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SAMI Recommendation — Compact Table + Inspector (Variant 3)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet" />
+<style>
+/* ─── TOKEN DEFINITIONS — UUIF 9.2 ────────────────────────────────────── */
+:root {
+  /* Text */
+  --uuif-text-primary:   #191c25;
+  --uuif-text-secondary: #4a618f;
+  --uuif-text-tertiary:  #888888;
+  --uuif-text-contrast:  #ffffff;
+  --uuif-text-disabled:  rgba(17,17,17,0.3);
+  --uuif-text-hover:     #ff5d00;
+  --uuif-text-highlight: #0c2b67;
+
+  /* Surface */
+  --uuif-surface-container: #ffffff;
+  --uuif-surface-bg:        #f4f6f9;
+  --uuif-surface-primary:   #5b74a7;
+  --uuif-surface-secondary: #d2dff2;
+  --uuif-surface-tertiary:  #f6f8fe;
+  --uuif-surface-highlight: #ff5d00;
+  --uuif-surface-hover:     rgba(17,17,17,0.05);
+  --uuif-surface-selected:  rgba(255,93,0,0.07);
+  --uuif-surface-disabled:  #e8eff9;
+  --uuif-surface-contrast:  #111315;
+  --uuif-surface-model:     #f0f3fa;
+
+  /* Border */
+  --uuif-border-primary:     #ff5d00;
+  --uuif-border-secondary:   #78a3e5;
+  --uuif-border-tertiary:    #cccccc;
+  --uuif-border-transparent: rgba(17,17,17,0.09);
+  --uuif-border-disabled:    #d2dff2;
+  --uuif-border-hover:       #ff5d00;
+
+  /* Icon */
+  --uuif-icon-primary:   #5885cc;
+  --uuif-icon-secondary: #9dafd3;
+  --uuif-icon-tertiary:  #62686d;
+  --uuif-icon-hover:     #ff5d00;
+
+  /* Branding */
+  --uuif-brand-navy:   #001b50;
+  --uuif-brand-blue:   #1f3c73;
+  --uuif-brand-orange: #ff5d00;
+  --uuif-brand-green:  #59a02e;
+  --uuif-brand-red:    #c70f0f;
+  --uuif-brand-yellow: #f3ac3d;
+
+  /* Fill */
+  --uuif-fill-blue-lightest:      #f6f8fe;
+  --uuif-fill-green-xxx-lighter:  #e3efdc;
+  --uuif-fill-yellow-xxx-lighter: #ffe9be;
+  --uuif-fill-red-lightest:       #fff0f0;
+  --uuif-fill-green-x-darker:     #478234;
+  --uuif-fill-orange-x-darker:    #c24903;
+  --uuif-fill-red-x-darker:       #ab0a0c;
+
+  /* Spacing */
+  --uuif-sp-1:  2px;
+  --uuif-sp-2:  4px;
+  --uuif-sp-3:  8px;
+  --uuif-sp-4:  12px;
+  --uuif-sp-5:  16px;
+  --uuif-sp-6:  20px;
+  --uuif-sp-7:  24px;
+  --uuif-sp-8:  32px;
+
+  /* Radius */
+  --uuif-radius-4:    4px;
+  --uuif-radius-6:    6px;
+  --uuif-radius-8:    8px;
+  --uuif-radius-12:   12px;
+  --uuif-radius-pill: 88px;
+
+  /* Shadow */
+  --uuif-shadow-sm: 0px 1px 6px 2px rgba(0,0,0,0.10);
+  --uuif-shadow-md: 0px 4px 12px 0px rgba(0,0,0,0.15);
+}
+
+/* ─── RESET + BASE ──────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Nunito Sans', sans-serif;
+  background: var(--uuif-surface-bg);
+  color: var(--uuif-text-primary);
+  font-size: 13px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* ─── SIDEBAR — Primary Nav Rail (60px) ───────────────────────────────── */
+.sidebar {
+  position: fixed; left: 0; top: 0; width: 60px; height: 100vh;
+  background: var(--uuif-brand-navy);
+  display: flex; flex-direction: column;
+  align-items: center; z-index: 300;
+}
+.sidebar-logo {
+  width: 60px; height: 52px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.sidebar-logo svg { width: 28px; height: 28px; }
+.sidebar-icon {
+  width: 60px; height: 48px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--uuif-icon-secondary);
+  cursor: pointer; position: relative;
+  border-left: 2px solid transparent;
+  transition: color .15s;
+}
+.sidebar-icon:hover { color: rgba(255,255,255,0.8); }
+.sidebar-icon.active {
+  background: rgba(17,17,17,0.35);
+  border-left-color: var(--uuif-brand-orange);
+  color: var(--uuif-brand-orange);
+}
+.sidebar-icon .badge {
+  position: absolute; top: 7px; right: 7px;
+  background: var(--uuif-brand-orange); color: var(--uuif-text-contrast);
+  font-size: 9px; font-weight: 700;
+  border-radius: var(--uuif-radius-pill);
+  min-width: 16px; height: 16px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 3px;
+}
+.sidebar-spacer { flex: 1; }
+
+/* ─── TOPBAR (46px) ─────────────────────────────────────────────────────── */
+.topbar {
+  position: fixed; left: 60px; right: 0; top: 0; height: 46px;
+  background: var(--uuif-surface-container);
+  border-bottom: 1px solid var(--uuif-border-transparent);
+  display: flex; align-items: center;
+  padding: 0 var(--uuif-sp-5); z-index: 200; gap: var(--uuif-sp-3);
+}
+.breadcrumb {
+  display: flex; align-items: center; gap: var(--uuif-sp-2);
+  font-size: 12px; color: var(--uuif-text-secondary); flex: 1;
+}
+.breadcrumb a { color: var(--uuif-icon-primary); text-decoration: none; }
+.breadcrumb a:hover { color: var(--uuif-text-hover); text-decoration: underline; }
+.breadcrumb .sep { color: var(--uuif-text-tertiary); }
+.breadcrumb .current { color: var(--uuif-text-primary); font-weight: 600; }
+.tenant-sel {
+  display: flex; align-items: center; gap: var(--uuif-sp-2);
+  border: 1px solid var(--uuif-border-tertiary); border-radius: var(--uuif-radius-pill);
+  padding: 3px var(--uuif-sp-4); font-size: 12px; cursor: pointer;
+  font-family: 'Nunito Sans', sans-serif;
+  background: var(--uuif-surface-container); color: var(--uuif-text-primary);
+  transition: border-color .15s;
+}
+.tenant-sel:hover { border-color: var(--uuif-border-secondary); }
+.tenant-sel .dot { width: 8px; height: 8px; background: var(--uuif-brand-orange); border-radius: 50%; }
+.topbar-icons { display: flex; align-items: center; gap: var(--uuif-sp-3); }
+.icon-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--uuif-text-tertiary); position: relative;
+  transition: background .15s;
+}
+.icon-btn:hover { background: var(--uuif-surface-hover); }
+.notif-dot {
+  position: absolute; top: 5px; right: 5px;
+  width: 8px; height: 8px; background: var(--uuif-brand-orange); border-radius: 50%;
+}
+.avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--uuif-brand-blue); color: var(--uuif-text-contrast);
+  font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+
+/* ─── PAGE WRAPPER ──────────────────────────────────────────────────────── */
+.page { margin-left: 60px; padding-top: 46px; min-height: 100vh; display: flex; flex-direction: column; }
+.page-content { flex: 1; padding: var(--uuif-sp-4) var(--uuif-sp-5) var(--uuif-sp-4); display: flex; flex-direction: column; }
+
+/* ─── PAGE HEADER ───────────────────────────────────────────────────────── */
+.page-hdr {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: var(--uuif-sp-3);
+}
+.page-hdr-left { display: flex; align-items: flex-start; gap: var(--uuif-sp-3); }
+.back-btn {
+  width: 28px; height: 28px; border: none; background: transparent;
+  cursor: pointer; color: var(--uuif-brand-orange);
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--uuif-radius-4); transition: background .15s;
+  margin-top: 2px; text-decoration: none;
+}
+.back-btn:hover { background: var(--uuif-surface-selected); }
+.page-title { font-size: 19px; font-weight: 700; color: var(--uuif-text-primary); line-height: 1.2; }
+.page-sub { font-size: 12px; color: var(--uuif-text-tertiary); margin-top: var(--uuif-sp-1); }
+.export-btn {
+  background: var(--uuif-surface-container);
+  border: 1px solid var(--uuif-border-secondary);
+  border-radius: var(--uuif-radius-pill);
+  padding: 5px var(--uuif-sp-5);
+  font-size: 13px; cursor: pointer;
+  font-family: 'Nunito Sans', sans-serif;
+  color: var(--uuif-text-secondary);
+  display: flex; align-items: center; gap: var(--uuif-sp-2);
+  font-weight: 500; transition: all .15s; white-space: nowrap;
+}
+.export-btn:hover { border-color: var(--uuif-border-hover); color: var(--uuif-text-hover); }
+
+/* ─── FILTER / SORT BAR ─────────────────────────────────────────────────── */
+.filter-bar {
+  display: flex; align-items: center; gap: var(--uuif-sp-3);
+  margin-bottom: var(--uuif-sp-3); flex-wrap: wrap;
+}
+.search-wrap {
+  display: flex; align-items: center;
+  background: var(--uuif-surface-container);
+  border: 1px solid var(--uuif-border-tertiary);
+  border-radius: var(--uuif-radius-6);
+  padding: 0 var(--uuif-sp-3); gap: var(--uuif-sp-2);
+  height: 32px; width: 220px;
+  transition: border-color .15s;
+}
+.search-wrap:focus-within { border-color: var(--uuif-border-secondary); }
+.search-wrap input {
+  background: none; border: none; outline: none;
+  font-size: 12px; color: var(--uuif-text-primary);
+  font-family: 'Nunito Sans', sans-serif; width: 100%;
+}
+.search-wrap input::placeholder { color: var(--uuif-text-tertiary); }
+.cat-chips { display: flex; align-items: center; gap: var(--uuif-sp-2); flex-wrap: wrap; }
+.cat-chip {
+  display: inline-flex; align-items: center; gap: var(--uuif-sp-1);
+  padding: 4px var(--uuif-sp-3);
+  border: 1px solid var(--uuif-border-tertiary);
+  border-radius: var(--uuif-radius-pill);
+  font-size: 11px; font-weight: 600; cursor: pointer;
+  background: var(--uuif-surface-container);
+  color: var(--uuif-text-secondary);
+  transition: all .15s; white-space: nowrap;
+}
+.cat-chip:hover { border-color: var(--uuif-border-secondary); color: var(--uuif-text-primary); }
+.cat-chip.active {
+  border-color: var(--uuif-brand-orange);
+  background: var(--uuif-surface-selected);
+  color: var(--uuif-brand-orange);
+}
+.sort-sel-wrap {
+  display: flex; align-items: center; gap: var(--uuif-sp-2);
+  background: var(--uuif-surface-container);
+  border: 1px solid var(--uuif-border-tertiary);
+  border-radius: var(--uuif-radius-6);
+  padding: 0 var(--uuif-sp-3); height: 32px;
+  font-size: 12px; color: var(--uuif-text-secondary);
+  cursor: pointer; margin-left: auto; white-space: nowrap;
+}
+.sort-sel-wrap select {
+  background: none; border: none; outline: none;
+  font-size: 12px; font-family: 'Nunito Sans', sans-serif;
+  color: var(--uuif-text-secondary); cursor: pointer;
+}
+
+/* ─── MASTER-DETAIL CONTAINER ───────────────────────────────────────────── */
+.master-detail {
+  display: flex; gap: 0; flex: 1;
+  min-height: 0;
+  border-radius: var(--uuif-radius-8);
+  overflow: hidden;
+  box-shadow: var(--uuif-shadow-sm);
+}
+
+/* ─── TABLE PANEL ───────────────────────────────────────────────────────── */
+.table-panel {
+  flex: 1; background: var(--uuif-surface-container);
+  display: flex; flex-direction: column;
+  border-right: 1px solid var(--uuif-border-transparent);
+  transition: flex .25s ease;
+  min-width: 0; overflow: hidden;
+}
+.master-detail.has-inspector .table-panel { flex: 0 0 55%; }
+
+/* Table header */
+.tbl-header-row {
+  display: grid;
+  grid-template-columns: 56px 120px 1fr 110px 128px 110px 60px;
+  align-items: center;
+  padding: 0 var(--uuif-sp-4);
+  height: 32px;
+  background: var(--uuif-surface-model);
+  border-bottom: 1px solid var(--uuif-border-transparent);
+  flex-shrink: 0;
+}
+.master-detail.has-inspector .tbl-header-row {
+  grid-template-columns: 56px 110px 1fr 100px 120px 96px 54px;
+}
+.th {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.07em; color: var(--uuif-text-tertiary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  user-select: none;
+}
+.th.sortable { cursor: pointer; }
+.th.sortable:hover { color: var(--uuif-text-primary); }
+
+/* Table body */
+.tbl-body { flex: 1; overflow-y: auto; }
+.tbl-row {
+  display: grid;
+  grid-template-columns: 56px 120px 1fr 110px 128px 110px 60px;
+  align-items: center;
+  padding: 0 var(--uuif-sp-4);
+  height: 44px;
+  border-bottom: 1px solid var(--uuif-border-transparent);
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: background .12s;
+  position: relative;
+}
+.master-detail.has-inspector .tbl-row {
+  grid-template-columns: 56px 110px 1fr 100px 120px 96px 54px;
+}
+.tbl-row:hover { background: #eef2f8; }
+.tbl-row.selected {
+  background: rgba(255,93,0,0.06);
+  border-left-color: var(--uuif-brand-orange);
+}
+.tbl-row:last-child { border-bottom: none; }
+
+/* ── SEVERITY BADGE ── */
+.sev-badge {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800; flex-shrink: 0;
+  position: relative;
+}
+.sev-badge.crit {
+  background: #fff0f0;
+  border: 2px solid var(--uuif-brand-red);
+  color: var(--uuif-brand-red);
+}
+.sev-badge .sev-score {
+  position: absolute; bottom: -6px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 8px; font-weight: 700; color: var(--uuif-brand-red);
+  white-space: nowrap; background: var(--uuif-surface-container);
+  padding: 0 1px; line-height: 1;
+}
+
+/* ── CATEGORY CELL ── */
+.cat-cell {
+  display: flex; align-items: center; gap: var(--uuif-sp-2);
+  overflow: hidden;
+}
+.cat-dot {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+}
+.cat-label {
+  font-size: 12px; font-weight: 600; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+}
+
+/* ── ISSUE CELL ── */
+.issue-cell {
+  font-size: 12px; color: var(--uuif-text-primary); font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 240px; padding-right: var(--uuif-sp-2);
+}
+
+/* ── AFFECTED CELL ── */
+.affected-cell {
+  font-size: 11px; color: var(--uuif-text-secondary); white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+}
+
+/* ── STATUS CHIP ── */
+/* uuif-chip Success */
+.chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 600; border-radius: var(--uuif-radius-4);
+  padding: 3px 7px; border: 1px solid; height: 22px;
+  white-space: nowrap; overflow: hidden; max-width: 100%;
+}
+.chip-green {
+  background: var(--uuif-fill-green-xxx-lighter);
+  color: var(--uuif-brand-green); border-color: var(--uuif-brand-green);
+}
+.chip-blue {
+  background: var(--uuif-fill-blue-lightest);
+  color: var(--uuif-surface-primary); border-color: var(--uuif-border-secondary);
+}
+.chip-yellow {
+  background: var(--uuif-fill-yellow-xxx-lighter);
+  color: #b07b00; border-color: var(--uuif-brand-yellow);
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner {
+  width: 8px; height: 8px; border-radius: 50%;
+  border: 1.5px solid var(--uuif-brand-green);
+  border-top-color: transparent;
+  animation: spin .8s linear infinite;
+  display: inline-block; flex-shrink: 0;
+}
+
+/* ── ACTION BUTTON ── */
+.action-btn {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 4px 9px;
+  background: var(--uuif-surface-primary);
+  color: var(--uuif-text-contrast);
+  border: none; border-radius: var(--uuif-radius-pill);
+  font-size: 11px; font-weight: 600;
+  cursor: pointer; white-space: nowrap;
+  font-family: 'Nunito Sans', sans-serif;
+  transition: background .15s;
+}
+.action-btn:hover { background: var(--uuif-brand-navy); }
+
+/* ── UPDATED CELL ── */
+.updated-cell {
+  font-size: 11px; color: var(--uuif-text-tertiary); white-space: nowrap;
+  text-align: right;
+}
+
+/* ─── INSPECTOR PANEL ───────────────────────────────────────────────────── */
+.inspector {
+  flex: 0 0 45%; background: var(--uuif-surface-container);
+  display: flex; flex-direction: column;
+  border-left: 1px solid var(--uuif-border-transparent);
+  min-width: 0; overflow: hidden;
+}
+.inspector.hidden { display: none; }
+
+/* Inspector header */
+.insp-header {
+  padding: var(--uuif-sp-4) var(--uuif-sp-5) var(--uuif-sp-3);
+  border-bottom: 1px solid var(--uuif-border-transparent);
+  flex-shrink: 0;
+}
+.insp-header-top {
+  display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: var(--uuif-sp-3);
+}
+.insp-close {
+  width: 28px; height: 28px; border: none; background: transparent;
+  cursor: pointer; color: var(--uuif-text-tertiary);
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--uuif-radius-4); font-size: 16px; line-height: 1;
+  transition: background .15s; flex-shrink: 0;
+}
+.insp-close:hover { background: var(--uuif-surface-model); color: var(--uuif-text-primary); }
+.insp-cat-tag {
+  font-size: 11px; font-weight: 700;
+  border-radius: var(--uuif-radius-4); padding: 3px var(--uuif-sp-3);
+  border: 1px solid; display: inline-block; letter-spacing: 0.01em;
+}
+.insp-title {
+  font-size: 15px; font-weight: 700; color: var(--uuif-text-primary);
+  line-height: 1.35;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.insp-scope {
+  display: flex; gap: var(--uuif-sp-4); font-size: 12px;
+  color: var(--uuif-text-secondary); align-items: center; flex-wrap: wrap;
+  margin-top: var(--uuif-sp-2);
+}
+.insp-scope-item { display: flex; align-items: center; gap: 4px; }
+
+/* Inspector scroll area */
+.insp-scroll { flex: 1; overflow-y: auto; }
+
+/* SAMI note — Info Status Banner */
+.sami-note {
+  margin: var(--uuif-sp-3) var(--uuif-sp-5) 0;
+  background: var(--uuif-fill-blue-lightest);
+  border: 1px solid var(--uuif-border-secondary);
+  border-radius: var(--uuif-radius-6);
+  padding: var(--uuif-sp-3) var(--uuif-sp-4);
+  font-size: 12px; color: var(--uuif-text-primary); line-height: 1.6;
+  display: flex; align-items: flex-start; gap: var(--uuif-sp-3);
+}
+.sami-tag {
+  background: var(--uuif-brand-orange); color: var(--uuif-text-contrast);
+  font-size: 9px; font-weight: 700; border-radius: var(--uuif-radius-4);
+  padding: 2px var(--uuif-sp-2); flex-shrink: 0; margin-top: 2px;
+  letter-spacing: 0.03em;
+}
+
+/* Evidence + Timeline */
+.insp-body { padding: var(--uuif-sp-4) var(--uuif-sp-5); }
+.section-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.07em; color: var(--uuif-text-tertiary);
+  margin-bottom: var(--uuif-sp-3);
+}
+.evidence-item {
+  display: flex; align-items: flex-start; gap: var(--uuif-sp-3);
+  padding: var(--uuif-sp-2) 0; font-size: 12px; color: var(--uuif-text-primary);
+  border-bottom: 1px solid var(--uuif-border-transparent); line-height: 1.5;
+}
+.evidence-item:last-child { border-bottom: none; }
+.ev-icon {
+  width: 22px; height: 22px; border-radius: var(--uuif-radius-4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; flex-shrink: 0; margin-top: 1px;
+}
+.ev-shield  { background: var(--uuif-fill-blue-lightest); }
+.ev-chart   { background: var(--uuif-surface-model); }
+.ev-warning { background: var(--uuif-fill-yellow-xxx-lighter); }
+.ev-check   { background: var(--uuif-fill-green-xxx-lighter); }
+.timeline-section { margin-top: var(--uuif-sp-5); }
+.timeline-item {
+  display: flex; gap: var(--uuif-sp-4); padding: var(--uuif-sp-2) 0;
+  font-size: 12px; border-bottom: 1px solid var(--uuif-border-transparent);
+  color: var(--uuif-text-primary); line-height: 1.5;
+}
+.timeline-item:last-child { border-bottom: none; }
+.tl-date {
+  color: var(--uuif-icon-primary); font-weight: 600;
+  min-width: 100px; flex-shrink: 0; font-size: 11px;
+}
+
+/* ─── INSPECTOR FOOTER ──────────────────────────────────────────────────── */
+.insp-footer-wrap {
+  border-top: 1px solid var(--uuif-border-transparent);
+  background: var(--uuif-surface-container);
+  flex-shrink: 0;
+}
+
+/* Default footer */
+.footer-default {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--uuif-sp-3) var(--uuif-sp-5);
+}
+.footer-default .view-link {
+  font-size: 12px; color: var(--uuif-icon-primary);
+  cursor: pointer; text-decoration: underline;
+}
+.footer-actions { display: flex; gap: var(--uuif-sp-3); }
+/* uuif-btn Secondary */
+.btn-sched {
+  background: var(--uuif-surface-container);
+  border: 1px solid var(--uuif-border-secondary);
+  border-radius: var(--uuif-radius-pill);
+  padding: 5px var(--uuif-sp-5); font-size: 12px;
+  cursor: pointer; color: var(--uuif-text-secondary);
+  font-weight: 500; display: flex; align-items: center; gap: 4px;
+  font-family: 'Nunito Sans', sans-serif; transition: all .15s;
+}
+.btn-sched:hover { border-color: var(--uuif-border-hover); color: var(--uuif-text-hover); }
+/* uuif-btn Primary */
+.btn-primary {
+  background: var(--uuif-surface-primary); color: var(--uuif-text-contrast);
+  border: none; border-radius: var(--uuif-radius-pill);
+  padding: 5px var(--uuif-sp-5); font-size: 12px;
+  cursor: pointer; font-weight: 700;
+  font-family: 'Nunito Sans', sans-serif; transition: background .15s;
+}
+.btn-primary:hover { background: var(--uuif-brand-navy); }
+
+/* Scheduled state footer */
+.footer-scheduled {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--uuif-sp-3) var(--uuif-sp-5);
+  background: var(--uuif-fill-blue-lightest);
+}
+.sched-info { display: flex; align-items: center; gap: var(--uuif-sp-3); }
+.sched-icon-wrap { color: var(--uuif-surface-primary); font-size: 16px; }
+.sched-text { font-size: 12px; font-weight: 700; color: var(--uuif-text-primary); }
+.sched-sub  { font-size: 11px; color: var(--uuif-text-tertiary); }
+.sched-actions { display: flex; gap: var(--uuif-sp-2); align-items: center; }
+.sched-actions button {
+  background: none; border: none; cursor: pointer;
+  font-size: 12px; padding: 4px var(--uuif-sp-3);
+  border-radius: var(--uuif-radius-4); font-weight: 600;
+  font-family: 'Nunito Sans', sans-serif; transition: background .15s;
+}
+.btn-edit   { color: var(--uuif-icon-primary); }
+.btn-edit:hover   { background: var(--uuif-surface-secondary) !important; }
+.btn-cancel { color: var(--uuif-brand-red); }
+.btn-cancel:hover { background: var(--uuif-fill-red-lightest) !important; }
+.btn-dnow {
+  color: var(--uuif-brand-orange) !important; font-weight: 700 !important;
+  border: 1px solid var(--uuif-border-primary) !important;
+  border-radius: var(--uuif-radius-pill) !important;
+}
+.btn-dnow:hover { background: var(--uuif-surface-selected) !important; }
+
+/* In-progress state footer */
+.footer-inprogress {
+  padding: var(--uuif-sp-3) var(--uuif-sp-5);
+  background: var(--uuif-fill-green-xxx-lighter);
+}
+.ip-top {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: var(--uuif-sp-3);
+}
+.ip-label {
+  font-size: 13px; font-weight: 700; color: var(--uuif-brand-green);
+  display: flex; align-items: center; gap: var(--uuif-sp-2);
+}
+.ip-eta { font-size: 11px; color: var(--uuif-text-tertiary); }
+.prog-bar {
+  height: 6px; background: var(--uuif-border-disabled);
+  border-radius: var(--uuif-radius-pill); overflow: hidden;
+}
+.prog-fill {
+  height: 100%; background: var(--uuif-brand-green);
+  border-radius: var(--uuif-radius-pill); transition: width 1.2s ease;
+}
+.ip-bottom {
+  display: flex; align-items: center; justify-content: space-between; margin-top: var(--uuif-sp-3);
+}
+.ip-status { font-size: 12px; color: var(--uuif-text-secondary); }
+.ip-links { display: flex; gap: var(--uuif-sp-3); }
+.ip-links button {
+  background: none; border: none; cursor: pointer;
+  font-size: 12px; padding: 4px var(--uuif-sp-3);
+  border-radius: var(--uuif-radius-4); font-weight: 600;
+  font-family: 'Nunito Sans', sans-serif; transition: background .15s;
+}
+.btn-view-prog { color: var(--uuif-icon-primary); text-decoration: underline; }
+.btn-pause { color: var(--uuif-text-tertiary); border: 1px solid var(--uuif-border-tertiary) !important; }
+.btn-pause:hover { background: var(--uuif-surface-model) !important; }
+
+/* Scheduling expansion footer */
+.footer-scheduling {
+  padding: var(--uuif-sp-4) var(--uuif-sp-5) var(--uuif-sp-5);
+  border-top: 2px solid var(--uuif-border-secondary);
+  background: var(--uuif-fill-blue-lightest);
+}
+.sched-exp-header {
+  font-size: 13px; font-weight: 700; color: var(--uuif-text-primary);
+  margin-bottom: var(--uuif-sp-3); display: flex; align-items: center; gap: var(--uuif-sp-2);
+}
+.sched-exp-header .seh-icon { color: var(--uuif-surface-primary); font-size: 14px; }
+.time-row { display: flex; gap: var(--uuif-sp-2); margin-bottom: var(--uuif-sp-3); flex-wrap: wrap; }
+.time-btn {
+  background: var(--uuif-surface-container);
+  border: 1.5px solid var(--uuif-border-tertiary);
+  border-radius: var(--uuif-radius-pill); padding: 4px var(--uuif-sp-4);
+  font-size: 12px; cursor: pointer; color: var(--uuif-text-secondary); font-weight: 500;
+  transition: all .15s; font-family: 'Nunito Sans', sans-serif;
+}
+.time-btn:hover { border-color: var(--uuif-border-hover); color: var(--uuif-text-hover); }
+.time-btn.selected {
+  border-color: var(--uuif-border-secondary);
+  background: var(--uuif-surface-secondary);
+  color: var(--uuif-surface-primary); font-weight: 700;
+}
+/* SAMI reasoning block — warning banner pattern */
+.sami-reason {
+  background: var(--uuif-fill-yellow-xxx-lighter);
+  border: 1px solid var(--uuif-brand-yellow);
+  border-radius: var(--uuif-radius-6);
+  padding: var(--uuif-sp-3) var(--uuif-sp-4); margin-bottom: var(--uuif-sp-3);
+  font-size: 12px; color: var(--uuif-text-primary); line-height: 1.6;
+  display: flex; gap: var(--uuif-sp-2); align-items: flex-start; min-height: 44px;
+}
+.sami-reason .ssb-tag {
+  background: var(--uuif-brand-orange); color: var(--uuif-text-contrast);
+  font-size: 9px; font-weight: 700; border-radius: var(--uuif-radius-4);
+  padding: 2px var(--uuif-sp-2); flex-shrink: 0; margin-top: 2px;
+}
+.sami-reason-text { color: var(--uuif-text-tertiary); font-style: italic; }
+.sched-confirm-row {
+  display: flex; align-items: center; justify-content: flex-end; gap: var(--uuif-sp-3);
+}
+.btn-sched-cancel {
+  background: none; border: none; cursor: pointer;
+  font-size: 13px; color: var(--uuif-text-tertiary);
+  padding: 5px var(--uuif-sp-3); border-radius: var(--uuif-radius-4);
+  font-family: 'Nunito Sans', sans-serif; transition: background .15s;
+}
+.btn-sched-cancel:hover { background: var(--uuif-surface-model); }
+.btn-sched-confirm {
+  background: var(--uuif-surface-primary); color: var(--uuif-text-contrast);
+  border: none; border-radius: var(--uuif-radius-pill);
+  padding: 5px var(--uuif-sp-6); font-size: 13px; cursor: pointer; font-weight: 700;
+  font-family: 'Nunito Sans', sans-serif; transition: background .15s;
+}
+.btn-sched-confirm:hover    { background: var(--uuif-brand-navy); }
+.btn-sched-confirm:disabled { background: var(--uuif-surface-disabled); color: var(--uuif-text-disabled); cursor: not-allowed; }
+
+/* ─── EMPTY STATE ───────────────────────────────────────────────────────── */
+.empty-inspector {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  color: var(--uuif-text-tertiary); text-align: center; padding: var(--uuif-sp-8);
+}
+.empty-inspector svg { opacity: 0.25; margin-bottom: var(--uuif-sp-4); }
+.empty-inspector p { font-size: 13px; line-height: 1.6; }
+
+/* ─── TOAST ─────────────────────────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--uuif-surface-contrast); color: var(--uuif-text-contrast);
+  padding: var(--uuif-sp-3) var(--uuif-sp-5);
+  border-radius: var(--uuif-radius-8); font-size: 13px; font-weight: 600;
+  display: flex; align-items: center; gap: var(--uuif-sp-3);
+  z-index: 999; transform: translateY(12px); opacity: 0;
+  transition: all .3s; pointer-events: none;
+  box-shadow: var(--uuif-shadow-md);
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast .ti { color: var(--uuif-brand-green); font-size: 16px; }
+
+/* ─── SCROLLBAR ─────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--uuif-border-disabled); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--uuif-icon-secondary); }
+
+/* ─── HIDDEN ROWS (filtered) ────────────────────────────────────────────── */
+.tbl-row.filtered-out { display: none; }
+</style>
+</head>
+<body>
+
+<!-- ─── SIDEBAR — Primary Nav Rail ─────────────────────────────────────── -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M14 2C9.2 2 5 6.1 5 11c0 3.2 1.6 6 4 7.8V22h10v-3.2c2.4-1.8 4-4.6 4-7.8C23 6.1 18.8 2 14 2z" fill="#FF5D00"/>
+      <rect x="9" y="22" width="10" height="2" rx="1" fill="#FF5D00" opacity="0.6"/>
+      <rect x="10" y="25" width="8" height="1.5" rx="0.75" fill="#FF5D00" opacity="0.4"/>
+    </svg>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+  </div>
+  <div class="sidebar-icon active">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    <span class="badge">8</span>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+  </div>
+  <div class="sidebar-spacer"></div>
+  <div class="sidebar-icon">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  </div>
+</nav>
+
+<!-- ─── TOPBAR ───────────────────────────────────────────────────────────── -->
+<header class="topbar">
+  <div class="breadcrumb">
+    <a href="#">Home</a><span class="sep">›</span>
+    <a href="#">NSM Dashboard</a><span class="sep">›</span>
+    <span class="current">SAMI Recommendations</span>
+  </div>
+  <button class="tenant-sel">
+    <div class="dot"></div> All Tenants (Global)
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+  </button>
+  <div class="topbar-icons">
+    <div class="icon-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <div class="notif-dot"></div>
+    </div>
+    <div class="avatar">AR</div>
+  </div>
+</header>
+
+<!-- ─── PAGE ─────────────────────────────────────────────────────────────── -->
+<main class="page">
+  <div class="page-content">
+
+    <!-- Page header -->
+    <div class="page-hdr">
+      <div class="page-hdr-left">
+        <a class="back-btn" href="#" title="Back">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        </a>
+        <div>
+          <div class="page-title">SAMI Recommendations</div>
+          <div class="page-sub">5 items need attention &nbsp;·&nbsp; Compact Table + Inspector — Variant 3 of 5</div>
+        </div>
+      </div>
+      <button class="export-btn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export digest
+      </button>
+    </div>
+
+    <!-- Filter / sort bar -->
+    <div class="filter-bar">
+      <div class="search-wrap">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" id="searchInput" placeholder="Search recommendations…" oninput="applyFilters()" />
+      </div>
+      <div class="cat-chips" id="catChips">
+        <button class="cat-chip active" data-cat="all" onclick="setCat(this,'all')">All</button>
+        <button class="cat-chip" data-cat="cve" onclick="setCat(this,'cve')">CVE</button>
+        <button class="cat-chip" data-cat="device" onclick="setCat(this,'device')">Device</button>
+        <button class="cat-chip" data-cat="behavioral" onclick="setCat(this,'behavioral')">Behavioral</button>
+        <button class="cat-chip" data-cat="policy" onclick="setCat(this,'policy')">Policy</button>
+        <button class="cat-chip" data-cat="subscription" onclick="setCat(this,'subscription')">Subscription</button>
+      </div>
+      <div class="sort-sel-wrap">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h9M8 18h5"/></svg>
+        <select>
+          <option>Risk Score ▾</option>
+          <option>Category</option>
+          <option>Affected</option>
+          <option>Updated</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Master–detail layout -->
+    <div class="master-detail" id="masterDetail">
+
+      <!-- TABLE PANEL -->
+      <div class="table-panel" id="tablePanel">
+
+        <!-- Column headers -->
+        <div class="tbl-header-row" id="tblHeaderRow">
+          <div class="th sortable">Severity</div>
+          <div class="th sortable">Category</div>
+          <div class="th sortable">Issue</div>
+          <div class="th">Affected</div>
+          <div class="th sortable">Status</div>
+          <div class="th">Next Action</div>
+          <div class="th" style="text-align:right">Updated</div>
+        </div>
+
+        <!-- Table body -->
+        <div class="tbl-body" id="tblBody">
+          <!-- Rows injected by JS -->
+        </div>
+
+      </div><!-- /table-panel -->
+
+      <!-- INSPECTOR PANEL -->
+      <div class="inspector hidden" id="inspector">
+        <!-- Content injected by JS -->
+      </div>
+
+    </div><!-- /master-detail -->
+
+  </div>
+</main>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span class="ti">✓</span><span id="toastMsg">Done</span>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════════════════════════════════ */
+
+/* Category color tokens (JS hex — CSS vars unavailable inline) */
+const CAT_COLORS = {
+  cve:          { dot: '#ff5d00', text: '#ff5d00', bg: 'rgba(255,93,0,0.08)',   border: '#ff5d00',  label: 'CVE Vulnerability'  },
+  device:       { dot: '#c70f0f', text: '#c70f0f', bg: '#fff0f0',               border: '#c70f0f',  label: 'Device Alert'        },
+  behavioral:   { dot: '#5885cc', text: '#5885cc', bg: '#f6f8fe',               border: '#78a3e5',  label: 'Behavioral Anomaly'  },
+  policy:       { dot: '#5b74a7', text: '#5b74a7', bg: '#f6f8fe',               border: '#78a3e5',  label: 'Policy Gap'          }, /* GAP: no purple in UUIF 9.2 */
+  subscription: { dot: '#59a02e', text: '#59a02e', bg: '#e3efdc',               border: '#59a02e',  label: 'Subscription Risk'   }
+};
+
+/* SAMI scheduling reasoning map */
+const SAMI_REASONING = {
+  'Tonight 11pm':  'Tonight at 11:00 PM falls within Acme Corp\'s maintenance window (10 PM–2 AM). SAMI will sequence tenant deployments — estimated total window: 38 minutes.',
+  'Tomorrow 2am':  'Tomorrow 2:00 AM works for Westfield IT and Beta Networks. Crown Logistics has no approved Friday window — their 2 devices require separate confirmation.',
+  'Monday 2am':    'Monday 2:00 AM is optimal — all 4 tenant maintenance windows align. No concurrent SAMI operations queued.',
+  'Custom':        'SAMI will validate against all 4 tenant maintenance windows and flag conflicts before confirming.'
+};
+
+/* 5 recommendation items */
+const ITEMS = [
+  {
+    id: 0,
+    cat: 'cve',
+    issue: 'SSL VPN Auth Bypass CVE-2026-1142',
+    affected: '12 FW · 4 Tenants',
+    state: 'inprogress',
+    stateLabel: 'Deploying 72%',
+    progress: 72,
+    deployedOf: '7 / 12 devices',
+    eta: '~28 min remaining',
+    nextAction: 'View Progress',
+    updated: '2h ago',
+    score: '9.8',
+    /* Inspector data */
+    tag: 'CVE Vulnerability · Critical',
+    title: 'SSL VPN Auth Bypass (CVE-2026-1142) — 12 Firewalls Across 4 Tenants',
+    scope: '12 Firewalls · Acme Corp, Beta Networks +2',
+    samiNote: 'CVE-2026-1142 enables unauthenticated RCE on SSL VPN gateways running SonicOS below 7.1.2-1023. Patch deployment started 1h 24m ago — 7 of 12 devices are patched. FW-BETA-01 and FW-ACME-02 are currently in progress. 3 Crown Logistics devices are queued pending their change window.',
+    evidence: [
+      { icon: '🛡', cls: 'ev-shield',  text: 'CVSS 9.8 (Critical) · NVD-confirmed · SonicWall PSIRT advisory published' },
+      { icon: '📊', cls: 'ev-chart',   text: '12 firewalls across 4 tenants running vulnerable firmware ≤ 7.1.1-907' },
+      { icon: '⚠️', cls: 'ev-warning', text: 'Active probe attempts on FW-ACME-03 and FW-BETA-01 in last 24h' },
+      { icon: '✅', cls: 'ev-check',   text: '7/12 devices patched · 2 in-flight · 3 queued (Crown Logistics window pending)' }
+    ],
+    timeline: [
+      { date: 'May 18, 07:00', desc: 'Patch 7.1.2-1023 pre-staged · compatibility check passed' },
+      { date: 'May 18, 16:30', desc: 'Deployment started — Acme Corp batch (4 devices) began' },
+      { date: 'May 18, 17:12', desc: 'Acme Corp batch complete (4/4) · Beta Networks batch started (3 devices)' },
+      { date: 'Pending',       desc: 'Crown Logistics batch (3 devices) — awaiting change window tonight' }
+    ],
+    viewLink: 'View deployment progress',
+    primaryLabel: 'View Live Deployment'
+  },
+  {
+    id: 1,
+    cat: 'device',
+    issue: '3 Gateways Unreachable — Northgate & Delta',
+    affected: '3 FW · 2 Tenants',
+    state: 'scheduled',
+    stateLabel: 'Scheduled Tonight 11pm',
+    scheduledWhen: 'Tonight, 11:00 PM',
+    scheduledNotes: 'BGP failover diagnosis',
+    nextAction: 'Run Diagnosis',
+    updated: '3h ago',
+    score: '8.4',
+    tag: 'Device Alert · Offline',
+    title: '3 Gateways Unreachable — Northgate Health & Delta Logistics Branch Sites',
+    scope: '3 Firewalls · Northgate Health, Delta Logistics',
+    samiNote: 'FW-NH-02, FW-NH-03, and FW-DL-01 stopped responding after a BGP route withdrawal. Scheduled for tonight at 11:00 PM: SAMI will attempt automated BGP path diagnosis and SD-WAN failover configuration on secondary WAN interfaces.',
+    evidence: [
+      { icon: '📡', cls: 'ev-warning', text: 'Last heartbeat: FW-NH-02 at 14:32 UTC · FW-NH-03 at 14:33 · FW-DL-01 at 14:35' },
+      { icon: '🌐', cls: 'ev-chart',   text: 'BGP route withdrawal on AS64512 upstream ISP link at 14:30 UTC' },
+      { icon: '⚠️', cls: 'ev-warning', text: '847 endpoints at Northgate Health branch currently uninspected' },
+      { icon: '🔒', cls: 'ev-shield',  text: 'No SD-WAN failover — secondary WAN unconfigured on FW-NH-02' }
+    ],
+    timeline: [
+      { date: 'May 26, 14:30', desc: 'BGP route withdrawal detected on upstream ISP link' },
+      { date: 'May 26, 14:37', desc: 'SAMI flagged 3 gateways unreachable — alert raised' },
+      { date: 'May 26, 14:41', desc: 'SAMI pre-staged BGP diagnosis runbook' },
+      { date: 'Tonight 11:00', desc: 'Automated diagnosis + SD-WAN failover scheduled' }
+    ],
+    viewLink: 'View affected devices',
+    primaryLabel: 'Run Diagnosis Now'
+  },
+  {
+    id: 2,
+    cat: 'behavioral',
+    issue: 'Credential Stuffing on Super-Admin Accounts',
+    affected: '2 Tenants · 2 Admins',
+    state: 'active',
+    stateLabel: 'Needs Action',
+    nextAction: 'Force MFA',
+    updated: '1h ago',
+    score: '8.1',
+    tag: 'Behavioral Anomaly · High',
+    title: 'Credential Stuffing Attack on Super-Admin Accounts — Beta Networks & Crown',
+    scope: '2 Tenants · 2 Admins at risk',
+    samiNote: '18 failed login attempts from 3 geographies detected across Beta Networks and Crown Logistics super-admin accounts. SAMI also detected concurrent active sessions from different IP ranges — likely credential compromise in progress.',
+    evidence: [
+      { icon: '🔑', cls: 'ev-warning', text: '18 failed logins in 40 min from US-East, EU-West, and AP-Southeast' },
+      { icon: '👤', cls: 'ev-chart',   text: 'admin@beta.net and admin@crown.io — both accounts show concurrent sessions' },
+      { icon: '🌍', cls: 'ev-warning', text: 'Session overlap: 192.0.2.45 (Ashburn) + 198.51.100.22 (Frankfurt) — same account' },
+      { icon: '⚡', cls: 'ev-shield',  text: 'No MFA enforced on either account — immediate risk of account takeover' }
+    ],
+    timeline: [
+      { date: 'May 26, 16:00', desc: 'First failed login detected — admin@beta.net from 192.0.2.45' },
+      { date: 'May 26, 16:18', desc: '12 additional failed attempts across both accounts from 3 geo regions' },
+      { date: 'May 26, 16:35', desc: 'Concurrent session anomaly flagged — same credential, 2 active sessions' },
+      { date: 'Now',           desc: 'SAMI recommends immediate MFA enforcement and session termination' }
+    ],
+    viewLink: 'View login activity',
+    primaryLabel: 'Force MFA Now'
+  },
+  {
+    id: 3,
+    cat: 'policy',
+    issue: 'Permit-Any Outbound Bypassing DPI-SSL',
+    affected: '9 FW · 3 Tenants',
+    state: 'scheduled',
+    stateLabel: 'Scheduled Monday 2am',
+    scheduledWhen: 'Monday, 2:00 AM',
+    scheduledNotes: 'Maintenance window policy push',
+    nextAction: 'Apply Policy',
+    updated: '4h ago',
+    score: '7.6',
+    tag: 'Policy Gap · High',
+    title: 'Permit-Any Outbound Rules Bypassing DPI-SSL — 9 Firewalls, 3 Tenants',
+    scope: '9 Firewalls · Acme Corp, Delta Logistics, Crown',
+    samiNote: 'Default-allow outbound rules at WAN interfaces on 9 firewalls are bypassing DPI-SSL inspection. C2 traffic exfiltration is uninspected. Policy drift has persisted for over 45 days. SAMI has pre-staged a corrected baseline policy for deployment during the Monday maintenance window.',
+    evidence: [
+      { icon: '🔓', cls: 'ev-warning', text: 'Permit-Any WAN outbound rule present on 9 firewalls — overrides DPI-SSL' },
+      { icon: '📈', cls: 'ev-chart',   text: 'Policy drift detected for 47 days — last compliance check: Apr 9, 2026' },
+      { icon: '🕵️', cls: 'ev-warning', text: 'SAMI detected uninspected outbound HTTPS flows to 12 unclassified hosts' },
+      { icon: '✅', cls: 'ev-check',   text: 'Corrected policy pre-staged and validated — ready for Monday deployment' }
+    ],
+    timeline: [
+      { date: 'Apr 09',        desc: 'Last compliance check passed — policy drift began' },
+      { date: 'May 24',        desc: 'SAMI detected Permit-Any outbound rules bypassing DPI-SSL on scan' },
+      { date: 'May 26, 09:00', desc: 'Corrected baseline policy pre-staged across 9 firewalls' },
+      { date: 'Mon 2:00 AM',   desc: 'Policy push scheduled for all-tenant maintenance window' }
+    ],
+    viewLink: 'View policy diff',
+    primaryLabel: 'Apply Policy Now'
+  },
+  {
+    id: 4,
+    cat: 'subscription',
+    issue: 'ATP & TZ Subscriptions Expiring — $87K ARR',
+    affected: '21 FW · 3 Tenants',
+    state: 'active',
+    stateLabel: 'Needs Action',
+    nextAction: 'Send Quotes',
+    updated: 'Today',
+    score: '6.8',
+    tag: 'Subscription Risk · Renewal',
+    title: 'ATP & TZ Subscriptions Expiring in <9 Days — 21 Firewalls, 3 Tenants, $87K ARR',
+    scope: '21 Firewalls · Acme Corp, Beta Networks, Delta Logistics',
+    samiNote: 'ATP sandboxing and TZ-series subscription bundles for Acme Corp, Beta Networks, and Delta Logistics expire within 9 days. Combined ARR at risk: $87,000. SAMI has prepared renewal quotes and identified the primary contacts at each tenant.',
+    evidence: [
+      { icon: '📅', cls: 'ev-warning', text: 'Acme Corp: 8 FW expiring Jun 3 · Beta Networks: 7 FW expiring Jun 4 · Delta: 6 FW Jun 5' },
+      { icon: '💰', cls: 'ev-chart',   text: '$87K ARR at risk — ATP Advanced + TZ670/570 bundles across 3 tenants' },
+      { icon: '⚠️', cls: 'ev-warning', text: 'ATP sandboxing will be disabled on expiry — real-time threat analysis interrupted' },
+      { icon: '📧', cls: 'ev-shield',  text: 'Renewal quotes prepared — contacts: jsmith@acme.com, ops@betanet.io, admin@deltalog.com' }
+    ],
+    timeline: [
+      { date: 'May 20',        desc: 'SAMI flagged impending subscription expiry across 3 tenants' },
+      { date: 'May 24',        desc: 'Renewal quotes auto-generated and validated by SAMI' },
+      { date: 'May 26 08:14',  desc: 'Escalated to partner dashboard — 9 days to expiry' },
+      { date: 'Jun 3–5',       desc: 'ATP + TZ subscriptions begin expiring (staggered by tenant)' }
+    ],
+    viewLink: 'View subscription details',
+    primaryLabel: 'Send Renewal Quotes'
+  }
+];
+
+/* ═══════════════════════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════════════════════ */
+let selectedId   = null;
+let footerState  = {};  // { [id]: 'default'|'scheduling'|'scheduled'|'inprogress' }
+let selectedTime = {};  // { [id]: timeName }
+
+/* Initialise footer states from item data */
+ITEMS.forEach(item => {
+  if (item.state === 'inprogress') footerState[item.id] = 'inprogress';
+  else if (item.state === 'scheduled') footerState[item.id] = 'scheduled';
+  else footerState[item.id] = 'default';
+  selectedTime[item.id] = null;
+});
+
+/* ═══════════════════════════════════════════════════════════════════════
+   RENDER TABLE ROWS
+═══════════════════════════════════════════════════════════════════════ */
+function renderTable() {
+  const body = document.getElementById('tblBody');
+  body.innerHTML = '';
+  ITEMS.forEach(item => {
+    const cc = CAT_COLORS[item.cat];
+    const row = document.createElement('div');
+    row.className = 'tbl-row' + (item.id === selectedId ? ' selected' : '');
+    row.dataset.id  = item.id;
+    row.dataset.cat = item.cat;
+    row.onclick = () => selectRow(item.id);
+
+    /* Status chip */
+    let chipHtml = '';
+    if (item.state === 'inprogress') {
+      chipHtml = `<span class="chip chip-green"><span class="spinner"></span> Deploying ${item.progress}%</span>`;
+    } else if (item.state === 'scheduled') {
+      const short = item.scheduledWhen.replace('Tonight, ', 'Tonight ').replace('Monday, ', 'Mon ');
+      chipHtml = `<span class="chip chip-blue">📅 ${short}</span>`;
+    } else {
+      chipHtml = `<span class="chip chip-yellow">Needs Action</span>`;
+    }
+
+    row.innerHTML = `
+      <div>
+        <div class="sev-badge crit">!
+          <span class="sev-score">${item.score}</span>
+        </div>
+      </div>
+      <div class="cat-cell">
+        <span class="cat-dot" style="background:${cc.dot}"></span>
+        <span class="cat-label" style="color:${cc.text}">${cc.label}</span>
+      </div>
+      <div class="issue-cell" title="${item.issue}">${item.issue}</div>
+      <div class="affected-cell">${item.affected}</div>
+      <div>${chipHtml}</div>
+      <div>
+        <button class="action-btn" onclick="handleAction(event,${item.id})">${item.nextAction}</button>
+      </div>
+      <div class="updated-cell">${item.updated}</div>
+    `;
+    body.appendChild(row);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ROW SELECTION
+═══════════════════════════════════════════════════════════════════════ */
+function selectRow(id) {
+  selectedId = id;
+  /* Update row highlights */
+  document.querySelectorAll('.tbl-row').forEach(r => {
+    r.classList.toggle('selected', parseInt(r.dataset.id) === id);
+  });
+  /* Show inspector */
+  const md   = document.getElementById('masterDetail');
+  const insp = document.getElementById('inspector');
+  md.classList.add('has-inspector');
+  insp.classList.remove('hidden');
+  renderInspector(id);
+}
+
+function closeInspector() {
+  selectedId = null;
+  document.querySelectorAll('.tbl-row').forEach(r => r.classList.remove('selected'));
+  const md   = document.getElementById('masterDetail');
+  const insp = document.getElementById('inspector');
+  md.classList.remove('has-inspector');
+  insp.classList.add('hidden');
+  insp.innerHTML = '';
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   RENDER INSPECTOR
+═══════════════════════════════════════════════════════════════════════ */
+function renderInspector(id) {
+  const item = ITEMS[id];
+  const cc   = CAT_COLORS[item.cat];
+  const insp = document.getElementById('inspector');
+  const fs   = footerState[id];
+
+  /* Evidence */
+  const evidenceHtml = item.evidence.map(e => `
+    <div class="evidence-item">
+      <div class="ev-icon ${e.cls}">${e.icon}</div>
+      <div>${e.text}</div>
+    </div>
+  `).join('');
+
+  /* Timeline */
+  const timelineHtml = item.timeline.map(t => `
+    <div class="timeline-item">
+      <div class="tl-date">${t.date}</div>
+      <div>${t.desc}</div>
+    </div>
+  `).join('');
+
+  /* Footer by state */
+  let footerHtml = '';
+  if (fs === 'inprogress') {
+    footerHtml = `
+      <div class="insp-footer-wrap">
+        <div class="footer-inprogress">
+          <div class="ip-top">
+            <div class="ip-label">
+              <span class="spinner" style="border-color:#59a02e;border-top-color:transparent"></span>
+              Deploying — ${item.progress}% complete
+            </div>
+            <div class="ip-eta">${item.eta}</div>
+          </div>
+          <div class="prog-bar"><div class="prog-fill" style="width:${item.progress}%"></div></div>
+          <div class="ip-bottom">
+            <div class="ip-status">${item.deployedOf} devices patched</div>
+            <div class="ip-links">
+              <button class="btn-view-prog" onclick="showToast('Opening deployment progress…')">View Progress</button>
+              <button class="btn-pause" onclick="showToast('Deployment paused.')">⏸ Pause</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  } else if (fs === 'scheduled') {
+    footerHtml = `
+      <div class="insp-footer-wrap">
+        <div class="footer-scheduled">
+          <div class="sched-info">
+            <div class="sched-icon-wrap">📅</div>
+            <div>
+              <div class="sched-text">Scheduled: ${item.scheduledWhen}</div>
+              <div class="sched-sub">${item.scheduledNotes}</div>
+            </div>
+          </div>
+          <div class="sched-actions">
+            <button class="btn-edit" onclick="triggerScheduling(${id})">Edit</button>
+            <button class="btn-cancel" onclick="cancelSchedule(${id})">Cancel</button>
+            <button class="btn-dnow" onclick="deployNow(${id})">Deploy Now</button>
+          </div>
+        </div>
+      </div>`;
+  } else if (fs === 'scheduling') {
+    const times = ['Tonight 11pm','Tomorrow 2am','Monday 2am','Custom'];
+    const sel   = selectedTime[id];
+    const timeBtns = times.map(t =>
+      `<button class="time-btn${sel===t?' selected':''}" onclick="selectTime(${id},'${t}')">${t}</button>`
+    ).join('');
+    const reasonText = sel
+      ? (SAMI_REASONING[sel] || '')
+      : '<span class="sami-reason-text">Select a time slot to see SAMI\'s reasoning.</span>';
+    footerHtml = `
+      <div class="insp-footer-wrap">
+        <div class="footer-scheduling">
+          <div class="sched-exp-header"><span class="seh-icon">📅</span> Schedule for Later</div>
+          <div class="time-row">${timeBtns}</div>
+          <div class="sami-reason">
+            <span class="ssb-tag">SAMI</span>
+            <span>${reasonText}</span>
+          </div>
+          <div class="sched-confirm-row">
+            <button class="btn-sched-cancel" onclick="cancelScheduling(${id})">Cancel</button>
+            <button class="btn-sched-confirm" ${sel?'':'disabled'} onclick="confirmSchedule(${id})">Confirm Schedule</button>
+          </div>
+        </div>
+      </div>`;
+  } else {
+    /* Default */
+    footerHtml = `
+      <div class="insp-footer-wrap">
+        <div class="footer-default">
+          <span class="view-link" onclick="showToast('Opening details…')">${item.viewLink}</span>
+          <div class="footer-actions">
+            <button class="btn-sched" onclick="triggerScheduling(${id})">
+              📅 Schedule for later
+            </button>
+            <button class="btn-primary" onclick="handlePrimary(${id})">${item.primaryLabel}</button>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  insp.innerHTML = `
+    <div class="insp-header">
+      <div class="insp-header-top">
+        <div>
+          <span class="insp-cat-tag" style="color:${cc.text};background:${cc.bg};border-color:${cc.border}">${item.tag}</span>
+        </div>
+        <button class="insp-close" onclick="closeInspector()">×</button>
+      </div>
+      <div class="insp-title">${item.title}</div>
+      <div class="insp-scope">
+        <span class="insp-scope-item">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          ${item.scope}
+        </span>
+        <span style="color:#ccc">·</span>
+        <span class="insp-scope-item" style="color:#888">Risk Score: <strong style="color:#c70f0f">${item.score} / 10</strong></span>
+      </div>
+    </div>
+
+    <div class="insp-scroll">
+      <div class="sami-note">
+        <span class="sami-tag">SAMI</span>
+        <span>${item.samiNote}</span>
+      </div>
+      <div class="insp-body">
+        <div class="section-label">Evidence</div>
+        ${evidenceHtml}
+        <div class="timeline-section">
+          <div class="section-label">Timeline</div>
+          ${timelineHtml}
+        </div>
+      </div>
+    </div>
+
+    ${footerHtml}
+  `;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   SCHEDULING INTERACTIONS
+═══════════════════════════════════════════════════════════════════════ */
+function triggerScheduling(id) {
+  footerState[id]  = 'scheduling';
+  selectedTime[id] = null;
+  renderInspector(id);
+}
+
+function cancelScheduling(id) {
+  const item = ITEMS[id];
+  footerState[id] = item.state === 'scheduled' ? 'scheduled' : 'default';
+  renderInspector(id);
+}
+
+function selectTime(id, time) {
+  selectedTime[id] = time;
+  renderInspector(id);
+}
+
+function confirmSchedule(id) {
+  const time = selectedTime[id];
+  if (!time) return;
+  const item = ITEMS[id];
+  item.state          = 'scheduled';
+  item.scheduledWhen  = time.replace('Tonight 11pm','Tonight, 11:00 PM')
+                            .replace('Tomorrow 2am','Tomorrow, 2:00 AM')
+                            .replace('Monday 2am','Monday, 2:00 AM')
+                            .replace('Custom','Custom Time');
+  item.scheduledNotes = 'Confirmed by SAMI';
+  footerState[id] = 'scheduled';
+  renderTable();
+  renderInspector(id);
+  showToast(`Scheduled: ${time}`);
+}
+
+function cancelSchedule(id) {
+  const item = ITEMS[id];
+  item.state = 'active';
+  footerState[id] = 'default';
+  renderTable();
+  renderInspector(id);
+  showToast('Schedule cancelled.');
+}
+
+function deployNow(id) {
+  const item = ITEMS[id];
+  item.state    = 'inprogress';
+  item.progress = 0;
+  item.deployedOf = '0 / 12 devices';
+  item.eta        = 'Starting…';
+  footerState[id] = 'inprogress';
+  renderTable();
+  renderInspector(id);
+  showToast('Deployment started.');
+  /* Simulate progress */
+  let p = 0;
+  const iv = setInterval(() => {
+    p += Math.floor(Math.random() * 8) + 4;
+    if (p >= 100) { p = 100; clearInterval(iv); }
+    item.progress   = p;
+    item.deployedOf = `${Math.round(p/100*12)} / 12 devices`;
+    item.eta        = p < 100 ? `~${Math.round((100-p)*0.28)} min remaining` : 'Complete';
+    if (footerState[id] === 'inprogress') renderInspector(id);
+  }, 1800);
+}
+
+function handlePrimary(id) {
+  const item = ITEMS[id];
+  if (item.cat === 'subscription') {
+    showToast('Renewal quotes sent to 3 tenants.');
+  } else if (item.cat === 'behavioral') {
+    showToast('MFA enforcement applied to 2 accounts.');
+  } else {
+    deployNow(id);
+  }
+}
+
+function handleAction(evt, id) {
+  evt.stopPropagation();
+  const item = ITEMS[id];
+  selectRow(id);
+  if (item.nextAction === 'View Progress') {
+    showToast('Opening deployment progress…');
+  } else if (item.nextAction === 'Run Diagnosis') {
+    showToast('Diagnosis runbook queued.');
+  } else if (item.nextAction === 'Force MFA') {
+    showToast('MFA enforcement applied.');
+  } else if (item.nextAction === 'Apply Policy') {
+    showToast('Policy deployment triggered.');
+  } else if (item.nextAction === 'Send Quotes') {
+    showToast('Quotes sent to tenant contacts.');
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   FILTER / SEARCH
+═══════════════════════════════════════════════════════════════════════ */
+let activeCat = 'all';
+
+function setCat(el, cat) {
+  activeCat = cat;
+  document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  applyFilters();
+}
+
+function applyFilters() {
+  const query = document.getElementById('searchInput').value.toLowerCase();
+  document.querySelectorAll('.tbl-row').forEach(row => {
+    const id   = parseInt(row.dataset.id);
+    const item = ITEMS[id];
+    const catMatch    = activeCat === 'all' || item.cat === activeCat;
+    const searchMatch = !query ||
+      item.issue.toLowerCase().includes(query) ||
+      CAT_COLORS[item.cat].label.toLowerCase().includes(query) ||
+      item.affected.toLowerCase().includes(query);
+    row.classList.toggle('filtered-out', !(catMatch && searchMatch));
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════════════════════════ */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._to);
+  t._to = setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════════════════════ */
+renderTable();
+</script>
+</body>
+</html>

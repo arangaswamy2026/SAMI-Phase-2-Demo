@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+  Design System Version: UUIF 9.2
+  Reference Files Read: 01-tokens-color.md, 02-tokens-foundation.md, 03-components-nav.md
+  Component Tokens Used: --uuif-brand-navy, --uuif-brand-orange, --uuif-surface-container,
+    --uuif-surface-bg, --uuif-surface-selected, --uuif-border-tertiary, --uuif-border-transparent,
+    --uuif-text-primary, --uuif-text-secondary, --uuif-theme-text-secondary
+  Components Used: Primary Nav Rail, SubNav Panel, Top Action Bar
+  Gaps Flagged: None
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAMI Dashboard — Shell</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Color tokens */
+    --uuif-text-primary: #191c25;
+    --uuif-text-secondary: #4a618f;
+    --uuif-text-tertiary: #888888;
+    --uuif-text-contrast: #ffffff;
+    --uuif-text-disabled: rgba(17,17,17,0.3);
+    --uuif-text-hover: #ff5d00;
+    --uuif-text-highlight: #0c2b67;
+
+    --uuif-surface-container: #ffffff;
+    --uuif-surface-bg: #fafafa;
+    --uuif-surface-primary: #5b74a7;
+    --uuif-surface-secondary: #d2dff2;
+    --uuif-surface-tertiary: #f6f8fe;
+    --uuif-surface-highlight: #ff5d00;
+    --uuif-surface-hover: rgba(17,17,17,0.06);
+    --uuif-surface-selected: rgba(255,72,26,0.09);
+    --uuif-surface-disabled: #e8eff9;
+    --uuif-surface-model: #f0f2f5;
+
+    --uuif-border-primary: #ff5d00;
+    --uuif-border-secondary: #78a3e5;
+    --uuif-border-tertiary: #cccccc;
+    --uuif-border-transparent: rgba(17,17,17,0.09);
+    --uuif-border-disabled: #d2dff2;
+
+    --uuif-icon-primary: #5885cc;
+    --uuif-icon-secondary: #9dafd3;
+
+    --uuif-brand-navy: #001b50;
+    --uuif-brand-blue: #1f3c73;
+    --uuif-brand-orange: #ff5d00;
+    --uuif-brand-green: #59a02e;
+    --uuif-brand-red: #c70f0f;
+    --uuif-brand-yellow: #f3ac3d;
+    --uuif-theme-text-secondary: #5b74a7;
+
+    /* Spacing */
+    --uuif-sp-1: 4px;
+    --uuif-sp-2: 8px;
+    --uuif-sp-3: 16px;
+    --uuif-sp-4: 24px;
+    --uuif-sp-5: 32px;
+    --uuif-sp-6: 48px;
+    --uuif-sp-7: 64px;
+
+    /* Radius */
+    --uuif-radius-4: 4px;
+    --uuif-radius-8: 8px;
+    --uuif-radius-pill: 88px;
+
+    /* Shadow */
+    --uuif-shadow-sm: 0px 1px 6px 2px rgba(0,0,0,0.12);
+    --uuif-shadow-md: 0px 4px 12px 0px rgba(0,0,0,0.16);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito Sans', sans-serif;
+    background: var(--uuif-surface-bg);
+    color: var(--uuif-text-primary);
+    min-height: 100vh;
+  }
+
+  /* ── Primary Nav Rail (60px) ── */
+  .uuif-nav-rail {
+    position: fixed;
+    top: 0; left: 0;
+    width: 60px;
+    height: 100vh;
+    background: var(--uuif-brand-navy);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 200;
+  }
+
+  .uuif-nav-rail__logo {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .uuif-nav-rail__divider {
+    width: 44px;
+    height: 1px;
+    background: rgba(255,255,255,0.15);
+    margin: 0 auto;
+    flex-shrink: 0;
+  }
+
+  .uuif-nav-rail__items {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    flex: 1;
+  }
+
+  .uuif-nav-rail__bottom {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding-bottom: var(--uuif-sp-3);
+  }
+
+  .uuif-nav-item {
+    width: 60px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.15s;
+  }
+
+  .uuif-nav-item:hover {
+    background: rgba(17,17,17,0.25);
+  }
+
+  .uuif-nav-item.is-active {
+    background: rgba(17,17,17,0.4);
+  }
+
+  .uuif-nav-item.is-active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 8px; bottom: 8px;
+    width: 2px;
+    background: var(--uuif-brand-orange);
+    border-radius: 0 2px 2px 0;
+  }
+
+  .uuif-nav-item svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* ── SubNav Panel (266px) ── */
+  .uuif-subnav {
+    position: fixed;
+    top: 0;
+    left: 60px;
+    width: 266px;
+    height: 100vh;
+    background: var(--uuif-surface-container);
+    border-right: 1px solid var(--uuif-border-tertiary);
+    display: flex;
+    flex-direction: column;
+    z-index: 190;
+    overflow-y: auto;
+  }
+
+  .uuif-subnav__header {
+    padding: var(--uuif-sp-3) var(--uuif-sp-3) var(--uuif-sp-2);
+    flex-shrink: 0;
+  }
+
+  .uuif-subnav__wordmark {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .uuif-subnav__unified-mgmt {
+    font-size: 14px;
+    font-weight: 600;
+    color: #e67f02;
+    letter-spacing: 0;
+    line-height: 1;
+  }
+
+  .uuif-subnav__divider {
+    height: 1px;
+    background: var(--uuif-border-tertiary);
+    margin: var(--uuif-sp-2) 0;
+  }
+
+  .uuif-subnav__page-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--uuif-brand-navy);
+    text-transform: uppercase;
+    padding: var(--uuif-sp-2) var(--uuif-sp-3);
+    letter-spacing: 0.02em;
+  }
+
+  .uuif-subnav__section {
+    padding: 0 var(--uuif-sp-2);
+    margin-bottom: var(--uuif-sp-1);
+  }
+
+  .uuif-subnav__section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--uuif-sp-2) var(--uuif-sp-2);
+    cursor: pointer;
+    border-radius: var(--uuif-radius-4);
+    transition: background 0.15s;
+  }
+
+  .uuif-subnav__section-header:hover {
+    background: var(--uuif-surface-hover);
+  }
+
+  .uuif-subnav__section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--uuif-brand-navy);
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .uuif-subnav__chevron {
+    width: 12px;
+    height: 12px;
+    opacity: 0.6;
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+
+  .uuif-subnav__section.is-open .uuif-subnav__chevron {
+    transform: rotate(180deg);
+  }
+
+  .uuif-subnav__links {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0 var(--uuif-sp-2) var(--uuif-sp-1);
+  }
+
+  .uuif-subnav__link {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--uuif-text-secondary);
+    padding: 6px var(--uuif-sp-2);
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+    transition: background 0.12s, color 0.12s;
+    line-height: 1.3;
+  }
+
+  .uuif-subnav__link:hover {
+    background: var(--uuif-surface-hover);
+    color: var(--uuif-text-primary);
+  }
+
+  .uuif-subnav__link.is-active {
+    font-weight: 600;
+    color: #e67f02;
+    background: var(--uuif-surface-selected);
+  }
+
+  /* ── Top Action Bar (46px) ── */
+  .uuif-topbar {
+    position: fixed;
+    top: 0;
+    left: 326px;
+    right: 0;
+    height: 46px;
+    background: var(--uuif-surface-container);
+    border-bottom: 1px solid var(--uuif-border-tertiary);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--uuif-sp-4);
+    z-index: 180;
+  }
+
+  .uuif-topbar__breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: var(--uuif-sp-1);
+    font-size: 13px;
+    color: var(--uuif-theme-text-secondary);
+  }
+
+  .uuif-topbar__breadcrumb a {
+    color: var(--uuif-theme-text-secondary);
+    text-decoration: none;
+    transition: color 0.12s;
+  }
+
+  .uuif-topbar__breadcrumb a:hover {
+    color: var(--uuif-brand-orange);
+  }
+
+  .uuif-topbar__breadcrumb .sep {
+    color: var(--uuif-border-tertiary);
+    font-size: 13px;
+  }
+
+  .uuif-topbar__breadcrumb .current {
+    font-weight: 600;
+    color: var(--uuif-text-primary);
+  }
+
+  .uuif-topbar__right {
+    display: flex;
+    align-items: center;
+    gap: var(--uuif-sp-2);
+  }
+
+  .uuif-topbar__tenant-selector {
+    display: flex;
+    align-items: center;
+    gap: var(--uuif-sp-1);
+    padding: 4px var(--uuif-sp-2);
+    border: 1px solid var(--uuif-border-tertiary);
+    border-radius: var(--uuif-radius-4);
+    font-size: 13px;
+    color: var(--uuif-text-primary);
+    cursor: pointer;
+    background: var(--uuif-surface-container);
+    min-width: 180px;
+    transition: border-color 0.15s;
+  }
+
+  .uuif-topbar__tenant-selector:hover {
+    border-color: var(--uuif-border-secondary);
+  }
+
+  .uuif-topbar__tenant-selector span {
+    flex: 1;
+    font-size: 13px;
+  }
+
+  .uuif-topbar__icon-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--uuif-radius-pill);
+    cursor: pointer;
+    transition: background 0.12s;
+    position: relative;
+  }
+
+  .uuif-topbar__icon-btn:hover {
+    background: var(--uuif-surface-hover);
+  }
+
+  .uuif-topbar__icon-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .uuif-topbar__badge {
+    position: absolute;
+    top: 4px; right: 4px;
+    width: 8px; height: 8px;
+    background: var(--uuif-brand-orange);
+    border-radius: 50%;
+    border: 1.5px solid var(--uuif-surface-container);
+  }
+
+  .uuif-topbar__avatar {
+    width: 28px;
+    height: 28px;
+    background: var(--uuif-surface-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--uuif-text-contrast);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  /* ── Page Content Area ── */
+  .uuif-page-content {
+    margin-left: 326px;
+    padding-top: 46px;
+    min-height: 100vh;
+    background: var(--uuif-surface-bg);
+    padding: 46px var(--uuif-sp-5) var(--uuif-sp-5) var(--uuif-sp-5);
+    margin-left: 326px;
+  }
+
+  /* ── Page Header ── */
+  .sami-page-header {
+    background: linear-gradient(160deg, #001438 0%, var(--uuif-brand-navy) 45%, #0e2a6e 100%);
+    margin: 0 calc(-1 * var(--uuif-sp-5));
+    padding: var(--uuif-sp-5) var(--uuif-sp-5) var(--uuif-sp-5);
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+
+  /* Dot-grid texture overlay */
+  .sami-page-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px);
+    background-size: 24px 24px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Orange glow orb bottom-right */
+  .sami-page-header::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; right: -40px;
+    width: 320px; height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,93,0,0.18) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .sami-page-header__inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--uuif-sp-3);
+  }
+
+  .sami-page-header__left { flex: 1; }
+
+  .sami-page-header__eyebrow {
+    display: flex;
+    align-items: center;
+    gap: var(--uuif-sp-1);
+    margin-bottom: var(--uuif-sp-2);
+  }
+
+  .sami-live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(255,93,0,0.15);
+    border: 1px solid rgba(255,93,0,0.35);
+    border-radius: var(--uuif-radius-pill);
+    padding: 3px 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--uuif-brand-orange);
+    letter-spacing: 0.04em;
+  }
+
+  .sami-live-badge__dot {
+    width: 6px; height: 6px;
+    background: var(--uuif-brand-orange);
+    border-radius: 50%;
+    animation: live-pulse 1.6s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes live-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.45; transform: scale(1.5); }
+  }
+
+  .sami-page-header__date {
+    font-size: 13px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.42);
+    letter-spacing: 0.02em;
+  }
+
+  .sami-page-header__greeting {
+    font-size: 36px;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.05;
+    margin-bottom: 6px;
+    letter-spacing: -0.02em;
+  }
+
+  .sami-page-header__subtitle {
+    font-size: 14px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.58);
+    line-height: 1.5;
+  }
+
+  .sami-page-header__subtitle strong {
+    color: rgba(255,255,255,0.92);
+    font-weight: 600;
+  }
+
+  /* ── Count Blocks Row ── */
+  .sami-count-row {
+    display: flex;
+    gap: var(--uuif-sp-3);
+    margin: 0 calc(-1 * var(--uuif-sp-5));
+    padding: var(--uuif-sp-4) var(--uuif-sp-5);
+    background: var(--uuif-surface-container);
+    border-bottom: none !important;
+  }
+
+  .uuif-count-block {
+    flex: 1;
+    padding: var(--uuif-sp-4) var(--uuif-sp-3);
+    background: var(--uuif-surface-container);
+    border: 1px solid var(--uuif-border-tertiary);
+    border-top: 3px solid var(--uuif-brand-orange);
+    border-radius: var(--uuif-radius-8);
+    display: flex;
+    align-items: center;
+    gap: var(--uuif-sp-3);
+    transition: box-shadow 0.15s, transform 0.15s;
+    cursor: default;
+  }
+
+  .uuif-count-block:hover {
+    box-shadow: var(--uuif-shadow-sm);
+    transform: translateY(-1px);
+  }
+
+  .uuif-count-block__icon {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, rgba(255,93,0,0.1) 0%, rgba(255,93,0,0.04) 100%);
+    border-radius: var(--uuif-radius-8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1px solid rgba(255,93,0,0.18);
+  }
+
+  .uuif-count-block__icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .uuif-count-block__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--uuif-sp-1);
+  }
+
+  .uuif-count-block__label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--uuif-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: 1;
+  }
+
+  .uuif-count-block__value {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--uuif-text-highlight);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  /* ── Sankey Bridge ── */
+  .sami-sankey-bridge {
+    margin: 0 calc(-1 * var(--uuif-sp-5));
+    background: var(--uuif-surface-bg);
+    position: relative;
+    margin-top: -8px;
+    margin-bottom: -8px;
+    z-index: 1;
+  }
+
+  .sami-sankey-bridge__label {
+    display: flex;
+    align-items: center;
+    gap: var(--uuif-sp-2);
+    padding: 10px var(--uuif-sp-5) 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--uuif-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .sami-sankey-bridge__label-dot {
+    width: 7px; height: 7px;
+    background: var(--uuif-brand-orange);
+    border-radius: 50%;
+    animation: live-pulse 1.6s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  #samiSankeyCanvas {
+    display: block;
+    width: 100%;
+  }
+
+  /* ── Metric Summary Cards ── */
+  .sami-metric-row {
+    display: flex;
+    gap: var(--uuif-sp-3);
+    padding: var(--uuif-sp-4) var(--uuif-sp-5);
+    margin: 0 calc(-1 * var(--uuif-sp-5));
+    background: var(--uuif-surface-bg);
+  }
+
+  .sami-metric-card {
+    flex: 1;
+    background: var(--uuif-surface-container);
+    border: 1px solid var(--uuif-border-tertiary);
+    border-radius: var(--uuif-radius-8);
+    padding: var(--uuif-sp-3) var(--uuif-sp-3) var(--uuif-sp-2);
+    display: flex;
+    flex-direction: column;
+    gap: var(--uuif-sp-2);
+    cursor: pointer;
+    transition: box-shadow 0.18s, transform 0.18s, border-color 0.18s;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Severity accent bar along top */
+  .sami-metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--metric-accent, var(--uuif-border-tertiary));
+    border-radius: var(--uuif-radius-8) var(--uuif-radius-8) 0 0;
+  }
+
+  .sami-metric-card:hover {
+    box-shadow: var(--uuif-shadow-sm);
+    transform: translateY(-2px);
+    border-color: var(--uuif-border-secondary);
+  }
+
+  .sami-metric-card__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--uuif-sp-2);
+  }
+
+  .sami-metric-card__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .sami-metric-card__label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--uuif-text-secondary);
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .sami-metric-card__value {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--metric-accent, var(--uuif-text-primary));
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin-top: 4px;
+  }
+
+  .sami-metric-card__delta {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--uuif-brand-red);
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+
+  .sami-metric-card__delta--up   { color: var(--uuif-brand-red); }
+  .sami-metric-card__delta--down { color: var(--uuif-brand-green); }
+
+  .sami-metric-card__chart {
+    width: 100%;
+    height: 36px;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     PRIMARY NAV RAIL
+══════════════════════════════════════ -->
+<nav class="uuif-nav-rail" role="navigation" aria-label="Primary navigation">
+
+  <!-- Logo -->
+  <div class="uuif-nav-rail__logo">
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="SonicWall">
+      <path d="M16 3C9.373 3 4 8.373 4 15c0 3.72 1.612 7.063 4.18 9.39L16 29l7.82-4.61A11.955 11.955 0 0 0 28 15c0-6.627-5.373-12-12-12z" fill="#FF5D00"/>
+      <path d="M10.5 18.5c0-1.5 1-2.5 2.5-3l5-1.5c1.5-.5 2.5-1.5 2.5-3s-1.5-3-3.5-3H11" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none"/>
+      <path d="M21.5 13.5c0 1.5-1 2.5-2.5 3l-5 1.5c-1.5.5-2.5 1.5-2.5 3s1.5 3 3.5 3H21" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none"/>
+    </svg>
+  </div>
+
+  <div class="uuif-nav-rail__divider"></div>
+
+  <!-- Primary nav items -->
+  <div class="uuif-nav-rail__items">
+
+    <!-- Dashboard (active) -->
+    <div class="uuif-nav-item is-active" title="Dashboard" role="button" aria-current="page">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="4" width="9" height="9" rx="1.5" fill="#FF5D00"/>
+        <rect x="15" y="4" width="9" height="9" rx="1.5" fill="#FF5D00"/>
+        <rect x="4" y="15" width="9" height="9" rx="1.5" fill="#FF5D00"/>
+        <rect x="15" y="15" width="9" height="9" rx="1.5" fill="#FF5D00"/>
+      </svg>
+    </div>
+
+    <!-- Alerts -->
+    <div class="uuif-nav-item" title="Alerts" role="button">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M14 5a7 7 0 0 0-7 7v4l-1.5 2.5h17L21 16v-4a7 7 0 0 0-7-7z" stroke="#D2DFF2" stroke-width="1.75" fill="none" stroke-linejoin="round"/>
+        <path d="M11.5 18.5a2.5 2.5 0 0 0 5 0" stroke="#D2DFF2" stroke-width="1.75" fill="none" stroke-linecap="round"/>
+        <circle cx="20" cy="7" r="3" fill="#FF5D00"/>
+      </svg>
+    </div>
+
+    <!-- Policies -->
+    <div class="uuif-nav-item" title="Policies" role="button">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="6" y="4" width="16" height="20" rx="2" stroke="#D2DFF2" stroke-width="1.75" fill="none"/>
+        <path d="M10 10h8M10 14h8M10 18h5" stroke="#D2DFF2" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <!-- Tenants / Users -->
+    <div class="uuif-nav-item" title="Tenants" role="button">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="10" cy="10" r="3.5" stroke="#D2DFF2" stroke-width="1.75" fill="none"/>
+        <circle cx="19" cy="10" r="3.5" stroke="#D2DFF2" stroke-width="1.75" fill="none"/>
+        <path d="M4 22c0-3.314 2.686-5 6-5s6 1.686 6 5" stroke="#D2DFF2" stroke-width="1.75" stroke-linecap="round" fill="none"/>
+        <path d="M19 17c2.5 0 5 1.2 5 5" stroke="#D2DFF2" stroke-width="1.75" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+
+    <div class="uuif-nav-rail__divider" style="margin: 4px auto;"></div>
+
+    <!-- Settings -->
+    <div class="uuif-nav-item" title="Settings" role="button">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="14" cy="14" r="3" stroke="#D2DFF2" stroke-width="1.75" fill="none"/>
+        <path d="M14 5v2M14 21v2M5 14h2M21 14h2M7.05 7.05l1.42 1.42M19.53 19.53l1.42 1.42M7.05 20.95l1.42-1.42M19.53 8.47l1.42-1.42" stroke="#D2DFF2" stroke-width="1.75" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <!-- Network -->
+    <div class="uuif-nav-item" title="Network" role="button">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="14" cy="14" r="9" stroke="#D2DFF2" stroke-width="1.75" fill="none"/>
+        <path d="M14 5c-2.5 3-4 5.5-4 9s1.5 6 4 9M14 5c2.5 3 4 5.5 4 9s-1.5 6-4 9M5 14h18" stroke="#D2DFF2" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <!-- Reports -->
+    <div class="uuif-nav-item" title="Reports" role="button">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6 22V16M11 22V12M16 22V8M21 22V4" stroke="#D2DFF2" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <!-- Devices -->
+    <div class="uuif-nav-item" title="Devices" role="button">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="8" width="20" height="13" rx="2" stroke="#D2DFF2" stroke-width="1.75" fill="none"/>
+        <path d="M10 24h8M14 21v3" stroke="#D2DFF2" stroke-width="1.75" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+  </div>
+
+  <!-- Bottom items -->
+  <div class="uuif-nav-rail__bottom">
+    <div class="uuif-nav-rail__divider" style="margin-bottom: 4px;"></div>
+    <!-- Help -->
+    <div class="uuif-nav-item" title="Help" role="button">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="14" cy="14" r="9" stroke="#D2DFF2" stroke-width="1.75" fill="none"/>
+        <path d="M11 11a3 3 0 1 1 3 3v2" stroke="#D2DFF2" stroke-width="1.75" stroke-linecap="round" fill="none"/>
+        <circle cx="14" cy="19.5" r="0.75" fill="#D2DFF2"/>
+      </svg>
+    </div>
+    <!-- SAMI AI -->
+    <div class="uuif-nav-item" title="SAMI AI" role="button">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M14 4L6 10v8l8 6 8-6v-8L14 4z" stroke="#D2DFF2" stroke-width="1.75" fill="none" stroke-linejoin="round"/>
+        <circle cx="14" cy="14" r="3" fill="#D2DFF2"/>
+        <path d="M14 7v4M14 17v4M7 14h4M17 14h4" stroke="#D2DFF2" stroke-width="1.25" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
+
+</nav>
+
+
+<!-- ══════════════════════════════════════
+     SUBNAV PANEL
+══════════════════════════════════════ -->
+<aside class="uuif-subnav" role="complementary" aria-label="Section navigation">
+
+  <!-- Header / Wordmark -->
+  <div class="uuif-subnav__header">
+    <div class="uuif-subnav__wordmark">
+      <!-- SonicWall wordmark SVG -->
+      <svg width="130" height="18" viewBox="0 0 130 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="SonicWall">
+        <text x="0" y="14" font-family="'Nunito Sans', sans-serif" font-size="14" font-weight="800" fill="#FF5D00" letter-spacing="1">SONICWALL</text>
+      </svg>
+      <span class="uuif-subnav__unified-mgmt">Unified Management</span>
+    </div>
+  </div>
+
+  <div class="uuif-subnav__divider"></div>
+
+  <!-- Page Title -->
+  <div class="uuif-subnav__page-title">Dashboard</div>
+
+  <!-- Section: Dashboard -->
+  <div class="uuif-subnav__section is-open">
+    <div class="uuif-subnav__section-header">
+      <span class="uuif-subnav__section-title">Dashboard</span>
+      <svg class="uuif-subnav__chevron" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2 4l4 4 4-4" stroke="#001b50" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="uuif-subnav__links">
+      <a class="uuif-subnav__link" href="#">Unified Dashboard</a>
+    </div>
+  </div>
+
+  <!-- Section: SAMI Dashboard -->
+  <div class="uuif-subnav__section is-open">
+    <div class="uuif-subnav__section-header">
+      <span class="uuif-subnav__section-title">SAMI Dashboard</span>
+      <svg class="uuif-subnav__chevron" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2 4l4 4 4-4" stroke="#001b50" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="uuif-subnav__links">
+      <a class="uuif-subnav__link is-active" href="#">Overview</a>
+      <a class="uuif-subnav__link" href="#">CVE Vulnerabilities</a>
+      <a class="uuif-subnav__link" href="#">Behavior Anomalies</a>
+      <a class="uuif-subnav__link" href="#">Policy Gaps</a>
+    </div>
+  </div>
+
+</aside>
+
+
+<!-- ══════════════════════════════════════
+     TOP ACTION BAR
+══════════════════════════════════════ -->
+<header class="uuif-topbar" role="banner">
+
+  <!-- Breadcrumb -->
+  <nav class="uuif-topbar__breadcrumb" aria-label="Breadcrumb">
+    <!-- Home icon -->
+    <a href="#" aria-label="Home">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2 7l6-5 6 5v7a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7z" stroke="#5b74a7" stroke-width="1.25" fill="none" stroke-linejoin="round"/>
+        <path d="M6 14V9h4v5" stroke="#5b74a7" stroke-width="1.25" fill="none"/>
+      </svg>
+    </a>
+    <span class="sep">/</span>
+    <a href="#">Dashboard</a>
+    <span class="sep">/</span>
+    <span class="current">System</span>
+  </nav>
+
+  <!-- Right controls -->
+  <div class="uuif-topbar__right">
+
+    <!-- Tenant selector -->
+    <div class="uuif-topbar__tenant-selector" role="combobox" aria-label="Select tenant">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="1" y="3" width="12" height="8" rx="1.5" stroke="#5b74a7" stroke-width="1.25" fill="none"/>
+        <path d="M4 7h6M4 9.5h4" stroke="#5b74a7" stroke-width="1" stroke-linecap="round"/>
+      </svg>
+      <span>Riverside Dental Office</span>
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 4.5l3 3 3-3" stroke="#5b74a7" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <!-- Notification bell -->
+    <div class="uuif-topbar__icon-btn" title="Notifications" role="button" aria-label="Notifications">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 2a5 5 0 0 0-5 5v3l-1 1.5h12L13 10V7a5 5 0 0 0-5-5z" stroke="#5b74a7" stroke-width="1.25" fill="none" stroke-linejoin="round"/>
+        <path d="M6.5 12.5a1.5 1.5 0 0 0 3 0" stroke="#5b74a7" stroke-width="1.25" fill="none" stroke-linecap="round"/>
+      </svg>
+      <span class="uuif-topbar__badge" aria-label="Unread notifications"></span>
+    </div>
+
+    <!-- Avatar -->
+    <div class="uuif-topbar__avatar" role="button" aria-label="User menu" title="NK">NK</div>
+
+  </div>
+</header>
+
+
+<!-- ══════════════════════════════════════
+     PAGE CONTENT (placeholder)
+══════════════════════════════════════ -->
+<main class="uuif-page-content" role="main">
+  <!-- ══ PAGE HEADER ══ -->
+  <section class="sami-page-header" aria-label="Dashboard header">
+    <div class="sami-page-header__inner">
+      <div class="sami-page-header__left">
+        <div class="sami-page-header__eyebrow">
+          <span class="sami-live-badge">
+            <span class="sami-live-badge__dot"></span>LIVE
+          </span>
+          <span class="sami-page-header__date">Tuesday, June 10 · 09:42 AM</span>
+        </div>
+        <h1 class="sami-page-header__greeting">Good morning, MK</h1>
+        <p class="sami-page-header__subtitle">SAMI processed <strong>1,247 events</strong> in the last hour across your managed environment</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ COUNT BLOCKS ROW ══ -->
+  <div class="sami-count-row" role="region" aria-label="Environment summary">
+
+    <div class="uuif-count-block">
+      <div class="uuif-count-block__icon">
+        <svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="5" width="18" height="12" rx="2" stroke="#FF5D00" stroke-width="1.6" fill="none"/>
+          <path d="M7 17v2M15 17v2M5 19h12" stroke="#FF5D00" stroke-width="1.6" stroke-linecap="round"/>
+          <circle cx="11" cy="11" r="2.5" stroke="#FF5D00" stroke-width="1.4" fill="none"/>
+        </svg>
+      </div>
+      <div class="uuif-count-block__body">
+        <span class="uuif-count-block__label">Managed Endpoints</span>
+        <span class="uuif-count-block__value">1,247</span>
+      </div>
+    </div>
+
+    <div class="uuif-count-block">
+      <div class="uuif-count-block__icon">
+        <svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M11 2L3 6v5c0 4.4 3.4 8.5 8 9.5 4.6-1 8-5.1 8-9.5V6L11 2z" stroke="#FF5D00" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
+          <path d="M8 11l2 2 4-4" stroke="#FF5D00" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="uuif-count-block__body">
+        <span class="uuif-count-block__label">Firewalls</span>
+        <span class="uuif-count-block__value">300</span>
+      </div>
+    </div>
+
+    <div class="uuif-count-block">
+      <div class="uuif-count-block__icon">
+        <svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M11 14a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" stroke="#FF5D00" stroke-width="1.5" fill="none"/>
+          <path d="M5.5 16.5a8 8 0 0 1 11 0" stroke="#FF5D00" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+          <path d="M2.5 19.5a12 12 0 0 1 17 0" stroke="#FF5D00" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+          <path d="M8 13a4.5 4.5 0 0 1 6 0" stroke="#FF5D00" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+        </svg>
+      </div>
+      <div class="uuif-count-block__body">
+        <span class="uuif-count-block__label">Access Points</span>
+        <span class="uuif-count-block__value">80</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ SANKEY BRIDGE ══ -->
+  <div class="sami-sankey-bridge" aria-hidden="true">
+    <div class="sami-sankey-bridge__label">
+      <span class="sami-sankey-bridge__label-dot"></span>
+      SAMI AI traffic triage flow
+    </div>
+    <canvas id="samiSankeyCanvas" height="220"></canvas>
+  </div>
+
+  <!-- ══ METRIC SUMMARY CARDS ══ -->
+  <div class="sami-metric-row" role="region" aria-label="Alert summary metrics">
+
+    <!-- Device Alerts -->
+    <div class="sami-metric-card" style="--metric-accent: #c70f0f">
+      <div class="sami-metric-card__top">
+        <div class="sami-metric-card__body">
+          <div class="sami-metric-card__label">Device Alerts</div>
+          <div class="sami-metric-card__value">8</div>
+        </div>
+        <span class="sami-metric-card__delta sami-metric-card__delta--up">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 8V2M2 5l3-3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>+2
+        </span>
+      </div>
+      <svg class="sami-metric-card__chart" viewBox="0 0 80 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="2"  y="22" width="8" height="12" rx="2" fill="#c70f0f" opacity="0.35"/>
+        <rect x="13" y="16" width="8" height="18" rx="2" fill="#c70f0f" opacity="0.5"/>
+        <rect x="24" y="18" width="8" height="16" rx="2" fill="#c70f0f" opacity="0.6"/>
+        <rect x="35" y="10" width="8" height="24" rx="2" fill="#c70f0f" opacity="0.75"/>
+        <rect x="46" y="14" width="8" height="20" rx="2" fill="#c70f0f" opacity="0.65"/>
+        <rect x="57" y="6"  width="8" height="28" rx="2" fill="#c70f0f" opacity="0.9"/>
+        <rect x="68" y="2"  width="8" height="32" rx="2" fill="#c70f0f"/>
+      </svg>
+    </div>
+
+    <!-- CVE Vulnerabilities -->
+    <div class="sami-metric-card" style="--metric-accent: #c70f0f">
+      <div class="sami-metric-card__top">
+        <div class="sami-metric-card__body">
+          <div class="sami-metric-card__label">CVE Vulnerabilities</div>
+          <div class="sami-metric-card__value">8</div>
+        </div>
+        <span class="sami-metric-card__delta sami-metric-card__delta--up">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 8V2M2 5l3-3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>+3
+        </span>
+      </div>
+      <svg class="sami-metric-card__chart" viewBox="0 0 80 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="2"  y="26" width="8" height="8"  rx="2" fill="#c70f0f" opacity="0.3"/>
+        <rect x="13" y="20" width="8" height="14" rx="2" fill="#c70f0f" opacity="0.45"/>
+        <rect x="24" y="24" width="8" height="10" rx="2" fill="#c70f0f" opacity="0.55"/>
+        <rect x="35" y="14" width="8" height="20" rx="2" fill="#c70f0f" opacity="0.7"/>
+        <rect x="46" y="10" width="8" height="24" rx="2" fill="#c70f0f" opacity="0.8"/>
+        <rect x="57" y="6"  width="8" height="28" rx="2" fill="#c70f0f" opacity="0.9"/>
+        <rect x="68" y="2"  width="8" height="32" rx="2" fill="#c70f0f"/>
+      </svg>
+    </div>
+
+    <!-- Behavioral Anomalies -->
+    <div class="sami-metric-card" style="--metric-accent: #f3ac3d">
+      <div class="sami-metric-card__top">
+        <div class="sami-metric-card__body">
+          <div class="sami-metric-card__label">Behavioral Anomalies</div>
+          <div class="sami-metric-card__value">20</div>
+        </div>
+        <span class="sami-metric-card__delta sami-metric-card__delta--up" style="color:#f3ac3d">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 8V2M2 5l3-3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>+5
+        </span>
+      </div>
+      <svg class="sami-metric-card__chart" viewBox="0 0 80 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M2 32 L13 24 L24 28 L35 14 L46 18 L57 8 L68 4 L80 6 L80 36 L2 36 Z" fill="#f3ac3d" opacity="0.18"/>
+        <path d="M2 32 L13 24 L24 28 L35 14 L46 18 L57 8 L68 4 L80 6" stroke="#f3ac3d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <circle cx="68" cy="4"  r="3" fill="#f3ac3d"/>
+      </svg>
+    </div>
+
+    <!-- Policy Gaps Found -->
+    <div class="sami-metric-card" style="--metric-accent: #59a02e">
+      <div class="sami-metric-card__top">
+        <div class="sami-metric-card__body">
+          <div class="sami-metric-card__label">Policy Gaps Found</div>
+          <div class="sami-metric-card__value">8</div>
+        </div>
+        <span class="sami-metric-card__delta sami-metric-card__delta--down">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 2v6M8 5L5 8 2 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>−1
+        </span>
+      </div>
+      <svg class="sami-metric-card__chart" viewBox="0 0 80 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="2"  y="24" width="8" height="10" rx="2" fill="#59a02e" opacity="0.35"/>
+        <rect x="13" y="16" width="8" height="18" rx="2" fill="#59a02e" opacity="0.5"/>
+        <rect x="24" y="20" width="8" height="14" rx="2" fill="#59a02e" opacity="0.6"/>
+        <rect x="35" y="10" width="8" height="24" rx="2" fill="#59a02e" opacity="0.75"/>
+        <rect x="46" y="16" width="8" height="18" rx="2" fill="#59a02e" opacity="0.65"/>
+        <rect x="57" y="8"  width="8" height="26" rx="2" fill="#59a02e" opacity="0.85"/>
+        <rect x="68" y="4"  width="8" height="30" rx="2" fill="#59a02e"/>
+      </svg>
+    </div>
+
+    <!-- Renewal Risk -->
+    <div class="sami-metric-card" style="--metric-accent: #5b74a7">
+      <div class="sami-metric-card__top">
+        <div class="sami-metric-card__body">
+          <div class="sami-metric-card__label">Renewal Risk</div>
+          <div class="sami-metric-card__value">8</div>
+        </div>
+        <span class="sami-metric-card__delta sami-metric-card__delta--up" style="color:#5b74a7">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 8V2M2 5l3-3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>+1
+        </span>
+      </div>
+      <svg class="sami-metric-card__chart" viewBox="0 0 80 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="2"  y="28" width="8" height="6"  rx="2" fill="#5b74a7" opacity="0.3"/>
+        <rect x="13" y="22" width="8" height="12" rx="2" fill="#5b74a7" opacity="0.45"/>
+        <rect x="24" y="26" width="8" height="8"  rx="2" fill="#5b74a7" opacity="0.55"/>
+        <rect x="35" y="16" width="8" height="18" rx="2" fill="#5b74a7" opacity="0.7"/>
+        <rect x="46" y="12" width="8" height="22" rx="2" fill="#5b74a7" opacity="0.8"/>
+        <rect x="57" y="8"  width="8" height="26" rx="2" fill="#5b74a7" opacity="0.9"/>
+        <rect x="68" y="4"  width="8" height="30" rx="2" fill="#5b74a7"/>
+      </svg>
+    </div>
+
+  </div>
+</main>
+
+<script>
+  /* Subnav section toggle */
+  document.querySelectorAll('.uuif-subnav__section-header').forEach(header => {
+    header.addEventListener('click', () => {
+      const section = header.closest('.uuif-subnav__section');
+      section.classList.toggle('is-open');
+      const links = section.querySelector('.uuif-subnav__links');
+      if (links) {
+        links.style.display = section.classList.contains('is-open') ? 'flex' : 'none';
+      }
+    });
+  });
+
+  /* Nav item selection */
+  document.querySelectorAll('.uuif-nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.uuif-nav-item').forEach(i => i.classList.remove('is-active'));
+      item.classList.add('is-active');
+    });
+  });
+</script>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   SAMI Sankey — Vertical DOM-anchored flow
+   Sources  : bottom-centre of each .uuif-count-block
+   Hub nodes: float in the vertical centre of the canvas
+   Dests    : top-centre of each .sami-metric-card
+   Particles travel top → hub → bottom along cubic beziers
+═══════════════════════════════════════════════════════ */
+(function () {
+  const canvas = document.getElementById('samiSankeyCanvas');
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  let W, H, animId;
+  let srcPts = [], dstPts = [], hubPts = [];
+  let paths  = [];
+  const particles = [];
+  const PARTICLE_COUNT = 60;
+
+  // UUIF colour tokens
+  const C = {
+    orange : '#ff5d00',
+    red    : '#c70f0f',
+    yellow : '#f3ac3d',
+    green  : '#59a02e',
+    blue   : '#5b74a7',
+    navy   : '#001b50',
+    teal   : '#0e8a7e',
+  };
+
+  // Source colours match count-block order: Endpoints, Firewalls, Access Points
+  const SRC_COLORS = [C.orange, C.blue, C.teal];
+  // Dest colours match metric-card order
+  const DST_COLORS = [C.red, C.red, C.yellow, C.green, C.blue];
+
+  // Single central SAMI hub
+  const HUB = { label: 'SAMI', color: C.orange };
+
+  // Every source feeds the single hub: [srcIdx]
+  const SRC_HUB  = [0, 1, 2];
+  // Hub feeds every destination: [dstIdx]
+  const HUB_DEST = [0, 1, 2, 3, 4];
+
+  // ── Measure actual card DOM positions relative to canvas ──
+  function measureAnchors() {
+    const cr = canvas.getBoundingClientRect();
+
+    srcPts = Array.from(document.querySelectorAll('.uuif-count-block')).map(el => {
+      const r = el.getBoundingClientRect();
+      return { x: r.left + r.width / 2 - cr.left, y: r.bottom - cr.top };
+    });
+
+    dstPts = Array.from(document.querySelectorAll('.sami-metric-card')).map(el => {
+      const r = el.getBoundingClientRect();
+      return { x: r.left + r.width / 2 - cr.left, y: r.top - cr.top };
+    });
+
+    // Single hub at vertical centre
+    hubPts = [{ x: W / 2, y: H / 2 }];
+  }
+
+  // ── Resize ──
+  function resize() {
+    W = canvas.parentElement.clientWidth;
+    H = 220;
+    canvas.width  = W;
+    canvas.height = H;
+  }
+
+  // ── Build bezier path objects ──
+  // For vertical flow: control points bend inward on Y so curves are smooth S-shapes
+  function makePath(from, to, color) {
+    const dy = to.y - from.y;
+    return {
+      from, to,
+      cp1: { x: from.x, y: from.y + dy * 0.45 },
+      cp2: { x: to.x,   y: to.y  - dy * 0.45 },
+      color,
+    };
+  }
+
+  function buildPaths() {
+    paths = [];
+    const hub = hubPts[0];
+    if (!hub) return;
+    SRC_HUB.forEach(si => {
+      if (!srcPts[si]) return;
+      paths.push(makePath(srcPts[si], hub, SRC_COLORS[si]));
+    });
+    HUB_DEST.forEach(di => {
+      if (!dstPts[di]) return;
+      paths.push(makePath(hub, dstPts[di], DST_COLORS[di]));
+    });
+  }
+
+  // ── Cubic bezier point ──
+  function bezPt(t, p0, p1, p2, p3) {
+    const u = 1 - t;
+    return {
+      x: u*u*u*p0.x + 3*u*u*t*p1.x + 3*u*t*t*p2.x + t*t*t*p3.x,
+      y: u*u*u*p0.y + 3*u*u*t*p1.y + 3*u*t*t*p2.y + t*t*t*p3.y,
+    };
+  }
+
+  // ── Particles ──
+  function spawnParticle() {
+    const path = paths[Math.floor(Math.random() * paths.length)];
+    return {
+      path,
+      t:      Math.random(),
+      speed:  0.0028 + Math.random() * 0.003,
+      r:      1.8 + Math.random() * 1.4,
+      alpha:  0,
+      color:  path.color,
+    };
+  }
+
+  function initParticles() {
+    particles.length = 0;
+    for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(spawnParticle());
+  }
+
+  // ── Draw guide ribbon ──
+  function drawRibbon(p) {
+    ctx.beginPath();
+    ctx.moveTo(p.from.x, p.from.y);
+    ctx.bezierCurveTo(p.cp1.x, p.cp1.y, p.cp2.x, p.cp2.y, p.to.x, p.to.y);
+    ctx.strokeStyle = p.color;
+    ctx.lineWidth   = 7;
+    ctx.globalAlpha = 0.18;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+
+  // ── Draw hub node ──
+  let pulse = 0;
+  function drawHub(pos, hub, pulsePhase) {
+    const R = 38;
+
+    // Outer pulse ring
+    const pr    = R + ((pulse + pulsePhase) % 1) * 42;
+    const pa    = (1 - ((pulse + pulsePhase) % 1)) * 0.38;
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, pr, 0, Math.PI * 2);
+    ctx.strokeStyle = hub.color;
+    ctx.lineWidth   = 1.5;
+    ctx.globalAlpha = pa;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    // Glow fill
+    const grd = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, R + 10);
+    grd.addColorStop(0, hub.color + '28');
+    grd.addColorStop(1, hub.color + '00');
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, R + 10, 0, Math.PI * 2);
+    ctx.fillStyle = grd;
+    ctx.fill();
+
+    // Filled circle
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, R, 0, Math.PI * 2);
+    ctx.fillStyle   = C.navy;
+    ctx.globalAlpha = 0.92;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+
+    // Border
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, R, 0, Math.PI * 2);
+    ctx.strokeStyle = hub.color;
+    ctx.lineWidth   = 1.8;
+    ctx.globalAlpha = 0.85;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    // Label inside hub
+    ctx.fillStyle   = '#ffffff';
+    ctx.font        = '700 14px "Nunito Sans", sans-serif';
+    ctx.textAlign   = 'center';
+    ctx.globalAlpha = 0.95;
+    ctx.fillText(hub.label, pos.x, pos.y + 5);
+    // Sub-label
+    ctx.font        = '400 11px "Nunito Sans", sans-serif';
+    ctx.fillStyle   = C.orange;
+    ctx.globalAlpha = 0.75;
+    ctx.fillText('AI Engine', pos.x, pos.y + 20);
+    ctx.globalAlpha = 1;
+  }
+
+  // ── Draw dot at card anchor (small indicator) ──
+  function drawAnchor(pt, color) {
+    ctx.beginPath();
+    ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
+    ctx.fillStyle   = color;
+    ctx.globalAlpha = 0.55;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+
+  // ── Main render loop ──
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    pulse = (pulse + 0.008) % 1;
+
+    // Guide ribbons
+    paths.forEach(drawRibbon);
+
+    // Particles
+    particles.forEach(p => {
+      p.t += p.speed;
+      if (p.t >= 1) { Object.assign(p, spawnParticle()); p.t = 0; }
+
+      // Fade in / out at ends
+      if      (p.t < 0.12) p.alpha = p.t / 0.12;
+      else if (p.t > 0.88) p.alpha = (1 - p.t) / 0.12;
+      else                 p.alpha = 1;
+
+      const pt = bezPt(p.t, p.path.from, p.path.cp1, p.path.cp2, p.path.to);
+
+      // Halo glow
+      const g = ctx.createRadialGradient(pt.x, pt.y, 0, pt.x, pt.y, p.r * 5);
+      g.addColorStop(0, p.color + 'cc');
+      g.addColorStop(1, p.color + '00');
+      ctx.beginPath();
+      ctx.arc(pt.x, pt.y, p.r * 5, 0, Math.PI * 2);
+      ctx.fillStyle   = g;
+      ctx.globalAlpha = p.alpha * 0.6;
+      ctx.fill();
+
+      // Core dot
+      ctx.beginPath();
+      ctx.arc(pt.x, pt.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle   = p.color;
+      ctx.globalAlpha = p.alpha;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    });
+
+    // Single SAMI hub node
+    if (hubPts[0]) drawHub(hubPts[0], HUB, 0);
+
+    // Source anchor dots (bottom of top cards)
+    srcPts.forEach((pt, i) => drawAnchor(pt, SRC_COLORS[i]));
+
+    // Dest anchor dots (top of bottom cards)
+    dstPts.forEach((pt, i) => drawAnchor(pt, DST_COLORS[i]));
+
+    animId = requestAnimationFrame(draw);
+  }
+
+  function init() {
+    resize();
+    measureAnchors();
+    buildPaths();
+    if (paths.length === 0) return; // cards not rendered yet, retry
+    initParticles();
+    if (animId) cancelAnimationFrame(animId);
+    draw();
+  }
+
+  // Retry init until cards are measurable (handles deferred layout)
+  function tryInit(attempts) {
+    resize();
+    measureAnchors();
+    buildPaths();
+    if (paths.length > 0) {
+      initParticles();
+      if (animId) cancelAnimationFrame(animId);
+      draw();
+    } else if (attempts > 0) {
+      setTimeout(() => tryInit(attempts - 1), 80);
+    }
+  }
+
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(init, 120);
+  });
+
+  if (document.fonts) {
+    document.fonts.ready.then(() => tryInit(10));
+  } else {
+    window.addEventListener('load', () => tryInit(10));
+  }
+})();
+</script>
+
+</body>
+</html>

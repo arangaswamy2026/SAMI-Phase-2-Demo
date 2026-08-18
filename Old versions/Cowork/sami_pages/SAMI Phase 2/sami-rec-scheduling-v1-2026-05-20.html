@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAMI Recommendation — Scheduling Patterns (v1)</title>
+<style>
+/* ─── RESET + BASE ──────────────────────────────────────────────────────── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; color: #1a2332; font-size: 13px; }
+
+/* ─── SIDEBAR ───────────────────────────────────────────────────────────── */
+.sidebar {
+  position: fixed; left: 0; top: 0; width: 48px; height: 100vh;
+  background: #0d1526; display: flex; flex-direction: column;
+  align-items: center; padding: 0; z-index: 200;
+}
+.sidebar-logo { width: 48px; height: 48px; background: #E85D1A; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sidebar-logo svg { width: 26px; height: 26px; fill: white; }
+.sidebar-icon { width: 48px; height: 44px; display: flex; align-items: center; justify-content: center; color: #7a8ba0; cursor: pointer; position: relative; transition: color .2s; }
+.sidebar-icon:hover { color: #fff; }
+.sidebar-icon.active { color: #fff; border-left: 2px solid #E85D1A; }
+.sidebar-icon .badge { position: absolute; top: 7px; right: 7px; background: #E85D1A; color: white; font-size: 9px; font-weight: 700; border-radius: 8px; min-width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; padding: 0 3px; }
+.sidebar-spacer { flex: 1; }
+
+/* ─── TOPBAR ────────────────────────────────────────────────────────────── */
+.topbar {
+  position: fixed; left: 48px; right: 0; top: 0; height: 44px;
+  background: #fff; border-bottom: 1px solid #e2e6ea;
+  display: flex; align-items: center; padding: 0 16px; z-index: 199; gap: 8px;
+}
+.breadcrumb { display: flex; align-items: center; gap: 4px; font-size: 12.5px; color: #555; flex: 1; }
+.breadcrumb a { color: #3b7dd8; text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.breadcrumb span { color: #999; }
+.tenant-selector { display: flex; align-items: center; gap: 6px; border: 1px solid #d0d7de; border-radius: 20px; padding: 4px 12px; font-size: 12.5px; cursor: pointer; background: #fff; color: #333; }
+.tenant-selector .dot { width: 8px; height: 8px; background: #E85D1A; border-radius: 50%; }
+.topbar-icons { display: flex; align-items: center; gap: 10px; }
+.topbar-icons .icon-btn { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #555; transition: background .2s; position: relative; }
+.topbar-icons .icon-btn:hover { background: #f0f2f5; }
+.topbar-icons .notif-badge { position: absolute; top: 2px; right: 2px; width: 8px; height: 8px; background: #E85D1A; border-radius: 50%; }
+.avatar { width: 30px; height: 30px; border-radius: 50%; background: #1a3a5c; color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+/* ─── PAGE WRAPPER ──────────────────────────────────────────────────────── */
+.page { margin-left: 48px; padding-top: 44px; min-height: 100vh; }
+.p2-content { padding: 12px 16px 0; }
+
+/* ─── PAGE HEADER ───────────────────────────────────────────────────────── */
+.p2-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+.p2-header-left { display: flex; align-items: flex-start; gap: 10px; }
+.back-btn { width: 28px; height: 28px; border: none; background: transparent; cursor: pointer; color: #E85D1A; display: flex; align-items: center; justify-content: center; margin-top: 2px; border-radius: 4px; text-decoration: none; }
+.back-btn:hover { background: #fff3ed; }
+.p2-title { font-size: 19px; font-weight: 800; color: #1a2332; line-height: 1.2; }
+.p2-sub { font-size: 12px; color: #888; margin-top: 2px; }
+.export-btn { background: #fff; border: 1px solid #d0d7de; border-radius: 20px; padding: 6px 14px; font-size: 12px; cursor: pointer; color: #333; display: flex; align-items: center; gap: 5px; }
+.export-btn:hover { background: #f5f6f8; }
+
+/* ─── OPTION SWITCHER BAR ───────────────────────────────────────────────── */
+.opt-switcher-bar {
+  display: flex; gap: 8px; margin-bottom: 10px;
+  background: #fff; border: 1px solid #e2e6ea; border-radius: 8px;
+  padding: 8px 12px; align-items: flex-start;
+}
+.opt-switcher-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px;
+  color: #888; white-space: nowrap; margin-top: 10px; margin-right: 4px;
+}
+.opt-cards { display: flex; gap: 8px; flex: 1; }
+.opt-card {
+  flex: 1; border: 1.5px solid #e2e6ea; border-radius: 7px; padding: 9px 12px;
+  cursor: pointer; background: #fafbfc; transition: all .2s;
+}
+.opt-card:hover { border-color: #c5d0dc; background: #fff; }
+.opt-card.active { border-color: #E85D1A; background: #fff8f5; }
+.opt-card-label { font-size: 11.5px; font-weight: 700; color: #333; margin-bottom: 3px; display: flex; align-items: center; gap: 6px; }
+.opt-card.active .opt-card-label { color: #E85D1A; }
+.opt-card-desc { font-size: 11px; color: #777; line-height: 1.4; }
+.opt-badge { font-size: 9px; font-weight: 700; background: #E85D1A; color: white; border-radius: 4px; padding: 2px 5px; }
+.opt-card:not(.active) .opt-badge { background: #dde3ea; color: #666; }
+
+/* ─── THREE-PANEL ───────────────────────────────────────────────────────── */
+.three-panel { display: flex; gap: 0; height: calc(100vh - 44px - 130px); min-height: 540px; }
+
+/* ─── LEFT NAV PANEL ────────────────────────────────────────────────────── */
+.nav-panel {
+  width: 184px; background: #fff; border-radius: 6px 0 0 6px;
+  border: 1px solid #e2e6ea; flex-shrink: 0; overflow-y: auto; display: flex; flex-direction: column;
+}
+.nav-panel .need-attn-header {
+  background: #1a2332; color: #fff; padding: 10px 14px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.need-attn-badge { background: #E85D1A; color: #fff; font-size: 10px; font-weight: 700; border-radius: 10px; padding: 1px 7px; }
+.nav-panel .by-category { padding: 10px 14px 5px; font-size: 10px; font-weight: 700; text-transform: uppercase; color: #aaa; letter-spacing: 0.5px; }
+.nav-item { display: flex; align-items: center; justify-content: space-between; padding: 7px 14px; font-size: 12.5px; color: #333; cursor: pointer; }
+.nav-item:hover { background: #f5f7fa; }
+.nav-item.active { color: #E85D1A; font-weight: 600; background: #fff8f5; }
+.nav-item .nav-count { font-size: 11px; color: #888; }
+.nav-item.active .nav-count { color: #E85D1A; }
+
+/* Option A: state sections in nav */
+.nav-state-section { display: none; }
+body.opt-a .nav-state-section { display: block; }
+.nav-state-header {
+  padding: 8px 14px 5px; font-size: 10px; font-weight: 700;
+  text-transform: uppercase; color: #aaa; letter-spacing: 0.5px;
+  border-top: 1px solid #eee; margin-top: 4px; display: flex; align-items: center; justify-content: space-between;
+}
+.nav-state-header .nsb { font-size: 9px; font-weight: 700; border-radius: 8px; padding: 1px 6px; }
+.nsb-inprog { background: #e8f8ee; color: #1a6b3c; }
+.nsb-sched { background: #e8f0ff; color: #3b5dc9; }
+.nav-state-item {
+  padding: 6px 14px; font-size: 11.5px; color: #444; cursor: pointer;
+  border-left: 2px solid transparent;
+}
+.nav-state-item:hover { background: #f5f7fa; }
+.nav-state-item.inprog { border-left-color: #22c55e; }
+.nav-state-item.sched { border-left-color: #3b7dd8; }
+.nav-state-item .nsi-title { font-weight: 600; color: #1a2332; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nav-state-item .nsi-meta { font-size: 10px; color: #888; margin-top: 2px; }
+.nav-progress-mini { height: 3px; background: #e0e0e0; border-radius: 2px; margin-top: 4px; overflow: hidden; }
+.nav-progress-fill { height: 100%; background: #22c55e; border-radius: 2px; transition: width .5s; }
+
+/* ─── LIST PANEL ────────────────────────────────────────────────────────── */
+.list-panel {
+  width: 310px; background: #fff; border-left: 1px solid #e2e6ea;
+  border-right: 1px solid #e2e6ea; flex-shrink: 0; overflow-y: auto;
+  border-top: 1px solid #e2e6ea; border-bottom: 1px solid #e2e6ea;
+  display: flex; flex-direction: column;
+}
+.list-panel-header {
+  padding: 10px 14px; font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.3px; color: #1a2332; border-bottom: 1px solid #eee;
+  background: #fff; position: sticky; top: 0; z-index: 1; flex-shrink: 0;
+}
+.list-panel-header span { color: #888; font-weight: 400; }
+
+/* Option B: status strip */
+.list-status-strip {
+  display: none; padding: 6px 14px; border-bottom: 1px solid #eee;
+  background: #fafbfc; align-items: center; gap: 10px; flex-shrink: 0;
+}
+body.opt-b .list-status-strip { display: flex; }
+.ss-pill { display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; }
+.ss-pill.inprog { color: #1a6b3c; }
+.ss-pill.sched { color: #3b5dc9; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+.ss-dot { width: 7px; height: 7px; border-radius: 50%; }
+.ss-dot.inprog { background: #22c55e; animation: pulse 1.5s infinite; }
+.ss-dot.sched { background: #3b7dd8; }
+
+.list-items { flex: 1; overflow-y: auto; }
+.list-item { padding: 12px 14px; border-bottom: 1px solid #eee; cursor: pointer; transition: background .15s; }
+.list-item:hover { background: #f8f9fb; }
+.list-item.active { background: #fff8f5; border-left: 3px solid #E85D1A; padding-left: 11px; }
+.list-item .li-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+.li-type { font-size: 10.5px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+.li-type.device::before { content:''; width:5px; height:5px; background:#E85D1A; border-radius:50%; }
+.li-type.device { color:#E85D1A; }
+.li-type.behavioral-a::before { content:''; width:5px; height:5px; background:#3b7dd8; border-radius:50%; }
+.li-type.behavioral-a { color:#3b7dd8; }
+.li-type.policy-g::before { content:''; width:5px; height:5px; background:#6b3bcc; border-radius:50%; }
+.li-type.policy-g { color:#6b3bcc; }
+.li-crit { width: 18px; height: 18px; border-radius: 50%; background: #e53e3e; color: white; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.li-time { font-size: 10.5px; color: #999; }
+.list-item .li-title { font-size: 12.5px; font-weight: 700; color: #1a2332; margin-bottom: 5px; line-height: 1.3; }
+.list-item .li-desc { font-size: 11.5px; color: #666; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* Option B: state badges on list items */
+.li-state-row { display: none; margin-top: 6px; padding-top: 6px; border-top: 1px solid #f0f0f0; }
+body.opt-b .li-state-row { display: flex; align-items: center; }
+.li-state-pill { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 600; border-radius: 12px; padding: 2px 8px; }
+.li-state-pill.active-pill { background: #fff3ed; color: #E85D1A; }
+.li-state-pill.inprog-pill { background: #e8f8ee; color: #1a6b3c; }
+.li-state-pill.sched-pill { background: #e8f0ff; color: #3b5dc9; }
+.inprog-spinner { width: 8px; height: 8px; border: 1.5px solid #22c55e; border-top-color: transparent; border-radius: 50%; animation: spin .8s linear infinite; display: inline-block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Option B: list item state border tinting */
+body.opt-b .list-item[data-state="inprogress"] { border-left: 3px solid #22c55e; padding-left: 11px; }
+body.opt-b .list-item[data-state="scheduled"] { border-left: 3px solid #3b7dd8; padding-left: 11px; }
+body.opt-b .list-item.active[data-state="inprogress"] { border-left: 3px solid #E85D1A; }
+
+/* ─── DETAIL PANEL ──────────────────────────────────────────────────────── */
+.detail-panel {
+  flex: 1; background: #fff; border: 1px solid #e2e6ea; border-left: none;
+  border-radius: 0 6px 6px 0; overflow: hidden; display: flex; flex-direction: column;
+}
+.detail-scroll { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+.detail-header { padding: 14px 20px 12px; border-bottom: 1px solid #eee; }
+.detail-header-top { display: flex; align-items: flex-start; justify-content: space-between; }
+.detail-badge { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+.cve-tag { background: #fff3ed; color: #E85D1A; font-size: 11px; font-weight: 700; border-radius: 4px; padding: 3px 8px; border: 1px solid #ffd0b0; }
+.detail-title { font-size: 15px; font-weight: 800; color: #1a2332; line-height: 1.3; margin-bottom: 8px; }
+.detail-scope { display: flex; gap: 12px; font-size: 11.5px; color: #666; align-items: center; flex-wrap: wrap; }
+
+/* Option C: work mode toggle */
+.work-mode-toggle { display: none; }
+body.opt-c .work-mode-toggle { display: flex; }
+.wm-toggle { display: flex; border: 1px solid #d0d7de; border-radius: 6px; overflow: hidden; }
+.wm-btn { padding: 5px 12px; font-size: 11.5px; font-weight: 600; cursor: pointer; border: none; background: #fff; color: #666; transition: all .15s; }
+.wm-btn.active { background: #1a2332; color: #fff; }
+
+.detail-sami-note {
+  margin: 12px 20px 0; background: #fff8f5; border-radius: 6px;
+  padding: 10px 12px; font-size: 12px; color: #444; line-height: 1.5;
+  display: flex; align-items: flex-start; gap: 8px;
+}
+.detail-sami-note .ds-tag { background: #E85D1A; color: #fff; font-size: 9px; font-weight: 700; border-radius: 3px; padding: 2px 5px; flex-shrink: 0; margin-top: 1px; }
+.detail-body { padding: 14px 20px; flex: 1; }
+.section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #888; margin-bottom: 10px; }
+.evidence-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 12.5px; color: #333; border-bottom: 1px solid #f0f2f5; }
+.evidence-item:last-child { border-bottom: none; }
+.ev-icon { width: 20px; height: 20px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+.ev-icon.shield { background: #e8f4ff; }
+.ev-icon.chart { background: #f0f0f0; }
+.ev-icon.warning { background: #fff0e8; }
+.ev-icon.check { background: #e8f8ee; }
+.timeline-section { margin-top: 14px; }
+.timeline-item { display: flex; gap: 12px; padding: 5px 0; font-size: 12px; border-bottom: 1px solid #f0f2f5; }
+.timeline-item:last-child { border-bottom: none; }
+.timeline-date { color: #3b7dd8; font-weight: 600; min-width: 115px; flex-shrink: 0; }
+
+/* ─── DETAIL FOOTER + INLINE SCHEDULER ─────────────────────────────────── */
+.detail-footer-wrap { border-top: 1px solid #eee; background: #fff; border-radius: 0 0 6px 6px; flex-shrink: 0; }
+
+/* Default footer */
+.df-default { display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; }
+.df-default .view-devices { font-size: 12.5px; color: #3b7dd8; cursor: pointer; text-decoration: underline; }
+.footer-actions { display: flex; gap: 8px; }
+.btn-sched { background: #fff; border: 1px solid #d0d7de; border-radius: 4px; padding: 7px 12px; font-size: 12.5px; cursor: pointer; color: #444; font-weight: 500; display: flex; align-items: center; gap: 5px; }
+.btn-sched:hover { background: #f5f7fa; border-color: #b0bcc8; }
+.btn-primary { background: #E85D1A; color: #fff; border: none; border-radius: 4px; padding: 7px 14px; font-size: 12.5px; cursor: pointer; font-weight: 700; }
+.btn-primary:hover { background: #d14d10; }
+
+/* Scheduled state footer */
+.df-scheduled { display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; background: #f0f5ff; border-radius: 0 0 6px 6px; }
+.df-sched-info { display: flex; align-items: center; gap: 8px; font-size: 12.5px; }
+.df-sched-info .sched-icon { color: #3b7dd8; font-size: 16px; }
+.df-sched-info .sched-text { color: #1a2332; font-weight: 600; }
+.df-sched-info .sched-sub { font-size: 11px; color: #666; margin-top: 1px; }
+.df-sched-links { display: flex; gap: 8px; }
+.df-sched-links button { background: none; border: none; cursor: pointer; font-size: 11.5px; padding: 3px 6px; border-radius: 3px; font-weight: 500; }
+.df-sched-links .btn-edit { color: #3b7dd8; }
+.df-sched-links .btn-edit:hover { background: #e8f0ff; }
+.df-sched-links .btn-cancel { color: #c0392b; }
+.df-sched-links .btn-cancel:hover { background: #fff5f5; }
+.df-sched-links .btn-dnow { color: #E85D1A; font-weight: 700; border: 1px solid #E85D1A; }
+.df-sched-links .btn-dnow:hover { background: #fff3ed; }
+
+/* In-progress state footer */
+.df-inprogress { padding: 10px 20px; background: #f0faf4; border-radius: 0 0 6px 6px; }
+.df-ip-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.df-ip-label { font-size: 12.5px; font-weight: 700; color: #1a6b3c; display: flex; align-items: center; gap: 6px; }
+.df-ip-eta { font-size: 11px; color: #888; }
+.df-prog-bar { height: 5px; background: #c8f0d8; border-radius: 3px; overflow: hidden; }
+.df-prog-fill { height: 100%; background: #22c55e; border-radius: 3px; transition: width 1s; }
+.df-ip-bottom { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+.df-ip-status { font-size: 11px; color: #444; }
+.df-ip-links { display: flex; gap: 8px; }
+.df-ip-links button { background: none; border: none; cursor: pointer; font-size: 11.5px; padding: 3px 6px; border-radius: 3px; font-weight: 500; }
+.df-ip-links .btn-view { color: #3b7dd8; text-decoration: underline; cursor: pointer; }
+.df-ip-links .btn-pause { color: #888; border: 1px solid #d0d7de; }
+.df-ip-links .btn-pause:hover { background: #f5f5f5; }
+
+/* Inline scheduler expansion */
+.df-scheduling {
+  padding: 12px 20px 14px; border-top: 2px solid #3b7dd8;
+  background: linear-gradient(180deg, #f5f8ff 0%, #fff 100%);
+}
+.sched-expand-header { font-size: 12px; font-weight: 700; color: #1a2332; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.sched-expand-header .seh-icon { color: #3b7dd8; font-size: 15px; }
+.sched-time-row { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+.sched-time-btn { background: #fff; border: 1.5px solid #d0d7de; border-radius: 6px; padding: 6px 12px; font-size: 11.5px; cursor: pointer; color: #444; font-weight: 500; transition: all .15s; }
+.sched-time-btn:hover { border-color: #3b7dd8; color: #3b7dd8; }
+.sched-time-btn.selected { border-color: #3b7dd8; background: #e8f0ff; color: #3b5dc9; font-weight: 700; }
+.sched-sami-block { background: #fffbf5; border: 1px solid #ffd0a0; border-radius: 6px; padding: 9px 11px; margin-bottom: 10px; font-size: 11.5px; color: #444; line-height: 1.5; display: flex; gap: 7px; align-items: flex-start; min-height: 44px; }
+.sched-sami-block .ssb-tag { background: #E85D1A; color: #fff; font-size: 9px; font-weight: 700; border-radius: 3px; padding: 2px 5px; flex-shrink: 0; margin-top: 1px; }
+.sched-sami-placeholder { color: #aaa; font-style: italic; }
+.sched-actions-row { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+.btn-sched-cancel { background: none; border: none; cursor: pointer; font-size: 12px; color: #888; padding: 5px 8px; border-radius: 3px; }
+.btn-sched-cancel:hover { background: #f5f5f5; }
+.btn-sched-confirm { background: #3b7dd8; color: #fff; border: none; border-radius: 4px; padding: 7px 16px; font-size: 12.5px; cursor: pointer; font-weight: 700; }
+.btn-sched-confirm:hover { background: #2c6bc0; }
+.btn-sched-confirm:disabled { background: #bdd2f0; cursor: not-allowed; }
+
+/* ─── OPTION C: WORK MODE VIEW ──────────────────────────────────────────── */
+.work-status-view { padding: 16px 20px; flex: 1; overflow-y: auto; }
+.ws-section { margin-bottom: 20px; }
+.ws-section-header { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #888; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.ws-section-header .wsc { font-size: 9px; font-weight: 700; border-radius: 10px; padding: 1px 7px; }
+.wsc-inprog { background: #e8f8ee; color: #1a6b3c; }
+.wsc-sched { background: #e8f0ff; color: #3b5dc9; }
+.wsc-active { background: #fff3ed; color: #E85D1A; }
+.ws-item { border: 1px solid #eee; border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; cursor: pointer; transition: border-color .15s; }
+.ws-item:hover { border-color: #c5d0dc; }
+.ws-item-title { font-size: 12px; font-weight: 700; color: #1a2332; margin-bottom: 4px; }
+.ws-item-meta { font-size: 11px; color: #666; margin-bottom: 6px; }
+.ws-prog-bar { height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden; margin-bottom: 4px; }
+.ws-prog-fill { height: 100%; background: #22c55e; border-radius: 2px; transition: width 1s; }
+.ws-item-bottom { font-size: 10.5px; color: #888; display: flex; align-items: center; justify-content: space-between; }
+.ws-item-bottom a { color: #3b7dd8; text-decoration: underline; cursor: pointer; }
+.ws-sched-when { display: flex; align-items: center; gap: 5px; font-size: 11.5px; color: #3b5dc9; font-weight: 600; }
+.ws-sched-edit { color: #3b7dd8; text-decoration: underline; cursor: pointer; font-size: 11px; }
+.ws-active-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border: 1px solid #ffd0b0; border-radius: 6px; margin-bottom: 6px; cursor: pointer; background: #fffbf8; }
+.ws-active-item:hover { background: #fff5ed; }
+.ws-active-title { font-size: 12px; font-weight: 600; color: #1a2332; }
+.ws-active-tag { font-size: 10.5px; color: #E85D1A; font-weight: 600; margin-top: 2px; }
+.ws-active-actions { display: flex; gap: 6px; }
+.ws-btn-sm { font-size: 11px; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-weight: 600; }
+.ws-btn-sched { background: #fff; border: 1px solid #d0d7de; color: #555; }
+.ws-btn-act { background: #E85D1A; border: none; color: #fff; }
+
+/* ─── TOAST ─────────────────────────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; background: #1a2332; color: #fff;
+  padding: 10px 18px; border-radius: 8px; font-size: 12.5px; font-weight: 600;
+  display: flex; align-items: center; gap: 8px; z-index: 999;
+  transform: translateY(10px); opacity: 0; transition: all .3s;
+  pointer-events: none;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast .toast-icon { color: #22c55e; font-size: 16px; }
+</style>
+</head>
+<body class="opt-a">
+
+<!-- ─── SIDEBAR ─────────────────────────────────────────────────────────── -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <svg viewBox="0 0 24 24"><path d="M12 2C8 2 4 6 4 10c0 4 2 7 5 9l0 3h6l0-3c3-2 5-5 5-9 0-4-4-8-8-8z"/></svg>
+  </div>
+  <div class="sidebar-icon active">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    <span class="badge">8</span>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+  </div>
+  <div class="sidebar-spacer"></div>
+  <div class="sidebar-icon">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <span class="badge">3</span>
+  </div>
+</nav>
+
+<!-- ─── TOPBAR ───────────────────────────────────────────────────────────── -->
+<header class="topbar">
+  <div class="breadcrumb">
+    <a href="sami-page1-dashboard-v2-2026-05-20.html">Home</a><span>›</span>
+    <a href="sami-page1-dashboard-v2-2026-05-20.html">Dashboard</a><span>›</span>
+    <span style="color:#333;font-weight:600">SAMI Recommendation</span>
+  </div>
+  <div class="tenant-selector">
+    <div class="dot"></div> All Tenants (Global)
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+  </div>
+  <div class="topbar-icons">
+    <div class="icon-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <div class="notif-badge"></div>
+    </div>
+    <div class="avatar">HN</div>
+  </div>
+</header>
+
+<!-- ─── PAGE ─────────────────────────────────────────────────────────────── -->
+<main class="page">
+  <div class="p2-content">
+
+    <!-- Page header -->
+    <div class="p2-header">
+      <div class="p2-header-left">
+        <a class="back-btn" href="sami-page1-dashboard-v2-2026-05-20.html" title="Back to Dashboard">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        </a>
+        <div>
+          <div class="p2-title">SAMI recommendation</div>
+          <div class="p2-sub">5 items need your attention &nbsp;·&nbsp; Scheduling & Work-in-Progress Patterns Exploration</div>
+        </div>
+      </div>
+      <button class="export-btn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export digest
+      </button>
+    </div>
+
+    <!-- ── Option Switcher ──────────────────────────────────────────────── -->
+    <div class="opt-switcher-bar">
+      <div class="opt-switcher-label">Design<br>Option</div>
+      <div class="opt-cards">
+        <div class="opt-card active" id="card-a" onclick="setOption('A')">
+          <div class="opt-card-label"><span class="opt-badge">A</span> Extended Left Nav</div>
+          <div class="opt-card-desc">Scheduled &amp; in-progress sections appear in the left nav panel — scan work status without leaving context</div>
+        </div>
+        <div class="opt-card" id="card-b" onclick="setOption('B')">
+          <div class="opt-card-label"><span class="opt-badge">B</span> Inline List States</div>
+          <div class="opt-card-desc">State badges on each list item + status strip — work status visible in the item list at a glance</div>
+        </div>
+        <div class="opt-card" id="card-c" onclick="setOption('C')">
+          <div class="opt-card-label"><span class="opt-badge">C</span> Detail Work Mode</div>
+          <div class="opt-card-desc">Toggle the detail panel between Alert Detail and Work Status — all queued &amp; running work in one board</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Three-Panel ──────────────────────────────────────────────────── -->
+    <div class="three-panel">
+
+      <!-- LEFT: Nav Panel -->
+      <div class="nav-panel" id="navPanel">
+        <div class="need-attn-header">
+          Need Attention <span class="need-attn-badge">5</span>
+        </div>
+        <div class="by-category">By Category</div>
+        <div class="nav-item active" onclick="selectNav(this)">CVE Vulnerabilities <span class="nav-count">3</span></div>
+        <div class="nav-item" onclick="selectNav(this)">Policy Gaps <span class="nav-count">4</span></div>
+        <div class="nav-item" onclick="selectNav(this)">Behavioral <span class="nav-count">3</span></div>
+        <div class="nav-item" onclick="selectNav(this)">Renewals <span class="nav-count">3</span></div>
+        <div class="nav-item" onclick="selectNav(this)">Device Alerts <span class="nav-count">3</span></div>
+
+        <!-- Option A: state sections -->
+        <div class="nav-state-section">
+          <div class="nav-state-header">
+            In Progress <span class="nsb nsb-inprog">1</span>
+          </div>
+          <div class="nav-state-item inprog" onclick="selectItemByIdx(0)">
+            <div class="nsi-title">CVE-2026-1142 Patch</div>
+            <div class="nsi-meta">7 of 12 devices · 1h 24m</div>
+            <div class="nav-progress-mini"><div class="nav-progress-fill" style="width:72%"></div></div>
+          </div>
+
+          <div class="nav-state-header">
+            Scheduled <span class="nsb nsb-sched">2</span>
+          </div>
+          <div class="nav-state-item sched" onclick="selectItemByIdx(1)">
+            <div class="nsi-title">BGP Failover Diagnosis</div>
+            <div class="nsi-meta">📅 Tonight, 11:00 PM</div>
+          </div>
+          <div class="nav-state-item sched" onclick="selectItemByIdx(3)">
+            <div class="nsi-title">Policy Baseline Push</div>
+            <div class="nsi-meta">📅 Monday, 2:00 AM</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MIDDLE: List Panel -->
+      <div class="list-panel">
+        <div class="list-panel-header">Need Attention &nbsp;<span>5 critical across all categories</span></div>
+
+        <!-- Option B: status strip -->
+        <div class="list-status-strip">
+          <div class="ss-pill inprog"><div class="ss-dot inprog"></div> 1 deploying</div>
+          <span style="color:#ccc">·</span>
+          <div class="ss-pill sched"><div class="ss-dot sched"></div> 2 scheduled</div>
+          <span style="color:#ccc">·</span>
+          <span style="font-size:11px;color:#999">2 need action</span>
+        </div>
+
+        <div class="list-items">
+          <!-- Item 0: CVE — in-progress -->
+          <div class="list-item active" data-state="inprogress" onclick="selectItemByIdx(0)">
+            <div class="li-meta">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div class="li-crit">!</div>
+                <div class="li-type device">CVE Vulnerability</div>
+              </div>
+              <div class="li-time">2 hrs ago</div>
+            </div>
+            <div class="li-title">SSL VPN Auth Bypass (CVE-2026-1142) — 12 Firewalls Across 4 Tenants</div>
+            <div class="li-desc">CVSS 9.8. Unauthenticated RCE on SonicOS &lt; 7.1.2-1023. Patch deployment in progress.</div>
+            <div class="li-state-row">
+              <span class="li-state-pill inprog-pill"><span class="inprog-spinner"></span> Deploying · 72% · 7/12 devices</span>
+            </div>
+          </div>
+
+          <!-- Item 1: Gateway — scheduled -->
+          <div class="list-item" data-state="scheduled" onclick="selectItemByIdx(1)">
+            <div class="li-meta">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div class="li-crit">!</div>
+                <div class="li-type device">Device Alert</div>
+              </div>
+              <div class="li-time">3 hrs ago</div>
+            </div>
+            <div class="li-title">3 Gateways Unreachable — Northgate Health &amp; Delta Logistics</div>
+            <div class="li-desc">FW-NH-02, FW-NH-03, and FW-DL-01 offline after BGP route change.</div>
+            <div class="li-state-row">
+              <span class="li-state-pill sched-pill">📅 Tonight, 11:00 PM — BGP diagnosis</span>
+            </div>
+          </div>
+
+          <!-- Item 2: Credential stuffing — active -->
+          <div class="list-item" data-state="active" onclick="selectItemByIdx(2)">
+            <div class="li-meta">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div class="li-crit">!</div>
+                <div class="li-type behavioral-a">Behavioral Anomaly</div>
+              </div>
+              <div class="li-time">1 hr ago</div>
+            </div>
+            <div class="li-title">Credential Stuffing on Super-Admin Accounts — Beta Networks &amp; Crown</div>
+            <div class="li-desc">18 failed logins from 3 geographies. Concurrent active sessions detected.</div>
+            <div class="li-state-row">
+              <span class="li-state-pill active-pill">● Needs action</span>
+            </div>
+          </div>
+
+          <!-- Item 3: Policy gap — scheduled -->
+          <div class="list-item" data-state="scheduled" onclick="selectItemByIdx(3)">
+            <div class="li-meta">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div class="li-crit">!</div>
+                <div class="li-type policy-g">Policy Gap</div>
+              </div>
+              <div class="li-time" style="color:#f5a623;">Drift &gt; 45d</div>
+            </div>
+            <div class="li-title">Permit-Any Outbound Rules Bypassing DPI-SSL — 9 Firewalls</div>
+            <div class="li-desc">Default-allow outbound at WAN across 9 firewalls. C2 traffic uninspected.</div>
+            <div class="li-state-row">
+              <span class="li-state-pill sched-pill">📅 Monday, 2:00 AM — maintenance window</span>
+            </div>
+          </div>
+
+          <!-- Item 4: Subscription — active -->
+          <div class="list-item" data-state="active" onclick="selectItemByIdx(4)">
+            <div class="li-meta">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div class="li-crit">!</div>
+                <div class="li-type behavioral-a">Subscription Risk</div>
+              </div>
+              <div class="li-time">Today · 08:14 AM</div>
+            </div>
+            <div class="li-title">ATP &amp; TZ Subscriptions Expiring &lt;9 Days — 3 Tenants, $87K ARR</div>
+            <div class="li-desc">Acme Corp, Beta Networks, and Delta Logistics. ATP sandboxing at risk.</div>
+            <div class="li-state-row">
+              <span class="li-state-pill active-pill">● Needs action</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Detail Panel -->
+      <div class="detail-panel" id="detailPanel">
+        <!-- rendered by JS -->
+      </div>
+
+    </div><!-- /three-panel -->
+  </div>
+</main>
+
+<!-- Toast -->
+<div class="toast" id="toast"><span class="toast-icon">✓</span><span id="toastMsg">Scheduled</span></div>
+
+<script>
+/* ─── DATA ─────────────────────────────────────────────────────────────── */
+const ICON_TENANT = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>`;
+const ICON_FW     = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
+const ICON_USER   = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>`;
+
+// Per-item work states
+const ITEM_STATES = {
+  0: { state: 'inprogress', progress: 72, deployed: 7, total: 12, eta: '~28 min remaining', since: '1h 24m' },
+  1: { state: 'scheduled',  when: 'Tonight, 11:00 PM', whenShort: 'Tonight 11pm', notes: 'Off-hours BGP failover diagnosis' },
+  2: { state: 'active' },
+  3: { state: 'scheduled',  when: 'Monday, 2:00 AM',   whenShort: 'Mon 2am',      notes: 'Maintenance window policy push' },
+  4: { state: 'active' }
+};
+
+// SAMI reasoning per schedule time (keyed by item index then time)
+const SAMI_SCHED_REASONING = {
+  default: {
+    'Tonight, 11:00 PM': 'Tonight at 11:00 PM falls within Acme Corp\'s maintenance window (10 PM–2 AM). SAMI will sequence tenant deployments to avoid concurrent restarts — estimated total window: 38 minutes.',
+    'Tomorrow, 2:00 AM': 'Tomorrow 2:00 AM works for Westfield IT and Beta Networks. Note: Crown Logistics has no approved Friday maintenance window — SAMI will exclude their 2 devices and require separate confirmation.',
+    'Monday, 2:00 AM': 'Monday 2:00 AM is optimal — all 4 tenant maintenance windows align. No concurrent SAMI operations queued. However: the active PoC exploit will have been in circulation 9 days by then. Risk exposure increases with delay.',
+    'Custom': 'Select a custom date and time. SAMI will validate against all 4 tenant maintenance windows and flag any conflicts before confirming.'
+  }
+};
+
+const details = [
+  {
+    tag: 'CVE Vulnerability · Critical', tagColor: '#E85D1A', tagBg: '#fff3ed', tagBorder: '#ffd0b0',
+    title: 'SSL VPN Auth Bypass (CVE-2026-1142) — 12 Firewalls Across 4 Tenants',
+    scope: [{ icon: ICON_TENANT, text: 'Acme Corp, Beta Networks +2' }, { icon: ICON_FW, text: '12 Firewalls' }],
+    samiNote: 'CVE-2026-1142 enables unauthenticated RCE on SSL VPN gateways running SonicOS below 7.1.2-1023. Patch deployment started 1h 24m ago — 7 of 12 devices are patched. FW-BETA-01 and FW-ACME-02 are currently in progress. 3 Crown Logistics devices are queued pending their change window.',
+    evidence: [
+      { icon: '🛡', cls: 'shield', text: 'CVSS 9.8 (Critical) · NVD-confirmed · SonicWall PSIRT advisory published' },
+      { icon: '📊', cls: 'chart',  text: '12 firewalls across 4 tenants running vulnerable firmware ≤ 7.1.1-907' },
+      { icon: '⚠️', cls: 'warning',text: 'Active probe attempts on FW-ACME-03 and FW-BETA-01 in last 24h' },
+      { icon: '✅', cls: 'check',  text: '7/12 devices patched · 2 in-flight · 3 queued (Crown Logistics change window pending)' }
+    ],
+    timeline: [
+      { date: 'May 18, 07:00', desc: 'Patch 7.1.2-1023 pre-staged · compatibility check passed' },
+      { date: 'May 18, 16:30', desc: 'Deployment started — Acme Corp batch (4 devices) began' },
+      { date: 'May 18, 17:12', desc: 'Acme Corp batch complete (4/4) · Beta Networks batch started (3 devices)' },
+      { date: 'May 18, 17:54', desc: 'Beta batch in progress (2/3 done) · FW-BETA-01 active sessions draining' },
+      { date: 'Pending', desc: 'Crown Logistics batch (3 devices) — awaiting change window tonight' }
+    ],
+    viewLink: 'View deployment progress', primaryLabel: 'View live deployment →', schedLabel: 'Adjust schedule'
+  },
+  {
+    tag: 'Device Alert · Offline', tagColor: '#c0392b', tagBg: '#fff5f5', tagBorder: '#ffc5c5',
+    title: '3 Gateways Unreachable — Northgate Health & Delta Logistics Branch Sites Unprotected',
+    scope: [{ icon: ICON_TENANT, text: 'Northgate Health · Delta Logistics' }, { icon: ICON_FW, text: '3 Firewalls offline · 3h 24m' }],
+    samiNote: 'FW-NH-02, FW-NH-03, and FW-DL-01 stopped responding after a BGP route withdrawal. Scheduled for tonight at 11:00 PM: SAMI will attempt automated BGP path diagnosis and SD-WAN failover configuration on secondary WAN interfaces.',
+    evidence: [
+      { icon: '📡', cls: 'warning', text: 'Last heartbeat: FW-NH-02 at 14:32 UTC · FW-NH-03 at 14:33 · FW-DL-01 at 14:35' },
+      { icon: '🌐', cls: 'chart',   text: 'BGP route withdrawal on AS64512 upstream ISP link at 14:30 UTC' },
+      { icon: '⚠️', cls: 'warning', text: '847 endpoints at Northgate Health branch currently uninspected' },
+      { icon: '🔒', cls: 'shield',  text: 'No SD-WAN failover — secondary WAN unconfigured on FW-NH-02' }
+    ],
+    timeline: [
+      { date: 'May 18, 14:30', desc: 'BGP route withdrawal detected on AS64512' },
+      { date: 'May 18, 14:35', desc: 'All 3 gateways lose heartbeat · SAMI raises Device Alert' },
+      { date: 'May 18, 17:44', desc: 'MSP schedules SAMI BGP diagnosis for Tonight, 11:00 PM' },
+      { date: 'Tonight 11:00 PM', desc: 'SAMI will attempt diagnosis and SD-WAN failover provisioning (scheduled)' }
+    ],
+    viewLink: 'View offline devices', primaryLabel: 'Run diagnosis now →', schedLabel: 'Reschedule'
+  },
+  {
+    tag: 'Behavioral Anomaly · High', tagColor: '#3b7dd8', tagBg: '#eff5ff', tagBorder: '#b8d0f8',
+    title: 'Credential Stuffing on Super-Admin Accounts — Beta Networks & Crown Logistics',
+    scope: [{ icon: ICON_TENANT, text: 'Beta Networks · Crown Logistics' }, { icon: ICON_USER, text: '2 Super-admin accounts targeted' }],
+    samiNote: '18 failed login attempts from 3 geographies against admin@beta.local and sysadmin@crown.local. Both accounts have no MFA. Concurrent active sessions detected alongside the probe traffic — indicating possible compromise. Immediate action recommended — this alert should not be deferred.',
+    evidence: [
+      { icon: '🔐', cls: 'warning', text: '18 failed logins in 60 min · source IPs: RU (7), CN (6), anonymous proxy (5)' },
+      { icon: '⚠️', cls: 'warning', text: 'admin@beta.local — 4 active sessions + 11 failed probes simultaneously' },
+      { icon: '⚠️', cls: 'warning', text: 'sysadmin@crown.local — 1 active session + 7 failed probes simultaneously' },
+      { icon: '🔒', cls: 'shield',  text: 'Both accounts have no MFA — password-only auth violates baseline policy' }
+    ],
+    timeline: [
+      { date: 'May 18, 16:52', desc: 'First probe attempt on admin@beta.local from RU IP 185.220.101.x' },
+      { date: 'May 18, 17:04', desc: 'Stuffing pattern confirmed — 11 attempts from 3 source countries' },
+      { date: 'May 18, 17:31', desc: 'SAMI flagged concurrent active sessions alongside live probes' },
+      { date: 'May 18, 17:56', desc: 'Behavioral Anomaly raised · MFA enforcement recommended immediately' }
+    ],
+    viewLink: 'View login activity', primaryLabel: 'Force MFA enrollment →', schedLabel: 'Schedule for later'
+  },
+  {
+    tag: 'Policy Gap · Drift > 45d', tagColor: '#6b3bcc', tagBg: '#f5f0ff', tagBorder: '#d4bcf8',
+    title: 'Permit-Any Outbound Rules Bypassing DPI-SSL — Acme, Beta & Westfield WAN Edge',
+    scope: [{ icon: ICON_TENANT, text: 'Acme Corp · Beta Networks · Westfield IT' }, { icon: ICON_FW, text: '9 Firewalls · 45+ day drift' }],
+    samiNote: 'Policy baseline push scheduled for Monday, 2:00 AM — aligned with all 3 tenant maintenance windows. SAMI has prepared the rule replacement set and will deploy zero-disruption in sequence: Acme (3 FW) → Beta (3 FW) → Westfield (3 FW), with rollback triggers between each batch.',
+    evidence: [
+      { icon: '🚨', cls: 'warning', text: '9 firewalls with permit-any outbound at WAN edge — DPI-SSL bypassed' },
+      { icon: '📊', cls: 'chart',   text: '2.3 TB outbound traffic uninspected in last 7 days' },
+      { icon: '📅', cls: 'chart',   text: 'Policy last reviewed 47 days ago — exceeds MSP baseline threshold' },
+      { icon: '✅', cls: 'check',   text: 'Replacement rule set prepared · zero-disruption deployment ready' }
+    ],
+    timeline: [
+      { date: 'Apr 03', desc: 'Baseline drift first detected on Acme Corp FW-ACME-01' },
+      { date: 'May 18', desc: 'MSP reviews rule changes and schedules Monday deployment' },
+      { date: 'Mon, 2:00 AM', desc: 'SAMI policy push begins — all 3 tenant batches (scheduled)' },
+      { date: 'Mon, ~2:40 AM', desc: 'Expected completion with compliance confirmation' }
+    ],
+    viewLink: 'View affected firewall rules', primaryLabel: 'Apply policy now →', schedLabel: 'Reschedule'
+  },
+  {
+    tag: 'Subscription Risk · Expiring Soon', tagColor: '#1a6b3c', tagBg: '#edfaf3', tagBorder: '#9be4be',
+    title: 'ATP & TZ Subscriptions Expiring in <9 Days — 3 Tenants, 21 Firewalls, $87K ARR at Risk',
+    scope: [{ icon: ICON_TENANT, text: 'Acme Corp · Beta Networks · Delta Logistics' }, { icon: ICON_FW, text: '21 Firewalls · $87K ARR' }],
+    samiNote: 'Three tenants have ATP and TotalSecure subscriptions expiring within 9 days. Renewal quotes have been pre-generated. SAMI recommends sending quotes today — Acme Corp\'s procurement lead typically needs 5 business days to process. Delaying past Friday creates a lapse risk.',
+    evidence: [
+      { icon: '📅', cls: 'warning', text: 'Acme Corp — 8 FW · ATP expires May 27 · $38K ARR' },
+      { icon: '📅', cls: 'warning', text: 'Beta Networks — 7 FW · ATP + TZ expires May 28 · $29K ARR' },
+      { icon: '📅', cls: 'warning', text: 'Delta Logistics — 6 FW · ATP expires May 29 · $20K ARR' },
+      { icon: '✅', cls: 'check',   text: 'Renewal quotes pre-generated · tenant contacts identified · ready to send' }
+    ],
+    timeline: [
+      { date: 'May 11', desc: '15-day warning — SAMI escalated to MSP dashboard' },
+      { date: 'May 18, 08:14', desc: '9-day critical threshold breached · $87K ARR flagged at risk' },
+      { date: 'May 27–29', desc: 'Expiry window if unrenewed — ATP, Gateway AV, IPS disabled' }
+    ],
+    viewLink: 'View renewal quotes', primaryLabel: 'Send renewal quotes →', schedLabel: 'Schedule for later'
+  }
+];
+
+/* ─── STATE ─────────────────────────────────────────────────────────────── */
+let currentOption   = 'A';
+let currentItem     = 0;
+let footerState     = 'inprogress';  // item 0 starts in-progress
+let selectedTime    = null;
+let workModeActive  = false;
+
+/* ─── OPTION SWITCHER ───────────────────────────────────────────────────── */
+function setOption(opt) {
+  currentOption = opt;
+  document.body.className = 'opt-' + opt.toLowerCase();
+  ['a','b','c'].forEach(x => {
+    document.getElementById('card-' + x).classList.toggle('active', x === opt.toLowerCase());
+  });
+  workModeActive = false;
+  renderDetail(currentItem);
+}
+
+/* ─── ITEM SELECTION ────────────────────────────────────────────────────── */
+function selectItemByIdx(idx) {
+  currentItem = idx;
+  const items = document.querySelectorAll('.list-item');
+  items.forEach(i => i.classList.remove('active'));
+  items[idx].classList.add('active');
+  workModeActive = false;
+  // Derive footer state from ITEM_STATES
+  const s = ITEM_STATES[idx];
+  footerState = s.state === 'inprogress' ? 'inprogress' : s.state === 'scheduled' ? 'scheduled' : 'default';
+  selectedTime = s.state === 'scheduled' ? s.when : null;
+  renderDetail(idx);
+}
+
+/* ─── DETAIL RENDERING ──────────────────────────────────────────────────── */
+function renderDetail(idx) {
+  const d = details[idx];
+  const is = ITEM_STATES[idx];
+  const dp = document.getElementById('detailPanel');
+
+  const scopeHTML = d.scope.map(s =>
+    `<span style="display:flex;align-items:center;gap:4px;">${s.icon} ${s.text}</span>`
+  ).join('');
+  const evidenceHTML = d.evidence.map(e =>
+    `<div class="evidence-item"><div class="ev-icon ${e.cls}">${e.icon}</div>${e.text}</div>`
+  ).join('');
+  const timelineHTML = d.timeline.map(t =>
+    `<div class="timeline-item"><div class="timeline-date">${t.date}</div><div>${t.desc}</div></div>`
+  ).join('');
+
+  // Work mode toggle (Option C only)
+  const wmToggle = currentOption === 'C' ? `
+    <div class="work-mode-toggle" style="margin-left:auto;">
+      <div class="wm-toggle">
+        <button class="wm-btn ${!workModeActive ? 'active' : ''}" onclick="setWorkMode(false)">Alert Detail</button>
+        <button class="wm-btn ${workModeActive ? 'active' : ''}" onclick="setWorkMode(true)">Work Status</button>
+      </div>
+    </div>` : '';
+
+  let mainContent;
+  if (currentOption === 'C' && workModeActive) {
+    mainContent = renderWorkStatusView();
+  } else {
+    mainContent = `
+      <div class="detail-sami-note">
+        <span class="ds-tag">SAMI</span><span>${d.samiNote}</span>
+      </div>
+      <div class="detail-body">
+        <div class="section-title">Evidence</div>
+        ${evidenceHTML}
+        <div class="timeline-section">
+          <div class="section-title" style="margin-top:14px;">Timeline</div>
+          ${timelineHTML}
+        </div>
+      </div>`;
+  }
+
+  dp.innerHTML = `
+    <div class="detail-scroll">
+      <div class="detail-header">
+        <div class="detail-header-top">
+          <div>
+            <div class="detail-badge">
+              <span class="cve-tag" style="color:${d.tagColor};background:${d.tagBg};border-color:${d.tagBorder};">${d.tag}</span>
+            </div>
+            <div class="detail-title">${d.title}</div>
+            <div class="detail-scope">${scopeHTML}</div>
+          </div>
+          ${wmToggle}
+        </div>
+      </div>
+      ${mainContent}
+    </div>
+    <div class="detail-footer-wrap" id="footerWrap">
+      ${renderFooter(idx)}
+    </div>`;
+}
+
+/* ─── FOOTER RENDERING ──────────────────────────────────────────────────── */
+function renderFooter(idx) {
+  const d = details[idx];
+  const is = ITEM_STATES[idx];
+
+  if (footerState === 'inprogress') {
+    return `
+      <div class="df-inprogress">
+        <div class="df-ip-top">
+          <div class="df-ip-label">
+            <span class="inprog-spinner"></span> Deployment in progress
+          </div>
+          <span class="df-ip-eta">${is.eta}</span>
+        </div>
+        <div class="df-prog-bar"><div class="df-prog-fill" style="width:${is.progress}%"></div></div>
+        <div class="df-ip-bottom">
+          <span class="df-ip-status">${is.deployed} of ${is.total} devices patched · Running ${is.since}</span>
+          <div class="df-ip-links">
+            <button class="df-ip-links btn-view" onclick="showToast('Opening live deployment view…')">View live progress</button>
+            <button class="df-ip-links btn-pause" onclick="showToast('Deployment pause requested. Crown Logistics batch will complete first.')">Pause queue</button>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  if (footerState === 'scheduled') {
+    const when = (is.state === 'scheduled') ? is.when : selectedTime;
+    const notes = (is.state === 'scheduled') ? is.notes : '';
+    return `
+      <div class="df-scheduled">
+        <div class="df-sched-info">
+          <span class="sched-icon">📅</span>
+          <div>
+            <div class="sched-text">Scheduled for ${when}</div>
+            <div class="sched-sub">${notes} · SAMI will execute automatically</div>
+          </div>
+        </div>
+        <div class="df-sched-links">
+          <button class="btn-edit" onclick="openScheduler(${idx})">Edit</button>
+          <button class="btn-cancel" onclick="cancelItemSchedule(${idx})">Cancel</button>
+          <button class="btn-dnow" onclick="deployNow(${idx})">Deploy now instead</button>
+        </div>
+      </div>`;
+  }
+
+  if (footerState === 'scheduling') {
+    return `
+      <div class="df-scheduling">
+        <div class="sched-expand-header"><span class="seh-icon">📅</span> Schedule for later</div>
+        <div class="sched-time-row">
+          ${['Tonight, 11:00 PM','Tomorrow, 2:00 AM','Monday, 2:00 AM','Custom'].map(t =>
+            `<button class="sched-time-btn ${selectedTime===t?'selected':''}" onclick="selectScheduleTime('${t}')">${t}</button>`
+          ).join('')}
+        </div>
+        <div class="sched-sami-block" id="samiReasonBlock">
+          <span class="ssb-tag">SAMI</span>
+          ${selectedTime && SAMI_SCHED_REASONING.default[selectedTime]
+            ? `<span>${SAMI_SCHED_REASONING.default[selectedTime]}</span>`
+            : `<span class="sched-sami-placeholder">Select a time above — SAMI will show scheduling context and conflict analysis.</span>`
+          }
+        </div>
+        <div class="sched-actions-row">
+          <button class="btn-sched-cancel" onclick="cancelSchedulerOpen(${idx})">Cancel</button>
+          <button class="btn-sched-confirm" onclick="confirmSchedule(${idx})" ${!selectedTime||selectedTime==='Custom'?'disabled':''}>Confirm schedule</button>
+        </div>
+      </div>`;
+  }
+
+  // default footer
+  return `
+    <div class="df-default">
+      <span class="view-devices" onclick="showToast('Opening device list…')">${d.viewLink}</span>
+      <div class="footer-actions">
+        <button class="btn-sched" onclick="openScheduler(${idx})">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          ${d.schedLabel}
+        </button>
+        <button class="btn-primary" onclick="showToast('Initiating action…')">${d.primaryLabel}</button>
+      </div>
+    </div>`;
+}
+
+/* ─── OPTION C: WORK STATUS VIEW ────────────────────────────────────────── */
+function renderWorkStatusView() {
+  return `
+    <div class="work-status-view">
+      <div class="ws-section">
+        <div class="ws-section-header">
+          In Progress <span class="wsc wsc-inprog">1</span>
+        </div>
+        <div class="ws-item" onclick="selectItemByIdx(0); setWorkMode(false);">
+          <div class="ws-item-title">SSL VPN Auth Bypass Patch — CVE-2026-1142</div>
+          <div class="ws-item-meta">7 of 12 devices patched · Running 1h 24m · ~28 min remaining</div>
+          <div class="ws-prog-bar"><div class="ws-prog-fill" style="width:72%"></div></div>
+          <div class="ws-item-bottom">
+            <span>Next: Crown Logistics batch (3 devices) · awaiting change window</span>
+            <a onclick="selectItemByIdx(0)">View deployment</a>
+          </div>
+        </div>
+      </div>
+      <div class="ws-section">
+        <div class="ws-section-header">
+          Scheduled <span class="wsc wsc-sched">2</span>
+        </div>
+        <div class="ws-item" onclick="selectItemByIdx(1); setWorkMode(false);">
+          <div class="ws-item-title">BGP Failover Diagnosis — 3 Gateways</div>
+          <div class="ws-item-meta">Northgate Health · Delta Logistics</div>
+          <div class="ws-sched-when">📅 Tonight, 11:00 PM &nbsp;·&nbsp; <a class="ws-sched-edit" onclick="event.stopPropagation(); selectItemByIdx(1); openScheduler(1);">Reschedule</a></div>
+        </div>
+        <div class="ws-item" onclick="selectItemByIdx(3); setWorkMode(false);">
+          <div class="ws-item-title">Policy Baseline Push — 9 Firewalls (DPI-SSL)</div>
+          <div class="ws-item-meta">Acme Corp · Beta Networks · Westfield IT</div>
+          <div class="ws-sched-when">📅 Monday, 2:00 AM &nbsp;·&nbsp; <a class="ws-sched-edit" onclick="event.stopPropagation(); selectItemByIdx(3); openScheduler(3);">Reschedule</a></div>
+        </div>
+      </div>
+      <div class="ws-section">
+        <div class="ws-section-header">
+          Needs Action <span class="wsc wsc-active">2</span>
+        </div>
+        <div class="ws-active-item" onclick="selectItemByIdx(2); setWorkMode(false);">
+          <div>
+            <div class="ws-active-title">Credential Stuffing — Beta Networks &amp; Crown</div>
+            <div class="ws-active-tag">⚠ Active attack · Immediate action recommended</div>
+          </div>
+          <div class="ws-active-actions">
+            <button class="ws-btn-sm ws-btn-sched" onclick="event.stopPropagation(); selectItemByIdx(2); openScheduler(2);">Schedule</button>
+            <button class="ws-btn-sm ws-btn-act" onclick="event.stopPropagation(); showToast('Opening MFA enrollment…')">Act now →</button>
+          </div>
+        </div>
+        <div class="ws-active-item" onclick="selectItemByIdx(4); setWorkMode(false);">
+          <div>
+            <div class="ws-active-title">ATP Subscriptions Expiring — $87K ARR Risk</div>
+            <div class="ws-active-tag">⚠ 9 days to expiry · Send quotes today</div>
+          </div>
+          <div class="ws-active-actions">
+            <button class="ws-btn-sm ws-btn-sched" onclick="event.stopPropagation(); selectItemByIdx(4); openScheduler(4);">Schedule</button>
+            <button class="ws-btn-sm ws-btn-act" onclick="event.stopPropagation(); showToast('Opening renewal quotes…')">Act now →</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ─── SCHEDULER ACTIONS ─────────────────────────────────────────────────── */
+function openScheduler(idx) {
+  footerState = 'scheduling';
+  selectedTime = null;
+  updateFooter(idx);
+}
+
+function cancelSchedulerOpen(idx) {
+  const is = ITEM_STATES[idx];
+  footerState = is.state === 'scheduled' ? 'scheduled' : is.state === 'inprogress' ? 'inprogress' : 'default';
+  selectedTime = is.state === 'scheduled' ? is.when : null;
+  updateFooter(idx);
+}
+
+function selectScheduleTime(t) {
+  selectedTime = t;
+  updateFooter(currentItem);
+}
+
+function confirmSchedule(idx) {
+  if (!selectedTime || selectedTime === 'Custom') return;
+  ITEM_STATES[idx] = { state: 'scheduled', when: selectedTime, whenShort: selectedTime, notes: 'Scheduled via SAMI' };
+  footerState = 'scheduled';
+  // Update list item data-state
+  document.querySelectorAll('.list-item')[idx].setAttribute('data-state', 'scheduled');
+  // Update Option B badge
+  const stateRows = document.querySelectorAll('.list-item .li-state-row');
+  if (stateRows[idx]) {
+    stateRows[idx].innerHTML = `<span class="li-state-pill sched-pill">📅 ${selectedTime}</span>`;
+  }
+  updateFooter(idx);
+  showToast(`Scheduled for ${selectedTime}`);
+  // Update Option A nav panel
+  refreshNavScheduledSection();
+}
+
+function cancelItemSchedule(idx) {
+  ITEM_STATES[idx] = { state: 'active' };
+  footerState = 'default';
+  selectedTime = null;
+  document.querySelectorAll('.list-item')[idx].setAttribute('data-state', 'active');
+  const stateRows = document.querySelectorAll('.list-item .li-state-row');
+  if (stateRows[idx]) {
+    stateRows[idx].innerHTML = `<span class="li-state-pill active-pill">● Needs action</span>`;
+  }
+  updateFooter(idx);
+  showToast('Schedule cancelled — item returned to active queue');
+  refreshNavScheduledSection();
+}
+
+function deployNow(idx) {
+  ITEM_STATES[idx] = { state: 'active' };
+  footerState = 'default';
+  selectedTime = null;
+  updateFooter(idx);
+  showToast('Deploying now — SAMI is initiating the action');
+}
+
+function updateFooter(idx) {
+  const fw = document.getElementById('footerWrap');
+  if (fw) fw.innerHTML = renderFooter(idx);
+}
+
+function setWorkMode(active) {
+  workModeActive = active;
+  renderDetail(currentItem);
+}
+
+/* ─── NAV REFRESH (Option A) ────────────────────────────────────────────── */
+function refreshNavScheduledSection() {
+  // Rebuild scheduled items in nav for Option A
+  const scheduled = Object.entries(ITEM_STATES)
+    .filter(([i, s]) => s.state === 'scheduled');
+  const inprog = Object.entries(ITEM_STATES)
+    .filter(([i, s]) => s.state === 'inprogress');
+  const navSections = document.querySelectorAll('.nav-state-section .nav-state-header');
+  if (navSections.length >= 2) {
+    navSections[0].querySelector('.nsb').textContent = inprog.length;
+    navSections[1].querySelector('.nsb').textContent = scheduled.length;
+  }
+}
+
+/* ─── NAV ITEM CLICK ────────────────────────────────────────────────────── */
+function selectNav(el) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+}
+
+/* ─── TOAST ─────────────────────────────────────────────────────────────── */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+/* ─── INIT ──────────────────────────────────────────────────────────────── */
+renderDetail(0);
+</script>
+</body>
+</html>

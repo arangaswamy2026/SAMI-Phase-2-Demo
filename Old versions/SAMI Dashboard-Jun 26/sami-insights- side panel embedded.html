@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAMI Recommendations · UUIF 9.2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
+<style>
+/* ─── UUIF 9.2 Tokens ─── */
+:root {
+  --uuif-brand-navy:              #001b50;
+  --uuif-brand-blue:              #1f3c73;
+  --uuif-brand-orange:            #ff5d00;
+  --uuif-brand-green:             #59a02e;
+  --uuif-brand-red:               #c70f0f;
+  --uuif-brand-yellow:            #f3ac3d;
+  --uuif-surface-container:       #ffffff;
+  --uuif-surface-bg:              #fafafa;
+  --uuif-surface-primary:         #5b74a7;
+  --uuif-surface-secondary:       #d2dff2;
+  --uuif-surface-tertiary:        #f6f8fe;
+  --uuif-surface-highlight:       #ff5d00;
+  --uuif-surface-hover:           rgba(17,17,17,0.06);
+  --uuif-surface-selected:        rgba(255,72,26,0.09);
+  --uuif-surface-disabled:        #e8eff9;
+  --uuif-surface-contrast:        #111315;
+  --uuif-surface-model:           #f0f2f5;
+  --uuif-text-primary:            #191c25;
+  --uuif-text-secondary:          #4a618f;
+  --uuif-text-tertiary:           #888888;
+  --uuif-text-contrast:           #ffffff;
+  --uuif-text-disabled:           rgba(17,17,17,0.3);
+  --uuif-text-hover:              #ff5d00;
+  --uuif-text-selected:           #ffffff;
+  --uuif-text-highlight:          #0c2b67;
+  --uuif-border-primary:          #ff5d00;
+  --uuif-border-secondary:        #78a3e5;
+  --uuif-border-tertiary:         #cccccc;
+  --uuif-border-transparent:      rgba(17,17,17,0.09);
+  --uuif-border-disabled:         #d2dff2;
+  --uuif-border-hover:            #ff5d00;
+  --uuif-icon-primary:            #5885cc;
+  --uuif-icon-secondary:          #9dafd3;
+  --uuif-icon-tertiary:           #62686d;
+  --uuif-fill-blue-lightest:      #f6f8fe;
+  --uuif-fill-green-xxx-lighter:  #e3efdc;
+  --uuif-fill-yellow-xxx-lighter: #ffe9be;
+  --uuif-fill-red-lightest:       #fff0f0;
+  --uuif-fill-green-x-darker:     #478234;
+  --uuif-shadow-sm:               0px 1px 6px 2px rgba(0,0,0,0.12);
+  --uuif-shadow-md:               0px 4px 12px 0px rgba(0,0,0,0.16);
+  --uuif-radius-4:                4px;
+  --uuif-radius-6:                6px;
+  --uuif-radius-8:                8px;
+  --uuif-radius-12:               12px;
+  --uuif-radius-pill:             88px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { overflow-x: hidden; height: 100%; }
+body {
+  font-family: 'Nunito Sans', sans-serif;
+  background: var(--uuif-surface-bg);
+  color: var(--uuif-text-primary);
+  font-size: 13px;
+  display: flex;
+}
+
+/* ═══════════════════════════
+   PRIMARY NAV RAIL
+═══════════════════════════ */
+.primary-nav {
+  position: fixed; left: 0; top: 0;
+  width: 60px; height: 100vh;
+  background: var(--uuif-brand-navy);
+  display: flex; flex-direction: column; align-items: center;
+  z-index: 100; flex-shrink: 0;
+}
+.nav-logo { width: 60px; height: 52px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.nav-item {
+  width: 60px; height: 52px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; position: relative; flex-shrink: 0;
+}
+.nav-item:hover { background: rgba(17,17,17,0.2); }
+.nav-item.active { background: rgba(17,17,17,0.4); }
+.nav-item.active::before { content:''; position:absolute; left:1px; top:0; bottom:0; width:2px; background:var(--uuif-brand-orange); }
+.nav-item svg { width: 24px; height: 24px; color: #D2DFF2; }
+.nav-item.active svg { color: #FF5D00; }
+.nav-badge { position:absolute; top:8px; right:8px; background:var(--uuif-brand-orange); color:#fff; font-size:9px; font-weight:700; border-radius:8px; min-width:16px; height:16px; display:flex; align-items:center; justify-content:center; padding:0 3px; }
+.nav-spacer { flex: 1; }
+.nav-divider { width:100%; height:0; border-top:0.5px solid rgba(255,255,255,0.15); margin:2px 0; flex-shrink:0; }
+
+/* ═══════════════════════════
+   TITLE BAR
+═══════════════════════════ */
+.title-bar {
+  position: fixed; left: 60px; right: 0; top: 0; height: 48px;
+  background: var(--uuif-surface-container);
+  border-bottom: 1px solid var(--uuif-border-transparent);
+  display: flex; align-items: center; padding: 0 20px; z-index: 99; gap: 8px;
+  overflow: hidden;
+}
+.breadcrumb { display:flex; align-items:center; gap:6px; font-size:13px; font-weight:500; color:var(--uuif-text-secondary); flex:1; min-width:0; }
+.breadcrumb a { color:var(--uuif-text-secondary); text-decoration:none; }
+.breadcrumb a:hover { color:var(--uuif-text-hover); }
+.breadcrumb-sep { color:var(--uuif-text-disabled); }
+.breadcrumb-current { color:var(--uuif-text-primary); font-weight:700; }
+.scope-selector {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  display:flex; align-items:center; gap:6px;
+  border:1px solid var(--uuif-border-tertiary); border-radius:var(--uuif-radius-4);
+  padding:0 10px; width:220px; height:29px; font-size:12px; cursor:pointer;
+  background:var(--uuif-surface-container); color:var(--uuif-text-primary);
+}
+.scope-dot { width:8px; height:8px; background:var(--uuif-brand-orange); border-radius:50%; flex-shrink:0; }
+.title-bar-icons { display:flex; align-items:center; }
+.title-bar-icon { width:44px; height:48px; display:flex; align-items:center; justify-content:center; cursor:pointer; opacity:0.65; position:relative; color:var(--uuif-text-secondary); }
+.title-bar-icon:hover { opacity:1; }
+.title-bar-icon svg { width:18px; height:18px; }
+.notif-badge { position:absolute; top:11px; right:10px; width:7px; height:7px; background:#ec682c; border-radius:50%; }
+.avatar-wrap { display:flex; align-items:center; gap:6px; padding:0 8px; cursor:pointer; }
+.avatar { width:29px; height:29px; border-radius:50%; background:var(--uuif-surface-primary); color:#fff; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+
+/* ═══════════════════════════
+   PAGE LAYOUT
+═══════════════════════════ */
+.page-wrapper {
+  margin-left: 60px; padding-top: 48px; height: 100vh;
+  display: flex; flex-direction: column; width: calc(100vw - 60px);
+  overflow: hidden;
+  transition: width 0.28s cubic-bezier(0.4,0,0.2,1);
+}
+body.sami-pane-open .page-wrapper { width: calc(100vw - 60px - 390px); }
+
+/* Full-width page sub-header — below title bar, above columns */
+.page-subheader {
+  flex-shrink: 0;
+  display: flex; align-items: center;
+  padding: 12px 24px 11px;
+  background: var(--uuif-surface-container);
+  border-bottom: 1px solid var(--uuif-border-transparent);
+  gap: 12px;
+}
+.page-subheader-back {
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: var(--uuif-radius-4);
+  color: var(--uuif-text-secondary); text-decoration: none; flex-shrink: 0;
+  border: 1px solid var(--uuif-border-transparent);
+}
+.page-subheader-back:hover { background: var(--uuif-surface-tertiary); color: var(--uuif-text-hover); border-color: var(--uuif-border-secondary); }
+.page-subheader-text { flex: 1; min-width: 0; }
+.page-subheader-title {
+  font-size: 18px; font-weight: 800; color: var(--uuif-text-highlight);
+  line-height: 1.2;
+}
+.page-subheader-sub {
+  font-size: 12px; color: var(--uuif-text-tertiary); margin-top: 2px;
+}
+.page-subheader-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+.page-shell {
+  flex: 1; display: flex; overflow: hidden;
+}
+
+/* ═══════════════════════════
+   COL 1 — Filter Sidebar
+═══════════════════════════ */
+.cat-sidebar {
+  width: 220px; flex-shrink: 0;
+  background: var(--uuif-surface-container);
+  border-right: 1px solid var(--uuif-border-transparent);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+
+/* Filter tabs */
+.filter-tabs {
+  display: flex; flex-direction: column;
+  padding: 6px 0 0;
+  overflow-y: auto; flex: 1;
+}
+.filter-tab-group-label {
+  font-size: 9.5px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.07em; color: var(--uuif-text-tertiary);
+  padding: 8px 16px 4px; flex-shrink: 0;
+}
+.filter-tab {
+  height: 36px; display: flex; align-items: center;
+  padding: 0 12px 0 16px;
+  border-left: 2px solid transparent;
+  border-bottom: 0.5px solid var(--uuif-border-transparent);
+  cursor: pointer; gap: 8px; flex-shrink: 0;
+  transition: background 0.1s;
+}
+.filter-tab:hover { background: var(--uuif-surface-tertiary); }
+.filter-tab.active {
+  background: var(--uuif-surface-selected);
+  border-left-color: var(--uuif-border-primary);
+}
+.filter-tab.active .ft-label { color: var(--uuif-brand-orange); font-weight: 700; }
+.ft-icon { width: 16px; height: 16px; flex-shrink: 0; display:flex; align-items:center; justify-content:center; color: var(--uuif-text-tertiary); }
+.filter-tab.active .ft-icon { color: var(--uuif-brand-orange); }
+.ft-label { font-size: 12px; color: var(--uuif-text-primary); flex: 1; }
+.ft-count {
+  font-size: 10.5px; font-weight: 600; color: var(--uuif-text-tertiary);
+  background: rgba(17,17,17,0.07);
+  border-radius: var(--uuif-radius-pill);
+  min-width: 18px; height: 18px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 5px; flex-shrink: 0;
+}
+.filter-tab.active .ft-count { background: rgba(255,93,0,0.12); color: var(--uuif-brand-orange); }
+.ft-count.red { background: rgba(199,15,15,0.1); color: var(--uuif-brand-red); }
+
+
+/* ═══════════════════════════
+   COL 2 — Insight List (full width when SAMI panel closed)
+═══════════════════════════ */
+.insight-list-col {
+  flex: 1;
+  background: var(--uuif-surface-bg);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.list-col-header {
+  padding: 10px 14px 9px;
+  border-bottom: 1px solid var(--uuif-border-transparent);
+  background: var(--uuif-surface-container);
+  flex-shrink: 0;
+}
+.list-col-title {
+  font-size: 11px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--uuif-text-highlight);
+}
+.list-col-sub { font-size: 10px; color: var(--uuif-text-tertiary); margin-top: 2px; }
+.insight-list { flex: 1; overflow-y: auto; padding: 10px 12px; }
+
+/* severity group heading */
+.sev-group-label {
+  font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em;
+  padding: 14px 0 7px; display: flex; align-items: center; gap: 7px;
+}
+.sev-group-label:first-child { padding-top: 4px; }
+.sev-group-label .sgl-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.sev-group-label.critical { color: #c70f0f; }
+.sev-group-label.critical .sgl-dot { background: #c70f0f; }
+.sev-group-label.warning  { color: #b87a00; }
+.sev-group-label.warning  .sgl-dot { background: #f3ac3d; }
+.sev-group-label.info     { color: var(--uuif-icon-primary); }
+.sev-group-label.info     .sgl-dot { background: var(--uuif-icon-primary); }
+.sgl-count {
+  font-size: 10px; font-weight: 700; background: rgba(17,17,17,0.07);
+  border-radius: var(--uuif-radius-pill); min-width: 18px; height: 18px;
+  display: inline-flex; align-items: center; justify-content: center; padding: 0 5px;
+  color: var(--uuif-text-tertiary);
+}
+
+/* ═══════════════════════════
+   RECOMMENDATION CARDS
+═══════════════════════════ */
+.rec-insight-card {
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.75);
+  border-radius: 10px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+  padding: 9px 11px 8px;
+  margin-bottom: 7px;
+  max-width: 560px;
+  cursor: pointer;
+  transition: box-shadow 0.15s;
+}
+.rec-insight-card:last-child { margin-bottom: 0; }
+.rec-insight-card:hover { box-shadow: 0 3px 14px rgba(0,0,0,0.1); }
+.rec-insight-card.active { box-shadow: 0 2px 14px rgba(255,93,0,0.14); outline: 1.5px solid rgba(255,93,0,0.28); }
+
+.ric-top { display: flex; align-items: flex-start; }
+
+.ric-content { flex: 1; min-width: 0; }
+.ric-chips-row {
+  display: flex; align-items: center; gap: 5px; margin-bottom: 6px; flex-wrap: wrap;
+}
+.ric-chip-type {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: 700;
+  background: rgba(17,17,17,0.05); border: 1px solid rgba(17,17,17,0.09);
+  border-radius: var(--uuif-radius-pill); padding: 2px 8px 2px 6px;
+  color: var(--uuif-text-secondary); white-space: nowrap; flex-shrink: 0;
+}
+.ric-chip-type svg { width: 10px; height: 10px; flex-shrink: 0; }
+.ric-time { font-size: 10.5px; color: var(--uuif-text-tertiary); margin-left: auto; white-space: nowrap; flex-shrink: 0; }
+.ric-title {
+  font-size: 13px; font-weight: 700; color: var(--uuif-text-primary);
+  line-height: 1.4; margin-bottom: 5px;
+}
+.ric-excerpt {
+  font-size: 11.5px; color: var(--uuif-text-secondary); line-height: 1.5; margin-bottom: 9px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.ric-footer {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;
+}
+.ric-tags { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.ric-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10.5px; color: var(--uuif-text-secondary);
+  background: rgba(88,133,204,0.07); border: 1px solid rgba(88,133,204,0.16);
+  border-radius: var(--uuif-radius-4); padding: 2px 7px;
+}
+.ric-tag svg { width: 10px; height: 10px; color: var(--uuif-icon-primary); flex-shrink: 0; }
+.ric-ask-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: none; border: 1px solid var(--uuif-border-tertiary);
+  border-radius: var(--uuif-radius-pill); padding: 4px 11px;
+  font-size: 11px; font-weight: 700; color: var(--uuif-text-secondary);
+  font-family: 'Nunito Sans', sans-serif; cursor: pointer; flex-shrink: 0;
+  transition: border-color 0.12s, color 0.12s;
+}
+.ric-ask-btn:hover { border-color: var(--uuif-brand-orange); color: var(--uuif-brand-orange); }
+
+/* ═══════════════════════════
+   SAMI CHAT PANEL (right overlay)
+═══════════════════════════ */
+
+/* Chat panel — floating by default, pinned = embedded sidebar */
+.sami-chat-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 390px;
+  height: 100vh;
+  background: #fff;
+  border-left: 1px solid rgba(0,0,0,0.1);
+  box-shadow: -6px 0 32px rgba(0,0,0,0.14);
+  display: flex;
+  flex-direction: column;
+  z-index: 8999;
+  overflow: hidden;
+  transform: translateX(100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.28s cubic-bezier(0.4,0,0.2,1), opacity 0.22s ease;
+}
+.sami-chat-panel.visible {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: all;
+}
+/* Pinned = embedded: docked below the title bar, content reflows */
+.sami-chat-panel.pinned {
+  top: 48px;
+  height: calc(100vh - 48px);
+  z-index: 90;
+  box-shadow: -2px 0 14px rgba(0,0,0,0.08);
+  border-left-color: rgba(17,17,17,0.12);
+}
+.sami-chat-header-actions button.pinned { color: var(--uuif-brand-orange); }
+.sami-chat-header-actions button.pinned:hover { color: #ff8330; }
+.sami-chat-panel.pinned .sami-chat-header { border-bottom-color: rgba(255,93,0,0.35); }
+
+/* Panel header */
+.sami-chat-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 18px 15px;
+  background: #3d5a7a;
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.sami-chat-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(255,255,255,0.18);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.sami-chat-header-title {
+  flex: 1; font-size: 14px; font-weight: 700;
+  color: #fff; font-family: 'Nunito Sans', sans-serif;
+}
+.sami-chat-header-actions { display: flex; align-items: center; gap: 14px; }
+.sami-chat-header-actions button {
+  background: none; border: none; cursor: pointer; padding: 2px;
+  color: rgba(255,255,255,0.75); display: flex; align-items: center; transition: color 0.15s;
+}
+.sami-chat-header-actions button:hover { color: #fff; }
+
+/* Chat body */
+.sami-chat-body {
+  flex: 1; overflow-y: auto; padding: 0;
+  position: relative; background: #fff;
+  display: flex; flex-direction: column; min-height: 0;
+}
+.sami-chat-body::-webkit-scrollbar { width: 4px; }
+.sami-chat-body::-webkit-scrollbar-track { background: transparent; }
+.sami-chat-body::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 4px; }
+
+/* Context view */
+.sami-chat-context {
+  display: none; flex-direction: column; height: 100%; overflow-y: auto;
+}
+.sami-chat-context.visible { display: flex; }
+.sami-chat-context::-webkit-scrollbar { width: 4px; }
+.sami-chat-context::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 4px; }
+
+.sami-ctx-card { padding: 14px 16px 12px; border-bottom: 1px solid #eef0f6; flex-shrink: 0; }
+.sami-ctx-tags { display: flex; align-items: center; gap: 7px; margin-bottom: 8px; flex-wrap: wrap; }
+.sami-ctx-tag {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 9px; border-radius: 5px;
+  font-size: 11px; font-weight: 700; border: 1px solid;
+}
+.sami-ctx-tag.critical { color: #c70f0f; border-color: rgba(199,15,15,0.3); background: rgba(199,15,15,0.07); }
+.sami-ctx-tag.cve { color: #2d3a54; border-color: #d8dde8; background: #f4f6fb; }
+.sami-ctx-tag.device-tag { color: #2d3a54; border-color: #d8dde8; background: #f4f6fb; }
+.sami-ctx-tag.behavioral-tag { color: #2563eb; border-color: rgba(37,99,235,0.3); background: #e6efff; }
+.sami-ctx-tag.policy-tag { color: #10b981; border-color: rgba(16,185,129,0.3); background: #e8f7f0; }
+.sami-ctx-tag.renewal-tag { color: #59a02e; border-color: rgba(89,160,46,0.3); background: #e3efdc; }
+.sami-ctx-tag.new-tag { color: #2d3a54; border-color: #d8dde8; background: #f4f6fb; }
+.sami-ctx-tag.attn-tag { color: #c70f0f; border-color: rgba(199,15,15,0.3); background: rgba(199,15,15,0.07); }
+.sami-ctx-time { font-size: 11px; color: #8892a8; margin-left: auto; }
+.sami-ctx-title { font-size: 15px; font-weight: 800; color: #1a2540; line-height: 1.35; margin-bottom: 8px; font-family: 'Nunito Sans', sans-serif; }
+.sami-ctx-meta { display: flex; align-items: center; gap: 14px; font-size: 11.5px; color: #6b7a99; }
+.sami-ctx-meta span { display: flex; align-items: center; gap: 4px; }
+
+.sami-ctx-analysis { padding: 14px 16px 0; flex-shrink: 0; }
+.sami-ctx-section-title { font-size: 13px; font-weight: 800; color: #1a2540; margin-bottom: 10px; font-family: 'Nunito Sans', sans-serif; }
+.sami-ctx-analysis-box {
+  background: #f7f8fb; border: 1px solid #e4e8f0; border-radius: 8px;
+  padding: 12px 14px; font-size: 12.5px; color: #3d4a6a;
+  line-height: 1.55; margin-bottom: 14px;
+}
+
+.sami-ctx-evidence { padding: 0 16px 14px; flex-shrink: 0; }
+.sami-ctx-evidence ul { margin: 0; padding-left: 18px; }
+.sami-ctx-evidence li { font-size: 12.5px; color: #3d4a6a; line-height: 1.6; margin-bottom: 2px; }
+
+.sami-ctx-timeline { padding: 0 16px 14px; flex-shrink: 0; }
+.sami-ctx-timeline-row {
+  display: grid; grid-template-columns: 110px 1fr;
+  gap: 8px 12px; font-size: 12px; color: #3d4a6a;
+  line-height: 1.5; padding: 3px 0;
+}
+.sami-ctx-timeline-row .tl-date { color: #8892a8; }
+
+/* Chat messages */
+.sami-chat-messages {
+  padding: 12px 14px; display: flex; flex-direction: column;
+  gap: 12px; flex-shrink: 0;
+}
+.sami-msg { display: flex; flex-direction: column; max-width: 82%; }
+.sami-msg.user { align-self: flex-end; align-items: flex-end; }
+.sami-msg.bot  { align-self: flex-start; align-items: flex-start; }
+.sami-msg-meta { font-size: 10px; color: #8892a8; margin-bottom: 4px; display: flex; align-items: center; gap: 5px; }
+.sami-msg-meta .msg-name { font-weight: 700; color: var(--uuif-brand-orange); }
+.sami-msg-bubble { padding: 8px 12px; border-radius: 10px; font-size: 12.5px; line-height: 1.5; font-family: 'Nunito Sans', sans-serif; }
+.sami-msg.user .sami-msg-bubble { background: #1a2540; color: #fff; border-bottom-right-radius: 3px; }
+.sami-msg.bot .sami-msg-bubble { background: #f0f2f8; color: #2d3a54; border-bottom-left-radius: 3px; }
+.sami-msg-actions { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
+.sami-msg-actions button { background: none; border: none; cursor: pointer; color: #b0b8cc; display: flex; align-items: center; padding: 2px; transition: color 0.15s; }
+.sami-msg-actions button:hover { color: #4a6080; }
+
+/* Context chip above input */
+.sami-chat-context-chip {
+  display: none; align-items: center; justify-content: space-between;
+  padding: 7px 14px; background: #f0f2f8; border-top: 1px solid #e4e8f0;
+  font-size: 11.5px; color: #2d3a54; font-weight: 600; gap: 8px; flex-shrink: 0;
+}
+.sami-chat-context-chip.visible { display: flex; }
+.sami-chat-context-chip span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sami-chat-context-chip button { background: none; border: none; cursor: pointer; color: #8892a8; display: flex; align-items: center; flex-shrink: 0; }
+.sami-chat-context-chip button:hover { color: #c70f0f; }
+
+/* Input row */
+.sami-chat-input-row {
+  padding: 12px 14px 8px; background: #fff; border-top: 1px solid #eef0f6;
+  display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+}
+.sami-chat-input-wrap {
+  flex: 1; display: flex; align-items: center; gap: 8px;
+  border: 1.5px solid #8b82f0; border-radius: var(--uuif-radius-pill);
+  padding: 8px 14px; background: #fff; transition: border-color 0.2s;
+}
+.sami-chat-input-wrap:focus-within { border-color: var(--uuif-brand-orange); }
+.sami-chat-input-wrap input {
+  flex: 1; border: none; outline: none; background: transparent;
+  font-size: 13px; color: #2d3a54; font-family: 'Nunito Sans', sans-serif;
+}
+.sami-chat-input-wrap input::placeholder { color: #b0b8cc; }
+.sami-chat-send {
+  width: 36px; height: 36px; border-radius: 50%; background: var(--uuif-brand-orange);
+  border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: background 0.15s, transform 0.1s;
+}
+.sami-chat-send:hover { background: #e64e00; transform: scale(1.06); }
+.sami-chat-footer {
+  text-align: left; font-size: 11px; color: #b0b8cc;
+  padding: 2px 14px 12px; background: #fff; flex-shrink: 0;
+  display: flex; align-items: center; gap: 5px;
+}
+
+/* Action bar inside panel */
+.sami-panel-action-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 10px 16px; flex-shrink: 0;
+  border-top: 1px solid #eef0f6; background: #fff;
+}
+.sami-panel-action-bar-right { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+.sami-panel-btn-secondary {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #fff; border: 1px solid var(--uuif-border-secondary);
+  color: var(--uuif-text-secondary); border-radius: var(--uuif-radius-pill); padding: 5.5px 16px;
+  font-family: 'Nunito Sans', sans-serif; font-size: 12px; cursor: pointer;
+}
+.sami-panel-btn-secondary:hover { border-color: var(--uuif-border-primary); color: var(--uuif-text-hover); }
+.sami-panel-btn-primary {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--uuif-brand-orange); border: 1px solid transparent; color: #fff;
+  border-radius: var(--uuif-radius-pill); padding: 5.5px 16px;
+  font-family: 'Nunito Sans', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer;
+}
+.sami-panel-btn-primary:hover { background: #e05300; }
+
+/* ─── SAMI FAB ─── */
+.sami-fab {
+  position: fixed; bottom: 28px; right: 28px;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--uuif-brand-orange); border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 16px rgba(255,93,0,0.45), 0 2px 6px rgba(0,0,0,0.18);
+  transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  z-index: 9000;
+}
+.sami-fab:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 22px rgba(255,93,0,0.55), 0 3px 8px rgba(0,0,0,0.22);
+}
+.sami-fab-pulse {
+  position: absolute; inset: -4px; border-radius: 50%;
+  background: rgba(255,93,0,0.25);
+  animation: sami-pulse 2.4s ease-out infinite;
+}
+@keyframes sami-pulse {
+  0%   { transform: scale(1);   opacity: 0.7; }
+  70%  { transform: scale(1.5); opacity: 0; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+.sami-fab-tooltip {
+  position: absolute; right: 62px; top: 50%; transform: translateY(-50%);
+  background: #1a2540; color: #fff; font-size: 12px; font-weight: 600;
+  padding: 5px 11px; border-radius: 6px; white-space: nowrap;
+  pointer-events: none; opacity: 0; transition: opacity 0.18s;
+}
+.sami-fab:hover .sami-fab-tooltip { opacity: 1; }
+.sami-fab-tooltip::after {
+  content: ''; position: absolute; left: 100%; top: 50%; transform: translateY(-50%);
+  border: 5px solid transparent; border-left-color: #1a2540;
+}
+
+/* btn-export for subheader (needs to exist without detail-col) */
+.btn-export {
+  display:inline-flex; align-items:center; gap:5px;
+  border:1px solid var(--uuif-border-tertiary); border-radius:var(--uuif-radius-pill);
+  padding:5px 14px; font-family:'Nunito Sans',sans-serif; font-size:12px;
+  cursor:pointer; color:var(--uuif-text-secondary); background:var(--uuif-surface-container);
+}
+.btn-export:hover { border-color:var(--uuif-border-secondary); }
+
+
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--uuif-border-tertiary); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--uuif-border-secondary); }
+</style>
+</head>
+<body>
+
+<!-- NAV RAIL -->
+<nav class="primary-nav">
+  <div class="nav-logo">
+    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+      <path d="M16 3C9.37 3 4 8.37 4 15c0 5.2 3.13 9.67 7.6 11.65V26h8.8v-.35C24.87 24.67 28 20.2 28 15c0-6.63-5.37-12-12-12z" fill="#FF5D00"/>
+      <path d="M12.5 11l7 4.5-7 4.5V11z" fill="white" opacity="0.9"/>
+    </svg>
+  </div>
+  <div class="nav-item active" title="Dashboard">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    <span class="nav-badge">5</span>
+  </div>
+  <div class="nav-item" title="Notifications">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+  </div>
+  <div class="nav-item" title="Tenants">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+  </div>
+  <div class="nav-item" title="Analytics">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-item" title="Settings">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  </div>
+  <div class="nav-spacer"></div>
+  <div class="nav-item" title="Help">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+  </div>
+</nav>
+
+<!-- TITLE BAR -->
+<header class="title-bar">
+  <div class="breadcrumb">
+    <a href="sami-dashboard-uuif.html">Home</a>
+    <span class="breadcrumb-sep">›</span>
+    <a href="sami-dashboard-uuif.html">Dashboard</a>
+    <span class="breadcrumb-sep">›</span>
+    <span class="breadcrumb-current">SAMI Recommendations</span>
+  </div>
+  <div class="scope-selector">
+    <span class="scope-dot"></span>
+    All Tenants (Global)
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left:auto;"><polyline points="6 9 12 15 18 9"/></svg>
+  </div>
+  <div class="title-bar-icons">
+    <div class="title-bar-icon" title="Notifications">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <div class="notif-badge"></div>
+    </div>
+    <div class="title-bar-icon" title="Help">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/></svg>
+    </div>
+    <div class="avatar-wrap">
+      <div class="avatar">HN</div>
+      <span style="font-size:10px;color:#888;">▾</span>
+    </div>
+  </div>
+</header>
+
+<!-- PAGE WRAPPER (sub-header + 3-col shell) -->
+<div class="page-wrapper">
+
+  <!-- Full-width page sub-header -->
+  <div class="page-subheader">
+    <a href="SAMI Dashboard-embedded side panel.html" class="page-subheader-back" title="Back to Dashboard">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+    </a>
+    <div class="page-subheader-text">
+      <div class="page-subheader-title">SAMI Recommendations</div>
+      <div class="page-subheader-sub">12 recommendations &nbsp;·&nbsp; 6 need your attention &nbsp;·&nbsp; May 18, 2026 · 08:14 AM</div>
+    </div>
+    <div class="page-subheader-actions">
+      <button class="btn-export" onclick="alert('Exporting digest…')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export digest
+      </button>
+    </div>
+  </div>
+
+  <!-- 3-column shell -->
+  <div class="page-shell">
+
+  <!-- ══ COL 1: Filter Sidebar ══ -->
+  <aside class="cat-sidebar">
+
+    <!-- Filter tabs -->
+    <div class="filter-tabs">
+      <span class="filter-tab-group-label">Filter by</span>
+
+      <div class="filter-tab active" onclick="selectFilter(this,'all')" data-filter="all">
+        <span class="ft-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
+        <span class="ft-label">All Recommendations</span>
+        <span class="ft-count">12</span>
+      </div>
+
+      <span class="filter-tab-group-label" style="margin-top:4px;">By Category</span>
+
+      <div class="filter-tab" onclick="selectFilter(this,'cve')" data-filter="cve">
+        <span class="ft-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+        <span class="ft-label">CVE Vulnerabilities</span>
+        <span class="ft-count">3</span>
+      </div>
+      <div class="filter-tab" onclick="selectFilter(this,'device')" data-filter="device">
+        <span class="ft-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
+        <span class="ft-label">Device Alerts</span>
+        <span class="ft-count">2</span>
+      </div>
+      <div class="filter-tab" onclick="selectFilter(this,'behavioral')" data-filter="behavioral">
+        <span class="ft-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+        <span class="ft-label">Behavioral</span>
+        <span class="ft-count">3</span>
+      </div>
+      <div class="filter-tab" onclick="selectFilter(this,'policy')" data-filter="policy">
+        <span class="ft-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>
+        <span class="ft-label">Policy Gaps</span>
+        <span class="ft-count">2</span>
+      </div>
+      <div class="filter-tab" onclick="selectFilter(this,'subscription')" data-filter="subscription">
+        <span class="ft-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></span>
+        <span class="ft-label">Renewals</span>
+        <span class="ft-count">2</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ══ COL 2: Insight List ══ -->
+  <section class="insight-list-col">
+    <div class="list-col-header">
+      <div class="list-col-title" id="list-col-title">All Recommendations</div>
+      <div class="list-col-sub" id="list-col-sub">5 items · May 18, 2026</div>
+    </div>
+    <div class="insight-list" id="insight-list">
+      <!-- rendered by JS -->
+    </div>
+  </section>
+
+  </div><!-- /page-shell -->
+
+</div><!-- /page-wrapper -->
+
+<!-- SAMI FAB -->
+<button class="sami-fab" id="sami-fab" onclick="toggleSamiFab()" aria-label="Ask SAMI">
+  <div class="sami-fab-pulse"></div>
+  <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+    <rect x="7" y="11" width="18" height="14" rx="3" fill="white" opacity="0.95"/>
+    <rect x="10" y="15" width="4" height="4" rx="1" fill="#ff5d00"/>
+    <rect x="18" y="15" width="4" height="4" rx="1" fill="#ff5d00"/>
+    <path d="M13 23h6" stroke="#ff5d00" stroke-width="1.5" stroke-linecap="round"/>
+    <rect x="14.5" y="7" width="3" height="4" rx="1.5" fill="white" opacity="0.9"/>
+    <circle cx="16" cy="7" r="2" fill="white" opacity="0.9"/>
+    <line x1="4" y1="16" x2="7" y2="16" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.85"/>
+    <line x1="25" y1="16" x2="28" y2="16" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.85"/>
+  </svg>
+  <div class="sami-fab-tooltip">Ask SAMI</div>
+</button>
+
+<!-- SAMI Chat Panel -->
+<div class="sami-chat-panel" id="sami-chat-panel">
+
+  <!-- Header -->
+  <div class="sami-chat-header" id="sami-chat-header">
+    <div class="sami-chat-avatar">
+      <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
+        <rect x="7" y="11" width="18" height="14" rx="3" fill="white" opacity="0.95"/>
+        <rect x="10" y="15" width="4" height="4" rx="1" fill="#ff5d00"/>
+        <rect x="18" y="15" width="4" height="4" rx="1" fill="#ff5d00"/>
+        <path d="M13 23h6" stroke="#ff5d00" stroke-width="1.5" stroke-linecap="round"/>
+        <rect x="14.5" y="7" width="3" height="4" rx="1.5" fill="white" opacity="0.9"/>
+        <circle cx="16" cy="7" r="2" fill="white" opacity="0.9"/>
+      </svg>
+    </div>
+    <div class="sami-chat-header-title" id="sami-chat-title">SAMI Assistant</div>
+    <div class="sami-chat-header-actions">
+      <button title="New chat" onclick="resetSamiPanel()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </button>
+      <button title="History">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </button>
+      <button title="Pin panel" id="sami-pin-btn" onclick="toggleSamiPin()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 4.5a1 1 0 0 1 1.414 0l2.829 2.828a1 1 0 0 1 0 1.415l-1.414 1.414a4 4 0 0 1-.729 4.243l-3.536 3.536a1 1 0 0 1-1.414 0l-1.415-1.415-3.535 3.536-1.415-1.414 3.536-3.535-1.415-1.415a1 1 0 0 1 0-1.414l3.536-3.536a4 4 0 0 1 4.243-.728z"/>
+          <path d="M3 21l5-5"/>
+        </svg>
+      </button>
+      <button title="Expand">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+      </button>
+      <button title="Close" id="sami-chat-close-btn" onclick="closeSamiPanel()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="sami-chat-body" id="sami-chat-body">
+    <!-- Context view — populated when insight is clicked -->
+    <div class="sami-chat-context visible" id="sami-chat-context">
+
+      <!-- Context card summary -->
+      <div class="sami-ctx-card">
+        <div class="sami-ctx-tags" id="sami-ctx-tags"></div>
+        <div class="sami-ctx-title" id="sami-ctx-title"></div>
+        <div class="sami-ctx-meta" id="sami-ctx-meta"></div>
+      </div>
+
+      <!-- SAMI Analysis -->
+      <div class="sami-ctx-analysis">
+        <div class="sami-ctx-section-title">SAMI Analysis</div>
+        <div class="sami-ctx-analysis-box" id="sami-ctx-analysis"></div>
+      </div>
+
+      <!-- Evidence -->
+      <div class="sami-ctx-evidence">
+        <div class="sami-ctx-section-title">Evidence</div>
+        <ul id="sami-ctx-evidence-list"></ul>
+      </div>
+
+      <!-- Timeline -->
+      <div class="sami-ctx-timeline">
+        <div class="sami-ctx-section-title">Timeline</div>
+        <div id="sami-ctx-timeline-list"></div>
+      </div>
+
+      <!-- Chat messages -->
+      <div class="sami-chat-messages" id="sami-chat-messages"></div>
+
+    </div><!-- /sami-chat-context -->
+  </div><!-- /sami-chat-body -->
+
+  <!-- Context chip (shown above input) -->
+  <div class="sami-chat-context-chip visible" id="sami-ctx-chip">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6b7a99" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+    <span id="sami-ctx-chip-label">Context loading…</span>
+    <button onclick="closeSamiPanel()" title="Close">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+
+  <!-- Input row -->
+  <div class="sami-chat-input-row">
+    <div class="sami-chat-input-wrap">
+      <svg width="12" height="12" viewBox="0 0 10 10" fill="#ff5d00"><path d="M5 1l.93 2.57L8.5 4.5l-2.57.93L5 8l-.93-2.57L1.5 4.5l2.57-.93z"/></svg>
+      <input type="text" id="sami-chat-input" placeholder="Ask SAMI about this…" onkeydown="if(event.key==='Enter') samiSend()">
+    </div>
+    <button class="sami-chat-send" onclick="samiSend()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+  <div class="sami-chat-footer">01/100 Queries Used ⓘ</div>
+
+  <!-- Action bar -->
+  <div class="sami-panel-action-bar" id="sami-panel-action-bar">
+    <div></div>
+    <div class="sami-panel-action-bar-right" id="sami-panel-actions">
+      <!-- populated by JS -->
+    </div>
+  </div>
+
+</div><!-- /sami-chat-panel -->
+
+<script>
+/* ─── SAMI Panel state ─── */
+var samiPanelOpen = false;
+var samiPinned = false;
+
+function toggleSamiFab() {
+  if (samiPanelOpen) {
+    closeSamiPanel();
+  } else {
+    samiPanelOpen = true;
+    document.getElementById('sami-chat-panel').classList.add('visible');
+    document.getElementById('sami-fab').style.opacity = '0';
+    document.getElementById('sami-fab').style.pointerEvents = 'none';
+    if (samiPinned) document.body.classList.add('sami-pane-open');
+  }
+}
+
+function closeSamiPanel() {
+  samiPanelOpen = false;
+  document.getElementById('sami-chat-panel').classList.remove('visible');
+  document.getElementById('sami-fab').style.opacity = '1';
+  document.getElementById('sami-fab').style.pointerEvents = '';
+  document.body.classList.remove('sami-pane-open');
+  document.querySelectorAll('.rec-insight-card').forEach(function(i) { i.classList.remove('active'); });
+}
+
+function toggleSamiPin() {
+  samiPinned = !samiPinned;
+  var panel = document.getElementById('sami-chat-panel');
+  var btn   = document.getElementById('sami-pin-btn');
+  panel.classList.toggle('pinned', samiPinned);
+  btn.classList.toggle('pinned', samiPinned);
+  btn.title = samiPinned ? 'Unpin panel' : 'Pin panel';
+  if (samiPanelOpen) {
+    document.body.classList.toggle('sami-pane-open', samiPinned);
+  }
+}
+
+function resetSamiPanel() {
+  document.getElementById('sami-chat-messages').innerHTML = '';
+  document.getElementById('sami-chat-input').value = '';
+}
+
+function samiSend() {
+  var input = document.getElementById('sami-chat-input');
+  var text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  var msgs = document.getElementById('sami-chat-messages');
+  msgs.innerHTML += '<div class="sami-msg user"><div class="sami-msg-bubble">' + text.replace(/</g,'&lt;') + '</div></div>';
+  setTimeout(function() {
+    msgs.innerHTML += '<div class="sami-msg bot"><div class="sami-msg-meta"><svg width="14" height="14" viewBox="0 0 32 32" fill="none"><rect x="7" y="11" width="18" height="14" rx="3" fill="#ff5d00"/><rect x="10" y="15" width="4" height="4" rx="1" fill="white"/><rect x="18" y="15" width="4" height="4" rx="1" fill="white"/></svg><span class="msg-name">SAMI</span></div><div class="sami-msg-bubble">I\'ll look into that for you. This is a prototype — full conversation support coming soon.</div></div>';
+    document.getElementById('sami-chat-body').scrollTop = 99999;
+  }, 600);
+  document.getElementById('sami-chat-body').scrollTop = 99999;
+}
+
+function openSamiWithInsight(d) {
+  samiPanelOpen = true;
+
+  // Title
+  document.getElementById('sami-chat-title').textContent = 'SAMI Assistant';
+
+  // Tags
+  var tagMap = {
+    cve:          { label: d.typeLabel, cls: 'cve' },
+    device:       { label: d.typeLabel, cls: 'device-tag' },
+    behavioral:   { label: d.typeLabel, cls: 'behavioral-tag' },
+    policy:       { label: d.typeLabel, cls: 'policy-tag' },
+    subscription: { label: d.typeLabel, cls: 'renewal-tag' }
+  };
+  var tagCls = (tagMap[d.typeKey] || {cls:'cve'}).cls;
+  var tagsHtml = '<span class="sami-ctx-tag ' + tagCls + '">' + d.typeLabel + '</span>';
+  if (d.attention) tagsHtml += '<span class="sami-ctx-tag attn-tag"><span style="width:7px;height:7px;border-radius:50%;background:#c70f0f;display:inline-block;margin-right:2px;"></span>Needs Attention</span>';
+  tagsHtml += '<span class="sami-ctx-time">' + d.time + '</span>';
+  document.getElementById('sami-ctx-tags').innerHTML = tagsHtml;
+
+  // Title & meta
+  document.getElementById('sami-ctx-title').textContent = d.title;
+  document.getElementById('sami-ctx-meta').innerHTML = '<span>' + d.meta + '</span>';
+
+  // Analysis
+  document.getElementById('sami-ctx-analysis').textContent = d.insight;
+
+  // Evidence
+  document.getElementById('sami-ctx-evidence-list').innerHTML = d.evidence.map(function(e) {
+    return '<li>' + e.text + '</li>';
+  }).join('');
+
+  // Timeline
+  document.getElementById('sami-ctx-timeline-list').innerHTML = d.timeline.map(function(t) {
+    return '<div class="sami-ctx-timeline-row"><span class="tl-date">' + t.date + '</span><span>' + t.event + '</span></div>';
+  }).join('');
+
+  // Clear previous chat messages
+  document.getElementById('sami-chat-messages').innerHTML = '';
+
+  // Context chip
+  document.getElementById('sami-ctx-chip-label').textContent = 'Context: ' + d.title.substring(0, 40) + '…';
+
+  // Action buttons
+  document.getElementById('sami-panel-actions').innerHTML =
+    '<button class="sami-panel-btn-secondary">' + d.secondaryBtn + '</button>' +
+    '<button class="sami-panel-btn-primary">' + d.primaryBtn + ' <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><polyline points="9 18 15 12 9 6"/></svg></button>';
+
+  // Show panel, hide FAB
+  samiPanelOpen = true;
+  document.getElementById('sami-chat-panel').classList.add('visible');
+  document.getElementById('sami-fab').style.opacity = '0';
+  document.getElementById('sami-fab').style.pointerEvents = 'none';
+  if (samiPinned) document.body.classList.add('sami-pane-open');
+
+  // Scroll body to top
+  document.getElementById('sami-chat-body').scrollTop = 0;
+}
+
+
+/* ─── Data ─── */
+const insights = [
+  /* ─── CVE (3) ─── */
+  {
+    id:0, filter:'cve', attention:true, typeKey:'cve', severity:'critical',
+    tenants:['Acme Corp','Beta Networks','Westfield IT','Crown Logistics'],
+    typeBadge:'CVE Vulnerability · Critical', typeBadgeCls:'cve', typeLabel:'CVE Vulnerability',
+    time:'2 hrs ago', title:'SSL VPN Auth Bypass (CVE-2026-1142) — 12 Firewalls Across 4 Tenants',
+    excerpt:'CVSS 9.8 critical. Unauthenticated RCE on SonicOS < 7.1.2-1023. Active PoC in the wild.',
+    meta:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> Acme Corp, Beta Networks +2 &nbsp;·&nbsp; <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> 12 Firewalls',
+    insight:'CVE-2026-1142 enables unauthenticated RCE on SSL VPN gateways running SonicOS below 7.1.2-1023. A public PoC exploit has been active for 4 days. SAMI pre-staged firmware patch 7.1.2-1023 and completed compatibility checks across all 12 affected devices. Probe attempts already detected on 2 devices.',
+    evidence:[
+      {text:'CVSS 9.8 (Critical) · NVD-confirmed · SonicWall PSIRT advisory published'},
+      {text:'12 firewalls across 4 tenants running vulnerable firmware ≤ 7.1.1-907'},
+      {text:'Active probe attempts on FW-ACME-03 and FW-BETA-01 in last 24h'},
+      {text:'Patch 7.1.2-1023 pre-staged · compatibility verified on all 12 devices'},
+      {text:'Acme Corp (4 FW) · Beta Networks (3 FW) · Westfield IT (3 FW) · Crown Logistics (2 FW)'}
+    ],
+    timeline:[
+      {date:'May 12, 09:12', event:'CVE-2026-1142 disclosed by SonicWall PSIRT'},
+      {date:'May 14, 14:30', event:'Public PoC exploit code published to GitHub'},
+      {date:'May 16, 03:48', event:'SAMI detected probe attempts on FW-ACME-03 and FW-BETA-01'},
+      {date:'May 17, 11:20', event:'SAMI identified all 12 vulnerable devices across 4 tenants'},
+      {date:'May 18, 07:00', event:'Patch 7.1.2-1023 pre-staged · compatibility check passed · ready to deploy'}
+    ],
+    primaryBtn:'Deploy patch to 12 devices', secondaryBtn:'Schedule for tonight', viewLink:'View 12 affected devices'
+  },
+  {
+    id:1, filter:'cve', attention:true, typeKey:'cve', severity:'warning',
+    tenants:['Northgate Health','Crown Logistics'],
+    typeBadge:'CVE Vulnerability · High', typeBadgeCls:'cve', typeLabel:'CVE Vulnerability',
+    time:'5 hrs ago', title:'Management API Privilege Escalation (CVE-2026-2087) — 6 Firewalls',
+    excerpt:'CVSS 8.1. Authenticated users can escalate to super-admin via malformed API call. Affects SonicOS 7.0.x.',
+    meta:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> 2 Tenants &nbsp;·&nbsp; <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> 6 Firewalls',
+    insight:'CVE-2026-2087 allows authenticated users to escalate privileges to super-admin via a malformed REST API call. Affects SonicOS 7.0.x across 6 devices at Northgate Health and Crown Logistics. Both tenants have external partner access enabled, increasing exposure. Patched in 7.0.3-build-1188.',
+    evidence:[
+      {text:'CVSS 8.1 (High) · SonicWall PSIRT advisory SW-2026-0217'},
+      {text:'6 firewalls running SonicOS 7.0.1 or 7.0.2 — both vulnerable versions'},
+      {text:'External partner access enabled on 4 of 6 affected devices'},
+      {text:'Patch 7.0.3-build-1188 available and compatibility verified'}
+    ],
+    timeline:[
+      {date:'May 10, 11:00', event:'CVE-2026-2087 privately reported to SonicWall PSIRT'},
+      {date:'May 15, 09:00', event:'Public advisory published after 90-day embargo'},
+      {date:'May 17, 14:20', event:'SAMI identified 6 vulnerable devices across 2 tenants'},
+      {date:'May 18, 08:00', event:'Patch staged and compatibility verified · awaiting approval'}
+    ],
+    primaryBtn:'Apply patch', secondaryBtn:'Review exposure', viewLink:'View 6 affected devices'
+  },
+  {
+    id:2, filter:'cve', attention:false, typeKey:'cve', severity:'info',
+    tenants:['Acme Corp','Beta Networks','Westfield IT','Crown Logistics','Northgate Health','Delta Logistics'],
+    typeBadge:'CVE Vulnerability · Medium', typeBadgeCls:'cve', typeLabel:'CVE Vulnerability',
+    time:'Yesterday', title:'HTTP Header Injection in Captive Portal (CVE-2026-1889) — 18 Devices',
+    excerpt:'CVSS 6.1. Reflected XSS via unvalidated redirect header in guest portal. No active exploitation detected.',
+    meta:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> 6 Tenants &nbsp;·&nbsp; <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> 18 Firewalls',
+    insight:'CVE-2026-1889 is a reflected XSS vulnerability in the SonicWall captive portal via unvalidated redirect headers. CVSS 6.1 Medium — no active exploitation detected. Affects all tenants using guest Wi-Fi with captive portal enabled. Low urgency but should be patched in the next maintenance window.',
+    evidence:[
+      {text:'CVSS 6.1 (Medium) · No active exploitation in the wild detected'},
+      {text:'18 devices across 6 tenants with captive portal enabled'},
+      {text:'Vulnerability exists only when guest portal redirect is configured'},
+      {text:'Fix available in SonicOS 7.1.3-build-0440 maintenance release'}
+    ],
+    timeline:[
+      {date:'May 05, 10:00', event:'Vulnerability reported via bug bounty program'},
+      {date:'May 12, 16:00', event:'SonicWall confirmed and issued advisory'},
+      {date:'May 17, 09:00', event:'SAMI identified 18 affected devices'},
+      {date:'May 18, 08:14', event:'Surfaced for scheduled maintenance patching'}
+    ],
+    primaryBtn:'Schedule maintenance patch', secondaryBtn:'Snooze 7 days', viewLink:'View 18 affected devices'
+  },
+  /* ─── Device Alerts (2) ─── */
+  {
+    id:3, filter:'device', attention:true, typeKey:'device', severity:'warning',
+    tenants:['Northgate Health','Delta Logistics'],
+    typeBadge:'Device Alert · High', typeBadgeCls:'device', typeLabel:'Device Alert',
+    time:'3 hrs ago', title:'3 Gateways Unreachable — Northgate Health & Delta Logistics Branch Sites Unprotected',
+    excerpt:'FW-NH-02, FW-NH-03 and FW-DL-01 offline after BGP route change. Branch perimeter inspection is now absent.',
+    meta:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> 2 Tenants &nbsp;·&nbsp; <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> 3 Firewalls offline',
+    insight:'FW-NH-02, FW-NH-03 (Northgate Health) and FW-DL-01 (Delta Logistics) have been unreachable for 3+ hours. Last heartbeat was lost immediately following a BGP route change at 05:14 AM. Branch sites are currently operating without perimeter firewall inspection.',
+    evidence:[
+      {text:'3 firewalls offline for 3+ hours — heartbeat lost at 05:14 AM'},
+      {text:'BGP route change logged at 05:12 AM on upstream router R-NH-CORE'},
+      {text:'Branch sites at Northgate Health HQ and Delta Logistics Warehouse are unprotected'},
+      {text:'FW-NH-01 (HQ) remains online — branch isolation only'}
+    ],
+    timeline:[
+      {date:'May 18, 05:12', event:'BGP route change on R-NH-CORE'},
+      {date:'May 18, 05:14', event:'Heartbeat lost on FW-NH-02, FW-NH-03, FW-DL-01'},
+      {date:'May 18, 07:00', event:'SAMI raised device alert — branch sites unprotected'},
+      {date:'May 18, 08:14', event:'Alert surfaced in SAMI Recommendations'}
+    ],
+    primaryBtn:'Run diagnostic', secondaryBtn:'Notify tenants', viewLink:'View 3 affected devices'
+  },
+  {
+    id:4, filter:'device', attention:false, typeKey:'device', severity:'info',
+    tenants:['Acme Corp','Beta Networks','Westfield IT','Delta Logistics'],
+    typeBadge:'Device Alert · Low', typeBadgeCls:'device', typeLabel:'Device Alert',
+    time:'2 days ago', title:'Firmware Version Drift Detected — 14 Devices Running EOL Release',
+    excerpt:'14 firewalls still on SonicOS 6.5.4 (end-of-life). No patch support. SAMI recommends upgrade before next audit.',
+    meta:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> 5 Tenants &nbsp;·&nbsp; <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> 14 Firewalls',
+    insight:'14 firewalls across 5 tenants are running SonicOS 6.5.4, which reached end-of-life on Dec 31, 2025. No further security patches will be issued for this version. These devices are ineligible for SAMI proactive monitoring capabilities until upgraded. Upgrade path to 7.1.2 is available and compatible.',
+    evidence:[
+      {text:'SonicOS 6.5.4 reached end-of-life on Dec 31, 2025 — no further patches'},
+      {text:'14 devices across Acme Corp (5), Beta (4), Westfield (3), Delta (2)'},
+      {text:'SAMI behavioral monitoring disabled on EOL devices'},
+      {text:'Upgrade path to SonicOS 7.1.2-1023 verified and available'}
+    ],
+    timeline:[
+      {date:'Dec 31, 2025', event:'SonicOS 6.5.4 reached end-of-life'},
+      {date:'Jan 15, 2026', event:'SAMI flagged 14 devices on EOL firmware'},
+      {date:'May 01, 2026', event:'Reminder issued — devices still on EOL build'},
+      {date:'May 18, 08:14', event:'Surfaced in SAMI Recommendations for upgrade planning'}
+    ],
+    primaryBtn:'Plan upgrade', secondaryBtn:'Snooze 14 days', viewLink:'View 14 affected devices'
+  },
+  /* ─── Behavioral (3) ─── */
+  {
+    id:5, filter:'behavioral', attention:true, typeKey:'behavioral', severity:'warning',
+    tenants:['Beta Networks','Crown Logistics'],
+    typeBadge:'Behavioral Anomaly · Medium', typeBadgeCls:'behavioral', typeLabel:'Behavioral Anomaly',
+    time:'1 hr ago', title:'Credential Stuffing on Super-Admin Accounts — Beta Networks & Crown Logistics',
+    excerpt:'18 failed login attempts from 3 new geographies against admin@beta.local and sysadmin@crown.local.',
+    meta:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> 2 Tenants &nbsp;·&nbsp; 2 Accounts at risk',
+    insight:'18 failed login attempts detected from 3 new geographies (BR, RU, NG) against admin@beta.local and sysadmin@crown.local in the last 60 minutes. Both accounts lack MFA enforcement. A concurrent active session from a known IP was also detected on admin@beta.local.',
+    evidence:[
+      {text:'18 failed logins from 3 new geographies in 60 minutes'},
+      {text:'Concurrent active session from known IP detected on admin@beta.local'},
+      {text:'Neither account has MFA enforced — Admin role with full tenant access'},
+      {text:'No successful logins from the anomalous geographies — yet'}
+    ],
+    timeline:[
+      {date:'May 18, 07:10', event:'First failed login attempt from BR IP range'},
+      {date:'May 18, 07:14', event:'Additional attempts from RU and NG IP ranges'},
+      {date:'May 18, 07:32', event:'Concurrent session detected on admin@beta.local'},
+      {date:'May 18, 08:14', event:'SAMI raised behavioral anomaly alert'}
+    ],
+    primaryBtn:'Force MFA now', secondaryBtn:'Snooze 24h', viewLink:'View login history'
+  },
+  {
+    id:6, filter:'behavioral', attention:true, typeKey:'behavioral', severity:'critical',
+    tenants:['Acme Corp'],
+    typeBadge:'Behavioral Anomaly · High', typeBadgeCls:'behavioral', typeLabel:'Behavioral Anomaly',
+    time:'4 hrs ago', title:'Unusual Data Egress — 2.3 GB Upload to Unknown External Host from Acme Corp',
+    excerpt:'FW-ACME-07 recorded 2.3 GB outbound transfer to 185.220.101.x over 40 minutes. No corresponding business application.',
+    meta:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> Acme Corp &nbsp;·&nbsp; FW-ACME-07',
+    insight:'FW-ACME-07 recorded an anomalous 2.3 GB outbound data transfer to 185.220.101.47 over 40 minutes beginning at 04:22 AM. The destination IP is classified as a Tor exit node. No matching business application or scheduled job accounts for this traffic. SAMI has flagged this as a potential data exfiltration event.',
+    evidence:[
+      {text:'2.3 GB transferred to 185.220.101.47 (known Tor exit node) in 40 minutes'},
+      {text:'Transfer occurred 04:22–05:02 AM — outside business hours'},
+      {text:'No scheduled job or business application matches this traffic pattern'},
+      {text:'SAMI DPI-SSL inspection shows TLS 1.3 encrypted payload — contents unverifiable'}
+    ],
+    timeline:[
+      {date:'May 18, 04:22', event:'Anomalous outbound transfer begins from FW-ACME-07'},
+      {date:'May 18, 05:02', event:'Transfer ends — 2.3 GB total transferred'},
+      {date:'May 18, 05:15', event:'SAMI anomaly detection flagged unusual egress pattern'},
+      {date:'May 18, 08:14', event:'Alert surfaced in SAMI Recommendations'}
+    ],
+    primaryBtn:'Isolate device', secondaryBtn:'Export traffic log', viewLink:'View traffic analysis'
+  },
+  {
+    id:7, filter:'behavioral', attention:false, typeKey:'behavioral', severity:'info',
+    tenants:['Westfield IT'],
+    typeBadge:'Behavioral Anomaly · Low', typeBadgeCls:'behavioral', typeLabel:'Behavioral Anomaly',
+    time:'3 days ago', title:'Repeated After-Hours Admin Logins — Westfield IT (7 occurrences)',
+    excerpt:'Admin account logged in from the same IP between 02:00–03:30 AM on 7 consecutive days. Unusual but no breach indicators.',
+    meta:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> Westfield IT &nbsp;·&nbsp; 1 Account',
+    insight:'The admin@westfield.local account has logged in from 192.168.12.44 between 02:00 and 03:30 AM on 7 consecutive nights (May 11–17). All sessions originated from the same internal IP. No failed attempts or suspicious activity during sessions. SAMI is flagging this for awareness — it may be a scheduled maintenance task.',
+    evidence:[
+      {text:'7 consecutive after-hours logins from 192.168.12.44 (internal IP)'},
+      {text:'All sessions within 02:00–03:30 AM window — no anomalous geography'},
+      {text:'No failed login attempts or lateral movement observed during sessions'},
+      {text:'No scheduled maintenance task registered in the change management system'}
+    ],
+    timeline:[
+      {date:'May 11–17', event:'After-hours login pattern observed on 7 consecutive nights'},
+      {date:'May 17, 03:31', event:'SAMI flagged recurring anomaly after 7th occurrence'},
+      {date:'May 18, 08:14', event:'Surfaced for awareness review'}
+    ],
+    primaryBtn:'Review session logs', secondaryBtn:'Mark as expected', viewLink:'View login history'
+  },
+  /* ─── Policy (2) ─── */
+  {
+    id:8, filter:'policy', attention:false, typeKey:'policy', severity:'warning',
+    tenants:['Acme Corp','Beta Networks','Westfield IT'],
+    typeBadge:'Policy Gap · Medium', typeBadgeCls:'policy', typeLabel:'Policy Gap',
+    time:'Drift > 45d', title:'Permit-Any Outbound Rules Bypassing DPI-SSL — Acme, Beta & Westfield WAN Edge',
+    excerpt:'Default-allow outbound at WAN interface across 9 firewalls. Encrypted C2 traffic can exfiltrate uninspected.',
+    meta:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> 3 Tenants &nbsp;·&nbsp; <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> 9 Firewalls affected',
+    insight:'Default-allow outbound rules at the WAN interface are bypassing DPI-SSL inspection across 9 firewalls in 3 tenants. This allows encrypted C2 traffic and data exfiltration to proceed uninspected. Policy baseline was last reviewed 45+ days ago.',
+    evidence:[
+      {text:'Permit-Any outbound rule on WAN interface — bypasses DPI-SSL'},
+      {text:'Policy drift of 45+ days from SonicWall secure baseline'},
+      {text:'9 firewalls across Acme Corp (4), Beta Networks (3), Westfield IT (2)'},
+      {text:'SAMI baseline policy prepared and ready for review'}
+    ],
+    timeline:[
+      {date:'Mar 31, 09:00', event:'Policy last reviewed and signed off'},
+      {date:'Apr 04, 14:00', event:'First drift detected — Acme Corp WAN rule modified'},
+      {date:'May 15, 08:00', event:'SAMI flagged policy baseline drift across 3 tenants'},
+      {date:'May 18, 08:14', event:'Surfaced in SAMI Recommendations'}
+    ],
+    primaryBtn:'Apply baseline', secondaryBtn:'Review rules', viewLink:'View 9 affected firewalls'
+  },
+  {
+    id:9, filter:'policy', attention:false, typeKey:'policy', severity:'info',
+    tenants:['Crown Logistics','Delta Logistics'],
+    typeBadge:'Policy Gap · Low', typeBadgeCls:'policy', typeLabel:'Policy Gap',
+    time:'Drift > 30d', title:'Guest SSID Bridging to Corporate LAN — 5 Access Points Across 2 Tenants',
+    excerpt:'Guest wireless networks at Crown Logistics and Delta Logistics are bridged to corporate LAN. Isolation rules missing.',
+    meta:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> 2 Tenants &nbsp;·&nbsp; 5 Access Points',
+    insight:'Guest SSIDs at Crown Logistics (3 APs) and Delta Logistics (2 APs) are bridged directly to the corporate LAN segment without guest isolation rules. This allows guest devices to potentially reach internal servers. SAMI recommends enabling client isolation and VLAN segmentation for all guest SSIDs.',
+    evidence:[
+      {text:'Guest SSID bridged to corporate LAN — no VLAN segmentation at 5 APs'},
+      {text:'Client isolation disabled — guest devices can reach internal RFC-1918 addresses'},
+      {text:'Crown Logistics: 3 APs (HQ, Warehouse A, Warehouse B)'},
+      {text:'Delta Logistics: 2 APs (Head Office, Loading Bay)'}
+    ],
+    timeline:[
+      {date:'Apr 18, 00:00', event:'SAMI first detected guest-to-corporate bridging'},
+      {date:'Apr 25, 00:00', event:'Reminder sent — no remediation action taken'},
+      {date:'May 15, 08:00', event:'SAMI escalated after 30-day drift threshold exceeded'},
+      {date:'May 18, 08:14', event:'Surfaced in SAMI Recommendations'}
+    ],
+    primaryBtn:'Apply VLAN isolation', secondaryBtn:'Review config', viewLink:'View 5 affected APs'
+  },
+  /* ─── Subscription/Device Alerts (2) ─── */
+  {
+    id:10, filter:'subscription', attention:false, typeKey:'subscription', severity:'info',
+    tenants:['Acme Corp','Beta Networks','Delta Logistics'],
+    typeBadge:'Renewal · Upcoming', typeBadgeCls:'renewal', typeLabel:'Renewal',
+    time:'Today · 08:14 AM', title:'ATP & TZ Subscriptions Expiring <9 Days — 3 Tenants, 21 Firewalls, $87K ARR at Risk',
+    excerpt:'Acme Corp, Beta Networks, and Delta Logistics. Capture ATP sandboxing and Gateway AV will be disabled.',
+    meta:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> 3 Tenants &nbsp;·&nbsp; 21 Firewalls',
+    insight:'Acme Corp (8 FW), Beta Networks (7 FW), and Delta Logistics (6 FW) Advanced Threat Protection and TZ subscriptions will lapse before the next QBR. Lapse will disable Capture ATP sandboxing and Gateway AV. $87K ARR at risk. Renewal quotes pre-generated.',
+    evidence:[
+      {text:'Acme Corp — 8 firewalls · ATP + Gateway AV · expires May 26'},
+      {text:'Beta Networks — 7 firewalls · ATP only · expires May 27'},
+      {text:'Delta Logistics — 6 firewalls · ATP + TZ bundle · expires May 24'},
+      {text:'Renewal quotes pre-generated and available in the billing portal'}
+    ],
+    timeline:[
+      {date:'May 24, 00:00', event:'Delta Logistics ATP + TZ bundle expires'},
+      {date:'May 26, 00:00', event:'Acme Corp ATP + Gateway AV expires'},
+      {date:'May 27, 00:00', event:'Beta Networks ATP expires'},
+      {date:'May 28', event:'QBR scheduled — all 3 accounts at risk before this date'}
+    ],
+    primaryBtn:'Initiate renewal', secondaryBtn:'Snooze 3 days', viewLink:'View subscription details'
+  },
+  {
+    id:11, filter:'subscription', attention:false, typeKey:'subscription', severity:'info',
+    tenants:['Westfield IT'],
+    typeBadge:'Renewal · Upcoming', typeBadgeCls:'renewal', typeLabel:'Renewal',
+    time:'May 15', title:'NSM Cloud Tier Overage — Westfield IT Exceeding 50-Device License by 8 Nodes',
+    excerpt:'Westfield IT currently managing 58 devices on a 50-node NSM license. 8 devices unlicensed and unmonitored.',
+    meta:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> Westfield IT &nbsp;·&nbsp; 8 Unlicensed Nodes',
+    insight:'Westfield IT is managing 58 devices under a 50-device NSM Cloud license. The 8 excess nodes are active but unmonitored — SAMI cannot provide threat intelligence for unlicensed devices. SAMI recommends upgrading to the 75-device tier or removing decommissioned devices to fall within the current license.',
+    evidence:[
+      {text:'58 active devices vs. 50-device NSM Cloud license — 8 excess nodes'},
+      {text:'8 unlicensed devices excluded from SAMI monitoring and threat analysis'},
+      {text:'Overage first detected May 15 — 3 new TZ470 devices onboarded'},
+      {text:'75-device tier upgrade adds $3,200 ARR — available immediately'}
+    ],
+    timeline:[
+      {date:'May 15, 10:00', event:'3 new TZ470 devices onboarded — license threshold exceeded'},
+      {date:'May 15, 10:05', event:'SAMI detected overage and disabled monitoring on 8 excess nodes'},
+      {date:'May 16, 09:00', event:'Overage notification sent to account admin'},
+      {date:'May 18, 08:14', event:'Surfaced in SAMI Recommendations'}
+    ],
+    primaryBtn:'Upgrade license', secondaryBtn:'Remove devices', viewLink:'View license details'
+  }
+];
+
+/* ─── Filter tabs ─── */
+const filterTitles = {
+  all:          { title: 'All Recommendations', sub: '12 items · May 18, 2026' },
+  cve:          { title: 'CVE Vulnerabilities',  sub: '3 items · May 18, 2026' },
+  device:       { title: 'Device Alerts',        sub: '2 items · May 18, 2026' },
+  behavioral:   { title: 'Behavioral Anomalies', sub: '3 items · May 18, 2026' },
+  policy:       { title: 'Policy Gaps',          sub: '2 items · May 18, 2026' },
+  subscription: { title: 'Renewals',              sub: '2 items · May 18, 2026' }
+};
+
+let currentFilter = 'all';
+let currentInsightId = 0;
+
+function selectFilter(el, filter) {
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  currentFilter = filter;
+
+  const meta = filterTitles[filter] || { title: filter, sub: '' };
+  document.getElementById('list-col-title').textContent = meta.title;
+  document.getElementById('list-col-sub').textContent = meta.sub;
+
+  renderList(filter);
+}
+
+function getFilteredInsights(filter) {
+  if (filter === 'all') return insights;
+  return insights.filter(i => i.filter === filter);
+}
+
+function renderList(filter) {
+  const list = document.getElementById('insight-list');
+  const items = getFilteredInsights(filter);
+
+  if (items.length === 0) {
+    list.innerHTML = `<div style="padding:24px 14px;font-size:12px;color:var(--uuif-text-tertiary);text-align:center;">No items in this category.</div>`;
+    return;
+  }
+
+  const typeIcons = {
+    cve:          `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+    device:       `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
+    behavioral:   `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>`,
+    policy:       `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>`,
+    subscription: `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>`
+  };
+  const tenantSvg = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>`;
+  const shieldSvg = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
+  const sevLabel = { critical:'Critical', warning:'Warning', info:'Info' };
+  const askSvg = `<svg width="11" height="11" viewBox="0 0 32 32" fill="none"><rect x="7" y="11" width="18" height="14" rx="3" fill="#ff5d00"/><rect x="10" y="15" width="4" height="4" rx="1" fill="white"/><rect x="18" y="15" width="4" height="4" rx="1" fill="white"/><path d="M13 23h6" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+
+  const sevOrder = ['critical', 'warning', 'info'];
+
+  function cardHtml(d) {
+    const sev = d.severity || 'info';
+    const tenantTag = d.tenants.length === 1
+      ? `<span class="ric-tag">${tenantSvg} ${d.tenants[0]}</span>`
+      : `<span class="ric-tag">${tenantSvg} ${d.tenants.length} Tenants</span>`;
+    const fwMatch = d.meta ? d.meta.match(/(\d+) Firewalls?(?:\s*offline)?/) : null;
+    const apMatch = d.meta ? d.meta.match(/(\d+) Access Points?/) : null;
+    const devMatch = fwMatch || apMatch;
+    const devTag = devMatch
+      ? `<span class="ric-tag">${shieldSvg} ${devMatch[1]} ${fwMatch ? 'Firewalls' : 'Access Points'}</span>`
+      : '';
+    return `
+    <div class="rec-insight-card sev-${sev}${d.id === currentInsightId ? ' active' : ''}" onclick="selectInsight(this,${d.id})">
+      <div class="ric-top">
+        <div class="ric-content">
+          <div class="ric-chips-row">
+            <span class="ric-chip-type">${typeIcons[d.typeKey] || ''}${d.typeLabel}</span>
+            <span class="ric-time">${d.time}</span>
+          </div>
+          <div class="ric-title">${d.title}</div>
+          <div class="ric-excerpt">${d.excerpt}</div>
+          <div class="ric-footer">
+            <div class="ric-tags">${tenantTag}${devTag}</div>
+            <button class="ric-ask-btn" onclick="event.stopPropagation();selectInsight(this.closest('.rec-insight-card'),${d.id})">${askSvg} Ask SAMI</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  let html = '';
+  sevOrder.forEach(sev => {
+    const group = items.filter(d => (d.severity || 'low') === sev);
+    if (!group.length) return;
+    html += `<div class="sev-group-label ${sev}"><span class="sgl-dot"></span>${sevLabel[sev]}<span class="sgl-count">${group.length}</span></div>`;
+    html += group.map(cardHtml).join('');
+  });
+  list.innerHTML = html;
+
+  if (samiPanelOpen && !items.find(i => i.id === currentInsightId)) {
+    closeSamiPanel();
+    currentInsightId = items[0].id;
+  }
+}
+
+function selectInsight(el, id) {
+  document.querySelectorAll('.rec-insight-card').forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
+  currentInsightId = id;
+  const d = insights.find(i => i.id === id);
+  openSamiWithInsight(d);
+}
+
+/* ─── Init ─── */
+renderList('all');
+/* Panel closed by default on this page — user opens via FAB or card click */
+</script>
+</body>
+</html>

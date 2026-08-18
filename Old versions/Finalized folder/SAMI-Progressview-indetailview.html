@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAMI Recommendation — Scheduling Patterns (UUIF 9.2)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
+<style>
+/*
+  Design System Version: UUIF 9.2
+  Component Tokens Used:
+    --uuif-brand-navy, --uuif-brand-blue, --uuif-brand-orange, --uuif-brand-green,
+    --uuif-brand-red, --uuif-brand-yellow,
+    --uuif-surface-container, --uuif-surface-bg, --uuif-surface-primary,
+    --uuif-surface-secondary, --uuif-surface-tertiary, --uuif-surface-selected,
+    --uuif-surface-hover, --uuif-surface-model, --uuif-surface-disabled, --uuif-surface-contrast,
+    --uuif-text-primary, --uuif-text-secondary, --uuif-text-tertiary,
+    --uuif-text-contrast, --uuif-text-hover, --uuif-text-disabled, --uuif-text-highlight,
+    --uuif-border-primary, --uuif-border-secondary, --uuif-border-tertiary,
+    --uuif-border-transparent, --uuif-border-disabled, --uuif-border-hover,
+    --uuif-icon-primary, --uuif-icon-secondary,
+    --uuif-fill-blue-lightest, --uuif-fill-green-xxx-lighter,
+    --uuif-fill-yellow-xxx-lighter, --uuif-fill-red-lightest,
+    --uuif-sp-1 through --uuif-sp-8,
+    --uuif-radius-4, --uuif-radius-6, --uuif-radius-8, --uuif-radius-pill,
+    --uuif-shadow-sm, --uuif-shadow-md
+  Components Used:
+    Primary Nav Rail, Top Action Bar, uuif-btn (Primary, Secondary),
+    uuif-chip (Success, Info, Warning, Error), Progress Bar (Small),
+    Dashboard Card panel pattern, Status Info Banner pattern
+  Gaps Flagged:
+    1. "Policy Gap" category uses purple in original — no purple token in UUIF 9.2.
+       Mapped to --uuif-surface-primary (#5b74a7) / --uuif-fill-blue-lightest.
+    2. Three-panel recommendation layout is a custom SAMI pattern not defined in UUIF 9.2.
+*/
+
+/* ─── TOKEN DEFINITIONS ─────────────────────────────────────────────────── */
+:root {
+  /* Text */
+  --uuif-text-primary:   #191c25;
+  --uuif-text-secondary: #4a618f;
+  --uuif-text-tertiary:  #888888;
+  --uuif-text-contrast:  #ffffff;
+  --uuif-text-disabled:  rgba(17,17,17,0.3);
+  --uuif-text-hover:     #ff5d00;
+  --uuif-text-selected:  #ffffff;
+  --uuif-text-highlight: #0c2b67;
+
+  /* Surface */
+  --uuif-surface-container: #ffffff;
+  --uuif-surface-bg:        #fafafa;
+  --uuif-surface-primary:   #5b74a7;
+  --uuif-surface-secondary: #d2dff2;
+  --uuif-surface-tertiary:  #f6f8fe;
+  --uuif-surface-highlight: #ff5d00;
+  --uuif-surface-hover:     rgba(17,17,17,0.06);
+  --uuif-surface-selected:  rgba(255,72,26,0.09);
+  --uuif-surface-disabled:  #e8eff9;
+  --uuif-surface-contrast:  #111315;
+  --uuif-surface-model:     #f0f2f5;
+
+  /* Border */
+  --uuif-border-primary:     #ff5d00;
+  --uuif-border-secondary:   #78a3e5;
+  --uuif-border-tertiary:    #cccccc;
+  --uuif-border-transparent: rgba(17,17,17,0.09);
+  --uuif-border-disabled:    #d2dff2;
+  --uuif-border-hover:       #ff5d00;
+  --uuif-border-selected:    #ffffff;
+
+  /* Icon */
+  --uuif-icon-primary:   #5885cc;
+  --uuif-icon-secondary: #9dafd3;
+  --uuif-icon-tertiary:  #62686d;
+  --uuif-icon-hover:     #ff5d00;
+
+  /* Branding */
+  --uuif-brand-navy:   #001b50;
+  --uuif-brand-blue:   #1f3c73;
+  --uuif-brand-orange: #ff5d00;
+  --uuif-brand-green:  #59a02e;
+  --uuif-brand-red:    #c70f0f;
+  --uuif-brand-yellow: #f3ac3d;
+  --uuif-theme-text-primary:   #001b50;
+  --uuif-theme-text-secondary: #5b74a7;
+  --uuif-theme-bg-primary:     #001b50;
+  --uuif-theme-bg-secondary:   #d2dff2;
+
+  /* Status */
+  --uuif-status-normal: #99CC00;
+  --uuif-status-minor:  #FFCC00;
+  --uuif-status-major:  #FF9900;
+  --uuif-status-high:   #FF0000;
+  --uuif-status-failed: #CC0000;
+
+  /* Fill */
+  --uuif-fill-blue-lightest:      #f6f8fe;
+  --uuif-fill-green-xxx-lighter:  #e3efdc;
+  --uuif-fill-yellow-xxx-lighter: #ffe9be;
+  --uuif-fill-red-lightest:       #fff0f0;
+  --uuif-fill-green-x-darker:     #478234;
+  --uuif-fill-orange-x-darker:    #c24903;
+  --uuif-fill-red-x-darker:       #ab0a0c;
+
+  /* Spacing */
+  --uuif-sp-1:  2px;
+  --uuif-sp-2:  4px;
+  --uuif-sp-3:  8px;
+  --uuif-sp-4:  12px;
+  --uuif-sp-5:  16px;
+  --uuif-sp-6:  20px;
+  --uuif-sp-7:  24px;
+  --uuif-sp-8:  32px;
+  --uuif-sp-9:  40px;
+  --uuif-sp-10: 48px;
+  --uuif-sp-12: 64px;
+
+  /* Radius */
+  --uuif-radius-4:    4px;
+  --uuif-radius-6:    6px;
+  --uuif-radius-8:    8px;
+  --uuif-radius-12:   12px;
+  --uuif-radius-22:   22px;
+  --uuif-radius-pill: 88px;
+
+  /* Shadow */
+  --uuif-shadow-sm: 0px 1px 6px 2px rgba(0,0,0,0.12);
+  --uuif-shadow-md: 0px 4px 12px 0px rgba(0,0,0,0.16);
+}
+
+/* ─── RESET + BASE ──────────────────────────────────────────────────────── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Nunito Sans', sans-serif;
+  background: var(--uuif-surface-bg);
+  color: var(--uuif-text-primary);
+  font-size: 13px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── SIDEBAR — Primary Nav Rail ────────────────────────────────────────── */
+.sidebar {
+  position: fixed; left: 0; top: 0; width: 60px; height: 100vh;
+  background: var(--uuif-brand-navy);
+  display: flex; flex-direction: column;
+  align-items: center; padding: 0; z-index: 200;
+}
+.sidebar-logo {
+  width: 60px; height: 52px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.sidebar-logo svg { width: 28px; height: 28px; }
+.sidebar-icon {
+  width: 60px; height: 52px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--uuif-icon-secondary);
+  cursor: pointer; position: relative; transition: color .15s;
+  border-left: 2px solid transparent;
+}
+.sidebar-icon:hover { color: var(--uuif-icon-hover); }
+.sidebar-icon.active {
+  background: rgba(17,17,17,0.4);
+  border-left-color: var(--uuif-brand-orange);
+  color: var(--uuif-brand-orange);
+}
+.sidebar-icon .badge {
+  position: absolute; top: 8px; right: 8px;
+  background: var(--uuif-brand-orange); color: var(--uuif-text-contrast);
+  font-size: 9px; font-weight: 700;
+  border-radius: var(--uuif-radius-pill);
+  min-width: 16px; height: 16px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 var(--uuif-sp-2);
+}
+.sidebar-spacer { flex: 1; }
+
+/* ─── TOPBAR — Top Action Bar ───────────────────────────────────────────── */
+.topbar {
+  position: fixed; left: 60px; right: 0; top: 0; height: 46px;
+  background: var(--uuif-surface-container);
+  border-bottom: 1px solid var(--uuif-border-transparent);
+  display: flex; align-items: center;
+  padding: 0 var(--uuif-sp-5); z-index: 199; gap: var(--uuif-sp-3);
+}
+.breadcrumb {
+  display: flex; align-items: center; gap: var(--uuif-sp-2);
+  font-size: 12px; color: var(--uuif-text-secondary); flex: 1;
+}
+.breadcrumb a { color: var(--uuif-icon-primary); text-decoration: none; }
+.breadcrumb a:hover { color: var(--uuif-text-hover); text-decoration: underline; }
+.breadcrumb span { color: var(--uuif-text-tertiary); }
+.tenant-selector {
+  display: flex; align-items: center; gap: var(--uuif-sp-2);
+  border: 1px solid var(--uuif-border-tertiary);
+  border-radius: var(--uuif-radius-pill);
+  padding: var(--uuif-sp-2) var(--uuif-sp-4);
+  font-size: 12px; cursor: pointer; font-family: 'Nunito Sans', sans-serif;
+  background: var(--uuif-surface-container); color: var(--uuif-text-primary);
+  transition: border-color .15s;
+}
+.tenant-selector:hover { border-color: var(--uuif-border-secondary); }
+.tenant-selector .dot { width: 8px; height: 8px; background: var(--uuif-brand-orange); border-radius: 50%; }
+.topbar-icons { display: flex; align-items: center; gap: var(--uuif-sp-3); }
+.topbar-icons .icon-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--uuif-text-tertiary);
+  transition: background .15s; position: relative;
+}
+.topbar-icons .icon-btn:hover { background: var(--uuif-surface-hover); }
+.topbar-icons .notif-badge {
+  position: absolute; top: 4px; right: 4px; width: 8px; height: 8px;
+  background: var(--uuif-brand-orange); border-radius: 50%;
+}
+.avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--uuif-brand-blue); color: var(--uuif-text-contrast);
+  font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+
+/* ─── PAGE WRAPPER ──────────────────────────────────────────────────────── */
+.page { margin-left: 60px; padding-top: 46px; min-height: 100vh; }
+.p2-content { padding: var(--uuif-sp-4) var(--uuif-sp-5) 0; }
+
+/* ─── PAGE HEADER ───────────────────────────────────────────────────────── */
+.p2-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: var(--uuif-sp-3);
+}
+.p2-header-left { display: flex; align-items: flex-start; gap: var(--uuif-sp-3); }
+.back-btn {
+  width: 28px; height: 28px; border: none; background: transparent;
+  cursor: pointer; color: var(--uuif-brand-orange);
+  display: flex; align-items: center; justify-content: center;
+  margin-top: var(--uuif-sp-1); border-radius: var(--uuif-radius-4);
+  text-decoration: none; transition: background .15s;
+}
+.back-btn:hover { background: var(--uuif-surface-selected); }
+.p2-title { font-size: 20px; font-weight: 700; color: var(--uuif-text-primary); line-height: 1.2; }
+.p2-sub { font-size: 12px; color: var(--uuif-text-tertiary); margin-top: var(--uuif-sp-1); }
+/* uuif-btn Secondary */
+.export-btn {
+  background: var(--uuif-surface-container);
+  border: 1px solid var(--uuif-border-secondary);
+  border-radius: var(--uuif-radius-pill);
+  padding: var(--uuif-sp-2) var(--uuif-sp-5);
+  font-size: 13px; cursor: pointer; font-family: 'Nunito Sans', sans-serif;
+  color: var(--uuif-text-secondary); display: flex; align-items: center;
+  gap: var(--uuif-sp-2); font-weight: 500; transition: all .15s;
+  white-space: nowrap; align-self: flex-start; margin-top: 2px;
+}
+.export-btn:hover { border-color: var(--uuif-border-hover); color: var(--uuif-text-hover); }
+
+/* ─── OPTION SWITCHER BAR ───────────────────────────────────────────────── */
+.opt-switcher-bar {
+  display: flex; gap: var(--uuif-sp-3); margin-bottom: var(--uuif-sp-3);
+  background: var(--uuif-surface-container);
+  border: 1px solid var(--uuif-border-tertiary);
+  border-radius: var(--uuif-radius-8);
+  padding: var(--uuif-sp-3) var(--uuif-sp-4); align-items: flex-start;
+}
+.opt-switcher-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.07em; color: var(--uuif-text-tertiary);
+  white-space: nowrap; margin-top: var(--uuif-sp-3); margin-right: var(--uuif-sp-1);
+  line-height: 1.4;
+}
+.opt-cards { display: flex; gap: var(--uuif-sp-3); flex: 1; }
+.opt-card {
+  flex: 1; border: 1.5px solid var(--uuif-border-tertiary);
+  border-radius: var(--uuif-radius-6);
+  padding: var(--uuif-sp-3) var(--uuif-sp-4);
+  cursor: pointer; background: var(--uuif-surface-bg); transition: all .15s;
+}
+.opt-card:hover { border-color: var(--uuif-border-secondary); background: var(--uuif-surface-container); }
+.opt-card.active { border-color: var(--uuif-border-primary); background: var(--uuif-surface-selected); }
+.opt-card-label {
+  font-size: 12px; font-weight: 700; color: var(--uuif-text-primary);
+  margin-bottom: var(--uuif-sp-1); display: flex; align-items: center; gap: var(--uuif-sp-2);
+}
+.opt-card.active .opt-card-label { color: var(--uuif-brand-orange); }
+.opt-card-desc { font-size: 11px; color: var(--uuif-text-tertiary); line-height: 1.5; }
+/* uuif-chip: Label/New variant */
+.opt-badge {
+  font-size: 9px; font-weight: 700;
+  background: var(--uuif-brand-orange); color: var(--uuif-text-contrast);
+  border-radius: var(--uuif-radius-4);
+  height: 16px; display: inline-flex; align-items: center; padding: 0 var(--uuif-sp-2);
+}
+.opt-card:not(.active) .opt-badge { background: var(--uuif-surface-model); color: var(--uuif-text-tertiary); }
+
+/* ─── THREE-PANEL ───────────────────────────────────────────────────────── */
+.three-panel { display: flex; gap: 0; height: calc(100vh - 46px - 150px); min-height: 540px; }
+
+/* ─── LEFT NAV PANEL ────────────────────────────────────────────────────── */
+.nav-panel {
+  width: 192px; background: var(--uuif-surface-container);
+  border-radius: var(--uuif-radius-6) 0 0 var(--uuif-radius-6);
+  border: 1px solid var(--uuif-border-tertiary);
+  flex-shrink: 0; overflow-y: auto; display: flex; flex-direction: column;
+}
+.nav-panel .need-attn-header {
+  background: var(--uuif-brand-navy); color: var(--uuif-text-contrast);
+  padding: var(--uuif-sp-3) var(--uuif-sp-4);
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.need-attn-badge {
+  background: var(--uuif-brand-orange); color: var(--uuif-text-contrast);
+  font-size: 10px; font-weight: 700;
+  border-radius: var(--uuif-radius-pill); padding: 1px var(--uuif-sp-3);
+}
+.nav-panel .by-category {
+  padding: var(--uuif-sp-3) var(--uuif-sp-4) var(--uuif-sp-2);
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  color: var(--uuif-text-tertiary); letter-spacing: 0.06em;
+}
+.nav-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--uuif-sp-2) var(--uuif-sp-4);
+  font-size: 13px; color: var(--uuif-text-primary); cursor: pointer;
+  border-left: 3px solid transparent; transition: background .1s;
+}
+.nav-item:hover { background: var(--uuif-surface-hover); }
+.nav-item.active {
+  color: var(--uuif-brand-orange); font-weight: 600;
+  background: var(--uuif-surface-selected);
+  border-left-color: var(--uuif-brand-orange);
+}
+.nav-item .nav-count { font-size: 12px; color: var(--uuif-text-tertiary); }
+.nav-item.active .nav-count { color: var(--uuif-brand-orange); }
+
+/* Option A: state sections in nav */
+.nav-state-section { display: none; }
+body.opt-a .nav-state-section { display: block; }
+.nav-state-header {
+  padding: var(--uuif-sp-3) var(--uuif-sp-4) var(--uuif-sp-2);
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  color: var(--uuif-text-tertiary); letter-spacing: 0.06em;
+  border-top: 1px solid var(--uuif-border-transparent); margin-top: var(--uuif-sp-2);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-state-header .nsb {
+  font-size: 9px; font-weight: 700;
+  border-radius: var(--uuif-radius-pill); padding: 1px var(--uuif-sp-2);
+}
+/* uuif-chip Success */
+.nsb-inprog { background: var(--uuif-fill-green-xxx-lighter); color: var(--uuif-brand-green); }
+/* uuif-chip Info */
+.nsb-sched  { background: var(--uuif-fill-blue-lightest); color: var(--uuif-surface-primary); }
+.nav-state-item {
+  padding: var(--uuif-sp-2) var(--uuif-sp-4);
+  font-size: 12px; color: var(--uuif-text-secondary); cursor: pointer;
+  border-left: 3px solid transparent; transition: background .1s;
+}
+.nav-state-item:hover { background: var(--uuif-surface-hover); }
+.nav-state-item.inprog { border-left-color: var(--uuif-brand-green); }
+.nav-state-item.sched  { border-left-color: var(--uuif-surface-primary); }
+.nav-state-item .nsi-title {
+  font-weight: 600; color: var(--uuif-text-primary); font-size: 12px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.nav-state-item .nsi-meta { font-size: 11px; color: var(--uuif-text-tertiary); margin-top: 2px; }
+/* uuif Progress Bar Small */
+.nav-progress-mini {
+  height: 4px; background: var(--uuif-border-disabled);
+  border-radius: var(--uuif-radius-pill); margin-top: var(--uuif-sp-2); overflow: hidden;
+}
+.nav-progress-fill {
+  height: 100%; background: var(--uuif-brand-green);
+  border-radius: var(--uuif-radius-pill); transition: width .5s;
+}
+
+/* ─── LIST PANEL ────────────────────────────────────────────────────────── */
+.list-panel {
+  width: 320px; background: var(--uuif-surface-container);
+  border: 1px solid var(--uuif-border-tertiary);
+  border-left: none;
+  flex-shrink: 0; overflow-y: hidden;
+  display: flex; flex-direction: column;
+}
+.list-panel-header {
+  padding: var(--uuif-sp-3) var(--uuif-sp-5);
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--uuif-text-highlight);
+  border-bottom: 1px solid var(--uuif-border-transparent);
+  background: var(--uuif-surface-container);
+  position: sticky; top: 0; z-index: 1; flex-shrink: 0;
+}
+.list-panel-header span { color: var(--uuif-text-tertiary); font-weight: 400; text-transform: none; letter-spacing: 0; }
+
+/* Option B: status strip */
+.list-status-strip {
+  display: none; padding: var(--uuif-sp-2) var(--uuif-sp-5);
+  border-bottom: 1px solid var(--uuif-border-transparent);
+  background: var(--uuif-surface-bg); align-items: center;
+  gap: var(--uuif-sp-3); flex-shrink: 0;
+}
+body.opt-b .list-status-strip { display: flex; }
+.ss-pill { display: flex; align-items: center; gap: var(--uuif-sp-2); font-size: 12px; font-weight: 600; }
+.ss-pill.inprog { color: var(--uuif-brand-green); }
+.ss-pill.sched  { color: var(--uuif-surface-primary); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+.ss-dot { width: 7px; height: 7px; border-radius: 50%; }
+.ss-dot.inprog { background: var(--uuif-brand-green); animation: pulse 1.5s infinite; }
+.ss-dot.sched  { background: var(--uuif-surface-primary); }
+
+.list-items { flex: 1; overflow-y: auto; }
+.list-item {
+  padding: var(--uuif-sp-4) var(--uuif-sp-5);
+  border-bottom: 1px solid var(--uuif-border-transparent);
+  cursor: pointer; transition: background .12s;
+  border-left: 3px solid transparent;
+}
+.list-item:hover { background: var(--uuif-surface-hover); }
+.list-item.active {
+  background: var(--uuif-surface-selected);
+  border-left-color: var(--uuif-brand-orange);
+}
+.list-item .li-meta {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: var(--uuif-sp-2);
+}
+.li-type { font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: var(--uuif-sp-2); }
+.li-type.device::before      { content:''; width:5px; height:5px; background: var(--uuif-brand-orange); border-radius:50%; }
+.li-type.device               { color: var(--uuif-brand-orange); }
+.li-type.behavioral-a::before { content:''; width:5px; height:5px; background: var(--uuif-icon-primary); border-radius:50%; }
+.li-type.behavioral-a         { color: var(--uuif-icon-primary); }
+/* GAP: no purple in UUIF 9.2 — using surface-primary */
+.li-type.policy-g::before { content:''; width:5px; height:5px; background: var(--uuif-surface-primary); border-radius:50%; }
+.li-type.policy-g         { color: var(--uuif-surface-primary); }
+.li-crit {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--uuif-brand-red); color: var(--uuif-text-contrast);
+  font-size: 10px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.li-time { font-size: 11px; color: var(--uuif-text-tertiary); }
+.list-item .li-title {
+  font-size: 13px; font-weight: 700; color: var(--uuif-text-primary);
+  margin-bottom: var(--uuif-sp-2); line-height: 1.4;
+}
+.list-item .li-desc {
+  font-size: 12px; color: var(--uuif-text-secondary); line-height: 1.5;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+/* Option B: state badges on list items */
+.li-state-row {
+  display: none; margin-top: var(--uuif-sp-2);
+  padding-top: var(--uuif-sp-2); border-top: 1px solid var(--uuif-border-transparent);
+}
+body.opt-b .li-state-row { display: flex; align-items: center; }
+/* uuif-chip variants */
+.li-state-pill {
+  display: inline-flex; align-items: center; gap: var(--uuif-sp-2);
+  font-size: 11px; font-weight: 600;
+  border-radius: var(--uuif-radius-4); padding: 2px var(--uuif-sp-3);
+  border: 1px solid; height: 22px;
+}
+/* Warning chip — "Needs action" */
+.li-state-pill.active-pill {
+  background: var(--uuif-fill-yellow-xxx-lighter);
+  color: var(--uuif-brand-yellow); border-color: var(--uuif-brand-yellow);
+}
+/* Success chip — "In progress" */
+.li-state-pill.inprog-pill {
+  background: var(--uuif-fill-green-xxx-lighter);
+  color: var(--uuif-brand-green); border-color: var(--uuif-brand-green);
+}
+/* Info chip — "Scheduled" */
+.li-state-pill.sched-pill {
+  background: var(--uuif-fill-blue-lightest);
+  color: var(--uuif-surface-primary); border-color: var(--uuif-border-secondary);
+}
+.inprog-spinner {
+  width: 8px; height: 8px;
+  border: 1.5px solid var(--uuif-brand-green); border-top-color: transparent;
+  border-radius: 50%; animation: spin .8s linear infinite; display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Option B: list item state border tinting */
+body.opt-b .list-item[data-state="inprogress"] { border-left: 3px solid var(--uuif-brand-green); }
+body.opt-b .list-item[data-state="scheduled"]  { border-left: 3px solid var(--uuif-surface-primary); }
+body.opt-b .list-item.active[data-state="inprogress"] { border-left: 3px solid var(--uuif-brand-orange); }
+
+/* ─── DETAIL PANEL ──────────────────────────────────────────────────────── */
+.detail-panel {
+  flex: 1; background: var(--uuif-surface-container);
+  border: 1px solid var(--uuif-border-tertiary); border-left: none;
+  border-radius: 0 var(--uuif-radius-6) var(--uuif-radius-6) 0;
+  overflow: hidden; display: flex; flex-direction: column;
+}
+.detail-scroll { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+.detail-header {
+  padding: var(--uuif-sp-5) var(--uuif-sp-6) var(--uuif-sp-4);
+  border-bottom: 1px solid var(--uuif-border-transparent);
+}
+.detail-header-top { display: flex; align-items: flex-start; justify-content: space-between; }
+.detail-badge { display: inline-flex; align-items: center; gap: var(--uuif-sp-3); margin-bottom: var(--uuif-sp-3); }
+.cve-tag {
+  font-size: 11px; font-weight: 700;
+  border-radius: var(--uuif-radius-4); padding: 3px var(--uuif-sp-3);
+  border: 1px solid; display: inline-block; letter-spacing: 0.01em;
+}
+.detail-title {
+  font-size: 16px; font-weight: 700; color: var(--uuif-text-primary);
+  line-height: 1.35; margin-bottom: var(--uuif-sp-3);
+}
+.detail-scope {
+  display: flex; gap: var(--uuif-sp-4); font-size: 12px;
+  color: var(--uuif-text-secondary); align-items: center; flex-wrap: wrap;
+}
+
+/* Option C: work mode toggle */
+.work-mode-toggle { display: none; }
+body.opt-c .work-mode-toggle { display: flex; }
+.wm-toggle {
+  display: flex; border: 1px solid var(--uuif-border-tertiary);
+  border-radius: var(--uuif-radius-6); overflow: hidden;
+}
+.wm-btn {
+  padding: var(--uuif-sp-2) var(--uuif-sp-4); font-size: 12px; font-weight: 600;
+  cursor: pointer; border: none; background: var(--uuif-surface-container);
+  color: var(--uuif-text-secondary); transition: all .15s;
+  font-family: 'Nunito Sans', sans-serif;
+}
+.wm-btn.active { background: var(--uuif-brand-navy); color: var(--uuif-text-contrast); }
+
+/* SAMI note — Info Status Banner pattern */
+.detail-sami-note {
+  margin: var(--uuif-sp-4) var(--uuif-sp-6) 0;
+  background: var(--uuif-fill-blue-lightest);
+  border: 1px solid var(--uuif-border-secondary);
+  border-radius: var(--uuif-radius-6);
+  padding: var(--uuif-sp-3) var(--uuif-sp-4);
+  font-size: 13px; color: var(--uuif-text-primary); line-height: 1.6;
+  display: flex; align-items: flex-start; gap: var(--uuif-sp-3);
+}
+.detail-sami-note .ds-tag {
+  background: var(--uuif-brand-orange); color: var(--uuif-text-contrast);
+  font-size: 10px; font-weight: 700; border-radius: var(--uuif-radius-4);
+  padding: 2px var(--uuif-sp-2); flex-shrink: 0; margin-top: 2px;
+  letter-spacing: 0.03em;
+}
+.detail-body { padding: var(--uuif-sp-5) var(--uuif-sp-6); flex: 1; }
+.section-title {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.07em; color: var(--uuif-text-tertiary); margin-bottom: var(--uuif-sp-3);
+}
+.evidence-item {
+  display: flex; align-items: center; gap: var(--uuif-sp-3);
+  padding: var(--uuif-sp-2) 0; font-size: 13px; color: var(--uuif-text-primary);
+  border-bottom: 1px solid var(--uuif-border-transparent);
+}
+.evidence-item:last-child { border-bottom: none; }
+.ev-icon {
+  width: 24px; height: 24px; border-radius: var(--uuif-radius-4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+}
+.ev-icon.shield  { background: var(--uuif-fill-blue-lightest); }
+.ev-icon.chart   { background: var(--uuif-surface-model); }
+.ev-icon.warning { background: var(--uuif-fill-yellow-xxx-lighter); }
+.ev-icon.check   { background: var(--uuif-fill-green-xxx-lighter); }
+.timeline-section { margin-top: var(--uuif-sp-5); }
+.timeline-item {
+  display: flex; gap: var(--uuif-sp-4); padding: var(--uuif-sp-2) 0;
+  font-size: 12px; border-bottom: 1px solid var(--uuif-border-transparent);
+  color: var(--uuif-text-primary);
+}
+.timeline-item:last-child { border-bottom: none; }
+.timeline-date {
+  color: var(--uuif-icon-primary); font-weight: 600;
+  min-width: 120px; flex-shrink: 0;
+}
+
+/* ─── DETAIL FOOTER + INLINE SCHEDULER ─────────────────────────────────── */
+.detail-footer-wrap {
+  border-top: 1px solid var(--uuif-border-transparent);
+  background: var(--uuif-surface-container);
+  border-radius: 0 0 var(--uuif-radius-6) var(--uuif-radius-6); flex-shrink: 0;
+}
+
+/* Default footer */
+.df-default {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--uuif-sp-3) var(--uuif-sp-6);
+}
+.df-default .view-devices {
+  font-size: 13px; color: var(--uuif-icon-primary);
+  cursor: pointer; text-decoration: underline;
+}
+.footer-actions { display: flex; gap: var(--uuif-sp-3); }
+/* uuif-btn Secondary */
+.btn-sched {
+  background: var(--uuif-surface-container);
+  border: 1px solid var(--uuif-border-secondary);
+  border-radius: var(--uuif-radius-pill);
+  padding: var(--uuif-sp-2) var(--uuif-sp-5);
+  font-size: 13px; cursor: pointer; color: var(--uuif-text-secondary);
+  font-weight: 500; display: flex; align-items: center; gap: var(--uuif-sp-2);
+  font-family: 'Nunito Sans', sans-serif; transition: all .15s;
+}
+.btn-sched:hover { border-color: var(--uuif-border-hover); color: var(--uuif-text-hover); }
+/* uuif-btn Primary */
+.btn-primary {
+  background: var(--uuif-surface-primary); color: var(--uuif-text-contrast);
+  border: none; border-radius: var(--uuif-radius-pill);
+  padding: var(--uuif-sp-2) var(--uuif-sp-5);
+  font-size: 13px; cursor: pointer; font-weight: 600;
+  font-family: 'Nunito Sans', sans-serif; transition: background .15s;
+}
+.btn-primary:hover { background: var(--uuif-brand-navy); }
+
+/* Scheduled state footer */
+.df-scheduled {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--uuif-sp-3) var(--uuif-sp-6);
+  background: var(--uuif-fill-blue-lightest);
+  border-radius: 0 0 var(--uuif-radius-6) var(--uuif-radius-6);
+}
+.df-sched-info { display: flex; align-items: center; gap: var(--uuif-sp-3); font-size: 13px; }
+.df-sched-info .sched-icon { color: var(--uuif-surface-primary); font-size: 16px; }
+.df-sched-info .sched-text { color: var(--uuif-text-primary); font-weight: 600; }
+.df-sched-info .sched-sub  { font-size: 11px; color: var(--uuif-text-tertiary); margin-top: 2px; }
+.df-sched-links { display: flex; gap: var(--uuif-sp-2); align-items: center; }
+.df-sched-links button {
+  background: none; border: none; cursor: pointer;
+  font-size: 12px; padding: var(--uuif-sp-2) var(--uuif-sp-3);
+  border-radius: var(--uuif-radius-4); font-weight: 600;
+  font-family: 'Nunito Sans', sans-serif; transition: background .15s;
+}
+.df-sched-links .btn-edit   { color: var(--uuif-icon-primary); }
+.df-sched-links .btn-edit:hover   { background: var(--uuif-surface-secondary); }
+.df-sched-links .btn-cancel { color: var(--uuif-brand-red); }
+.df-sched-links .btn-cancel:hover { background: var(--uuif-fill-red-lightest); }
+.df-sched-links .btn-dnow {
+  color: var(--uuif-brand-orange); font-weight: 700;
+  border: 1px solid var(--uuif-border-primary);
+  border-radius: var(--uuif-radius-pill);
+}
+.df-sched-links .btn-dnow:hover { background: var(--uuif-surface-selected); }
+
+/* In-progress state footer */
+.df-inprogress {
+  padding: var(--uuif-sp-3) var(--uuif-sp-6);
+  background: var(--uuif-fill-green-xxx-lighter);
+  border-radius: 0 0 var(--uuif-radius-6) var(--uuif-radius-6);
+}
+.df-ip-top {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: var(--uuif-sp-3);
+}
+.df-ip-label {
+  font-size: 13px; font-weight: 700; color: var(--uuif-brand-green);
+  display: flex; align-items: center; gap: var(--uuif-sp-2);
+}
+.df-ip-eta { font-size: 11px; color: var(--uuif-text-tertiary); }
+/* uuif Progress Bar Small */
+.df-prog-bar {
+  height: 6px; background: var(--uuif-border-disabled);
+  border-radius: var(--uuif-radius-pill); overflow: hidden;
+}
+.df-prog-fill {
+  height: 100%; background: var(--uuif-brand-green);
+  border-radius: var(--uuif-radius-pill); transition: width 1s;
+}
+.df-ip-bottom {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: var(--uuif-sp-3);
+}
+.df-ip-status { font-size: 12px; color: var(--uuif-text-secondary); }
+.df-ip-links { display: flex; gap: var(--uuif-sp-3); }
+.df-ip-links button {
+  background: none; border: none; cursor: pointer;
+  font-size: 12px; padding: var(--uuif-sp-2) var(--uuif-sp-3);
+  border-radius: var(--uuif-radius-4); font-weight: 600;
+  font-family: 'Nunito Sans', sans-serif; transition: background .15s;
+}
+.df-ip-links .btn-view  { color: var(--uuif-icon-primary); text-decoration: underline; cursor: pointer; }
+.df-ip-links .btn-pause { color: var(--uuif-text-tertiary); border: 1px solid var(--uuif-border-tertiary); }
+.df-ip-links .btn-pause:hover { background: var(--uuif-surface-model); }
+
+/* Inline scheduler expansion */
+.df-scheduling {
+  padding: var(--uuif-sp-4) var(--uuif-sp-6) var(--uuif-sp-5);
+  border-top: 2px solid var(--uuif-border-secondary);
+  background: var(--uuif-fill-blue-lightest);
+}
+.sched-expand-header {
+  font-size: 13px; font-weight: 700; color: var(--uuif-text-primary);
+  margin-bottom: var(--uuif-sp-3); display: flex; align-items: center; gap: var(--uuif-sp-2);
+}
+.sched-expand-header .seh-icon { color: var(--uuif-surface-primary); font-size: 15px; }
+.sched-time-row { display: flex; gap: var(--uuif-sp-2); margin-bottom: var(--uuif-sp-3); flex-wrap: wrap; }
+/* uuif-btn Secondary small */
+.sched-time-btn {
+  background: var(--uuif-surface-container);
+  border: 1.5px solid var(--uuif-border-tertiary);
+  border-radius: var(--uuif-radius-pill);
+  padding: var(--uuif-sp-2) var(--uuif-sp-4);
+  font-size: 12px; cursor: pointer; color: var(--uuif-text-secondary); font-weight: 500;
+  transition: all .15s; font-family: 'Nunito Sans', sans-serif;
+}
+.sched-time-btn:hover   { border-color: var(--uuif-border-hover); color: var(--uuif-text-hover); }
+.sched-time-btn.selected {
+  border-color: var(--uuif-border-secondary);
+  background: var(--uuif-surface-secondary);
+  color: var(--uuif-surface-primary); font-weight: 700;
+}
+/* SAMI reasoning block — Warning banner pattern */
+.sched-sami-block {
+  background: var(--uuif-fill-yellow-xxx-lighter);
+  border: 1px solid var(--uuif-brand-yellow);
+  border-radius: var(--uuif-radius-6);
+  padding: var(--uuif-sp-3) var(--uuif-sp-4);
+  margin-bottom: var(--uuif-sp-3); font-size: 12px;
+  color: var(--uuif-text-primary); line-height: 1.6;
+  display: flex; gap: var(--uuif-sp-2); align-items: flex-start; min-height: 44px;
+}
+.sched-sami-block .ssb-tag {
+  background: var(--uuif-brand-orange); color: var(--uuif-text-contrast);
+  font-size: 9px; font-weight: 700; border-radius: var(--uuif-radius-4);
+  padding: 2px var(--uuif-sp-2); flex-shrink: 0; margin-top: 2px;
+}
+.sched-sami-placeholder { color: var(--uuif-text-tertiary); font-style: italic; }
+.sched-actions-row { display: flex; align-items: center; justify-content: flex-end; gap: var(--uuif-sp-3); }
+.btn-sched-cancel {
+  background: none; border: none; cursor: pointer;
+  font-size: 13px; color: var(--uuif-text-tertiary);
+  padding: var(--uuif-sp-2) var(--uuif-sp-3); border-radius: var(--uuif-radius-4);
+  font-family: 'Nunito Sans', sans-serif; transition: background .15s;
+}
+.btn-sched-cancel:hover { background: var(--uuif-surface-model); }
+/* uuif-btn Primary */
+.btn-sched-confirm {
+  background: var(--uuif-surface-primary); color: var(--uuif-text-contrast);
+  border: none; border-radius: var(--uuif-radius-pill);
+  padding: var(--uuif-sp-2) var(--uuif-sp-6);
+  font-size: 13px; cursor: pointer; font-weight: 700;
+  font-family: 'Nunito Sans', sans-serif; transition: background .15s;
+}
+.btn-sched-confirm:hover    { background: var(--uuif-brand-navy); }
+.btn-sched-confirm:disabled { background: var(--uuif-surface-disabled); color: var(--uuif-text-disabled); cursor: not-allowed; }
+
+/* ─── OPTION C: WORK MODE VIEW ──────────────────────────────────────────── */
+.work-status-view { padding: var(--uuif-sp-5) var(--uuif-sp-6); flex: 1; overflow-y: auto; }
+.ws-section { margin-bottom: var(--uuif-sp-6); }
+.ws-section-header {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.07em; color: var(--uuif-text-tertiary);
+  margin-bottom: var(--uuif-sp-3); display: flex; align-items: center; gap: var(--uuif-sp-2);
+}
+.ws-section-header .wsc {
+  font-size: 9px; font-weight: 700;
+  border-radius: var(--uuif-radius-pill); padding: 1px var(--uuif-sp-3);
+  height: 18px; display: inline-flex; align-items: center;
+}
+.wsc-inprog { background: var(--uuif-fill-green-xxx-lighter); color: var(--uuif-brand-green); }
+.wsc-sched  { background: var(--uuif-fill-blue-lightest); color: var(--uuif-surface-primary); }
+.wsc-active { background: var(--uuif-fill-yellow-xxx-lighter); color: var(--uuif-brand-yellow); }
+.ws-item {
+  border: 1px solid var(--uuif-border-tertiary);
+  border-radius: var(--uuif-radius-6);
+  padding: var(--uuif-sp-3) var(--uuif-sp-4); margin-bottom: var(--uuif-sp-3);
+  cursor: pointer; transition: border-color .15s; background: var(--uuif-surface-container);
+}
+.ws-item:hover { border-color: var(--uuif-border-secondary); }
+.ws-item-title { font-size: 13px; font-weight: 700; color: var(--uuif-text-primary); margin-bottom: var(--uuif-sp-2); }
+.ws-item-meta  { font-size: 12px; color: var(--uuif-text-secondary); margin-bottom: var(--uuif-sp-2); }
+.ws-prog-bar {
+  height: 4px; background: var(--uuif-border-disabled);
+  border-radius: var(--uuif-radius-pill); overflow: hidden; margin-bottom: var(--uuif-sp-2);
+}
+.ws-prog-fill {
+  height: 100%; background: var(--uuif-brand-green);
+  border-radius: var(--uuif-radius-pill); transition: width 1s;
+}
+.ws-item-bottom {
+  font-size: 11px; color: var(--uuif-text-tertiary);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.ws-item-bottom a { color: var(--uuif-icon-primary); text-decoration: underline; cursor: pointer; }
+.ws-sched-when {
+  display: flex; align-items: center; gap: var(--uuif-sp-2);
+  font-size: 12px; color: var(--uuif-surface-primary); font-weight: 600;
+}
+.ws-sched-edit { color: var(--uuif-icon-primary); text-decoration: underline; cursor: pointer; font-size: 12px; }
+.ws-active-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--uuif-sp-3) var(--uuif-sp-4);
+  border: 1px solid var(--uuif-border-secondary);
+  border-radius: var(--uuif-radius-6); margin-bottom: var(--uuif-sp-2);
+  cursor: pointer; background: var(--uuif-fill-blue-lightest);
+  transition: background .15s;
+}
+.ws-active-item:hover { background: var(--uuif-surface-secondary); }
+.ws-active-title { font-size: 13px; font-weight: 600; color: var(--uuif-text-primary); }
+.ws-active-tag  { font-size: 11px; color: var(--uuif-brand-yellow); font-weight: 600; margin-top: 2px; }
+.ws-active-actions { display: flex; gap: var(--uuif-sp-2); }
+.ws-btn-sm { font-size: 12px; padding: var(--uuif-sp-2) var(--uuif-sp-3); border-radius: var(--uuif-radius-pill); cursor: pointer; font-weight: 600; font-family: 'Nunito Sans', sans-serif; }
+/* Secondary */
+.ws-btn-sched { background: var(--uuif-surface-container); border: 1px solid var(--uuif-border-secondary); color: var(--uuif-text-secondary); }
+/* Primary */
+.ws-btn-act   { background: var(--uuif-surface-primary); border: none; color: var(--uuif-text-contrast); }
+
+/* ─── TOAST ─────────────────────────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--uuif-surface-contrast); color: var(--uuif-text-contrast);
+  padding: var(--uuif-sp-3) var(--uuif-sp-5);
+  border-radius: var(--uuif-radius-8); font-size: 13px; font-weight: 600;
+  display: flex; align-items: center; gap: var(--uuif-sp-3); z-index: 999;
+  transform: translateY(10px); opacity: 0; transition: all .3s;
+  pointer-events: none; box-shadow: var(--uuif-shadow-md);
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast .toast-icon { color: var(--uuif-brand-green); font-size: 16px; }
+</style>
+</head>
+<body class="opt-a">
+
+<!-- ─── SIDEBAR — Primary Nav Rail ─────────────────────────────────────── -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <!-- SonicWall Swoosh logomark — fill="#FF5D00" per UUIF 9.2 -->
+    <svg viewBox="0 0 24 24" fill="#FF5D00"><path d="M12 2C8 2 4 6 4 10c0 4 2 7 5 9l0 3h6l0-3c3-2 5-5 5-9 0-4-4-8-8-8z"/></svg>
+  </div>
+  <div class="sidebar-icon active">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    <span class="badge">8</span>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+  </div>
+  <div class="sidebar-icon">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+  </div>
+  <div class="sidebar-spacer"></div>
+  <div class="sidebar-icon">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <span class="badge">3</span>
+  </div>
+</nav>
+
+<!-- ─── TOPBAR ───────────────────────────────────────────────────────────── -->
+<header class="topbar">
+  <div class="breadcrumb">
+    <a href="#">Home</a><span>›</span>
+    <a href="#">Dashboard</a><span>›</span>
+    <span style="color: var(--uuif-text-primary); font-weight: 600;">SAMI Recommendation</span>
+  </div>
+  <div class="tenant-selector">
+    <div class="dot"></div> All Tenants (Global)
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+  </div>
+  <div class="topbar-icons">
+    <div class="icon-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <div class="notif-badge"></div>
+    </div>
+    <div class="avatar">HN</div>
+  </div>
+</header>
+
+<!-- ─── PAGE ─────────────────────────────────────────────────────────────── -->
+<main class="page">
+  <div class="p2-content">
+
+    <!-- Page header -->
+    <div class="p2-header">
+      <div class="p2-header-left">
+        <a class="back-btn" href="#" title="Back to Dashboard">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        </a>
+        <div>
+          <div class="p2-title">SAMI Recommendation</div>
+          <div class="p2-sub">5 items need your attention &nbsp;·&nbsp; Scheduling &amp; Work-in-Progress Patterns Exploration</div>
+        </div>
+      </div>
+      <button class="export-btn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export digest
+      </button>
+    </div>
+
+    <!-- ── Option Switcher ──────────────────────────────────────────────── -->
+    <div class="opt-switcher-bar">
+      <div class="opt-switcher-label">Design<br>Option</div>
+      <div class="opt-cards">
+        <div class="opt-card active" id="card-a" onclick="setOption('A')">
+          <div class="opt-card-label"><span class="opt-badge">A</span> Extended Left Nav</div>
+          <div class="opt-card-desc">Scheduled &amp; in-progress sections appear in the left nav panel — scan work status without leaving context</div>
+        </div>
+        <div class="opt-card" id="card-b" onclick="setOption('B')">
+          <div class="opt-card-label"><span class="opt-badge">B</span> Inline List States</div>
+          <div class="opt-card-desc">State badges on each list item + status strip — work status visible in the item list at a glance</div>
+        </div>
+        <div class="opt-card" id="card-c" onclick="setOption('C')">
+          <div class="opt-card-label"><span class="opt-badge">C</span> Detail Work Mode</div>
+          <div class="opt-card-desc">Toggle the detail panel between Alert Detail and Work Status — all queued &amp; running work in one board</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Three-Panel ──────────────────────────────────────────────────── -->
+    <div class="three-panel">
+
+      <!-- LEFT: Nav Panel -->
+      <div class="nav-panel" id="navPanel">
+        <div class="need-attn-header">
+          Need Attention <span class="need-attn-badge">5</span>
+        </div>
+        <div class="by-category">By Category</div>
+        <div class="nav-item active" onclick="selectNav(this)">CVE Vulnerabilities <span class="nav-count">3</span></div>
+        <div class="nav-item" onclick="selectNav(this)">Policy Gaps <span class="nav-count">4</span></div>
+        <div class="nav-item" onclick="selectNav(this)">Behavioral <span class="nav-count">3</span></div>
+        <div class="nav-item" onclick="selectNav(this)">Renewals <span class="nav-count">3</span></div>
+        <div class="nav-item" onclick="selectNav(this)">Device Alerts <span class="nav-count">3</span></div>
+
+        <!-- Option A: state sections -->
+        <div class="nav-state-section">
+          <div class="nav-state-header">
+            In Progress <span class="nsb nsb-inprog">1</span>
+          </div>
+          <div class="nav-state-item inprog" onclick="selectItemByIdx(0)">
+            <div class="nsi-title">CVE-2026-1142 Patch</div>
+            <div class="nsi-meta">7 of 12 devices · 1h 24m</div>
+            <div class="nav-progress-mini"><div class="nav-progress-fill" style="width:72%"></div></div>
+          </div>
+
+          <div class="nav-state-header">
+            Scheduled <span class="nsb nsb-sched">2</span>
+          </div>
+          <div class="nav-state-item sched" onclick="selectItemByIdx(1)">
+            <div class="nsi-title">BGP Failover Diagnosis</div>
+            <div class="nsi-meta">📅 Tonight, 11:00 PM</div>
+          </div>
+          <div class="nav-state-item sched" onclick="selectItemByIdx(3)">
+            <div class="nsi-title">Policy Baseline Push</div>
+            <div class="nsi-meta">📅 Monday, 2:00 AM</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MIDDLE: List Panel -->
+      <div class="list-panel">
+        <div class="list-panel-header">Need Attention &nbsp;<span>5 critical across all categories</span></div>
+
+        <!-- Option B: status strip -->
+        <div class="list-status-strip">
+          <div class="ss-pill inprog"><div class="ss-dot inprog"></div> 1 deploying</div>
+          <span style="color: var(--uuif-border-tertiary)">·</span>
+          <div class="ss-pill sched"><div class="ss-dot sched"></div> 2 scheduled</div>
+          <span style="color: var(--uuif-border-tertiary)">·</span>
+          <span style="font-size:11px;color: var(--uuif-text-tertiary)">2 need action</span>
+        </div>
+
+        <div class="list-items">
+          <!-- Item 0: CVE — in-progress -->
+          <div class="list-item active" data-state="inprogress" onclick="selectItemByIdx(0)">
+            <div class="li-meta">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div class="li-crit">!</div>
+                <div class="li-type device">CVE Vulnerability</div>
+              </div>
+              <div class="li-time">2 hrs ago</div>
+            </div>
+            <div class="li-title">SSL VPN Auth Bypass (CVE-2026-1142) — 12 Firewalls Across 4 Tenants</div>
+            <div class="li-desc">CVSS 9.8. Unauthenticated RCE on SonicOS &lt; 7.1.2-1023. Patch deployment in progress.</div>
+            <div class="li-state-row">
+              <span class="li-state-pill inprog-pill"><span class="inprog-spinner"></span> Deploying · 72% · 7/12 devices</span>
+            </div>
+          </div>
+
+          <!-- Item 1: Gateway — scheduled -->
+          <div class="list-item" data-state="scheduled" onclick="selectItemByIdx(1)">
+            <div class="li-meta">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div class="li-crit">!</div>
+                <div class="li-type device">Device Alert</div>
+              </div>
+              <div class="li-time">3 hrs ago</div>
+            </div>
+            <div class="li-title">3 Gateways Unreachable — Northgate Health &amp; Delta Logistics</div>
+            <div class="li-desc">FW-NH-02, FW-NH-03, and FW-DL-01 offline after BGP route change.</div>
+            <div class="li-state-row">
+              <span class="li-state-pill sched-pill">📅 Tonight, 11:00 PM — BGP diagnosis</span>
+            </div>
+          </div>
+
+          <!-- Item 2: Credential stuffing — active -->
+          <div class="list-item" data-state="active" onclick="selectItemByIdx(2)">
+            <div class="li-meta">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div class="li-crit">!</div>
+                <div class="li-type behavioral-a">Behavioral Anomaly</div>
+              </div>
+              <div class="li-time">1 hr ago</div>
+            </div>
+            <div class="li-title">Credential Stuffing on Super-Admin Accounts — Beta Networks &amp; Crown</div>
+            <div class="li-desc">18 failed logins from 3 geographies. Concurrent active sessions detected.</div>
+            <div class="li-state-row">
+              <span class="li-state-pill active-pill">● Needs action</span>
+            </div>
+          </div>
+
+          <!-- Item 3: Policy gap — scheduled -->
+          <div class="list-item" data-state="scheduled" onclick="selectItemByIdx(3)">
+            <div class="li-meta">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div class="li-crit">!</div>
+                <div class="li-type policy-g">Policy Gap</div>
+              </div>
+              <div class="li-time" style="color: var(--uuif-brand-yellow);">Drift &gt; 45d</div>
+            </div>
+            <div class="li-title">Permit-Any Outbound Rules Bypassing DPI-SSL — 9 Firewalls</div>
+            <div class="li-desc">Default-allow outbound at WAN across 9 firewalls. C2 traffic uninspected.</div>
+            <div class="li-state-row">
+              <span class="li-state-pill sched-pill">📅 Monday, 2:00 AM — maintenance window</span>
+            </div>
+          </div>
+
+          <!-- Item 4: Subscription — active -->
+          <div class="list-item" data-state="active" onclick="selectItemByIdx(4)">
+            <div class="li-meta">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div class="li-crit">!</div>
+                <div class="li-type behavioral-a">Subscription Risk</div>
+              </div>
+              <div class="li-time">Today · 08:14 AM</div>
+            </div>
+            <div class="li-title">ATP &amp; TZ Subscriptions Expiring &lt;9 Days — 3 Tenants, $87K ARR</div>
+            <div class="li-desc">Acme Corp, Beta Networks, and Delta Logistics. ATP sandboxing at risk.</div>
+            <div class="li-state-row">
+              <span class="li-state-pill active-pill">● Needs action</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Detail Panel -->
+      <div class="detail-panel" id="detailPanel">
+        <!-- rendered by JS -->
+      </div>
+
+    </div><!-- /three-panel -->
+  </div>
+</main>
+
+<!-- Toast -->
+<div class="toast" id="toast"><span class="toast-icon">✓</span><span id="toastMsg">Scheduled</span></div>
+
+<script>
+/* ─── DATA ─────────────────────────────────────────────────────────────── */
+const ICON_TENANT = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>`;
+const ICON_FW     = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
+const ICON_USER   = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>`;
+
+// Per-item work states
+const ITEM_STATES = {
+  0: { state: 'inprogress', progress: 72, deployed: 7, total: 12, eta: '~28 min remaining', since: '1h 24m' },
+  1: { state: 'scheduled',  when: 'Tonight, 11:00 PM', whenShort: 'Tonight 11pm', notes: 'Off-hours BGP failover diagnosis' },
+  2: { state: 'active' },
+  3: { state: 'scheduled',  when: 'Monday, 2:00 AM',   whenShort: 'Mon 2am',      notes: 'Maintenance window policy push' },
+  4: { state: 'active' }
+};
+
+// SAMI reasoning per schedule time
+const SAMI_SCHED_REASONING = {
+  default: {
+    'Tonight, 11:00 PM': 'Tonight at 11:00 PM falls within Acme Corp\'s maintenance window (10 PM–2 AM). SAMI will sequence tenant deployments to avoid concurrent restarts — estimated total window: 38 minutes.',
+    'Tomorrow, 2:00 AM': 'Tomorrow 2:00 AM works for Westfield IT and Beta Networks. Note: Crown Logistics has no approved Friday maintenance window — SAMI will exclude their 2 devices and require separate confirmation.',
+    'Monday, 2:00 AM': 'Monday 2:00 AM is optimal — all 4 tenant maintenance windows align. No concurrent SAMI operations queued. However: the active PoC exploit will have been in circulation 9 days by then. Risk exposure increases with delay.',
+    'Custom': 'Select a custom date and time. SAMI will validate against all 4 tenant maintenance windows and flag any conflicts before confirming.'
+  }
+};
+
+/*
+  Tag colors use UUIF 9.2 hex values (JS cannot reference CSS vars inline):
+  CVE Vulnerability  → --uuif-brand-orange / --uuif-surface-selected / --uuif-border-primary
+  Device Alert       → --uuif-brand-red    / --uuif-fill-red-lightest / --uuif-brand-red
+  Behavioral Anomaly → --uuif-icon-primary / --uuif-fill-blue-lightest / --uuif-border-secondary
+  Policy Gap         → --uuif-surface-primary / --uuif-fill-blue-lightest / --uuif-border-secondary (GAP: no purple in UUIF 9.2)
+  Subscription Risk  → --uuif-brand-green  / --uuif-fill-green-xxx-lighter / --uuif-brand-green
+*/
+const details = [
+  {
+    tag: 'CVE Vulnerability · Critical',
+    tagColor: '#ff5d00', tagBg: 'rgba(255,72,26,0.09)', tagBorder: '#ff5d00',
+    title: 'SSL VPN Auth Bypass (CVE-2026-1142) — 12 Firewalls Across 4 Tenants',
+    scope: [{ icon: ICON_TENANT, text: 'Acme Corp, Beta Networks +2' }, { icon: ICON_FW, text: '12 Firewalls' }],
+    samiNote: 'CVE-2026-1142 enables unauthenticated RCE on SSL VPN gateways running SonicOS below 7.1.2-1023. Patch deployment started 1h 24m ago — 7 of 12 devices are patched. FW-BETA-01 and FW-ACME-02 are currently in progress. 3 Crown Logistics devices are queued pending their change window.',
+    evidence: [
+      { icon: '🛡', cls: 'shield', text: 'CVSS 9.8 (Critical) · NVD-confirmed · SonicWall PSIRT advisory published' },
+      { icon: '📊', cls: 'chart',  text: '12 firewalls across 4 tenants running vulnerable firmware ≤ 7.1.1-907' },
+      { icon: '⚠️', cls: 'warning',text: 'Active probe attempts on FW-ACME-03 and FW-BETA-01 in last 24h' },
+      { icon: '✅', cls: 'check',  text: '7/12 devices patched · 2 in-flight · 3 queued (Crown Logistics change window pending)' }
+    ],
+    timeline: [
+      { date: 'May 18, 07:00', desc: 'Patch 7.1.2-1023 pre-staged · compatibility check passed' },
+      { date: 'May 18, 16:30', desc: 'Deployment started — Acme Corp batch (4 devices) began' },
+      { date: 'May 18, 17:12', desc: 'Acme Corp batch complete (4/4) · Beta Networks batch started (3 devices)' },
+      { date: 'May 18, 17:54', desc: 'Beta batch in progress (2/3 done) · FW-BETA-01 active sessions draining' },
+      { date: 'Pending', desc: 'Crown Logistics batch (3 devices) — awaiting change window tonight' }
+    ],
+    viewLink: 'View deployment progress', primaryLabel: 'View live deployment →', schedLabel: 'Adjust schedule'
+  },
+  {
+    tag: 'Device Alert · Offline',
+    tagColor: '#c70f0f', tagBg: '#fff0f0', tagBorder: '#c70f0f',
+    title: '3 Gateways Unreachable — Northgate Health & Delta Logistics Branch Sites Unprotected',
+    scope: [{ icon: ICON_TENANT, text: 'Northgate Health · Delta Logistics' }, { icon: ICON_FW, text: '3 Firewalls offline · 3h 24m' }],
+    samiNote: 'FW-NH-02, FW-NH-03, and FW-DL-01 stopped responding after a BGP route withdrawal. Scheduled for tonight at 11:00 PM: SAMI will attempt automated BGP path diagnosis and SD-WAN failover configuration on secondary WAN interfaces.',
+    evidence: [
+      { icon: '📡', cls: 'warning', text: 'Last heartbeat: FW-NH-02 at 14:32 UTC · FW-NH-03 at 14:33 · FW-DL-01 at 14:35' },
+      { icon: '🌐', cls: 'chart',   text: 'BGP route withdrawal on AS64512 upstream ISP link at 14:30 UTC' },
+      { icon: '⚠️', cls: 'warning', text: '847 endpoints at Northgate Health branch currently uninspected' },
+      { icon: '🔒', cls: 'shield',  text: 'No SD-WAN failover — secondary WAN unconfigured on FW-NH-02' }
+    ],
+    timeline: [
+      { date: 'May 18, 14:30', desc: 'BGP route withdrawal detected on AS64512' },
+      { date: 'May 18, 14:35', desc: 'All 3 gateways lose heartbeat · SAMI raises Device Alert' },
+      { date: 'May 18, 17:44', desc: 'MSP schedules SAMI BGP diagnosis for Tonight, 11:00 PM' },
+      { date: 'Tonight 11:00 PM', desc: 'SAMI will attempt diagnosis and SD-WAN failover provisioning (scheduled)' }
+    ],
+    viewLink: 'View offline devices', primaryLabel: 'Run diagnosis now →', schedLabel: 'Reschedule'
+  },
+  {
+    tag: 'Behavioral Anomaly · High',
+    tagColor: '#5885cc', tagBg: '#f6f8fe', tagBorder: '#78a3e5',
+    title: 'Credential Stuffing on Super-Admin Accounts — Beta Networks & Crown Logistics',
+    scope: [{ icon: ICON_TENANT, text: 'Beta Networks · Crown Logistics' }, { icon: ICON_USER, text: '2 Super-admin accounts targeted' }],
+    samiNote: '18 failed login attempts from 3 geographies against admin@beta.local and sysadmin@crown.local. Both accounts have no MFA. Concurrent active sessions detected alongside the probe traffic — indicating possible compromise. Immediate action recommended — this alert should not be deferred.',
+    evidence: [
+      { icon: '🔐', cls: 'warning', text: '18 failed logins in 60 min · source IPs: RU (7), CN (6), anonymous proxy (5)' },
+      { icon: '⚠️', cls: 'warning', text: 'admin@beta.local — 4 active sessions + 11 failed probes simultaneously' },
+      { icon: '⚠️', cls: 'warning', text: 'sysadmin@crown.local — 1 active session + 7 failed probes simultaneously' },
+      { icon: '🔒', cls: 'shield',  text: 'Both accounts have no MFA — password-only auth violates baseline policy' }
+    ],
+    timeline: [
+      { date: 'May 18, 16:52', desc: 'First probe attempt on admin@beta.local from RU IP 185.220.101.x' },
+      { date: 'May 18, 17:04', desc: 'Stuffing pattern confirmed — 11 attempts from 3 source countries' },
+      { date: 'May 18, 17:31', desc: 'SAMI flagged concurrent active sessions alongside live probes' },
+      { date: 'May 18, 17:56', desc: 'Behavioral Anomaly raised · MFA enforcement recommended immediately' }
+    ],
+    viewLink: 'View login activity', primaryLabel: 'Force MFA enrollment →', schedLabel: 'Schedule for later'
+  },
+  {
+    tag: 'Policy Gap · Drift > 45d',
+    tagColor: '#5b74a7', tagBg: '#f6f8fe', tagBorder: '#78a3e5',
+    title: 'Permit-Any Outbound Rules Bypassing DPI-SSL — Acme, Beta & Westfield WAN Edge',
+    scope: [{ icon: ICON_TENANT, text: 'Acme Corp · Beta Networks · Westfield IT' }, { icon: ICON_FW, text: '9 Firewalls · 45+ day drift' }],
+    samiNote: 'Policy baseline push scheduled for Monday, 2:00 AM — aligned with all 3 tenant maintenance windows. SAMI has prepared the rule replacement set and will deploy zero-disruption in sequence: Acme (3 FW) → Beta (3 FW) → Westfield (3 FW), with rollback triggers between each batch.',
+    evidence: [
+      { icon: '🚨', cls: 'warning', text: '9 firewalls with permit-any outbound at WAN edge — DPI-SSL bypassed' },
+      { icon: '📊', cls: 'chart',   text: '2.3 TB outbound traffic uninspected in last 7 days' },
+      { icon: '📅', cls: 'chart',   text: 'Policy last reviewed 47 days ago — exceeds MSP baseline threshold' },
+      { icon: '✅', cls: 'check',   text: 'Replacement rule set prepared · zero-disruption deployment ready' }
+    ],
+    timeline: [
+      { date: 'Apr 03', desc: 'Baseline drift first detected on Acme Corp FW-ACME-01' },
+      { date: 'May 18', desc: 'MSP reviews rule changes and schedules Monday deployment' },
+      { date: 'Mon, 2:00 AM', desc: 'SAMI policy push begins — all 3 tenant batches (scheduled)' },
+      { date: 'Mon, ~2:40 AM', desc: 'Expected completion with compliance confirmation' }
+    ],
+    viewLink: 'View affected firewall rules', primaryLabel: 'Apply policy now →', schedLabel: 'Reschedule'
+  },
+  {
+    tag: 'Subscription Risk · Expiring Soon',
+    tagColor: '#59a02e', tagBg: '#e3efdc', tagBorder: '#59a02e',
+    title: 'ATP & TZ Subscriptions Expiring in <9 Days — 3 Tenants, 21 Firewalls, $87K ARR at Risk',
+    scope: [{ icon: ICON_TENANT, text: 'Acme Corp · Beta Networks · Delta Logistics' }, { icon: ICON_FW, text: '21 Firewalls · $87K ARR' }],
+    samiNote: 'Three tenants have ATP and TotalSecure subscriptions expiring within 9 days. Renewal quotes have been pre-generated. SAMI recommends sending quotes today — Acme Corp\'s procurement lead typically needs 5 business days to process. Delaying past Friday creates a lapse risk.',
+    evidence: [
+      { icon: '📅', cls: 'warning', text: 'Acme Corp — 8 FW · ATP expires May 27 · $38K ARR' },
+      { icon: '📅', cls: 'warning', text: 'Beta Networks — 7 FW · ATP + TZ expires May 28 · $29K ARR' },
+      { icon: '📅', cls: 'warning', text: 'Delta Logistics — 6 FW · ATP expires May 29 · $20K ARR' },
+      { icon: '✅', cls: 'check',   text: 'Renewal quotes pre-generated · tenant contacts identified · ready to send' }
+    ],
+    timeline: [
+      { date: 'May 11', desc: '15-day warning — SAMI escalated to MSP dashboard' },
+      { date: 'May 18, 08:14', desc: '9-day critical threshold breached · $87K ARR flagged at risk' },
+      { date: 'May 27–29', desc: 'Expiry window if unrenewed — ATP, Gateway AV, IPS disabled' }
+    ],
+    viewLink: 'View renewal quotes', primaryLabel: 'Send renewal quotes →', schedLabel: 'Schedule for later'
+  }
+];
+
+/* ─── STATE ─────────────────────────────────────────────────────────────── */
+let currentOption  = 'A';
+let currentItem    = 0;
+let footerState    = 'inprogress';
+let selectedTime   = null;
+let workModeActive = false;
+
+/* ─── OPTION SWITCHER ───────────────────────────────────────────────────── */
+function setOption(opt) {
+  currentOption = opt;
+  document.body.className = 'opt-' + opt.toLowerCase();
+  ['a','b','c'].forEach(x => {
+    document.getElementById('card-' + x).classList.toggle('active', x === opt.toLowerCase());
+  });
+  workModeActive = false;
+  renderDetail(currentItem);
+}
+
+/* ─── ITEM SELECTION ────────────────────────────────────────────────────── */
+function selectItemByIdx(idx) {
+  currentItem = idx;
+  const items = document.querySelectorAll('.list-item');
+  items.forEach(i => i.classList.remove('active'));
+  items[idx].classList.add('active');
+  workModeActive = false;
+  const s = ITEM_STATES[idx];
+  footerState = s.state === 'inprogress' ? 'inprogress' : s.state === 'scheduled' ? 'scheduled' : 'default';
+  selectedTime = s.state === 'scheduled' ? s.when : null;
+  renderDetail(idx);
+}
+
+/* ─── DETAIL RENDERING ──────────────────────────────────────────────────── */
+function renderDetail(idx) {
+  const d = details[idx];
+  const is = ITEM_STATES[idx];
+  const dp = document.getElementById('detailPanel');
+
+  const scopeHTML = d.scope.map(s =>
+    `<span style="display:flex;align-items:center;gap:4px;">${s.icon} ${s.text}</span>`
+  ).join('');
+  const evidenceHTML = d.evidence.map(e =>
+    `<div class="evidence-item"><div class="ev-icon ${e.cls}">${e.icon}</div>${e.text}</div>`
+  ).join('');
+  const timelineHTML = d.timeline.map(t =>
+    `<div class="timeline-item"><div class="timeline-date">${t.date}</div><div>${t.desc}</div></div>`
+  ).join('');
+
+  const wmToggle = currentOption === 'C' ? `
+    <div class="work-mode-toggle" style="margin-left:auto;">
+      <div class="wm-toggle">
+        <button class="wm-btn ${!workModeActive ? 'active' : ''}" onclick="setWorkMode(false)">Alert Detail</button>
+        <button class="wm-btn ${workModeActive ? 'active' : ''}" onclick="setWorkMode(true)">Work Status</button>
+      </div>
+    </div>` : '';
+
+  let mainContent;
+  if (currentOption === 'C' && workModeActive) {
+    mainContent = renderWorkStatusView();
+  } else {
+    mainContent = `
+      <div class="detail-sami-note">
+        <span class="ds-tag">SAMI</span><span>${d.samiNote}</span>
+      </div>
+      <div class="detail-body">
+        <div class="section-title">Evidence</div>
+        ${evidenceHTML}
+        <div class="timeline-section">
+          <div class="section-title" style="margin-top:16px;">Timeline</div>
+          ${timelineHTML}
+        </div>
+      </div>`;
+  }
+
+  dp.innerHTML = `
+    <div class="detail-scroll">
+      <div class="detail-header">
+        <div class="detail-header-top">
+          <div>
+            <div class="detail-badge">
+              <span class="cve-tag" style="color:${d.tagColor};background:${d.tagBg};border-color:${d.tagBorder};">${d.tag}</span>
+            </div>
+            <div class="detail-title">${d.title}</div>
+            <div class="detail-scope">${scopeHTML}</div>
+          </div>
+          ${wmToggle}
+        </div>
+      </div>
+      ${mainContent}
+    </div>
+    <div class="detail-footer-wrap" id="footerWrap">
+      ${renderFooter(idx)}
+    </div>`;
+}
+
+/* ─── FOOTER RENDERING ──────────────────────────────────────────────────── */
+function renderFooter(idx) {
+  const d = details[idx];
+  const is = ITEM_STATES[idx];
+
+  if (footerState === 'inprogress') {
+    return `
+      <div class="df-inprogress">
+        <div class="df-ip-top">
+          <div class="df-ip-label">
+            <span class="inprog-spinner"></span> Deployment in progress
+          </div>
+          <span class="df-ip-eta">${is.eta}</span>
+        </div>
+        <div class="df-prog-bar"><div class="df-prog-fill" style="width:${is.progress}%"></div></div>
+        <div class="df-ip-bottom">
+          <span class="df-ip-status">${is.deployed} of ${is.total} devices patched · Running ${is.since}</span>
+          <div class="df-ip-links">
+            <button class="df-ip-links btn-view" onclick="showToast('Opening live deployment view…')">View live progress</button>
+            <button class="df-ip-links btn-pause" onclick="showToast('Deployment pause requested. Crown Logistics batch will complete first.')">Pause queue</button>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  if (footerState === 'scheduled') {
+    const when  = (is.state === 'scheduled') ? is.when  : selectedTime;
+    const notes = (is.state === 'scheduled') ? is.notes : '';
+    return `
+      <div class="df-scheduled">
+        <div class="df-sched-info">
+          <span class="sched-icon">📅</span>
+          <div>
+            <div class="sched-text">Scheduled for ${when}</div>
+            <div class="sched-sub">${notes} · SAMI will execute automatically</div>
+          </div>
+        </div>
+        <div class="df-sched-links">
+          <button class="btn-edit" onclick="openScheduler(${idx})">Edit</button>
+          <button class="btn-cancel" onclick="cancelItemSchedule(${idx})">Cancel</button>
+          <button class="btn-dnow" onclick="deployNow(${idx})">Deploy now instead</button>
+        </div>
+      </div>`;
+  }
+
+  if (footerState === 'scheduling') {
+    return `
+      <div class="df-scheduling">
+        <div class="sched-expand-header"><span class="seh-icon">📅</span> Schedule for later</div>
+        <div class="sched-time-row">
+          ${['Tonight, 11:00 PM','Tomorrow, 2:00 AM','Monday, 2:00 AM','Custom'].map(t =>
+            `<button class="sched-time-btn ${selectedTime===t?'selected':''}" onclick="selectScheduleTime('${t}')">${t}</button>`
+          ).join('')}
+        </div>
+        <div class="sched-sami-block" id="samiReasonBlock">
+          <span class="ssb-tag">SAMI</span>
+          ${selectedTime && SAMI_SCHED_REASONING.default[selectedTime]
+            ? `<span>${SAMI_SCHED_REASONING.default[selectedTime]}</span>`
+            : `<span class="sched-sami-placeholder">Select a time above — SAMI will show scheduling context and conflict analysis.</span>`
+          }
+        </div>
+        <div class="sched-actions-row">
+          <button class="btn-sched-cancel" onclick="cancelSchedulerOpen(${idx})">Cancel</button>
+          <button class="btn-sched-confirm" onclick="confirmSchedule(${idx})" ${!selectedTime||selectedTime==='Custom'?'disabled':''}>Confirm schedule</button>
+        </div>
+      </div>`;
+  }
+
+  // default footer
+  return `
+    <div class="df-default">
+      <span class="view-devices" onclick="showToast('Opening device list…')">${d.viewLink}</span>
+      <div class="footer-actions">
+        <button class="btn-sched" onclick="openScheduler(${idx})">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          ${d.schedLabel}
+        </button>
+        <button class="btn-primary" onclick="showToast('Initiating action…')">${d.primaryLabel}</button>
+      </div>
+    </div>`;
+}
+
+/* ─── OPTION C: WORK STATUS VIEW ────────────────────────────────────────── */
+function renderWorkStatusView() {
+  return `
+    <div class="work-status-view">
+      <div class="ws-section">
+        <div class="ws-section-header">
+          In Progress <span class="wsc wsc-inprog">1</span>
+        </div>
+        <div class="ws-item" onclick="selectItemByIdx(0); setWorkMode(false);">
+          <div class="ws-item-title">SSL VPN Auth Bypass Patch — CVE-2026-1142</div>
+          <div class="ws-item-meta">7 of 12 devices patched · Running 1h 24m · ~28 min remaining</div>
+          <div class="ws-prog-bar"><div class="ws-prog-fill" style="width:72%"></div></div>
+          <div class="ws-item-bottom">
+            <span>Next: Crown Logistics batch (3 devices) · awaiting change window</span>
+            <a onclick="selectItemByIdx(0)">View deployment</a>
+          </div>
+        </div>
+      </div>
+      <div class="ws-section">
+        <div class="ws-section-header">
+          Scheduled <span class="wsc wsc-sched">2</span>
+        </div>
+        <div class="ws-item" onclick="selectItemByIdx(1); setWorkMode(false);">
+          <div class="ws-item-title">BGP Failover Diagnosis — 3 Gateways</div>
+          <div class="ws-item-meta">Northgate Health · Delta Logistics</div>
+          <div class="ws-sched-when">📅 Tonight, 11:00 PM &nbsp;·&nbsp; <a class="ws-sched-edit" onclick="event.stopPropagation(); selectItemByIdx(1); openScheduler(1);">Reschedule</a></div>
+        </div>
+        <div class="ws-item" onclick="selectItemByIdx(3); setWorkMode(false);">
+          <div class="ws-item-title">Policy Baseline Push — 9 Firewalls (DPI-SSL)</div>
+          <div class="ws-item-meta">Acme Corp · Beta Networks · Westfield IT</div>
+          <div class="ws-sched-when">📅 Monday, 2:00 AM &nbsp;·&nbsp; <a class="ws-sched-edit" onclick="event.stopPropagation(); selectItemByIdx(3); openScheduler(3);">Reschedule</a></div>
+        </div>
+      </div>
+      <div class="ws-section">
+        <div class="ws-section-header">
+          Needs Action <span class="wsc wsc-active">2</span>
+        </div>
+        <div class="ws-active-item" onclick="selectItemByIdx(2); setWorkMode(false);">
+          <div>
+            <div class="ws-active-title">Credential Stuffing — Beta Networks &amp; Crown</div>
+            <div class="ws-active-tag">⚠ Active attack · Immediate action recommended</div>
+          </div>
+          <div class="ws-active-actions">
+            <button class="ws-btn-sm ws-btn-sched" onclick="event.stopPropagation(); selectItemByIdx(2); openScheduler(2);">Schedule</button>
+            <button class="ws-btn-sm ws-btn-act" onclick="event.stopPropagation(); showToast('Opening MFA enrollment…')">Act now →</button>
+          </div>
+        </div>
+        <div class="ws-active-item" onclick="selectItemByIdx(4); setWorkMode(false);">
+          <div>
+            <div class="ws-active-title">ATP Subscriptions Expiring — $87K ARR Risk</div>
+            <div class="ws-active-tag">⚠ 9 days to expiry · Send quotes today</div>
+          </div>
+          <div class="ws-active-actions">
+            <button class="ws-btn-sm ws-btn-sched" onclick="event.stopPropagation(); selectItemByIdx(4); openScheduler(4);">Schedule</button>
+            <button class="ws-btn-sm ws-btn-act" onclick="event.stopPropagation(); showToast('Opening renewal quotes…')">Act now →</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ─── SCHEDULER ACTIONS ─────────────────────────────────────────────────── */
+function openScheduler(idx) {
+  footerState = 'scheduling';
+  selectedTime = null;
+  updateFooter(idx);
+}
+function cancelSchedulerOpen(idx) {
+  const is = ITEM_STATES[idx];
+  footerState = is.state === 'scheduled' ? 'scheduled' : is.state === 'inprogress' ? 'inprogress' : 'default';
+  selectedTime = is.state === 'scheduled' ? is.when : null;
+  updateFooter(idx);
+}
+function selectScheduleTime(t) {
+  selectedTime = t;
+  updateFooter(currentItem);
+}
+function confirmSchedule(idx) {
+  if (!selectedTime || selectedTime === 'Custom') return;
+  ITEM_STATES[idx] = { state: 'scheduled', when: selectedTime, whenShort: selectedTime, notes: 'Scheduled via SAMI' };
+  footerState = 'scheduled';
+  document.querySelectorAll('.list-item')[idx].setAttribute('data-state', 'scheduled');
+  const stateRows = document.querySelectorAll('.list-item .li-state-row');
+  if (stateRows[idx]) {
+    stateRows[idx].innerHTML = `<span class="li-state-pill sched-pill">📅 ${selectedTime}</span>`;
+  }
+  updateFooter(idx);
+  showToast(`Scheduled for ${selectedTime}`);
+  refreshNavScheduledSection();
+}
+function cancelItemSchedule(idx) {
+  ITEM_STATES[idx] = { state: 'active' };
+  footerState = 'default';
+  selectedTime = null;
+  document.querySelectorAll('.list-item')[idx].setAttribute('data-state', 'active');
+  const stateRows = document.querySelectorAll('.list-item .li-state-row');
+  if (stateRows[idx]) {
+    stateRows[idx].innerHTML = `<span class="li-state-pill active-pill">● Needs action</span>`;
+  }
+  updateFooter(idx);
+  showToast('Schedule cancelled — item returned to active queue');
+  refreshNavScheduledSection();
+}
+function deployNow(idx) {
+  ITEM_STATES[idx] = { state: 'active' };
+  footerState = 'default';
+  selectedTime = null;
+  updateFooter(idx);
+  showToast('Deploying now — SAMI is initiating the action');
+}
+function updateFooter(idx) {
+  const fw = document.getElementById('footerWrap');
+  if (fw) fw.innerHTML = renderFooter(idx);
+}
+function setWorkMode(active) {
+  workModeActive = active;
+  renderDetail(currentItem);
+}
+
+/* ─── NAV REFRESH (Option A) ────────────────────────────────────────────── */
+function refreshNavScheduledSection() {
+  const scheduled = Object.entries(ITEM_STATES).filter(([i, s]) => s.state === 'scheduled');
+  const inprog    = Object.entries(ITEM_STATES).filter(([i, s]) => s.state === 'inprogress');
+  const navSections = document.querySelectorAll('.nav-state-section .nav-state-header');
+  if (navSections.length >= 2) {
+    navSections[0].querySelector('.nsb').textContent = inprog.length;
+    navSections[1].querySelector('.nsb').textContent = scheduled.length;
+  }
+}
+function selectNav(el) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+}
+
+/* ─── TOAST ─────────────────────────────────────────────────────────────── */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+/* ─── INIT ──────────────────────────────────────────────────────────────── */
+renderDetail(0);
+</script>
+</body>
+</html>
